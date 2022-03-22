@@ -2,7 +2,7 @@ module github.com/hm-edu/portal-common
 
 go 1.18
 
-require github.com/gofiber/fiber/v2 v2.29.0
+require github.com/gofiber/fiber/v2 v2.30.0
 
 require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
