@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package domainService;
+
+option go_package = "github.com/hm-edu/domain-api";
+
+service DomainService {
+    rpc CheckPermission(CheckPermissionRequest) returns (CheckPermissionResponse) {}
+}
+
+message CheckPermissionRequest {
+    repeated string domains = 1;
+}
+
+message CheckPermissionResponse {
+    repeated Permission permissions = 1;
+}
+
+message Permission {
+    string domain = 1;
+    bool granted = 2;
+}

@@ -1,0 +1,47 @@
+{
+    "folders": [
+        {
+            "path": "."
+        },
+        {
+            "path": "backend/common"
+        },
+        {
+            "path": "backend/domain-service"
+        },
+        {
+            "path": "backend/pki-service"
+        },
+        {
+            "path": "backend/domain-api/go"
+        }
+    ],
+    "settings": {
+        "[json]": {
+            "editor.insertSpaces": true,
+            "editor.tabSize": 2
+        },
+        "[yaml]": {
+            "editor.insertSpaces": true,
+            "editor.tabSize": 2
+        },
+        "[go]": {
+            "editor.formatOnSave": true
+        },
+        "[tf]": {
+            "editor.insertSpaces": true,
+            "editor.tabSize": 2
+        },
+        "go.formatTool": "goimports",
+        "go.useLanguageServer": true,
+        "workspace.supportMultiRootWorkspace": true,
+        "launch": {},
+        "files.exclude": {
+            "**/.git": true
+        },
+        "go.lintTool": "golangci-lint",
+        "gopls": {
+            "allowModfileModifications": true
+        }
+    }
+}

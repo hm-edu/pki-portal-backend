@@ -6,13 +6,6 @@ jobs:
   golangci:
     name: lint
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        dir: 
-          - backend/pki-service
-          - backend/domain-service
-          - backend/common    
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v2
@@ -21,5 +14,4 @@ jobs:
       - name: golangci-lint       
         uses: golangci/golangci-lint-action@v3.1.0
         with:
-           working-directory: ${{ matrix.dir }}
            args: --timeout 240s
