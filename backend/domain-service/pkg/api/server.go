@@ -12,16 +12,18 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/hm-edu/domain-service/pkg/api/docs"
-	_ "github.com/hm-edu/domain-service/pkg/api/docs"
 	commonApi "github.com/hm-edu/portal-common/api"
 	commonAuth "github.com/hm-edu/portal-common/auth"
 	"go.uber.org/zap"
+
+	// Required for the generation of swagger docs
+	_ "github.com/hm-edu/domain-service/pkg/api/docs"
 )
 
 var (
 	healthy     int32
 	ready       int32
-	openApiSpec *openapi3.T
+	openAPISpec *openapi3.T
 )
 
 // @title Domain Service
@@ -38,18 +40,19 @@ var (
 // @in header
 // @name Authorization
 
-type APIServer struct {
+// Server is the basic structure of the users' REST-API server
+type Server struct {
 	app    *fiber.App
 	logger *zap.Logger
 	config *commonApi.Config
 }
 
 // NewServer creates a new server
-func NewServer(logger *zap.Logger, config *commonApi.Config) *APIServer {
-	return &APIServer{app: fiber.New(fiber.Config{DisableStartupMessage: true}), logger: logger, config: config}
+func NewServer(logger *zap.Logger, config *commonApi.Config) *Server {
+	return &Server{app: fiber.New(fiber.Config{DisableStartupMessage: true}), logger: logger, config: config}
 }
 
-func (api *APIServer) wireRoutesAndMiddleware() {
+func (api *Server) wireRoutesAndMiddleware() {
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
 	swaggerCfg := swagger.ConfigDefault
@@ -66,14 +69,14 @@ func (api *APIServer) wireRoutesAndMiddleware() {
 		Logger: api.logger,
 	}))
 	api.app.Get("/docs/spec.json", func(c *fiber.Ctx) error {
-		if openApiSpec == nil {
-			spec, err := commonApi.ToOpenApi3(docs.SwaggerInfo)
+		if openAPISpec == nil {
+			spec, err := commonApi.ToOpenAPI3(docs.SwaggerInfo)
 			if err != nil {
 				return err
 			}
-			openApiSpec = spec
+			openAPISpec = spec
 		}
-		return c.JSON(openApiSpec)
+		return c.JSON(openAPISpec)
 	})
 	api.app.Get("/docs/*", swagger.New(swaggerCfg)) // default
 	api.app.Get("/healthz", api.healthzHandler)
@@ -82,7 +85,7 @@ func (api *APIServer) wireRoutesAndMiddleware() {
 }
 
 // ListenAndServe starts the http server and waits for the channel to stop the server
-func (api *APIServer) ListenAndServe(stopCh <-chan struct{}) {
+func (api *Server) ListenAndServe(stopCh <-chan struct{}) {
 
 	api.wireRoutesAndMiddleware()
 	go func() {
@@ -93,5 +96,8 @@ func (api *APIServer) ListenAndServe(stopCh <-chan struct{}) {
 		}
 	}()
 	_ = <-stopCh
-	api.app.Shutdown()
+	err := api.app.Shutdown()
+	if err != nil {
+		api.logger.Fatal("Stopping http server failed", zap.Error(err))
+	}
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -15,6 +16,7 @@ import (
 
 var tracer = otel.Tracer("oauth2-introspection")
 
+// Config of the OAuth2-Introspection middleware
 type Config struct {
 	// Filter defines a function to skip middleware.
 	// Optional. Default: nil
@@ -54,6 +56,7 @@ func makeCfg(config []Config) (cfg Config) {
 	return cfg
 }
 
+// OAuthIntrospectionHandler is the actual handler that does the introspection
 func OAuthIntrospectionHandler(cfg Config) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.UserContext()
@@ -62,12 +65,12 @@ func OAuthIntrospectionHandler(cfg Config) fiber.Handler {
 		defer span.End()
 		auth := c.Get("Authorization")
 		if auth == "" {
-			span.RecordError(errors.New("Missing authorization"))
+			span.RecordError(errors.New("missing authorization"))
 			return cfg.ErrorHandler(c, models.Error{Status: fiber.StatusUnauthorized, Message: "Unauthorized", Details: "Missing or malformed access token"})
 		}
 		token := strings.TrimPrefix(auth, "Bearer ")
 		if token == auth {
-			span.RecordError(errors.New("Missing authorization"))
+			span.RecordError(errors.New("missing authorization"))
 			return cfg.ErrorHandler(c, models.Error{Status: fiber.StatusUnauthorized, Message: "Unauthorized", Details: "Missing or malformed access token"})
 		}
 		resp, err := http.PostForm(cfg.Endpoint, url.Values{"client_id": {cfg.ClientID}, "client_secret": {cfg.ClientSecret}, "token": {token}})
@@ -76,10 +79,11 @@ func OAuthIntrospectionHandler(cfg Config) fiber.Handler {
 			return cfg.ErrorHandler(c, models.Error{Status: fiber.StatusInternalServerError, Message: "Internal Server Error", Details: "Introspection Failed"})
 		}
 		if resp.StatusCode != 200 {
-			span.RecordError(fmt.Errorf("Server returned %v", resp.StatusCode))
+			span.RecordError(fmt.Errorf("server returned %v", resp.StatusCode))
 			return cfg.ErrorHandler(c, models.Error{Status: fiber.StatusInternalServerError, Message: "Internal Server Error", Details: "Introspection Failed"})
 		}
-		defer resp.Body.Close()
+		defer func(i io.ReadCloser) { _ = i.Close() }(resp.Body)
+
 		obj := new(IntrospectionResult)
 		err = json.NewDecoder(resp.Body).Decode(obj)
 
@@ -100,6 +104,7 @@ func OAuthIntrospectionHandler(cfg Config) fiber.Handler {
 	}
 }
 
+// New generates a new handler that shal be used as a middleware.
 func New(config ...Config) fiber.Handler {
 	cfg := makeCfg(config)
 	handler := OAuthIntrospectionHandler(cfg)

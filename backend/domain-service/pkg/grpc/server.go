@@ -13,16 +13,19 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
+// Server is the basic structure of the GRPC server.
 type Server struct {
 	logger *zap.Logger
 	config *Config
 }
 
+// Config is the basic structure of the GRPC configuration
 type Config struct {
 	Port        int    `mapstructure:"grpc-port"`
 	ServiceName string `mapstructure:"grpc-service-name"`
 }
 
+// NewServer creates a new GRPC server
 func NewServer(config *Config, logger *zap.Logger) (*Server, error) {
 	srv := &Server{
 		logger: logger,
@@ -32,6 +35,7 @@ func NewServer(config *Config, logger *zap.Logger) (*Server, error) {
 	return srv, nil
 }
 
+// ListenAndServe starts the GRPC server and waits for requests
 func (s *Server) ListenAndServe() {
 	addr := fmt.Sprintf(":%v", s.config.Port)
 	s.logger.Info("Starting GRPC Server.", zap.String("addr", addr))

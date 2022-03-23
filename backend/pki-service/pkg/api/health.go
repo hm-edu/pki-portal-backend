@@ -20,7 +20,7 @@ type healthResponse struct {
 // @Router /healthz [get]
 // @Success 200 {object} healthResponse "OK"
 // @Failure 503 {object} healthResponse "Service Unavailable"
-func (s *APIServer) healthzHandler(c *fiber.Ctx) (err error) {
+func (s *Server) healthzHandler(c *fiber.Ctx) (err error) {
 	if atomic.LoadInt32(&healthy) == 1 {
 		return c.JSON(healthResponse{Status: "OK"})
 	}
@@ -36,7 +36,7 @@ func (s *APIServer) healthzHandler(c *fiber.Ctx) (err error) {
 // @Router /readyz [get]
 // @Success 200 {object} healthResponse "OK"
 // @Failure 503 {object} healthResponse "Service Unavailable"
-func (s *APIServer) readyzHandler(c *fiber.Ctx) (err error) {
+func (s *Server) readyzHandler(c *fiber.Ctx) (err error) {
 	if atomic.LoadInt32(&ready) == 1 {
 		return c.JSON(healthResponse{Status: "OK"})
 	}

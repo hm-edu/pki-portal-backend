@@ -1,5 +1,6 @@
 package api
 
+// Config of the REST-API
 type Config struct {
 	Host         string `mapstructure:"host"`
 	Port         string `mapstructure:"port"`

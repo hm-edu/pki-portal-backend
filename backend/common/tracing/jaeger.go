@@ -32,6 +32,8 @@ func NewGRPCStreamServerInterceptor() grpc.StreamServerInterceptor {
 	return otelgrpc.StreamServerInterceptor()
 }
 
+// InitTracer performs the initalization of the traceprovider.
+// By default this tries to init a jeager tracer.
 func InitTracer(logger *zap.Logger, name string) *sdktrace.TracerProvider {
 	//exporter, err := stdout.New(stdout.WithPrettyPrint())
 	exporter, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint("http://localhost:14268/api/traces")))

@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func (s *APIServer) addAcmeAccount(c *fiber.Ctx) (err error) {
+func (s *Server) addAcmeAccount(c *fiber.Ctx) (err error) {
 	conn, err := grpc.Dial("localhost:8083", grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()))
 	if err != nil {
 		return err

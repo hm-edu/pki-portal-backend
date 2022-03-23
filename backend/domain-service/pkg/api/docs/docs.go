@@ -159,7 +159,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Domain Service",
-	Description:      "Go microservice for Domain management. Provides an wrapper above the sectigo API.",
+	Description:      "Go microservice for Domain management.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }
