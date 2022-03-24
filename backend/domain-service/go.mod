@@ -68,6 +68,11 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
+require (
+	github.com/inconshreveable/mousetrap v1.0.0 // indirect
+	github.com/spf13/cobra v1.4.0 // indirect
+)
+
 replace github.com/hm-edu/portal-common => ../common
 
 replace github.com/hm-edu/domain-api => ../domain-api/go

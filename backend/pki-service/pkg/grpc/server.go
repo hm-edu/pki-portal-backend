@@ -35,7 +35,7 @@ func NewServer(config *Config, logger *zap.Logger) (*Server, error) {
 }
 
 // ListenAndServe starts the GRPC server and waits for requests
-func (s *Server) ListenAndServe() {
+func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	addr := fmt.Sprintf(":%v", s.config.Port)
 	s.logger.Info("Starting GRPC Server.", zap.String("addr", addr))
 	listener, err := net.Listen("tcp", addr)
@@ -51,8 +51,12 @@ func (s *Server) ListenAndServe() {
 	grpc_health_v1.RegisterHealthServer(srv, server)
 	server.SetServingStatus(s.config.ServiceName, grpc_health_v1.HealthCheckResponse_SERVING)
 
-	if err := srv.Serve(listener); err != nil {
-		s.logger.Fatal("failed to serve", zap.Error(err))
-	}
+	go func() {
+		if err := srv.Serve(listener); err != nil {
+			s.logger.Error("failed to serve", zap.Error(err))
+		}
+	}()
+	_ = <-stopCh
+	s.logger.Info("Stopping GRPC server")
 	srv.GracefulStop()
 }

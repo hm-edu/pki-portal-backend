@@ -3,6 +3,7 @@ package api
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net/http"
 
 	swagger "github.com/arsmn/fiber-swagger/v2"
@@ -92,11 +93,13 @@ func (api *Server) ListenAndServe(stopCh <-chan struct{}) {
 	go func() {
 		addr := api.config.Host + ":" + api.config.Port
 		api.logger.Info("Starting HTTP Server.", zap.String("addr", addr))
-		if err := api.app.Listen(addr); err != http.ErrServerClosed {
+		if err := api.app.Listen(addr); err != nil && err != http.ErrServerClosed {
+			fmt.Printf("%v", err)
 			api.logger.Fatal("HTTP server crashed", zap.Error(err))
 		}
 	}()
 	_ = <-stopCh
+	api.logger.Info("Stopping HTTP server")
 	err := api.app.Shutdown()
 	if err != nil {
 		api.logger.Error("Stopping http server failed", zap.Error(err))
