@@ -10,7 +10,9 @@ import (
 	"os"
 
 	"github.com/hm-edu/domain-service/pkg/api"
+	"github.com/hm-edu/domain-service/pkg/database"
 	"github.com/hm-edu/domain-service/pkg/grpc"
+	"github.com/hm-edu/domain-service/pkg/store"
 	commonApi "github.com/hm-edu/portal-common/api"
 	"github.com/hm-edu/portal-common/logging"
 	"github.com/hm-edu/portal-common/signals"
@@ -66,17 +68,20 @@ var runCmd = &cobra.Command{
 				logger.Fatal("Error shutting down tracer provider.", zap.Error(err))
 			}
 		}()
+		database.ConnectDb(logger, true)
+
+		store := store.NewDomainStore(database.DB.Db)
 
 		stopCh := signals.SetupSignalHandler()
 
 		// start gRPC server
 		if grpcCfg.Port > 0 {
-			grpcSrv, _ := grpc.NewServer(&grpcCfg, logger)
+			grpcSrv, _ := grpc.NewServer(&grpcCfg, logger, store)
 			go grpcSrv.ListenAndServe(stopCh)
 		}
 
 		// start HTTP server
-		srv := api.NewServer(logger, &srvCfg)
+		srv := api.NewServer(logger, &srvCfg, store)
 		srv.ListenAndServe(stopCh)
 	},
 }
@@ -87,8 +92,6 @@ func init() {
 	runCmd.Flags().String("host", "", "Host to bind service to")
 	runCmd.Flags().Int("port", 8080, "HTTP port to bind service to")
 	runCmd.Flags().Int("grpc-port", 8081, "GRPC port to bind service to")
-	runCmd.Flags().String("oauth2_id", "", "The client id used for token introspection")
-	runCmd.Flags().String("oauth2_secret", "", "The client secret used for token introspection")
-	runCmd.Flags().String("oauth2_endpoint", "", "The url used for token introspection")
+	runCmd.Flags().String("jwks_uri", "", "The location of the jwk set")
 	runCmd.Flags().String("level", "info", "log level debug, info, warn, error, flat or panic")
 }

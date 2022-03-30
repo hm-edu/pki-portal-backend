@@ -14,9 +14,9 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/hm-edu/pki-service/pkg/api/docs"
 	commonApi "github.com/hm-edu/portal-common/api"
-	commonAuth "github.com/hm-edu/portal-common/auth"
 	"go.uber.org/zap"
 
+	jwtware "github.com/gofiber/jwt/v3"
 	// Required for the generation of swagger docs
 	_ "github.com/hm-edu/pki-service/pkg/api/docs"
 )
@@ -59,11 +59,6 @@ func (api *Server) wireRoutesAndMiddleware() {
 	swaggerCfg := swagger.ConfigDefault
 	swaggerCfg.URL = "/docs/spec.json"
 
-	auth := commonAuth.New(commonAuth.Config{
-		Endpoint:     api.config.Endpoint,
-		ClientID:     api.config.ClientID,
-		ClientSecret: api.config.ClientSecret,
-	})
 	api.app.Use(otelfiber.Middleware("pki-service"))
 	api.app.Use(recover.New())
 	api.app.Use(fiberzap.New(fiberzap.Config{
@@ -79,10 +74,11 @@ func (api *Server) wireRoutesAndMiddleware() {
 		}
 		return c.JSON(openAPISpec)
 	})
+	jwt := jwtware.New(jwtware.Config{KeySetURL: api.config.JwksURI})
 	api.app.Get("/docs/*", swagger.New(swaggerCfg)) // default
 	api.app.Get("/healthz", api.healthzHandler)
 	api.app.Get("/readyz", api.readyzHandler)
-	api.app.Get("/whoami", auth, api.whoamiHandler)
+	api.app.Get("/whoami", jwt, api.whoamiHandler)
 	api.app.Post("/acme", api.addAcmeAccount)
 }
 

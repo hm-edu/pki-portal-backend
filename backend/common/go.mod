@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/getkin/kin-openapi v0.92.0
 	github.com/gofiber/fiber/v2 v2.30.0
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/swaggo/swag v1.8.0
 )
 
@@ -19,6 +20,7 @@ require (
 	github.com/go-openapi/jsonreference v0.19.6 // indirect
 	github.com/go-openapi/spec v0.20.4 // indirect
 	github.com/go-openapi/swag v0.21.1 // indirect
+	github.com/golang-jwt/jwt/v4 v4.4.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect

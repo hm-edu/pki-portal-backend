@@ -51,7 +51,7 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
-	github.com/spf13/pflag v1.0.5
+	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.10.1
 	github.com/swaggo/swag v1.8.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.5.0 // indirect
@@ -60,7 +60,7 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
-	golang.org/x/sys v0.0.0-20220319134239-a9b59b0215f8 // indirect
+	golang.org/x/sys v0.0.0-20220328115105-d36c6a25d886 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.10 // indirect
 	google.golang.org/genproto v0.0.0-20220323144105-ec3c684e5b14 // indirect
@@ -69,8 +69,32 @@ require (
 )
 
 require (
+	entgo.io/ent v0.10.1
+	github.com/go-playground/validator v9.31.0+incompatible
+	github.com/gofiber/jwt/v3 v3.2.9
+	github.com/mattn/go-sqlite3 v1.14.12
+	github.com/spf13/cobra v1.4.0
+)
+
+require gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
+
+require (
+	ariga.io/atlas v0.3.7-0.20220303204946-787354f533c3 // indirect
+	github.com/agext/levenshtein v1.2.1 // indirect
+	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
+	github.com/go-openapi/inflect v0.19.0 // indirect
+	github.com/go-playground/locales v0.14.0 // indirect
+	github.com/go-playground/universal-translator v0.18.0 // indirect
+	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	github.com/golang-jwt/jwt/v4 v4.4.1 // indirect
+	github.com/google/go-cmp v0.5.7 // indirect
+	github.com/google/uuid v1.3.0 // indirect
+	github.com/hashicorp/hcl/v2 v2.10.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
-	github.com/spf13/cobra v1.4.0 // indirect
+	github.com/leodido/go-urn v1.2.1 // indirect
+	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
+	github.com/zclconf/go-cty v1.8.0 // indirect
+	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
 )
 
 replace github.com/hm-edu/portal-common => ../common

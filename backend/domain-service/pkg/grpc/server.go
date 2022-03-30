@@ -5,6 +5,7 @@ import (
 	"net"
 
 	pb "github.com/hm-edu/domain-api"
+	"github.com/hm-edu/domain-service/pkg/store"
 	"github.com/hm-edu/portal-common/tracing"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -17,6 +18,7 @@ import (
 type Server struct {
 	logger *zap.Logger
 	config *Config
+	store  *store.DomainStore
 }
 
 // Config is the basic structure of the GRPC configuration
@@ -26,10 +28,11 @@ type Config struct {
 }
 
 // NewServer creates a new GRPC server
-func NewServer(config *Config, logger *zap.Logger) (*Server, error) {
+func NewServer(config *Config, logger *zap.Logger, store *store.DomainStore) (*Server, error) {
 	srv := &Server{
 		logger: logger,
 		config: config,
+		store:  store,
 	}
 
 	return srv, nil

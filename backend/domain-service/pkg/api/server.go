@@ -2,7 +2,6 @@
 package api
 
 import (
-	"crypto/tls"
 	"net/http"
 
 	swagger "github.com/arsmn/fiber-swagger/v2"
@@ -12,10 +11,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/hm-edu/domain-service/pkg/api/docs"
+	"github.com/hm-edu/domain-service/pkg/store"
 	commonApi "github.com/hm-edu/portal-common/api"
-	commonAuth "github.com/hm-edu/portal-common/auth"
 	"go.uber.org/zap"
 
+	jwtware "github.com/gofiber/jwt/v3"
 	// Required for the generation of swagger docs
 	_ "github.com/hm-edu/domain-service/pkg/api/docs"
 )
@@ -45,24 +45,18 @@ type Server struct {
 	app    *fiber.App
 	logger *zap.Logger
 	config *commonApi.Config
+	store  *store.DomainStore
 }
 
 // NewServer creates a new server
-func NewServer(logger *zap.Logger, config *commonApi.Config) *Server {
-	return &Server{app: fiber.New(fiber.Config{DisableStartupMessage: true}), logger: logger, config: config}
+func NewServer(logger *zap.Logger, config *commonApi.Config, store *store.DomainStore) *Server {
+	return &Server{app: fiber.New(fiber.Config{DisableStartupMessage: true}), logger: logger, config: config, store: store}
 }
 
 func (api *Server) wireRoutesAndMiddleware() {
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-
 	swaggerCfg := swagger.ConfigDefault
 	swaggerCfg.URL = "/docs/spec.json"
 
-	auth := commonAuth.New(commonAuth.Config{
-		Endpoint:     api.config.Endpoint,
-		ClientID:     api.config.ClientID,
-		ClientSecret: api.config.ClientSecret,
-	})
 	api.app.Use(otelfiber.Middleware("pki-service"))
 	api.app.Use(recover.New())
 	api.app.Use(fiberzap.New(fiberzap.Config{
@@ -78,10 +72,17 @@ func (api *Server) wireRoutesAndMiddleware() {
 		}
 		return c.JSON(openAPISpec)
 	})
+	jwt := jwtware.New(jwtware.Config{KeySetURL: api.config.JwksURI})
 	api.app.Get("/docs/*", swagger.New(swaggerCfg)) // default
 	api.app.Get("/healthz", api.healthzHandler)
 	api.app.Get("/readyz", api.readyzHandler)
-	api.app.Get("/whoami", auth, api.whoamiHandler)
+	api.app.Get("/whoami", jwt, api.whoamiHandler)
+
+	h := NewHandler(api.store)
+
+	v1 := api.app.Group("/domains").Use(jwt)
+	v1.Get("/", h.ListDomains)
+	v1.Post("/", h.CreateDomain)
 }
 
 // ListenAndServe starts the http server and waits for the channel to stop the server

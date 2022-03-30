@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/hm-edu/portal-common/auth"
 )
 
 // whoamiHandler godoc
@@ -16,7 +17,7 @@ import (
 // @Failure 401 {object} models.Error "Forbidden"
 // @Failure 403 {object} models.Error "Unauthorized"
 func (s *Server) whoamiHandler(c *fiber.Ctx) (err error) {
-	sub := c.Locals("subject")
+	sub := auth.UserFromRequest(c)
 
 	return c.JSON(sub)
 }

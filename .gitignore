@@ -2,3 +2,6 @@ backend/pki-service/pki-service
 backend/domain-service/domain-service
 **/.idea
 **/.env
+**/__debug_bin
+**/*.sqlite3
+**/*.db
