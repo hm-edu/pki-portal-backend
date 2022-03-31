@@ -5,11 +5,9 @@ go 1.18
 require (
 	github.com/brpaz/echozap v1.1.2
 	github.com/getkin/kin-openapi v0.92.0
-	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/hm-edu/domain-api v0.0.0-00010101000000-000000000000
 	github.com/hm-edu/portal-common v0.0.0-20220323161424-5f2cec9d122b
 	github.com/joho/godotenv v1.4.0
-	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/lestrrat-go/jwx v1.2.21
 	github.com/spf13/cobra v1.4.0
@@ -23,11 +21,11 @@ require (
 require (
 	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.0-20210816181553-5444fa50b93d // indirect
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/goccy/go-json v0.9.6 // indirect
+	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
