@@ -32,6 +32,7 @@ func (Domain) Edges() []ent.Edge {
 	}
 }
 
+// Mixin adds default time fields to this model.
 func (Domain) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		mixin.Time{},

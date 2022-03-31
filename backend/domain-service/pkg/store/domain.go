@@ -30,14 +30,14 @@ func (s *DomainStore) ListDomains(ctx context.Context, owner string) ([]*ent.Dom
 		return nil, err
 	}
 
-	domains, err := tx.Domain.Query().Where(domain.Or(domain.HasDelegationsWith(delegation.User(owner)), domain.Owner(owner))).All(ctx)
+	domains, err := tx.Domain.Query().WithDelegations().Where(domain.Or(domain.HasDelegationsWith(delegation.User(owner)), domain.Owner(owner))).All(ctx)
 
 	if err != nil {
 		return nil, err
 	}
 	fqdns := helper.Map(domains, func(d *ent.Domain) predicate.Domain { return domain.FqdnHasSuffix("." + d.Fqdn) })
 
-	childs, err := tx.Domain.Query().Where(domain.Or(fqdns...)).All(ctx)
+	childs, err := tx.Domain.Query().WithDelegations().Where(domain.Or(fqdns...)).All(ctx)
 
 	if err != nil {
 		return nil, err
@@ -51,18 +51,51 @@ func (s *DomainStore) ListDomains(ctx context.Context, owner string) ([]*ent.Dom
 	return domains, nil
 }
 
+// GetDomainByID tries to find a domain with the given FQDN.
+func (s *DomainStore) GetDomainByID(ctx context.Context, id int) (*ent.Domain, error) {
+	return s.db.Domain.Query().Where(domain.ID(id)).WithDelegations().First(ctx)
+}
+
+// GetDomain tries to find a domain with the given FQDN.
 func (s *DomainStore) GetDomain(ctx context.Context, fqdn string) (*ent.Domain, error) {
-	return s.db.Domain.Query().Where(domain.FqdnEQ(fqdn)).First(ctx)
+	return s.db.Domain.Query().Where(domain.Fqdn(fqdn)).WithDelegations().First(ctx)
 }
 
-func (s *DomainStore) CreateDomain(ctx context.Context, d *ent.Domain) error {
-	return s.db.Domain.Create().SetFqdn(d.Fqdn).SetOwner(d.Owner).SetApproved(d.Approved).Exec(ctx)
-}
-func (s *DomainStore) Approve(ctx context.Context, d *ent.Domain) error {
-	return s.db.Domain.UpdateOne(d).SetApproved(true).Exec(ctx)
+// Create tries to create a new domain entry.
+func (s *DomainStore) Create(ctx context.Context, d *ent.Domain) (*ent.Domain, error) {
+	return s.db.Domain.Create().SetFqdn(d.Fqdn).SetOwner(d.Owner).SetApproved(d.Approved).Save(ctx)
 }
 
-func (s *DomainStore) DeleteDomains(ctx context.Context, d []*ent.Domain) error {
+// Owner sets the owner of a domain.
+func (s *DomainStore) Owner(ctx context.Context, d *ent.Domain, owner string) (*ent.Domain, error) {
+	return s.db.Domain.UpdateOne(d).SetOwner(owner).Save(ctx)
+}
+
+// Approve sets the given domain on approved.
+func (s *DomainStore) Approve(ctx context.Context, d *ent.Domain) (*ent.Domain, error) {
+	return s.db.Domain.UpdateOne(d).SetApproved(true).Save(ctx)
+}
+
+// AddDelegation adds a delegation to a domain.
+func (s *DomainStore) AddDelegation(ctx context.Context, d *ent.Domain, user string) (*ent.Domain, error) {
+	err := s.db.Delegation.Create().SetDomain(d).SetUser(user).Exec(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return s.db.Domain.Query().Where(domain.ID(d.ID)).WithDelegations().First(ctx)
+}
+
+// DeleteDelegation tries to delete a delegation.
+func (s *DomainStore) DeleteDelegation(ctx context.Context, d *ent.Domain, delegation *ent.Delegation) (*ent.Domain, error) {
+	err := s.db.Delegation.DeleteOneID(delegation.ID).Exec(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return s.db.Domain.Query().Where(domain.ID(d.ID)).WithDelegations().First(ctx)
+}
+
+// Delete tries to delete all passed domains.
+func (s *DomainStore) Delete(ctx context.Context, d []*ent.Domain) error {
 	tx, err := s.db.Tx(ctx)
 	if err != nil {
 		return fmt.Errorf("starting a transaction: %w", err)

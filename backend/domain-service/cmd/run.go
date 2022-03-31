@@ -68,7 +68,7 @@ var runCmd = &cobra.Command{
 				logger.Fatal("Error shutting down tracer provider.", zap.Error(err))
 			}
 		}()
-		database.ConnectDb(logger, true)
+		database.ConnectDb(logger)
 
 		store := store.NewDomainStore(database.DB.Db)
 

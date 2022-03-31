@@ -1,68 +1,31 @@
 package model
 
 import (
-	"github.com/go-playground/validator/v10"
 	"github.com/hm-edu/domain-service/ent"
 	"github.com/hm-edu/portal-common/helper"
 	"github.com/labstack/echo/v4"
 )
 
-type Validator struct {
-	validator *validator.Validate
-}
-
-func NewValidator() *Validator {
-	return &Validator{
-		validator: validator.New(),
-	}
-}
-
-func (v *Validator) Validate(i interface{}) error {
-	return v.validator.Struct(i)
-}
-
+// DomainRequest represents an request for an action on a domain.
 type DomainRequest struct {
 	FQDN string `json:"fqdn" validate:"required,fqdn"`
 }
-type DeleteDomainRequest struct {
-	FQDN    string `json:"fqdn" validate:"required,fqdn"`
-	SubTree bool   `json:"subtree"`
-}
 
-func (r *DomainRequest) Bind(c echo.Context, d *ent.Domain, v *Validator) error {
+// Bind binds an incoming echo request to the internal domain model and perfoms a validation
+func (r *DomainRequest) Bind(c echo.Context, v *Validator) error {
 	if err := c.Bind(r); err != nil {
 		return err
 	}
-	if err := v.Validate(r); err != nil {
-		return err
-	}
-	d.Fqdn = r.FQDN
-	return nil
+	err := v.Validate(r)
+	return err
 }
 
-func (r *DeleteDomainRequest) Bind(c echo.Context, v *Validator) error {
-	if err := c.Bind(r); err != nil {
-		return err
-	}
-	if err := v.Validate(r); err != nil {
-		return err
-	}
-	return nil
-}
-
-func DelegationToOutput(d *ent.Delegation) Delegation {
-	return Delegation{ID: d.ID, User: d.User}
-}
-
+// DomainToOutput converts the internal domain model to the REST representation.
 func DomainToOutput(d *ent.Domain) Domain {
 	return Domain{ID: d.ID, FQDN: d.Fqdn, Owner: d.Owner, Approved: d.Approved, Delegations: helper.Map(d.Edges.Delegations, DelegationToOutput)}
 }
 
-type Delegation struct {
-	ID   int    `json:"id"`
-	User string `json:"user"`
-}
-
+// Domain represents a domain.
 type Domain struct {
 	ID          int          `json:"id"`
 	FQDN        string       `json:"fqdn"`

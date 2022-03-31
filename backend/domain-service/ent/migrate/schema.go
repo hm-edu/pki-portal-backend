@@ -14,7 +14,7 @@ var (
 		{Name: "create_time", Type: field.TypeTime},
 		{Name: "update_time", Type: field.TypeTime},
 		{Name: "user", Type: field.TypeString},
-		{Name: "domain_delegations", Type: field.TypeInt, Nullable: true},
+		{Name: "domain_delegations", Type: field.TypeInt},
 	}
 	// DelegationsTable holds the schema information for the "delegations" table.
 	DelegationsTable = &schema.Table{
@@ -27,6 +27,13 @@ var (
 				Columns:    []*schema.Column{DelegationsColumns[4]},
 				RefColumns: []*schema.Column{DomainsColumns[0]},
 				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "delegation_user_domain_delegations",
+				Unique:  true,
+				Columns: []*schema.Column{DelegationsColumns[3], DelegationsColumns[4]},
 			},
 		},
 	}

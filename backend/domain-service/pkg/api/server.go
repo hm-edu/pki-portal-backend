@@ -99,21 +99,22 @@ func (api *Server) wireRoutesAndMiddleware() {
 	api.app.GET("/readyz", api.readyzHandler)
 	api.app.GET("/whoami", api.whoamiHandler, jwtMiddleware)
 
-	h := NewHandler(api.store)
-
 	v1 := api.app.Group("/domains")
 	{
+		h := NewHandler(api.store)
 		v1.Use(jwtMiddleware)
 		v1.GET("/", h.ListDomains)
 		v1.POST("/", h.CreateDomain)
-		v1.DELETE("/", h.DeleteDomains)
-		v1.POST("/approve", h.ApproveDomain)
-		v1.POST("/transfer", h.TransferDomain)
+		v1.DELETE("/:id", h.DeleteDomains)
+		v1.POST("/:id/approve", h.ApproveDomain)
+		v1.POST("/:id/transfer", h.TransferDomain)
+		v1.POST("/:id/delegation", h.AddDelegation)
+		v1.DELETE("/:domain/delegation/:delegation", h.DeleteDelegation)
 	}
 
 }
 
-// ListenAndServe starts the http server and waits for the channel to stop the server
+// ListenAndServe starts the http server and waits for the channel to stop the server.
 func (api *Server) ListenAndServe(stopCh <-chan struct{}) {
 
 	api.wireRoutesAndMiddleware()
@@ -124,6 +125,8 @@ func (api *Server) ListenAndServe(stopCh <-chan struct{}) {
 			api.logger.Fatal("HTTP server crashed", zap.Error(err))
 		}
 	}()
+	ready = 1
+	healthy = 1
 	_ = <-stopCh
 	err := api.app.Shutdown(context.Background())
 	if err != nil {

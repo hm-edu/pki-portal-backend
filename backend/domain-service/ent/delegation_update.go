@@ -47,14 +47,6 @@ func (du *DelegationUpdate) SetDomainID(id int) *DelegationUpdate {
 	return du
 }
 
-// SetNillableDomainID sets the "domain" edge to the Domain entity by ID if the given value is not nil.
-func (du *DelegationUpdate) SetNillableDomainID(id *int) *DelegationUpdate {
-	if id != nil {
-		du = du.SetDomainID(*id)
-	}
-	return du
-}
-
 // SetDomain sets the "domain" edge to the Domain entity.
 func (du *DelegationUpdate) SetDomain(d *Domain) *DelegationUpdate {
 	return du.SetDomainID(d.ID)
@@ -146,6 +138,9 @@ func (du *DelegationUpdate) check() error {
 		if err := delegation.UserValidator(v); err != nil {
 			return &ValidationError{Name: "user", err: fmt.Errorf(`ent: validator failed for field "Delegation.user": %w`, err)}
 		}
+	}
+	if _, ok := du.mutation.DomainID(); du.mutation.DomainCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Delegation.domain"`)
 	}
 	return nil
 }
@@ -254,14 +249,6 @@ func (duo *DelegationUpdateOne) SetDomainID(id int) *DelegationUpdateOne {
 	return duo
 }
 
-// SetNillableDomainID sets the "domain" edge to the Domain entity by ID if the given value is not nil.
-func (duo *DelegationUpdateOne) SetNillableDomainID(id *int) *DelegationUpdateOne {
-	if id != nil {
-		duo = duo.SetDomainID(*id)
-	}
-	return duo
-}
-
 // SetDomain sets the "domain" edge to the Domain entity.
 func (duo *DelegationUpdateOne) SetDomain(d *Domain) *DelegationUpdateOne {
 	return duo.SetDomainID(d.ID)
@@ -360,6 +347,9 @@ func (duo *DelegationUpdateOne) check() error {
 		if err := delegation.UserValidator(v); err != nil {
 			return &ValidationError{Name: "user", err: fmt.Errorf(`ent: validator failed for field "Delegation.user": %w`, err)}
 		}
+	}
+	if _, ok := duo.mutation.DomainID(); duo.mutation.DomainCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Delegation.domain"`)
 	}
 	return nil
 }

@@ -4,18 +4,21 @@ import (
 	"context"
 
 	"github.com/hm-edu/domain-service/ent"
+	// Importing the go-sqlite3 is required to create a sqlite3 database.
 	_ "github.com/mattn/go-sqlite3"
 	"go.uber.org/zap"
 )
 
+// DbInstance is a wrapper around a entgo database client.
 type DbInstance struct {
 	Db *ent.Client
 }
 
+// DB is a globally accessible domain instance.
 var DB DbInstance
 
-// ConnectDb
-func ConnectDb(log *zap.Logger, dev bool) {
+// ConnectDb establishs a new database connection.
+func ConnectDb(log *zap.Logger) {
 
 	client, err := ent.Open("sqlite3", "file:db.sqlite3?cache=shared&_fk=1")
 

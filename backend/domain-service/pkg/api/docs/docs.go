@@ -30,7 +30,7 @@ const docTemplate = `{
                         "API": []
                     }
                 ],
-                "description": "Lists all domains",
+                "description": "Lists all domains that are either owned or delegated, or a child of a owned or delegated domain.",
                 "consumes": [
                     "application/json"
                 ],
@@ -40,7 +40,7 @@ const docTemplate = `{
                 "tags": [
                     "Domains"
                 ],
-                "summary": "List domains endpoint",
+                "summary": "List domains.",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -65,7 +65,7 @@ const docTemplate = `{
                         "API": []
                     }
                 ],
-                "description": "Creates a new domain",
+                "description": "Creates a new domain if the FQDN is not already taken. Approvement is automatically done, in case the user owns a upper zone or a upper zone was already delegated to him.",
                 "consumes": [
                     "application/json"
                 ],
@@ -75,7 +75,7 @@ const docTemplate = `{
                 "tags": [
                     "Domains"
                 ],
-                "summary": "Creates a new domain if the FQDN is not already taken",
+                "summary": "Create a domain.",
                 "parameters": [
                     {
                         "description": "The Domain to create",
@@ -101,14 +101,16 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/domains/{id}": {
             "delete": {
                 "security": [
                     {
                         "API": []
                     }
                 ],
-                "description": "Deletes a domain",
+                "description": "Deletes a domain. Existing certificates are not are not longer accessible.",
                 "consumes": [
                     "application/json"
                 ],
@@ -118,16 +120,14 @@ const docTemplate = `{
                 "tags": [
                     "Domains"
                 ],
-                "summary": "Delete a domain and optional the complete subtree",
+                "summary": "Delete a domain",
                 "parameters": [
                     {
-                        "description": "The Domains to delete",
-                        "name": "domain",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.DeleteDomainRequest"
-                        }
+                        "type": "integer",
+                        "description": "Domain ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -143,7 +143,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/domains/approve": {
+        "/domains/{id}/approve": {
             "post": {
                 "security": [
                     {
@@ -160,16 +160,14 @@ const docTemplate = `{
                 "tags": [
                     "Domains"
                 ],
-                "summary": "Approves a domain request",
+                "summary": "Approve domain request",
                 "parameters": [
                     {
-                        "description": "The Domain to approve",
-                        "name": "domain",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.DomainRequest"
-                        }
+                        "type": "integer",
+                        "description": "Domain ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -200,14 +198,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/domains/transfer": {
+        "/domains/{id}/delegation": {
             "post": {
                 "security": [
                     {
                         "API": []
                     }
                 ],
-                "description": "Transfers a domain to a new owner",
+                "description": "Adds a new delegation to an existing domain.",
                 "consumes": [
                     "application/json"
                 ],
@@ -217,7 +215,109 @@ const docTemplate = `{
                 "tags": [
                     "Domains"
                 ],
-                "summary": "Transfers a domain to a new owner",
+                "summary": "Add delegation.",
+                "parameters": [
+                    {
+                        "description": "The Delegation to add",
+                        "name": "delegation",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.DelegationRequest"
+                        }
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Domain ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Domain"
+                        }
+                    },
+                    "400": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/domains/{id}/delegation/{delegation}": {
+            "delete": {
+                "security": [
+                    {
+                        "API": []
+                    }
+                ],
+                "description": "Deletes an existing delegation.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Domains"
+                ],
+                "summary": "Delete delegation.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Domain ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Delegation ID",
+                        "name": "delegation",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Domain"
+                        }
+                    },
+                    "400": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/domains/{id}/transfer": {
+            "post": {
+                "security": [
+                    {
+                        "API": []
+                    }
+                ],
+                "description": "Transfers a domain to a new owner. Transfering is only possible if you are either the owner of the domain itself or responsible for one of the parent zones.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Domains"
+                ],
+                "summary": "Transfer domain",
                 "parameters": [
                     {
                         "description": "The Domain to transfer",
@@ -225,13 +325,23 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.DomainRequest"
+                            "$ref": "#/definitions/model.TransferRequest"
                         }
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Domain ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
-                    "204": {
-                        "description": ""
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Domain"
+                        }
                     },
                     "400": {
                         "description": "Unauthorized",
@@ -361,17 +471,14 @@ const docTemplate = `{
                 }
             }
         },
-        "model.DeleteDomainRequest": {
+        "model.DelegationRequest": {
             "type": "object",
             "required": [
-                "fqdn"
+                "user"
             ],
             "properties": {
-                "fqdn": {
+                "user": {
                     "type": "string"
-                },
-                "subtree": {
-                    "type": "boolean"
                 }
             }
         },
@@ -405,6 +512,17 @@ const docTemplate = `{
             ],
             "properties": {
                 "fqdn": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.TransferRequest": {
+            "type": "object",
+            "required": [
+                "owner"
+            ],
+            "properties": {
+                "owner": {
                     "type": "string"
                 }
             }

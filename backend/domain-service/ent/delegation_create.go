@@ -61,14 +61,6 @@ func (dc *DelegationCreate) SetDomainID(id int) *DelegationCreate {
 	return dc
 }
 
-// SetNillableDomainID sets the "domain" edge to the Domain entity by ID if the given value is not nil.
-func (dc *DelegationCreate) SetNillableDomainID(id *int) *DelegationCreate {
-	if id != nil {
-		dc = dc.SetDomainID(*id)
-	}
-	return dc
-}
-
 // SetDomain sets the "domain" edge to the Domain entity.
 func (dc *DelegationCreate) SetDomain(d *Domain) *DelegationCreate {
 	return dc.SetDomainID(d.ID)
@@ -170,6 +162,9 @@ func (dc *DelegationCreate) check() error {
 		if err := delegation.UserValidator(v); err != nil {
 			return &ValidationError{Name: "user", err: fmt.Errorf(`ent: validator failed for field "Delegation.user": %w`, err)}
 		}
+	}
+	if _, ok := dc.mutation.DomainID(); !ok {
+		return &ValidationError{Name: "domain", err: errors.New(`ent: missing required edge "Delegation.domain"`)}
 	}
 	return nil
 }
