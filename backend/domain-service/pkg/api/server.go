@@ -72,7 +72,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 
 	config := middleware.JWTConfig{
 		ParseTokenFunc: func(auth string, c echo.Context) (interface{}, error) {
-			return commonAuth.GetToken(auth, c, ks, api.config.Audience)
+			return commonAuth.GetToken(auth, ks, api.config.Audience)
 		},
 	}
 

@@ -9,13 +9,15 @@ import (
 	"github.com/lestrrat-go/jwx/jwk"
 )
 
+// UserFromRequest extracts username (or email) from the previously claimset.
 func UserFromRequest(c echo.Context) string {
 	token := c.Get("user").(*jwt.Token)
 	user := token.Claims.(jwt.MapClaims)["email"].(string)
 	return user
 }
 
-func GetToken(auth string, c echo.Context, ks jwk.Set, aud string) (interface{}, error) {
+// GetToken extracts the JWT Token from header and also performs a check on the passed audience.
+func GetToken(auth string, ks jwk.Set, aud string) (interface{}, error) {
 	keyFunc := func(t *jwt.Token) (interface{}, error) {
 		return GetKey(t, ks)
 	}
@@ -34,6 +36,7 @@ func GetToken(auth string, c echo.Context, ks jwk.Set, aud string) (interface{},
 	return token, nil
 }
 
+// GetKey looks for a signature key in the passed JWK Set that matches to the key id in the passed header.
 func GetKey(token *jwt.Token, ks jwk.Set) (interface{}, error) {
 	keyID, ok := token.Header["kid"].(string)
 	if !ok {

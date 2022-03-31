@@ -1,6 +1,8 @@
 package api
 
 import (
+	"net/http"
+
 	pb "github.com/hm-edu/domain-api"
 	"github.com/labstack/echo/v4"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
@@ -18,5 +20,5 @@ func (s *Server) addAcmeAccount(c echo.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	return c.JSON(permission)
+	return c.JSON(http.StatusOK, permission)
 }
