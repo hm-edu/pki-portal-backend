@@ -12,11 +12,11 @@ const docTemplate = `{
         "title": "{{.Title}}",
         "contact": {
             "name": "Source Code",
-            "url": "https://github.com/hm-edu/pki-service/blob/main/LICENSE"
+            "url": "https://github.com/hm-edu/portal-backend"
         },
         "license": {
             "name": "Apache License",
-            "url": "https://github.com/hm-edu/pki-service/blob/main/LICENSE"
+            "url": "https://github.com/hm-edu/portal-backend/blob/main/LICENSE"
         },
         "version": "{{.Version}}"
     },
@@ -106,16 +106,10 @@ const docTemplate = `{
                             "type": "string"
                         }
                     },
-                    "401": {
-                        "description": "Forbidden",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
-                        }
-                    },
-                    "403": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/echo.HTTPError"
                         }
                     }
                 }
@@ -131,15 +125,10 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Error": {
+        "echo.HTTPError": {
             "type": "object",
             "properties": {
-                "details": {
-                    "type": "string"
-                },
-                "message": {
-                    "type": "string"
-                }
+                "message": {}
             }
         }
     },

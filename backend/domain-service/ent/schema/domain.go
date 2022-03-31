@@ -16,7 +16,7 @@ type Domain struct {
 // Fields of the Domain.
 func (Domain) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("fqdn").NotEmpty(),
+		field.String("fqdn").NotEmpty().Unique(),
 		field.String("owner").NotEmpty(),
 		field.Bool("approved").Default(false),
 	}

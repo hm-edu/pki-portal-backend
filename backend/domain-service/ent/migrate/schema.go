@@ -35,7 +35,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "create_time", Type: field.TypeTime},
 		{Name: "update_time", Type: field.TypeTime},
-		{Name: "fqdn", Type: field.TypeString},
+		{Name: "fqdn", Type: field.TypeString, Unique: true},
 		{Name: "owner", Type: field.TypeString},
 		{Name: "approved", Type: field.TypeBool, Default: false},
 	}

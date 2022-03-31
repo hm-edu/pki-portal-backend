@@ -1,8 +1,10 @@
 package api
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"net/http"
+
 	"github.com/hm-edu/portal-common/auth"
+	"github.com/labstack/echo/v4"
 )
 
 // whoamiHandler godoc
@@ -14,10 +16,9 @@ import (
 // @Router /whoami [get]
 // @Security API
 // @Success 200 {string} string "Username"
-// @Failure 401 {object} models.Error "Forbidden"
-// @Failure 403 {object} models.Error "Unauthorized"
-func (s *Server) whoamiHandler(c *fiber.Ctx) (err error) {
+// @Failure 400 {object} echo.HTTPError "Bad Request"
+func (s *Server) whoamiHandler(c echo.Context) (err error) {
 	sub := auth.UserFromRequest(c)
 
-	return c.JSON(sub)
+	return c.JSON(http.StatusOK, sub)
 }

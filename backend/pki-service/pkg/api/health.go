@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"sync/atomic"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 )
 
 type healthResponse struct {
@@ -20,11 +20,11 @@ type healthResponse struct {
 // @Router /healthz [get]
 // @Success 200 {object} healthResponse "OK"
 // @Failure 503 {object} healthResponse "Service Unavailable"
-func (s *Server) healthzHandler(c *fiber.Ctx) (err error) {
+func (s *Server) healthzHandler(c echo.Context) (err error) {
 	if atomic.LoadInt32(&healthy) == 1 {
-		return c.JSON(healthResponse{Status: "OK"})
+		return c.JSON(http.StatusOK, healthResponse{Status: "OK"})
 	}
-	return c.Status(http.StatusServiceUnavailable).JSON(healthResponse{Status: "Service Unavailable"})
+	return c.JSON(http.StatusServiceUnavailable, healthResponse{Status: "Service Unavailable"})
 }
 
 // readyzHandler godoc
@@ -36,9 +36,9 @@ func (s *Server) healthzHandler(c *fiber.Ctx) (err error) {
 // @Router /readyz [get]
 // @Success 200 {object} healthResponse "OK"
 // @Failure 503 {object} healthResponse "Service Unavailable"
-func (s *Server) readyzHandler(c *fiber.Ctx) (err error) {
+func (s *Server) readyzHandler(c echo.Context) (err error) {
 	if atomic.LoadInt32(&ready) == 1 {
-		return c.JSON(healthResponse{Status: "OK"})
+		return c.JSON(http.StatusOK, healthResponse{Status: "OK"})
 	}
-	return c.Status(http.StatusServiceUnavailable).JSON(healthResponse{Status: "Service Unavailable"})
+	return c.JSON(http.StatusServiceUnavailable, healthResponse{Status: "Service Unavailable"})
 }

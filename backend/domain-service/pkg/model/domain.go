@@ -1,10 +1,10 @@
 package model
 
 import (
-	"github.com/go-playground/validator"
-	"github.com/gofiber/fiber/v2"
+	"github.com/go-playground/validator/v10"
 	"github.com/hm-edu/domain-service/ent"
 	"github.com/hm-edu/portal-common/helper"
+	"github.com/labstack/echo/v4"
 )
 
 type Validator struct {
@@ -21,18 +21,32 @@ func (v *Validator) Validate(i interface{}) error {
 	return v.validator.Struct(i)
 }
 
-type DomainCreateRequest struct {
-	FQDN string `json:"fqdn" validate:"required"`
+type DomainRequest struct {
+	FQDN string `json:"fqdn" validate:"required,fqdn"`
+}
+type DeleteDomainRequest struct {
+	FQDN    string `json:"fqdn" validate:"required,fqdn"`
+	SubTree bool   `json:"subtree"`
 }
 
-func (r *DomainCreateRequest) Bind(c *fiber.Ctx, d *ent.Domain, v *Validator) error {
-	if err := c.BodyParser(r); err != nil {
+func (r *DomainRequest) Bind(c echo.Context, d *ent.Domain, v *Validator) error {
+	if err := c.Bind(r); err != nil {
 		return err
 	}
 	if err := v.Validate(r); err != nil {
 		return err
 	}
 	d.Fqdn = r.FQDN
+	return nil
+}
+
+func (r *DeleteDomainRequest) Bind(c echo.Context, v *Validator) error {
+	if err := c.Bind(r); err != nil {
+		return err
+	}
+	if err := v.Validate(r); err != nil {
+		return err
+	}
 	return nil
 }
 

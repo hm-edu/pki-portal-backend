@@ -12,17 +12,236 @@ const docTemplate = `{
         "title": "{{.Title}}",
         "contact": {
             "name": "Source Code",
-            "url": "https://github.com/hm-edu/pki-service/blob/main/LICENSE"
+            "url": "https://github.com/hm-edu/portal-backend"
         },
         "license": {
             "name": "Apache License",
-            "url": "https://github.com/hm-edu/pki-service/blob/main/LICENSE"
+            "url": "https://github.com/hm-edu/portal-backend/blob/main/LICENSE"
         },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/domains/": {
+            "get": {
+                "security": [
+                    {
+                        "API": []
+                    }
+                ],
+                "description": "Lists all domains",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Domains"
+                ],
+                "summary": "List domains endpoint",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Domain"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "API": []
+                    }
+                ],
+                "description": "Creates a new domain",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Domains"
+                ],
+                "summary": "Creates a new domain if the FQDN is not already taken",
+                "parameters": [
+                    {
+                        "description": "The Domain to create",
+                        "name": "domain",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.DomainRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Domain"
+                        }
+                    },
+                    "400": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "API": []
+                    }
+                ],
+                "description": "Deletes a domain",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Domains"
+                ],
+                "summary": "Delete a domain and optional the complete subtree",
+                "parameters": [
+                    {
+                        "description": "The Domains to delete",
+                        "name": "domain",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.DeleteDomainRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Unauthorized or Request Error",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/domains/approve": {
+            "post": {
+                "security": [
+                    {
+                        "API": []
+                    }
+                ],
+                "description": "Approves an outstanding domain request",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Domains"
+                ],
+                "summary": "Approves a domain request",
+                "parameters": [
+                    {
+                        "description": "The Domain to approve",
+                        "name": "domain",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.DomainRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Domain"
+                        }
+                    },
+                    "400": {
+                        "description": "Unauthorized or Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    },
+                    "403": {
+                        "description": "Access to domain denied",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Domain in zone does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/domains/transfer": {
+            "post": {
+                "security": [
+                    {
+                        "API": []
+                    }
+                ],
+                "description": "Transfers a domain to a new owner",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Domains"
+                ],
+                "summary": "Transfers a domain to a new owner",
+                "parameters": [
+                    {
+                        "description": "The Domain to transfer",
+                        "name": "domain",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.DomainRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/healthz": {
             "get": {
                 "description": "Used by Kubernetes Liveness Probe",
@@ -106,16 +325,10 @@ const docTemplate = `{
                             "type": "string"
                         }
                     },
-                    "401": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/models.Error"
-                        }
-                    },
-                    "403": {
+                    "400": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/echo.HTTPError"
                         }
                     }
                 }
@@ -131,13 +344,67 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Error": {
+        "echo.HTTPError": {
             "type": "object",
             "properties": {
-                "details": {
+                "message": {}
+            }
+        },
+        "model.Delegation": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "user": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.DeleteDomainRequest": {
+            "type": "object",
+            "required": [
+                "fqdn"
+            ],
+            "properties": {
+                "fqdn": {
                     "type": "string"
                 },
-                "message": {
+                "subtree": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "model.Domain": {
+            "type": "object",
+            "properties": {
+                "approved": {
+                    "type": "boolean"
+                },
+                "delegations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Delegation"
+                    }
+                },
+                "fqdn": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "owner": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.DomainRequest": {
+            "type": "object",
+            "required": [
+                "fqdn"
+            ],
+            "properties": {
+                "fqdn": {
                     "type": "string"
                 }
             }

@@ -17,7 +17,7 @@ var DB DbInstance
 // ConnectDb
 func ConnectDb(log *zap.Logger, dev bool) {
 
-	client, err := ent.Open("sqlite3", "file:db.sqlite3&cache=shared&_fk=1")
+	client, err := ent.Open("sqlite3", "file:db.sqlite3?cache=shared&_fk=1")
 
 	if err != nil {
 		log.Fatal("failed opening DB Connection", zap.Error(err))
