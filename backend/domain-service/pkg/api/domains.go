@@ -142,7 +142,7 @@ func (h *Handler) extractData(c echo.Context) ([]*ent.Domain, *ent.Domain, error
 
 // TransferDomain godoc
 // @Summary Transfer domain
-// @Description Transfers a domain to a new owner. Transfering is only possible if you are either the owner of the domain itself or responsible for one of the parent zones.
+// @Description Transfers a domain to a new owner. Transferring is only possible if you are either the owner of the domain itself or responsible for one of the parent zones.
 // @Tags Domains
 // @Accept json
 // @Produce json

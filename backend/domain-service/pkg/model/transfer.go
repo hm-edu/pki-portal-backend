@@ -2,7 +2,7 @@ package model
 
 import "github.com/labstack/echo/v4"
 
-// TransferRequest represents an request for transfering a domain.
+// TransferRequest represents an request for transferring a domain.
 type TransferRequest struct {
 	Owner string `json:"owner" validate:"required"`
 }

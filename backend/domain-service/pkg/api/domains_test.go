@@ -23,7 +23,9 @@ import (
 func TestCreateDomainsWithoutTokenAndMiddleware(t *testing.T) {
 	e := echo.New()
 	client := enttest.Open(t, "sqlite3", "file:db?mode=memory&cache=shared&_fk=1")
-	defer client.Close()
+	defer func(*ent.Client) {
+		_ = client.Close()
+	}(client)
 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(`{"fqdn":"example.com"}`))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
@@ -36,7 +38,9 @@ func TestCreateDomainsWithoutTokenAndMiddleware(t *testing.T) {
 func TestCreateDomainsFqdns(t *testing.T) {
 	e := echo.New()
 	client := enttest.Open(t, "sqlite3", "file:db?mode=memory&cache=shared&_fk=1")
-	defer client.Close()
+	defer func(*ent.Client) {
+		_ = client.Close()
+	}(client)
 
 	testcases := []string{"{}", "{fqdn:1}", `{fqdn:"%:"}`}
 	for _, tc := range testcases {
@@ -58,7 +62,9 @@ func TestCreateDomainsFqdns(t *testing.T) {
 func TestCreateDomainsWithToken(t *testing.T) {
 	e := echo.New()
 	client := enttest.Open(t, "sqlite3", "file:db?mode=memory&cache=shared&_fk=1")
-	defer client.Close()
+	defer func(*ent.Client) {
+		_ = client.Close()
+	}(client)
 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(`{"fqdn":"example.com"}`))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
@@ -77,7 +83,9 @@ func TestCreateDomainsWithToken(t *testing.T) {
 func TestCreateDomainsTwice(t *testing.T) {
 	e := echo.New()
 	client := enttest.Open(t, "sqlite3", "file:db?mode=memory&cache=shared&_fk=1")
-	defer client.Close()
+	defer func(*ent.Client) {
+		_ = client.Close()
+	}(client)
 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(`{"fqdn":"example.com"}`))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
@@ -103,7 +111,9 @@ func TestCreateDomainsTwice(t *testing.T) {
 func TestCreateDomainsAutoApprove(t *testing.T) {
 	e := echo.New()
 	client := enttest.Open(t, "sqlite3", "file:db?mode=memory&cache=shared&_fk=1")
-	defer client.Close()
+	defer func(*ent.Client) {
+		_ = client.Close()
+	}(client)
 
 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(`{"fqdn":"foo.example.com"}`))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -126,8 +136,9 @@ func TestCreateDomainsAutoApprove(t *testing.T) {
 func TestCreateDomainsNoAutoApproveOtherUser(t *testing.T) {
 	e := echo.New()
 	client := enttest.Open(t, "sqlite3", "file:db?mode=memory&cache=shared&_fk=1")
-	defer client.Close()
-
+	defer func(*ent.Client) {
+		_ = client.Close()
+	}(client)
 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(`{"fqdn":"foo.example.com"}`))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
@@ -149,7 +160,9 @@ func TestCreateDomainsNoAutoApproveOtherUser(t *testing.T) {
 func TestCreateDomainsNoAutoApproveOtherUserChild(t *testing.T) {
 	e := echo.New()
 	client := enttest.Open(t, "sqlite3", "file:db?mode=memory&cache=shared&_fk=1")
-	defer client.Close()
+	defer func(*ent.Client) {
+		_ = client.Close()
+	}(client)
 
 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(`{"fqdn":"foo.example.com"}`))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
