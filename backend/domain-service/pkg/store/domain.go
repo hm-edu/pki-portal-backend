@@ -36,18 +36,20 @@ func (s *DomainStore) ListDomains(ctx context.Context, owner string) ([]*ent.Dom
 		return nil, err
 	}
 	fqdns := helper.Map(domains, func(d *ent.Domain) predicate.Domain { return domain.FqdnHasSuffix("." + d.Fqdn) })
+	ids := helper.Map(domains, func(d *ent.Domain) int { return d.ID })
 
-	childs, err := tx.Domain.Query().WithDelegations().Where(domain.Or(fqdns...)).All(ctx)
-
-	if err != nil {
-		return nil, err
+	if len(fqdns) != 0 {
+		childs, err := tx.Domain.Query().WithDelegations().Where(domain.And(domain.Or(fqdns...), domain.IDNotIn(ids...))).All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		domains = append(domains, childs...)
 	}
 
 	err = tx.Commit()
 	if err != nil {
 		return nil, err
 	}
-	domains = append(domains, childs...)
 	return domains, nil
 }
 
