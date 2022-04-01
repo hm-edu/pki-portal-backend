@@ -24,17 +24,21 @@ func NewDomainStore(db *ent.Client) *DomainStore {
 }
 
 // ListDomains returns all domains that are owned or delegated to one user
-func (s *DomainStore) ListDomains(ctx context.Context, owner string) ([]*ent.Domain, error) {
+func (s *DomainStore) ListDomains(ctx context.Context, owner string, approved bool) ([]*ent.Domain, error) {
 	tx, err := s.db.Tx(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	domains, err := tx.Domain.Query().WithDelegations().Where(domain.Or(domain.HasDelegationsWith(delegation.User(owner)), domain.Owner(owner))).All(ctx)
-
+	predicates := domain.Or(domain.HasDelegationsWith(delegation.User(owner)), domain.Owner(owner))
+	if approved {
+		predicates = domain.And(predicates, domain.Approved(true))
+	}
+	domains, err := tx.Domain.Query().WithDelegations().Where(predicates).All(ctx)
 	if err != nil {
 		return nil, err
 	}
+
 	fqdns := helper.Map(domains, func(d *ent.Domain) predicate.Domain { return domain.FqdnHasSuffix("." + d.Fqdn) })
 	ids := helper.Map(domains, func(d *ent.Domain) int { return d.ID })
 

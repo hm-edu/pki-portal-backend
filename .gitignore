@@ -5,3 +5,4 @@ backend/domain-service/domain-service
 **/__debug_bin
 **/*.sqlite3
 **/*.db
+backend/domain-service/coverage.txt

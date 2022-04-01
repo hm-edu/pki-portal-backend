@@ -24,7 +24,7 @@ import (
 // @Success 200 {object} []model.Domain
 // @Failure 400 {object} echo.HTTPError "Unauthorized"
 func (h *Handler) ListDomains(c echo.Context) error {
-	domains, err := h.domainStore.ListDomains(c.Request().Context(), auth.UserFromRequest(c))
+	domains, err := h.domainStore.ListDomains(c.Request().Context(), auth.UserFromRequest(c), false)
 	if err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
 	}
@@ -49,7 +49,7 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 	}
 	domain := ent.Domain{Owner: auth.UserFromRequest(c), Fqdn: req.FQDN}
 
-	domains, err := h.domainStore.ListDomains(c.Request().Context(), auth.UserFromRequest(c))
+	domains, err := h.domainStore.ListDomains(c.Request().Context(), auth.UserFromRequest(c), true)
 	if err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
 	}
@@ -127,7 +127,7 @@ func (h *Handler) extractData(c echo.Context) ([]*ent.Domain, *ent.Domain, error
 		return nil, nil, &echo.HTTPError{Code: http.StatusBadRequest}
 	}
 
-	domains, err := h.domainStore.ListDomains(c.Request().Context(), auth.UserFromRequest(c))
+	domains, err := h.domainStore.ListDomains(c.Request().Context(), auth.UserFromRequest(c), true)
 	if err != nil {
 		return nil, nil, &echo.HTTPError{Code: http.StatusBadRequest}
 	}
@@ -202,7 +202,7 @@ func (h *Handler) DeleteDelegation(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusBadRequest}
 	}
 
-	domains, err := h.domainStore.ListDomains(c.Request().Context(), auth.UserFromRequest(c))
+	domains, err := h.domainStore.ListDomains(c.Request().Context(), auth.UserFromRequest(c), true)
 	if err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest}
 	}
