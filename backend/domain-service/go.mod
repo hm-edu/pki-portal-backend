@@ -66,11 +66,17 @@ require (
 	github.com/lestrrat-go/jwx v1.2.21
 	github.com/mattn/go-sqlite3 v1.14.12
 	github.com/spf13/cobra v1.4.0
+	github.com/stretchr/testify v1.7.1
 	github.com/swaggo/echo-swagger v1.3.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.31.0
 )
 
-require github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+)
 
 require (
 	ariga.io/atlas v0.3.7 // indirect
@@ -83,7 +89,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-playground/validator/v10 v10.10.1
 	github.com/goccy/go-json v0.9.6 // indirect
-	github.com/golang-jwt/jwt/v4 v4.4.1 // indirect
+	github.com/golang-jwt/jwt/v4 v4.4.1
 	github.com/google/go-cmp v0.5.7 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/hashicorp/hcl/v2 v2.11.1 // indirect
