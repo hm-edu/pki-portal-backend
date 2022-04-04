@@ -21,7 +21,7 @@ func TestSmimeCsrInvalid(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-
+	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "test", "given_name": "Test", "family_name": "Test", "name": "Test"}})
 	h := NewHandler(sectigo.NewClient(http.DefaultClient, zap.L(), "", "", ""), &cfg.SectigoConfiguration{})
 	assert.Error(t, h.HandleCsr(c))
 }
