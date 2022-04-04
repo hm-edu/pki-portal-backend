@@ -10,6 +10,7 @@ import (
 	"os"
 
 	"github.com/hm-edu/pki-service/pkg/api"
+	"github.com/hm-edu/pki-service/pkg/cfg"
 	"github.com/hm-edu/pki-service/pkg/grpc"
 	commonApi "github.com/hm-edu/portal-common/api"
 	"github.com/hm-edu/portal-common/logging"
@@ -58,6 +59,11 @@ var runCmd = &cobra.Command{
 		if err := viper.Unmarshal(&srvCfg); err != nil {
 			logger.Panic("config unmarshal failed", zap.Error(err))
 		}
+		// load HTTP server config
+		var sectigoCfg cfg.SectigoConfiguration
+		if err := viper.Unmarshal(&sectigoCfg); err != nil {
+			logger.Panic("config unmarshal failed", zap.Error(err))
+		}
 
 		tp := tracing.InitTracer(logger, "pki-service")
 
@@ -76,7 +82,7 @@ var runCmd = &cobra.Command{
 		}
 
 		// start HTTP server
-		srv := api.NewServer(logger, &srvCfg)
+		srv := api.NewServer(logger, &srvCfg, &sectigoCfg)
 		srv.ListenAndServe(stopCh)
 	},
 }
@@ -87,8 +93,15 @@ func init() {
 	runCmd.Flags().String("host", "", "Host to bind service to")
 	runCmd.Flags().Int("port", 8080, "HTTP port to bind service to")
 	runCmd.Flags().Int("grpc-port", 8081, "GRPC port to bind service to")
-	runCmd.Flags().String("oauth2_id", "", "The client id used for token introspection")
-	runCmd.Flags().String("oauth2_secret", "", "The client secret used for token introspection")
-	runCmd.Flags().String("oauth2_endpoint", "", "The url used for token introspection")
+	runCmd.Flags().String("jwks_uri", "", "The location of the jwk set")
+	runCmd.Flags().String("audience", "", "The expected audience")
+	runCmd.Flags().String("sectigo_user", "", "The sectigo user")
+	runCmd.Flags().String("sectigo_password", "", "The password for the sectigo user")
+	runCmd.Flags().String("sectigo_customer", "", "The sectigo customerUri")
+	runCmd.Flags().Int("smime_profile", 0, "The (default) smime profile id")
+	runCmd.Flags().Int("smime_org_id", 0, "The (default) org id")
+	runCmd.Flags().Int("smime_term", 0, "The (default) lifetime")
+	runCmd.Flags().Int("smime_key_length", 0, "The (expected) key length")
+	runCmd.Flags().String("smime_key_type", "", "The (expected) key type")
 	runCmd.Flags().String("level", "info", "log level debug, info, warn, error, flat or panic")
 }

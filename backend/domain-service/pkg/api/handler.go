@@ -1,8 +1,8 @@
 package api
 
 import (
-	"github.com/hm-edu/domain-service/pkg/model"
 	"github.com/hm-edu/domain-service/pkg/store"
+	"github.com/hm-edu/portal-common/model"
 )
 
 // Handler is a wrapper around the domainstore and a validator.

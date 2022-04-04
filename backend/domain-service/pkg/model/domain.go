@@ -3,6 +3,7 @@ package model
 import (
 	"github.com/hm-edu/domain-service/ent"
 	"github.com/hm-edu/portal-common/helper"
+	"github.com/hm-edu/portal-common/model"
 	"github.com/labstack/echo/v4"
 )
 
@@ -12,7 +13,7 @@ type DomainRequest struct {
 }
 
 // Bind binds an incoming echo request to the internal domain model and perfoms a validation
-func (r *DomainRequest) Bind(c echo.Context, v *Validator) error {
+func (r *DomainRequest) Bind(c echo.Context, v *model.Validator) error {
 	if err := c.Bind(r); err != nil {
 		return err
 	}

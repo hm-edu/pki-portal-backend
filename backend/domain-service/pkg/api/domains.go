@@ -104,13 +104,9 @@ func (h *Handler) DeleteDomains(c echo.Context) error {
 // @Failure 404 {object} echo.HTTPError "Domain in zone does not exist"
 func (h *Handler) ApproveDomain(c echo.Context) error {
 
-	domains, domain, err := h.extractData(c)
+	_, domain, err := h.extractData(c)
 	if err != nil {
 		return err
-	}
-
-	if !helper.Any(domains, func(i *ent.Domain) bool { return i.Approved && strings.HasSuffix(domain.Fqdn, "."+i.Fqdn) }) {
-		return &echo.HTTPError{Code: http.StatusForbidden, Message: "Your not responsible for this zone"}
 	}
 
 	updated, err := h.domainStore.Approve(c.Request().Context(), domain)
