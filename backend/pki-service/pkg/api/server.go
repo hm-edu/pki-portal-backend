@@ -108,7 +108,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 	group := api.app.Group("/smime")
 	{
 		group.Use(jwtMiddleware)
-		group.POST("/enroll", handler.HandleCsr)
+		group.POST("/csr", handler.HandleCsr)
 	}
 
 	api.checkSectigoConfiguration(c)
