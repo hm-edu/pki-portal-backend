@@ -5,6 +5,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// User contains the basic user data provided using OIDC/OAuth2 Access Tokens
 type User struct {
 	Firstname  string `validate:"required"`
 	Lastname   string `validate:"required"`

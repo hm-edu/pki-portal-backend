@@ -81,6 +81,57 @@ const docTemplate = `{
                 }
             }
         },
+        "/smime/csr": {
+            "post": {
+                "security": [
+                    {
+                        "API": []
+                    }
+                ],
+                "description": "This endpoint handles a provided CSR. The validity of the CSR is checked and passed to the sectigo server in combination with the basic user information extracted from the JWT.\nThe server uses his own configuration, so the profile and the lifetime of the certificate can not be modified.\nAfterwards the new certificate is returned as X509 certificate.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SMIME"
+                ],
+                "summary": "SMIME CSR Endpoint",
+                "parameters": [
+                    {
+                        "description": "The CSR",
+                        "name": "csr",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.CsrRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "certificate",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/whoami": {
             "get": {
                 "security": [
@@ -129,6 +180,17 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "message": {}
+            }
+        },
+        "model.CsrRequest": {
+            "type": "object",
+            "required": [
+                "csr"
+            ],
+            "properties": {
+                "csr": {
+                    "type": "string"
+                }
             }
         }
     },

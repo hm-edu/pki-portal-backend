@@ -13,6 +13,20 @@ import (
 	"github.com/spf13/viper"
 )
 
+// HandleCsr godoc
+// @Summary SMIME CSR Endpoint
+// @Description This endpoint handles a provided CSR. The validity of the CSR is checked and passed to the sectigo server in combination with the basic user information extracted from the JWT.
+// @Description The server uses his own configuration, so the profile and the lifetime of the certificate can not be modified.
+// @Description Afterwards the new certificate is returned as X509 certificate.
+// @Tags SMIME
+// @Accept json
+// @Produce json
+// @Router /smime/csr [post]
+// @Param csr body model.CsrRequest true "The CSR"
+// @Security API
+// @Success 200 {string} string "certificate"
+// @Failure 400 {object} echo.HTTPError "Bad Request"
+// @Failure 500 {object} echo.HTTPError "Internal Server Error"
 func (h *Handler) HandleCsr(c echo.Context) error {
 	user := commonnModel.User{}
 
