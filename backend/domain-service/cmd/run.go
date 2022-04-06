@@ -32,18 +32,18 @@ var runCmd = &cobra.Command{
 
 		err := viper.BindPFlags(cmd.Flags())
 		if err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n\n", err.Error())
+			_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n", err.Error())
 			os.Exit(1)
 		}
 		err = godotenv.Load()
 		if err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n\n", err.Error())
-			os.Exit(1)
+			_, _ = fmt.Fprintf(os.Stderr, "Hint: %s\n", err.Error())
 		}
 		viper.AutomaticEnv()
 
 		// configure logging
 		logger, _ := logging.InitZap(viper.GetString("level"))
+		zap.ReplaceGlobals(logger)
 		defer func(logger *zap.Logger) {
 			_ = logger.Sync()
 		}(logger)

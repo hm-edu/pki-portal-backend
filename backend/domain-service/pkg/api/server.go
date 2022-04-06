@@ -9,6 +9,7 @@ import (
 	"github.com/brpaz/echozap"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/hm-edu/domain-service/pkg/api/docs"
+	"github.com/hm-edu/domain-service/pkg/api/domains"
 	"github.com/hm-edu/domain-service/pkg/store"
 	commonApi "github.com/hm-edu/portal-common/api"
 	commonAuth "github.com/hm-edu/portal-common/auth"
@@ -78,6 +79,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 
 	jwtMiddleware := middleware.JWTWithConfig(config)
 
+	api.app.Use(middleware.RequestID())
 	api.app.Use(middleware.Recover())
 	api.app.Use(echozap.ZapLogger(api.logger))
 	api.app.Use(otelecho.Middleware("pki-service"))
@@ -94,22 +96,24 @@ func (api *Server) wireRoutesAndMiddleware() {
 
 	api.app.GET("/docs/*", echoSwagger.EchoWrapHandler(func(c *echoSwagger.Config) {
 		c.URL = "/docs/spec.json"
-	})) // default
+	}))
 	api.app.GET("/healthz", api.healthzHandler)
 	api.app.GET("/readyz", api.readyzHandler)
 	api.app.GET("/whoami", api.whoamiHandler, jwtMiddleware)
 
 	v1 := api.app.Group("/domains")
 	{
-		h := NewHandler(api.store)
+		h := domains.NewHandler(api.store)
 		v1.Use(jwtMiddleware)
 		v1.GET("/", h.ListDomains)
 		v1.POST("/", h.CreateDomain)
-		v1.DELETE("/:id", h.DeleteDomains)
-		v1.POST("/:id/approve", h.ApproveDomain)
-		v1.POST("/:id/transfer", h.TransferDomain)
-		v1.POST("/:id/delegation", h.AddDelegation)
-		v1.DELETE("/:domain/delegation/:delegation", h.DeleteDelegation)
+		{
+			v1.DELETE("/:id", h.DeleteDomains)
+			v1.POST("/:id/approve", h.ApproveDomain)
+			v1.POST("/:id/transfer", h.TransferDomain)
+			v1.POST("/:id/delegation", h.AddDelegation)
+			v1.DELETE("/:domain/delegation/:delegation", h.DeleteDelegation)
+		}
 	}
 
 }
@@ -125,8 +129,10 @@ func (api *Server) ListenAndServe(stopCh <-chan struct{}) {
 			api.logger.Fatal("HTTP server crashed", zap.Error(err))
 		}
 	}()
+
 	ready = 1
 	healthy = 1
+
 	_ = <-stopCh
 	err := api.app.Shutdown(context.Background())
 	if err != nil {

@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DomainServiceClient interface {
 	CheckPermission(ctx context.Context, in *CheckPermissionRequest, opts ...grpc.CallOption) (*CheckPermissionResponse, error)
+	ListDomains(ctx context.Context, in *ListDomainsRequest, opts ...grpc.CallOption) (*ListDomainsResponse, error)
 }
 
 type domainServiceClient struct {
@@ -42,11 +43,21 @@ func (c *domainServiceClient) CheckPermission(ctx context.Context, in *CheckPerm
 	return out, nil
 }
 
+func (c *domainServiceClient) ListDomains(ctx context.Context, in *ListDomainsRequest, opts ...grpc.CallOption) (*ListDomainsResponse, error) {
+	out := new(ListDomainsResponse)
+	err := c.cc.Invoke(ctx, "/domainService.DomainService/ListDomains", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DomainServiceServer is the server API for DomainService service.
 // All implementations must embed UnimplementedDomainServiceServer
 // for forward compatibility
 type DomainServiceServer interface {
 	CheckPermission(context.Context, *CheckPermissionRequest) (*CheckPermissionResponse, error)
+	ListDomains(context.Context, *ListDomainsRequest) (*ListDomainsResponse, error)
 	mustEmbedUnimplementedDomainServiceServer()
 }
 
@@ -56,6 +67,9 @@ type UnimplementedDomainServiceServer struct {
 
 func (UnimplementedDomainServiceServer) CheckPermission(context.Context, *CheckPermissionRequest) (*CheckPermissionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckPermission not implemented")
+}
+func (UnimplementedDomainServiceServer) ListDomains(context.Context, *ListDomainsRequest) (*ListDomainsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListDomains not implemented")
 }
 func (UnimplementedDomainServiceServer) mustEmbedUnimplementedDomainServiceServer() {}
 
@@ -88,6 +102,24 @@ func _DomainService_CheckPermission_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DomainService_ListDomains_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListDomainsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DomainServiceServer).ListDomains(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/domainService.DomainService/ListDomains",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DomainServiceServer).ListDomains(ctx, req.(*ListDomainsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DomainService_ServiceDesc is the grpc.ServiceDesc for DomainService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -98,6 +130,10 @@ var DomainService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CheckPermission",
 			Handler:    _DomainService_CheckPermission_Handler,
+		},
+		{
+			MethodName: "ListDomains",
+			Handler:    _DomainService_ListDomains_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

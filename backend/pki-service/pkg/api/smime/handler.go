@@ -1,4 +1,4 @@
-package api
+package smime
 
 import (
 	"github.com/hm-edu/pki-service/pkg/cfg"

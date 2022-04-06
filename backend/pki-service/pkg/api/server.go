@@ -4,18 +4,17 @@ package api
 import (
 	"context"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/brpaz/echozap"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/hm-edu/pki-service/pkg/api/docs"
+	"github.com/hm-edu/pki-service/pkg/api/smime"
+	"github.com/hm-edu/pki-service/pkg/api/ssl"
 	"github.com/hm-edu/pki-service/pkg/cfg"
 	commonApi "github.com/hm-edu/portal-common/api"
 	commonAuth "github.com/hm-edu/portal-common/auth"
-	"github.com/hm-edu/portal-common/helper"
 	"github.com/hm-edu/sectigo-client/sectigo"
-	"github.com/hm-edu/sectigo-client/sectigo/client"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/lestrrat-go/jwx/jwk"
@@ -80,6 +79,8 @@ func (api *Server) wireRoutesAndMiddleware() {
 	}
 
 	jwtMiddleware := middleware.JWTWithConfig(config)
+
+	api.app.Use(middleware.RequestID())
 	api.app.Use(otelecho.Middleware("pki-service"))
 	api.app.Use(middleware.Recover())
 	api.app.Use(echozap.ZapLogger(api.logger))
@@ -99,46 +100,26 @@ func (api *Server) wireRoutesAndMiddleware() {
 	api.app.GET("/healthz", api.healthzHandler)
 	api.app.GET("/readyz", api.readyzHandler)
 	api.app.GET("/whoami", api.whoamiHandler, jwtMiddleware)
+
 	// According to https://go.dev/src/net/http/client.go:
 	// "Clients are safe for concurrent use by multiple goroutines."
 	// => one http client is fine ;)
 	c := sectigo.NewClient(http.DefaultClient, api.logger, api.sectigoCfg.User, api.sectigoCfg.Password, api.sectigoCfg.CustomerURI)
-	handler := NewHandler(c, api.sectigoCfg)
-	api.app.POST("/acme", api.addAcmeAccount)
-	group := api.app.Group("/smime")
+
+	group := api.app.Group("/ssl")
 	{
+		ssl := ssl.NewHandler(c, api.sectigoCfg)
+		group.Use(jwtMiddleware)
+		group.POST("/acme", ssl.AddAcmeAccount)
+	}
+
+	group = api.app.Group("/smime")
+	{
+		handler := smime.NewHandler(c, api.sectigoCfg)
 		group.Use(jwtMiddleware)
 		group.POST("/csr", handler.HandleCsr)
 	}
 
-	api.checkSectigoConfiguration(c)
-
-}
-
-func (api *Server) checkSectigoConfiguration(c *sectigo.Client) {
-	profiles, err := c.ClientService.Profiles()
-	if err != nil {
-		api.logger.Fatal("fetching profiles failed", zap.Error(err))
-	}
-	if len(*profiles) == 0 {
-		api.logger.Fatal("no profiles found")
-	}
-	found := helper.Any(*profiles, func(t client.ListProfileItem) bool {
-		if t.ID == api.sectigoCfg.SmimeProfile {
-			if helper.Any(t.Terms, func(i int) bool { return i == api.sectigoCfg.SmimeTerm }) &&
-				helper.Any(t.KeyTypes[api.sectigoCfg.SmimeKeyType], func(i string) bool {
-					conv, _ := strconv.Atoi(i)
-					return conv == api.sectigoCfg.SmimeKeyLength
-				}) {
-				return true
-			}
-			return false
-		}
-		return false
-	})
-	if !found {
-		api.logger.Fatal("smime profile not found")
-	}
 }
 
 // ListenAndServe starts the http server and waits for the channel to stop the server

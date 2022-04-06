@@ -51,8 +51,8 @@ const docTemplate = `{
                             }
                         }
                     },
-                    "400": {
-                        "description": "Unauthorized",
+                    "default": {
+                        "description": "Error processing the request",
                         "schema": {
                             "$ref": "#/definitions/echo.HTTPError"
                         }
@@ -94,8 +94,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/model.Domain"
                         }
                     },
-                    "400": {
-                        "description": "Unauthorized",
+                    "default": {
+                        "description": "Error processing the request",
                         "schema": {
                             "$ref": "#/definitions/echo.HTTPError"
                         }
@@ -134,8 +134,8 @@ const docTemplate = `{
                     "204": {
                         "description": ""
                     },
-                    "400": {
-                        "description": "Unauthorized or Request Error",
+                    "default": {
+                        "description": "Error processing the request",
                         "schema": {
                             "$ref": "#/definitions/echo.HTTPError"
                         }
@@ -177,20 +177,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/model.Domain"
                         }
                     },
-                    "400": {
-                        "description": "Unauthorized or Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/echo.HTTPError"
-                        }
-                    },
-                    "403": {
-                        "description": "Access to domain denied",
-                        "schema": {
-                            "$ref": "#/definitions/echo.HTTPError"
-                        }
-                    },
-                    "404": {
-                        "description": "Domain in zone does not exist",
+                    "default": {
+                        "description": "Error processing the request",
                         "schema": {
                             "$ref": "#/definitions/echo.HTTPError"
                         }
@@ -241,8 +229,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/model.Domain"
                         }
                     },
-                    "400": {
-                        "description": "Unauthorized",
+                    "default": {
+                        "description": "Error processing the request",
                         "schema": {
                             "$ref": "#/definitions/echo.HTTPError"
                         }
@@ -291,8 +279,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/model.Domain"
                         }
                     },
-                    "400": {
-                        "description": "Unauthorized",
+                    "default": {
+                        "description": "Error processing the request",
                         "schema": {
                             "$ref": "#/definitions/echo.HTTPError"
                         }
@@ -307,7 +295,7 @@ const docTemplate = `{
                         "API": []
                     }
                 ],
-                "description": "Transfers a domain to a new owner. Transfering is only possible if you are either the owner of the domain itself or responsible for one of the parent zones.",
+                "description": "Transfers a domain to a new owner. Transferring is only possible if you are either the owner of the domain itself or responsible for one of the parent zones.",
                 "consumes": [
                     "application/json"
                 ],
@@ -343,8 +331,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/model.Domain"
                         }
                     },
-                    "400": {
-                        "description": "Unauthorized",
+                    "default": {
+                        "description": "Error processing the request",
                         "schema": {
                             "$ref": "#/definitions/echo.HTTPError"
                         }

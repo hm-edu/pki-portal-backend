@@ -31,18 +31,18 @@ var runCmd = &cobra.Command{
 
 		err := viper.BindPFlags(cmd.Flags())
 		if err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n\n", err.Error())
+			_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n", err.Error())
 			os.Exit(1)
 		}
 		err = godotenv.Load()
 		if err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n\n", err.Error())
-			os.Exit(1)
+			_, _ = fmt.Fprintf(os.Stderr, "Hint: %s\n", err.Error())
 		}
 		viper.AutomaticEnv()
 
 		// configure logging
 		logger, _ := logging.InitZap(viper.GetString("level"))
+		zap.ReplaceGlobals(logger)
 		defer func(logger *zap.Logger) {
 			_ = logger.Sync()
 		}(logger)
@@ -75,6 +75,8 @@ var runCmd = &cobra.Command{
 
 		stopCh := signals.SetupSignalHandler()
 
+		sectigoCfg.CheckSectigoConfiguration()
+
 		// start gRPC server
 		if grpcCfg.Port > 0 {
 			grpcSrv, _ := grpc.NewServer(&grpcCfg, logger)
@@ -97,7 +99,7 @@ func init() {
 	runCmd.Flags().String("audience", "", "The expected audience")
 	runCmd.Flags().String("sectigo_user", "", "The sectigo user")
 	runCmd.Flags().String("sectigo_password", "", "The password for the sectigo user")
-	runCmd.Flags().String("sectigo_customer", "", "The sectigo customerUri")
+	runCmd.Flags().String("sectigo_customeruri", "", "The sectigo customerUri")
 	runCmd.Flags().Int("smime_profile", 0, "The (default) smime profile id")
 	runCmd.Flags().Int("smime_org_id", 0, "The (default) org id")
 	runCmd.Flags().Int("smime_term", 0, "The (default) lifetime")

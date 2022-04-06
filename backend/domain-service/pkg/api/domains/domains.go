@@ -1,4 +1,4 @@
-package api
+package domains
 
 import (
 	"net/http"
@@ -22,7 +22,7 @@ import (
 // @Router /domains/ [get]
 // @Security API
 // @Success 200 {object} []model.Domain
-// @Failure 400 {object} echo.HTTPError "Unauthorized"
+// @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) ListDomains(c echo.Context) error {
 	domains, err := h.domainStore.ListDomains(c.Request().Context(), auth.UserFromRequest(c), false)
 	if err != nil {
@@ -41,7 +41,7 @@ func (h *Handler) ListDomains(c echo.Context) error {
 // @Param domain body model.DomainRequest true "The Domain to create"
 // @Security API
 // @Success 201 {object} model.Domain
-// @Failure 400 {object} echo.HTTPError "Unauthorized"
+// @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) CreateDomain(c echo.Context) error {
 	req := &model.DomainRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
@@ -75,7 +75,7 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 // @Param id path int true "Domain ID"
 // @Security API
 // @Success 204
-// @Failure 400 {object} echo.HTTPError "Unauthorized or Request Error"
+// @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) DeleteDomains(c echo.Context) error {
 
 	_, domain, err := h.extractData(c)
@@ -99,9 +99,7 @@ func (h *Handler) DeleteDomains(c echo.Context) error {
 // @Param id path int true "Domain ID"
 // @Security API
 // @Success 200 {object} model.Domain The updated domain
-// @Failure 400 {object} echo.HTTPError "Unauthorized or Bad Request"
-// @Failure 403 {object} echo.HTTPError "Access to domain denied"
-// @Failure 404 {object} echo.HTTPError "Domain in zone does not exist"
+// @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) ApproveDomain(c echo.Context) error {
 
 	_, domain, err := h.extractData(c)
@@ -111,7 +109,7 @@ func (h *Handler) ApproveDomain(c echo.Context) error {
 
 	updated, err := h.domainStore.Approve(c.Request().Context(), domain)
 	if err != nil {
-		return &echo.HTTPError{Code: http.StatusBadRequest}
+		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while approving domain"}
 	}
 
 	return c.JSON(http.StatusOK, model.DomainToOutput(updated))
@@ -120,12 +118,12 @@ func (h *Handler) ApproveDomain(c echo.Context) error {
 func (h *Handler) extractData(c echo.Context) ([]*ent.Domain, *ent.Domain, error) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return nil, nil, &echo.HTTPError{Code: http.StatusBadRequest}
+		return nil, nil, &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid domain ID"}
 	}
 
 	domains, err := h.domainStore.ListDomains(c.Request().Context(), auth.UserFromRequest(c), true)
 	if err != nil {
-		return nil, nil, &echo.HTTPError{Code: http.StatusBadRequest}
+		return nil, nil, &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while fetching domains"}
 	}
 
 	var domain *ent.Domain
@@ -147,7 +145,7 @@ func (h *Handler) extractData(c echo.Context) ([]*ent.Domain, *ent.Domain, error
 // @Param id path int true "Domain ID"
 // @Security API
 // @Success 200 {object} model.Domain The updated domain
-// @Failure 400 {object} echo.HTTPError "Unauthorized"
+// @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) TransferDomain(c echo.Context) error {
 
 	req := &model.TransferRequest{}
@@ -185,28 +183,16 @@ func (h *Handler) TransferDomain(c echo.Context) error {
 // @Param delegation path int true "Delegation ID"
 // @Security API
 // @Success 200 {object} model.Domain The updated domain
-// @Failure 400 {object} echo.HTTPError "Unauthorized"
+// @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) DeleteDelegation(c echo.Context) error {
-
-	domainID, err := strconv.Atoi(c.Param("domain"))
+	_, domain, err := h.extractData(c)
 	if err != nil {
-		return &echo.HTTPError{Code: http.StatusBadRequest}
+		return err
 	}
 
 	delegationID, err := strconv.Atoi(c.Param("delegation"))
 	if err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest}
-	}
-
-	domains, err := h.domainStore.ListDomains(c.Request().Context(), auth.UserFromRequest(c), true)
-	if err != nil {
-		return &echo.HTTPError{Code: http.StatusBadRequest}
-	}
-
-	var domain *ent.Domain
-	domain = helper.First(domains, func(i *ent.Domain) bool { return i.ID == domainID })
-	if domain == nil {
-		return &echo.HTTPError{Code: http.StatusNotFound, Message: "Domain not found"}
 	}
 
 	delegated, err := domain.QueryDelegations().Where(delegation.ID(delegationID)).First(c.Request().Context())
@@ -233,7 +219,7 @@ func (h *Handler) DeleteDelegation(c echo.Context) error {
 // @Param id path int true "Domain ID"
 // @Security API
 // @Success 200 {object} model.Domain The updated domain
-// @Failure 400 {object} echo.HTTPError "Unauthorized"
+// @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) AddDelegation(c echo.Context) error {
 
 	req := &model.DelegationRequest{}

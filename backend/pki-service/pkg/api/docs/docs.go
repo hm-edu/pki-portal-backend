@@ -117,14 +117,8 @@ const docTemplate = `{
                             "type": "string"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/echo.HTTPError"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
+                    "default": {
+                        "description": "Error processing the request",
                         "schema": {
                             "$ref": "#/definitions/echo.HTTPError"
                         }
