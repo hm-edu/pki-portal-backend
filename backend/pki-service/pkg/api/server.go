@@ -110,6 +110,8 @@ func (api *Server) wireRoutesAndMiddleware() {
 	{
 		ssl := ssl.NewHandler(c, api.sectigoCfg)
 		group.Use(jwtMiddleware)
+		group.GET("/", ssl.List)
+		group.POST("/revoke", ssl.Revoke)
 		group.POST("/acme", ssl.AddAcmeAccount)
 	}
 
@@ -117,6 +119,8 @@ func (api *Server) wireRoutesAndMiddleware() {
 	{
 		handler := smime.NewHandler(c, api.sectigoCfg)
 		group.Use(jwtMiddleware)
+		group.GET("/", handler.List)
+		group.POST("/revoke", handler.Revoke)
 		group.POST("/csr", handler.HandleCsr)
 	}
 

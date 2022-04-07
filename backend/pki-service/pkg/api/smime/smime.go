@@ -14,6 +14,33 @@ import (
 	"go.opentelemetry.io/otel"
 )
 
+// List godoc
+// @Summary SMIME List Endpoint
+// @Tags SMIME
+// @Accept json
+// @Produce json
+// @Router /smime/ [get]
+// @Security API
+// @Success 200 {object} model.SMIME "certificate"
+// @Response default {object} echo.HTTPError "Error processing the request"
+func (h *Handler) List(c echo.Context) error {
+	return nil
+}
+
+// Revoke godoc
+// @Summary SMIME Revoke Endpoint
+// @Tags SMIME
+// @Accept json
+// @Produce json
+// @Router /smime/revoke [post]
+// @Param serial body string true "The serial of the certificate to revoke"
+// @Security API
+// @Success 204
+// @Response default {object} echo.HTTPError "Error processing the request"
+func (h *Handler) Revoke(c echo.Context) error {
+	return nil
+}
+
 // HandleCsr godoc
 // @Summary SMIME CSR Endpoint
 // @Description This endpoint handles a provided CSR. The validity of the CSR is checked and passed to the sectigo server in combination with the basic user information extracted from the JWT.
