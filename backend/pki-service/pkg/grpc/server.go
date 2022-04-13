@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net"
 
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	"github.com/hm-edu/portal-common/tracing"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -44,8 +46,8 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	}
 
 	srv := grpc.NewServer(
-		grpc.UnaryInterceptor(tracing.NewGRPUnaryServerInterceptor()),
-		grpc.StreamInterceptor(tracing.NewGRPCStreamServerInterceptor()))
+		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(tracing.NewGRPUnaryServerInterceptor(), grpc_zap.UnaryServerInterceptor(s.logger))),
+		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(tracing.NewGRPCStreamServerInterceptor(), grpc_zap.StreamServerInterceptor(s.logger))))
 	server := health.NewServer()
 	reflection.Register(srv)
 	grpc_health_v1.RegisterHealthServer(srv, server)

@@ -23,6 +23,16 @@ func NewDomainStore(db *ent.Client) *DomainStore {
 	}
 }
 
+// ListAllDomains returns all domains.
+func (s *DomainStore) ListAllDomains(ctx context.Context, approved bool) ([]string, error) {
+	var domains []string
+	err := s.db.Domain.Query().Where(domain.Approved(approved)).Select(domain.FieldFqdn).Scan(ctx, &domains)
+	if err != nil {
+		return nil, err
+	}
+	return domains, nil
+}
+
 // ListDomains returns all domains that are owned or delegated to one user
 func (s *DomainStore) ListDomains(ctx context.Context, owner string, approved bool) ([]*ent.Domain, error) {
 	tx, err := s.db.Tx(ctx)

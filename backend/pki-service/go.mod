@@ -6,7 +6,6 @@ require (
 	github.com/brpaz/echozap v1.1.2
 	github.com/getkin/kin-openapi v0.94.0
 	github.com/golang-jwt/jwt/v4 v4.4.1
-	github.com/hm-edu/domain-api v0.0.0-00010101000000-000000000000
 	github.com/hm-edu/portal-common v0.0.0-20220404094030-9bf17529d940
 	github.com/hm-edu/sectigo-client v0.0.0-20220403042717-5cef32a54cfc
 	github.com/jarcoal/httpmock v1.1.0
@@ -36,6 +35,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
+	github.com/hm-edu/portal-apis v0.0.0-20220413135645-44f42dd816bf // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/labstack/gommon v0.3.1 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
@@ -77,6 +77,7 @@ require (
 	github.com/go-openapi/spec v0.20.4 // indirect
 	github.com/go-openapi/swag v0.21.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
@@ -97,5 +98,3 @@ require (
 )
 
 replace github.com/hm-edu/portal-common => ../common
-
-replace github.com/hm-edu/domain-api => ../domain-api/go

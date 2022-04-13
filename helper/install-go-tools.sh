@@ -22,9 +22,9 @@ go_protoc() {
     # shellcheck disable=2035
     protoc \
     -I $HOME/.local/protoc/include -I. \
-    --go_out=go \
+    --go_out=. \
     --go_opt=paths=source_relative \
-    --go-grpc_out=go \
+    --go-grpc_out=. \
     --go-grpc_opt=paths=source_relative \
     *.proto
 }

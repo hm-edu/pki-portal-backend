@@ -4,7 +4,6 @@ go 1.18
 
 require (
 	github.com/getkin/kin-openapi v0.94.0
-	github.com/hm-edu/domain-api v0.0.0-00010101000000-000000000000
 	github.com/hm-edu/portal-common v0.0.0-20220331123818-e3651e095512
 	go.opentelemetry.io/otel v1.6.1 // indirect
 	go.uber.org/zap v1.21.0
@@ -74,6 +73,8 @@ require (
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
+	github.com/hm-edu/portal-apis v0.0.0-20220413135645-44f42dd816bf // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
@@ -115,5 +116,3 @@ require (
 )
 
 replace github.com/hm-edu/portal-common => ../common
-
-replace github.com/hm-edu/domain-api => ../domain-api/go

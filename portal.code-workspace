@@ -11,9 +11,6 @@
         },
         {
             "path": "backend/pki-service"
-        },
-        {
-            "path": "backend/domain-api/go"
         }
     ],
     "settings": {

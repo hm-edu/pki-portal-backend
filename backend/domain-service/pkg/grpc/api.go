@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	pb "github.com/hm-edu/domain-api"
 	"github.com/hm-edu/domain-service/ent"
 	"github.com/hm-edu/domain-service/pkg/store"
+	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/helper"
 )
 
@@ -40,6 +40,19 @@ func (api *domainAPIServer) CheckPermission(ctx context.Context, req *pb.CheckPe
 	resp := pb.CheckPermissionResponse{Permissions: permissions}
 
 	return &resp, nil
+}
+
+func (api *domainAPIServer) CheckRegistration(ctx context.Context, req *pb.CheckRegistrationRequest) (*pb.CheckRegistrationResponse, error) {
+	domains, err := api.store.ListAllDomains(ctx, true)
+	if err != nil {
+		return nil, err
+	}
+	missing := helper.Where(req.Domains, func(t string) bool {
+		return !helper.Any(domains, func(d string) bool {
+			return d == t
+		})
+	})
+	return &pb.CheckRegistrationResponse{Missing: missing}, nil
 }
 
 func (api *domainAPIServer) ListDomains(ctx context.Context, req *pb.ListDomainsRequest) (*pb.ListDomainsResponse, error) {
