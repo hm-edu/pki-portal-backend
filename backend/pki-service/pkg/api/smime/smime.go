@@ -24,7 +24,7 @@ import (
 // @Success 200 {object} model.SMIME "certificate"
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) List(c echo.Context) error {
-	return nil
+	return c.JSON(http.StatusOK, model.SMIME{})
 }
 
 // Revoke godoc
@@ -38,7 +38,7 @@ func (h *Handler) List(c echo.Context) error {
 // @Success 204
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) Revoke(c echo.Context) error {
-	return nil
+	return c.NoContent(http.StatusNoContent)
 }
 
 // HandleCsr godoc

@@ -1,6 +1,11 @@
 package ssl
 
-import "github.com/labstack/echo/v4"
+import (
+	"net/http"
+
+	"github.com/hm-edu/pki-service/pkg/model"
+	"github.com/labstack/echo/v4"
+)
 
 // List godoc
 // @Summary SSL List Endpoint
@@ -12,7 +17,7 @@ import "github.com/labstack/echo/v4"
 // @Success 200 {object} model.SSL "Certificates"
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) List(c echo.Context) error {
-	return nil
+	return c.JSON(http.StatusOK, model.SSL{})
 }
 
 // Revoke godoc
@@ -26,5 +31,5 @@ func (h *Handler) List(c echo.Context) error {
 // @Success 204
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) Revoke(c echo.Context) error {
-	return nil
+	return c.NoContent(http.StatusNoContent)
 }

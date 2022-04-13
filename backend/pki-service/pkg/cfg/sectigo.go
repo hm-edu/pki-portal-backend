@@ -21,6 +21,7 @@ type SectigoConfiguration struct {
 	SmimeKeyType   string `mapstructure:"smime_key_type"`
 }
 
+// CheckSectigoConfiguration checks the sectigo configuration for the syntactical correctness.
 func (cfg *SectigoConfiguration) CheckSectigoConfiguration() {
 
 	logger := zap.L()

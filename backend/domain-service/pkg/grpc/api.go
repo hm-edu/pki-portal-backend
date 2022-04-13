@@ -32,9 +32,8 @@ func (api *domainAPIServer) CheckPermission(ctx context.Context, req *pb.CheckPe
 			return d.Fqdn == t || strings.HasSuffix(t, fmt.Sprintf(".%s", d.Fqdn))
 		}) {
 			return &pb.Permission{Domain: t, Granted: true}
-		} else {
-			return &pb.Permission{Domain: t, Granted: false}
 		}
+		return &pb.Permission{Domain: t, Granted: false}
 	})
 
 	resp := pb.CheckPermissionResponse{Permissions: permissions}
