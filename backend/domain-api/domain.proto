@@ -7,7 +7,17 @@ option go_package = "github.com/hm-edu/domain-api";
 service DomainService {
     rpc CheckPermission(CheckPermissionRequest) returns (CheckPermissionResponse) {}
     rpc ListDomains(ListDomainsRequest) returns (ListDomainsResponse) {}
+    rpc CheckRegistration(CheckRegistrationRequest) returns (CheckRegistrationResponse) {}
 }
+
+message CheckRegistrationRequest{
+    repeated string domains = 1;
+}
+
+message CheckRegistrationResponse{
+    repeated string missing = 1;
+}
+
 message ListDomainsRequest {
     bool approved = 1;
     string user = 2;

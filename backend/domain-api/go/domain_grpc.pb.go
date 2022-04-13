@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type DomainServiceClient interface {
 	CheckPermission(ctx context.Context, in *CheckPermissionRequest, opts ...grpc.CallOption) (*CheckPermissionResponse, error)
 	ListDomains(ctx context.Context, in *ListDomainsRequest, opts ...grpc.CallOption) (*ListDomainsResponse, error)
+	CheckRegistration(ctx context.Context, in *CheckRegistrationRequest, opts ...grpc.CallOption) (*CheckRegistrationResponse, error)
 }
 
 type domainServiceClient struct {
@@ -52,12 +53,22 @@ func (c *domainServiceClient) ListDomains(ctx context.Context, in *ListDomainsRe
 	return out, nil
 }
 
+func (c *domainServiceClient) CheckRegistration(ctx context.Context, in *CheckRegistrationRequest, opts ...grpc.CallOption) (*CheckRegistrationResponse, error) {
+	out := new(CheckRegistrationResponse)
+	err := c.cc.Invoke(ctx, "/domainService.DomainService/CheckRegistration", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DomainServiceServer is the server API for DomainService service.
 // All implementations must embed UnimplementedDomainServiceServer
 // for forward compatibility
 type DomainServiceServer interface {
 	CheckPermission(context.Context, *CheckPermissionRequest) (*CheckPermissionResponse, error)
 	ListDomains(context.Context, *ListDomainsRequest) (*ListDomainsResponse, error)
+	CheckRegistration(context.Context, *CheckRegistrationRequest) (*CheckRegistrationResponse, error)
 	mustEmbedUnimplementedDomainServiceServer()
 }
 
@@ -70,6 +81,9 @@ func (UnimplementedDomainServiceServer) CheckPermission(context.Context, *CheckP
 }
 func (UnimplementedDomainServiceServer) ListDomains(context.Context, *ListDomainsRequest) (*ListDomainsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListDomains not implemented")
+}
+func (UnimplementedDomainServiceServer) CheckRegistration(context.Context, *CheckRegistrationRequest) (*CheckRegistrationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckRegistration not implemented")
 }
 func (UnimplementedDomainServiceServer) mustEmbedUnimplementedDomainServiceServer() {}
 
@@ -120,6 +134,24 @@ func _DomainService_ListDomains_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DomainService_CheckRegistration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckRegistrationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DomainServiceServer).CheckRegistration(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/domainService.DomainService/CheckRegistration",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DomainServiceServer).CheckRegistration(ctx, req.(*CheckRegistrationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DomainService_ServiceDesc is the grpc.ServiceDesc for DomainService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -134,6 +166,10 @@ var DomainService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListDomains",
 			Handler:    _DomainService_ListDomains_Handler,
+		},
+		{
+			MethodName: "CheckRegistration",
+			Handler:    _DomainService_CheckRegistration_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
