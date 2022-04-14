@@ -1,5 +1,5 @@
 image:
-  file: .gitpod.Dockerimage
+  file: .gitpod.Dockerfile
 tasks: 
    - init: |
       go install github.com/swaggo/swag/cmd/swag@latest && \ 
