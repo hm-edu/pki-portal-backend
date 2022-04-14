@@ -37,7 +37,7 @@ func NewGRPCStreamServerInterceptor() grpc.StreamServerInterceptor {
 func InitTracer(logger *zap.Logger, name string) *sdktrace.TracerProvider {
 	//exporter, err := stdout.New(stdout.WithPrettyPrint())
 	logger.Debug("Setting up tracing provider")
-	exporter, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint("http://localhost:14268/api/traces")))
+	exporter, err := jaeger.New(jaeger.WithCollectorEndpoint())
 	if err != nil {
 		logger.Fatal("Error creating jaeger collector.", zap.Error(err))
 	}

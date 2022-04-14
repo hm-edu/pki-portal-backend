@@ -10,8 +10,9 @@ jobs:
       fail-fast: false
       matrix:
         dir: 
-          - backend/pki-service
-          - backend/domain-service
+          - backend/pki-rest-interface
+          - backend/pki-handler
+          - backend/domain-rest-interface
           - backend/common    
     steps:
       - uses: actions/checkout@v3

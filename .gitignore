@@ -1,8 +1,8 @@
-backend/pki-service/pki-service
-backend/domain-service/domain-service
+backend/pki-rest-interface/pki-rest-interface
+backend/domain-rest-interface/domain-rest-interface
 **/.idea
 **/.env
 **/__debug_bin
 **/*.sqlite3
 **/*.db
-backend/domain-service/coverage.txt
+backend/domain-rest-interface/coverage.txt

@@ -7,10 +7,13 @@
             "path": "backend/common"
         },
         {
-            "path": "backend/domain-service"
+            "path": "backend/domain-rest-interface"
         },
         {
-            "path": "backend/pki-service"
+            "path": "backend/pki-rest-interface"
+        },
+        {
+            "path": "backend/pki-handler"
         }
     ],
     "settings": {
@@ -31,7 +34,6 @@
         },
         "go.formatTool": "goimports",
         "go.useLanguageServer": true,
-        "workspace.supportMultiRootWorkspace": true,
         "launch": {},
         "files.exclude": {
             "**/.git": true
