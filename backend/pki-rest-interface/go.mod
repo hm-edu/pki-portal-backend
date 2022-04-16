@@ -7,7 +7,7 @@ require (
 	github.com/getkin/kin-openapi v0.94.0
 	github.com/golang-jwt/jwt/v4 v4.4.1
 	github.com/hm-edu/portal-common v0.0.0-20220404094030-9bf17529d940
-	github.com/hm-edu/sectigo-client v0.0.0-20220403042717-5cef32a54cfc
+	github.com/hm-edu/sectigo-client v0.0.0-20220416173800-3b90aae52576
 	github.com/jarcoal/httpmock v1.1.0
 	github.com/joho/godotenv v1.4.0
 	github.com/labstack/echo/v4 v4.7.2
@@ -35,7 +35,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/hm-edu/portal-apis v0.0.0-20220413135645-44f42dd816bf // indirect
+	github.com/hm-edu/portal-apis v0.0.0-20220416165402-16ac3096bc05 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/labstack/gommon v0.3.1 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
@@ -88,11 +88,11 @@ require (
 	go.opentelemetry.io/otel/trace v1.6.1 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
-	golang.org/x/net v0.0.0-20220403103023-749bd193bc2b // indirect
-	golang.org/x/sys v0.0.0-20220403205710-6acee93ad0eb // indirect
+	golang.org/x/net v0.0.0-20220412020605-290c469a71a5 // indirect
+	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.10 // indirect
-	google.golang.org/genproto v0.0.0-20220401170504-314d38edb7de // indirect
+	google.golang.org/genproto v0.0.0-20220414192740-2d67ff6cf2b4 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

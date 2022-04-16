@@ -181,6 +181,8 @@ github.com/hm-edu/sectigo-client v0.0.0-20220416042957-6cd096934fac h1:QXyp0vFOz
 github.com/hm-edu/sectigo-client v0.0.0-20220416042957-6cd096934fac/go.mod h1:Sd9RYOQ9sngEkDHWipUsPsptKgB+Oc6QOyvF0D+2pJ0=
 github.com/hm-edu/sectigo-client v0.0.0-20220416110255-cdd824f55e21 h1:NwbOeR6iQEzuPHXdxT3dpSEGt6FMQZ7MOzz7MTPM0u4=
 github.com/hm-edu/sectigo-client v0.0.0-20220416110255-cdd824f55e21/go.mod h1:Sd9RYOQ9sngEkDHWipUsPsptKgB+Oc6QOyvF0D+2pJ0=
+github.com/hm-edu/sectigo-client v0.0.0-20220416173800-3b90aae52576 h1:HXyAn4b5p0ZYDYEvJSQXnVO4xzwlgBkTetWZbXWMrtI=
+github.com/hm-edu/sectigo-client v0.0.0-20220416173800-3b90aae52576/go.mod h1:Sd9RYOQ9sngEkDHWipUsPsptKgB+Oc6QOyvF0D+2pJ0=
 github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/ianlancetaylor/demangle v0.0.0-20200824232613-28f6c0f3b639/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NHg9XEKhtSvM=

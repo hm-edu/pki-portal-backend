@@ -3,7 +3,7 @@ module github.com/hm-edu/pki-handler
 go 1.18
 
 require (
-	github.com/hm-edu/sectigo-client v0.0.0-20220416110255-cdd824f55e21
+	github.com/hm-edu/sectigo-client v0.0.0-20220416173800-3b90aae52576
 	github.com/mattn/go-sqlite3 v1.14.10
 	github.com/spf13/cobra v1.4.0
 	go.uber.org/zap v1.21.0
