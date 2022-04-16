@@ -6,3 +6,4 @@ backend/domain-rest-interface/domain-rest-interface
 **/*.sqlite3
 **/*.db
 backend/domain-rest-interface/coverage.txt
+backend/pki-handler/pki-handler

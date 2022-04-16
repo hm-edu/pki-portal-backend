@@ -55,7 +55,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 // @Success 200 {string} string "certificate"
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) HandleCsr(c echo.Context) error {
-	_, span := otel.GetTracerProvider().Tracer("smime").Start(c.Request().Context(), "operation")
+	_, span := otel.GetTracerProvider().Tracer("smime").Start(c.Request().Context(), "handleCsr")
 	defer span.End()
 	span.AddEvent("Validation")
 	user := commonnModel.User{}
