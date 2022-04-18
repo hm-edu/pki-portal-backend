@@ -19,7 +19,7 @@ import (
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) List(c echo.Context) error {
 
-	h.ssl.ListCertificates(c.Request().Context(), &pb.ListSslRequest{})
+	_, _ = h.ssl.ListCertificates(c.Request().Context(), &pb.ListSslRequest{})
 
 	return c.JSON(http.StatusOK, model.SSL{})
 }

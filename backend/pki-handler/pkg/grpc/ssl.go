@@ -216,7 +216,7 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 	return &emptypb.Empty{}, nil
 }
 
-// For polls the given function 'f', once every 'interval', up to 'timeout'.
+// WaitFor polls the given function 'f', once every 'interval', up to 'timeout'.
 func WaitFor(timeout, interval time.Duration, f func() (bool, error)) error {
 	var lastErr error
 	timeUp := time.After(timeout)
