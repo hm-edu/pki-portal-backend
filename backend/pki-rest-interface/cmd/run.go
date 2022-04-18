@@ -58,7 +58,7 @@ var runCmd = &cobra.Command{
 
 		// load handler config
 		var handlerCfg cfg.HandlerConfiguration
-		if err := viper.Unmarshal(&srvCfg); err != nil {
+		if err := viper.Unmarshal(&handlerCfg); err != nil {
 			logger.Panic("config unmarshal failed", zap.Error(err))
 		}
 		tp := tracing.InitTracer(logger, "pki-rest-interface")
