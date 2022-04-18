@@ -13,6 +13,7 @@ import (
 	"github.com/hm-edu/portal-common/helper"
 	"github.com/hm-edu/sectigo-client/sectigo"
 	"github.com/hm-edu/sectigo-client/sectigo/client"
+
 	"go.opentelemetry.io/otel"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"

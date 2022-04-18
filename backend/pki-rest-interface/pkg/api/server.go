@@ -8,6 +8,11 @@ import (
 
 	"github.com/brpaz/echozap"
 	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/lestrrat-go/jwx/jwk"
+	echoSwagger "github.com/swaggo/echo-swagger"
+
 	"github.com/hm-edu/pki-rest-interface/pkg/api/docs"
 	"github.com/hm-edu/pki-rest-interface/pkg/api/smime"
 	"github.com/hm-edu/pki-rest-interface/pkg/api/ssl"
@@ -15,10 +20,7 @@ import (
 	pb "github.com/hm-edu/portal-apis"
 	commonApi "github.com/hm-edu/portal-common/api"
 	commonAuth "github.com/hm-edu/portal-common/auth"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	"github.com/lestrrat-go/jwx/jwk"
-	echoSwagger "github.com/swaggo/echo-swagger"
+
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/zap"
@@ -156,7 +158,8 @@ func smimeClient(host string) (pb.SmimeServiceClient, error) {
 }
 
 func connect(host string) (*grpc.ClientConn, error) {
-	ctx, _ := context.WithTimeout(context.TODO(), time.Second*3)
+	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*3)
+	defer cancel()
 	creds, err := xds.NewClientCredentials(xds.ClientOptions{
 		FallbackCreds: insecure.NewCredentials(),
 	})
