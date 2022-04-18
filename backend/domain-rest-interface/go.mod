@@ -61,6 +61,8 @@ require (
 require (
 	entgo.io/ent v0.10.1
 	github.com/brpaz/echozap v1.1.2
+	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
+	github.com/hm-edu/portal-apis v0.0.0-20220413135645-44f42dd816bf
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/lestrrat-go/jwx v1.2.21
 	github.com/mattn/go-sqlite3 v1.14.12
@@ -71,11 +73,18 @@ require (
 )
 
 require (
+	cloud.google.com/go v0.99.0 // indirect
+	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
+	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/cncf/udpa/go v0.0.0-20210930031921-04548b0d99d4 // indirect
+	github.com/cncf/xds/go v0.0.0-20211130200136-a8f946100490 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/envoyproxy/go-control-plane v0.10.1 // indirect
+	github.com/envoyproxy/protoc-gen-validate v0.6.2 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
-	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
-	github.com/hm-edu/portal-apis v0.0.0-20220413135645-44f42dd816bf // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8 // indirect
+	google.golang.org/appengine v1.6.7 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
 
@@ -88,7 +97,7 @@ require (
 	github.com/go-openapi/inflect v0.19.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
-	github.com/go-playground/validator/v10 v10.10.1
+	github.com/go-playground/validator/v10 v10.10.1 // indirect
 	github.com/goccy/go-json v0.9.6 // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.1
 	github.com/google/go-cmp v0.5.7 // indirect

@@ -11,9 +11,12 @@ import (
 	"github.com/hm-edu/portal-common/tracing"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	creds "google.golang.org/grpc/credentials/xds"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/grpc/xds"
 )
 
 // Server is the basic structure of the GRPC server.
@@ -48,10 +51,13 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	if err != nil {
 		s.logger.Fatal("failed to listen", zap.Int("port", s.config.Port))
 	}
-
-	srv := grpc.NewServer(
+	creds, err := creds.NewServerCredentials(creds.ServerOptions{FallbackCreds: insecure.NewCredentials()})
+	if err != nil {
+		s.logger.Fatal("failed to get credentials")
+	}
+	srv := xds.NewGRPCServer(
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(tracing.NewGRPUnaryServerInterceptor(), grpc_zap.UnaryServerInterceptor(s.logger))),
-		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(tracing.NewGRPCStreamServerInterceptor(), grpc_zap.StreamServerInterceptor(s.logger))))
+		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(tracing.NewGRPCStreamServerInterceptor(), grpc_zap.StreamServerInterceptor(s.logger))), grpc.Creds(creds))
 
 	server := health.NewServer()
 	reflection.Register(srv)

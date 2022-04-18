@@ -11,8 +11,15 @@ require (
 
 require (
 	ariga.io/atlas v0.3.7-0.20220303204946-787354f533c3 // indirect
+	cloud.google.com/go/compute v1.5.0 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
+	github.com/census-instrumentation/opencensus-proto v0.2.1 // indirect
+	github.com/cespare/xxhash/v2 v2.1.1 // indirect
+	github.com/cncf/udpa/go v0.0.0-20210930031921-04548b0d99d4 // indirect
+	github.com/cncf/xds/go v0.0.0-20211011173535-cb28da3451f1 // indirect
+	github.com/envoyproxy/go-control-plane v0.9.10-0.20210907150352-cf90f659a021 // indirect
+	github.com/envoyproxy/protoc-gen-validate v0.1.0 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
 	github.com/google/go-cmp v0.5.7 // indirect
 	github.com/google/uuid v1.3.0 // indirect
@@ -21,6 +28,8 @@ require (
 	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
 	github.com/zclconf/go-cty v1.8.0 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
+	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5 // indirect
+	google.golang.org/appengine v1.6.7 // indirect
 )
 
 require (
@@ -32,7 +41,7 @@ require (
 	go.opentelemetry.io/otel v1.6.1
 	go.opentelemetry.io/otel/exporters/jaeger v1.6.1 // indirect
 	go.opentelemetry.io/otel/sdk v1.6.1 // indirect
-	go.opentelemetry.io/otel/trace v1.6.1 // indirect
+	go.opentelemetry.io/otel/trace v1.6.1
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	google.golang.org/protobuf v1.28.0
