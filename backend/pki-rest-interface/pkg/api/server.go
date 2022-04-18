@@ -20,6 +20,7 @@ import (
 	"github.com/lestrrat-go/jwx/jwk"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -167,6 +168,7 @@ func connect(host string) (*grpc.ClientConn, error) {
 		host,
 		grpc.WithTransportCredentials(creds),
 		grpc.WithBlock(),
+		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
 	)
 	if err != nil {
 		return nil, err
