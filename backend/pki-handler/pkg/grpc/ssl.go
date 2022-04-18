@@ -61,13 +61,13 @@ func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequ
 	if err != nil {
 		return nil, status.Error(codes.Internal, "Error querying certificates")
 	}
-	return &pb.ListSslResponse{Items: helper.Map(certificates, func(x *ent.Certificate) *pb.CertificateDetails {
+	return &pb.ListSslResponse{Items: helper.Map(certificates, func(x *ent.Certificate) *pb.ListSslResponse_CertificateDetails {
 
 		var nbf *timestamppb.Timestamp
 		if x.NotBefore != nil {
 			nbf = timestamppb.New(*x.NotBefore)
 		}
-		return &pb.CertificateDetails{
+		return &pb.ListSslResponse_CertificateDetails{
 			Id:                      int32(x.SslId),
 			CommonName:              x.CommonName,
 			SubjectAlternativeNames: helper.Map(x.Edges.Domains, func(t *ent.Domain) string { return t.Fqdn }),
@@ -140,7 +140,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	}
 
 	cert := ""
-	err = s.WaitFor(5*time.Minute, 5*time.Second, func() (bool, error) {
+	err = WaitFor(5*time.Minute, 5*time.Second, func() (bool, error) {
 		c, err := s.client.SslService.Collect(enrollment.SslID, "x509")
 		if err != nil {
 			if e, ok := err.(*sectigo.ErrorResponse); ok {
@@ -217,7 +217,7 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 }
 
 // For polls the given function 'f', once every 'interval', up to 'timeout'.
-func (s *sslAPIServer) WaitFor(timeout, interval time.Duration, f func() (bool, error)) error {
+func WaitFor(timeout, interval time.Duration, f func() (bool, error)) error {
 	var lastErr error
 	timeUp := time.After(timeout)
 	for {

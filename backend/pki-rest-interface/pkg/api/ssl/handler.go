@@ -1,24 +1,26 @@
 package ssl
 
 import (
-	"github.com/hm-edu/pki-rest-interface/pkg/cfg"
+	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/model"
-	"github.com/hm-edu/sectigo-client/sectigo"
+	"go.uber.org/zap"
 )
 
 // Handler is a wrapper around the domainstore and a validator.
 type Handler struct {
-	sectigoClient *sectigo.Client
-	sectigoCfg    *cfg.SectigoConfiguration
-	validator     *model.Validator
+	validator *model.Validator
+	domain    pb.DomainServiceClient
+	ssl       pb.SSLServiceClient
+	logger    *zap.Logger
 }
 
 // NewHandler generates a new handler for acting on the domain storage.
-func NewHandler(c *sectigo.Client, sectigoCfg *cfg.SectigoConfiguration) *Handler {
+func NewHandler(domain pb.DomainServiceClient, ssl pb.SSLServiceClient, logger *zap.Logger) *Handler {
 	v := model.NewValidator()
 	return &Handler{
-		sectigoClient: c,
-		validator:     v,
-		sectigoCfg:    sectigoCfg,
+		validator: v,
+		domain:    domain,
+		ssl:       ssl,
+		logger:    logger,
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/hm-edu/pki-rest-interface/pkg/model"
+	pb "github.com/hm-edu/portal-apis"
 	"github.com/labstack/echo/v4"
 )
 
@@ -17,6 +18,9 @@ import (
 // @Success 200 {object} model.SSL "Certificates"
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) List(c echo.Context) error {
+
+	h.ssl.ListCertificates(c.Request().Context(), &pb.ListSslRequest{})
+
 	return c.JSON(http.StatusOK, model.SSL{})
 }
 

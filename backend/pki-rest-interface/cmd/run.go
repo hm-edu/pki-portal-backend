@@ -55,12 +55,12 @@ var runCmd = &cobra.Command{
 		if err := viper.Unmarshal(&srvCfg); err != nil {
 			logger.Panic("config unmarshal failed", zap.Error(err))
 		}
-		// load HTTP server config
-		var sectigoCfg cfg.SectigoConfiguration
-		if err := viper.Unmarshal(&sectigoCfg); err != nil {
+
+		// load handler config
+		var handlerCfg cfg.HandlerConfiguration
+		if err := viper.Unmarshal(&srvCfg); err != nil {
 			logger.Panic("config unmarshal failed", zap.Error(err))
 		}
-
 		tp := tracing.InitTracer(logger, "pki-rest-interface")
 
 		defer func() {
@@ -71,8 +71,6 @@ var runCmd = &cobra.Command{
 
 		stopCh := signals.SetupSignalHandler()
 
-		sectigoCfg.CheckSectigoConfiguration()
-
 		// start gRPC server
 		if grpcCfg.Port > 0 {
 			grpcSrv, _ := grpc.NewServer(&grpcCfg, logger)
@@ -80,7 +78,7 @@ var runCmd = &cobra.Command{
 		}
 
 		// start HTTP server
-		srv := api.NewServer(logger, &srvCfg, &sectigoCfg)
+		srv := api.NewServer(logger, &srvCfg, &handlerCfg)
 		srv.ListenAndServe(stopCh)
 	},
 }
@@ -93,13 +91,8 @@ func init() {
 	runCmd.Flags().Int("grpc-port", 8081, "GRPC port to bind service to")
 	runCmd.Flags().String("jwks_uri", "", "The location of the jwk set")
 	runCmd.Flags().String("audience", "", "The expected audience")
-	runCmd.Flags().String("sectigo_user", "", "The sectigo user")
-	runCmd.Flags().String("sectigo_password", "", "The password for the sectigo user")
-	runCmd.Flags().String("sectigo_customeruri", "", "The sectigo customerUri")
-	runCmd.Flags().Int("smime_profile", 0, "The (default) smime profile id")
-	runCmd.Flags().Int("smime_org_id", 0, "The (default) org id")
-	runCmd.Flags().Int("smime_term", 0, "The (default) lifetime")
-	runCmd.Flags().Int("smime_key_length", 0, "The (expected) key length")
-	runCmd.Flags().String("smime_key_type", "", "The (expected) key type")
+	runCmd.Flags().String("smime_service", "", "The smime service to use")
+	runCmd.Flags().String("ssl_service", "", "The ssl service to use")
+	runCmd.Flags().String("domain_service", "", "The domain service to use")
 	runCmd.Flags().String("level", "info", "log level debug, info, warn, error, flat or panic")
 }

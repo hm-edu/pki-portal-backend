@@ -12,14 +12,17 @@ import (
 	"github.com/hm-edu/pki-rest-interface/pkg/api/smime"
 	"github.com/hm-edu/pki-rest-interface/pkg/api/ssl"
 	"github.com/hm-edu/pki-rest-interface/pkg/cfg"
+	pb "github.com/hm-edu/portal-apis"
 	commonApi "github.com/hm-edu/portal-common/api"
 	commonAuth "github.com/hm-edu/portal-common/auth"
-	"github.com/hm-edu/sectigo-client/sectigo"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/lestrrat-go/jwx/jwk"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/credentials/xds"
 
 	echoSwagger "github.com/swaggo/echo-swagger"
 	// Required for the generation of swagger docs
@@ -51,12 +54,12 @@ type Server struct {
 	app        *echo.Echo
 	logger     *zap.Logger
 	config     *commonApi.Config
-	sectigoCfg *cfg.SectigoConfiguration
+	handlerCfg *cfg.HandlerConfiguration
 }
 
 // NewServer creates a new server
-func NewServer(logger *zap.Logger, config *commonApi.Config, sectigoCfg *cfg.SectigoConfiguration) *Server {
-	return &Server{app: echo.New(), logger: logger, config: config, sectigoCfg: sectigoCfg}
+func NewServer(logger *zap.Logger, config *commonApi.Config, handlerCfg *cfg.HandlerConfiguration) *Server {
+	return &Server{app: echo.New(), logger: logger, config: config, handlerCfg: handlerCfg}
 }
 
 func (api *Server) wireRoutesAndMiddleware() {
@@ -101,14 +104,17 @@ func (api *Server) wireRoutesAndMiddleware() {
 	api.app.GET("/readyz", api.readyzHandler)
 	api.app.GET("/whoami", api.whoamiHandler, jwtMiddleware)
 
-	// According to https://go.dev/src/net/http/client.go:
-	// "Clients are safe for concurrent use by multiple goroutines."
-	// => one http client is fine ;)
-	c := sectigo.NewClient(http.DefaultClient, api.logger, api.sectigoCfg.User, api.sectigoCfg.Password, api.sectigoCfg.CustomerURI)
-
 	group := api.app.Group("/ssl")
 	{
-		ssl := ssl.NewHandler(c, api.sectigoCfg)
+		domainClient, err := domainClient(api.handlerCfg.DomainService)
+		if err != nil {
+			api.logger.Fatal("failed to create domain client", zap.Error(err))
+		}
+		sslClient, err := sslClient(api.handlerCfg.SslService)
+		if err != nil {
+			api.logger.Fatal("failed to create ssl client", zap.Error(err))
+		}
+		ssl := ssl.NewHandler(domainClient, sslClient, api.logger)
 		group.Use(jwtMiddleware)
 		group.GET("/", ssl.List)
 		group.POST("/revoke", ssl.Revoke)
@@ -116,13 +122,71 @@ func (api *Server) wireRoutesAndMiddleware() {
 
 	group = api.app.Group("/smime")
 	{
-		handler := smime.NewHandler(c, api.sectigoCfg)
+		smimeClient, err := smimeClient(api.handlerCfg.SmimeService)
+		if err != nil {
+			api.logger.Fatal("failed to create smime client", zap.Error(err))
+		}
+		handler := smime.NewHandler(smimeClient, api.logger)
 		group.Use(jwtMiddleware)
 		group.GET("/", handler.List)
 		group.POST("/revoke", handler.Revoke)
 		group.POST("/csr", handler.HandleCsr)
 	}
 
+}
+
+func domainClient(host string) (pb.DomainServiceClient, error) {
+	creds, err := xds.NewClientCredentials(xds.ClientOptions{
+		FallbackCreds: insecure.NewCredentials(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	conn, err := grpc.DialContext(
+		context.Background(),
+		host,
+		grpc.WithTransportCredentials(creds),
+	)
+	if err != nil {
+		return nil, err
+	}
+	return pb.NewDomainServiceClient(conn), nil
+}
+
+func smimeClient(host string) (pb.SmimeServiceClient, error) {
+	creds, err := xds.NewClientCredentials(xds.ClientOptions{
+		FallbackCreds: insecure.NewCredentials(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	conn, err := grpc.DialContext(
+		context.Background(),
+		host,
+		grpc.WithTransportCredentials(creds),
+	)
+	if err != nil {
+		return nil, err
+	}
+	return pb.NewSmimeServiceClient(conn), nil
+}
+
+func sslClient(host string) (pb.SSLServiceClient, error) {
+	creds, err := xds.NewClientCredentials(xds.ClientOptions{
+		FallbackCreds: insecure.NewCredentials(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	conn, err := grpc.DialContext(
+		context.Background(),
+		host,
+		grpc.WithTransportCredentials(creds),
+	)
+	if err != nil {
+		return nil, err
+	}
+	return pb.NewSSLServiceClient(conn), nil
 }
 
 // ListenAndServe starts the http server and waits for the channel to stop the server

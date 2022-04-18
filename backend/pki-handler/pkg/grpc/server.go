@@ -69,8 +69,10 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 
 	c := sectigo.NewClient(http.DefaultClient, s.logger, s.sectigoCfg.User, s.sectigoCfg.Password, s.sectigoCfg.CustomerURI)
 
-	api := newSslAPIServer(c, s.sectigoCfg, s.db)
-	pb.RegisterSSLServiceServer(srv, api)
+	ssl := newSslAPIServer(c, s.sectigoCfg, s.db)
+	pb.RegisterSSLServiceServer(srv, ssl)
+	smime := newSmimeAPIServer(c, s.sectigoCfg)
+	pb.RegisterSmimeServiceServer(srv, smime)
 	grpc_health_v1.RegisterHealthServer(srv, server)
 	server.SetServingStatus(s.config.ServiceName, grpc_health_v1.HealthCheckResponse_SERVING)
 

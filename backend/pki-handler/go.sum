@@ -177,6 +177,10 @@ github.com/hm-edu/portal-apis v0.0.0-20220416093458-61513dc20bdc h1:XyJnZWGuGjxa
 github.com/hm-edu/portal-apis v0.0.0-20220416093458-61513dc20bdc/go.mod h1:m5sljdCnWRuLK4HUFJaC+dz6WfRjg47gS47Yai5Wdrw=
 github.com/hm-edu/portal-apis v0.0.0-20220416165402-16ac3096bc05 h1:J8FXJi7RCJkxD3cx6S2XjXg8HRCcKZ1te7WhS+j8AEo=
 github.com/hm-edu/portal-apis v0.0.0-20220416165402-16ac3096bc05/go.mod h1:m5sljdCnWRuLK4HUFJaC+dz6WfRjg47gS47Yai5Wdrw=
+github.com/hm-edu/portal-apis v0.0.0-20220418065733-1039af5d96e1 h1:/sUwNyoQTez1eUYSNpW2ecxYD6wKtCYJcbKiO2ZDSIE=
+github.com/hm-edu/portal-apis v0.0.0-20220418065733-1039af5d96e1/go.mod h1:m5sljdCnWRuLK4HUFJaC+dz6WfRjg47gS47Yai5Wdrw=
+github.com/hm-edu/portal-apis v0.0.0-20220418073241-c18ecaabd722 h1:sPYdtTGCjIaSnuytk6xF1lSflSzi6w9RIskuqng525U=
+github.com/hm-edu/portal-apis v0.0.0-20220418073241-c18ecaabd722/go.mod h1:m5sljdCnWRuLK4HUFJaC+dz6WfRjg47gS47Yai5Wdrw=
 github.com/hm-edu/sectigo-client v0.0.0-20220416042957-6cd096934fac h1:QXyp0vFOzK5kPKuIu5l2i4cX0hDh+3Af8FQm9b1F3ZQ=
 github.com/hm-edu/sectigo-client v0.0.0-20220416042957-6cd096934fac/go.mod h1:Sd9RYOQ9sngEkDHWipUsPsptKgB+Oc6QOyvF0D+2pJ0=
 github.com/hm-edu/sectigo-client v0.0.0-20220416110255-cdd824f55e21 h1:NwbOeR6iQEzuPHXdxT3dpSEGt6FMQZ7MOzz7MTPM0u4=
