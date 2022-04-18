@@ -139,17 +139,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 }
 
 func domainClient(host string) (pb.DomainServiceClient, error) {
-	creds, err := xds.NewClientCredentials(xds.ClientOptions{
-		FallbackCreds: insecure.NewCredentials(),
-	})
-	if err != nil {
-		return nil, err
-	}
-	conn, err := grpc.DialContext(
-		context.Background(),
-		host,
-		grpc.WithTransportCredentials(creds),
-	)
+	conn, err := connect(host)
 	if err != nil {
 		return nil, err
 	}
@@ -157,24 +147,15 @@ func domainClient(host string) (pb.DomainServiceClient, error) {
 }
 
 func smimeClient(host string) (pb.SmimeServiceClient, error) {
-	creds, err := xds.NewClientCredentials(xds.ClientOptions{
-		FallbackCreds: insecure.NewCredentials(),
-	})
-	if err != nil {
-		return nil, err
-	}
-	conn, err := grpc.DialContext(
-		context.Background(),
-		host,
-		grpc.WithTransportCredentials(creds),
-	)
+	conn, err := connect(host)
 	if err != nil {
 		return nil, err
 	}
 	return pb.NewSmimeServiceClient(conn), nil
 }
 
-func sslClient(host string) (pb.SSLServiceClient, error) {
+func connect(host string) (*grpc.ClientConn, error) {
+	ctx, _ := context.WithTimeout(context.TODO(), time.Second*3)
 	creds, err := xds.NewClientCredentials(xds.ClientOptions{
 		FallbackCreds: insecure.NewCredentials(),
 	})
@@ -182,10 +163,19 @@ func sslClient(host string) (pb.SSLServiceClient, error) {
 		return nil, err
 	}
 	conn, err := grpc.DialContext(
-		context.Background(),
+		ctx,
 		host,
 		grpc.WithTransportCredentials(creds),
+		grpc.WithBlock(),
 	)
+	if err != nil {
+		return nil, err
+	}
+	return conn, nil
+}
+
+func sslClient(host string) (pb.SSLServiceClient, error) {
+	conn, err := connect(host)
 	if err != nil {
 		return nil, err
 	}
