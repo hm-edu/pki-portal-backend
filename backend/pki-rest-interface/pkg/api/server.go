@@ -18,13 +18,16 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/lestrrat-go/jwx/jwk"
+	echoSwagger "github.com/swaggo/echo-swagger"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/credentials/xds"
 
-	echoSwagger "github.com/swaggo/echo-swagger"
+	// Required for the xds connections
+	_ "google.golang.org/grpc/xds"
+
 	// Required for the generation of swagger docs
 	_ "github.com/hm-edu/pki-rest-interface/pkg/api/docs"
 )
