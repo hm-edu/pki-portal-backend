@@ -18,12 +18,12 @@ type User struct {
 func (r *User) Bind(c echo.Context, v *Validator) error {
 	token := c.Get("user").(*jwt.Token)
 	claims := token.Claims.(jwt.MapClaims)
-	r = &User{
-		FirstName:  claims["given_name"].(string),
-		LastName:   claims["family_name"].(string),
-		CommonName: claims["name"].(string),
-		Email:      claims["email"].(string),
-	}
+
+	r.FirstName = claims["given_name"].(string)
+	r.LastName = claims["family_name"].(string)
+	r.CommonName = claims["name"].(string)
+	r.Email = claims["email"].(string)
+
 	err := v.Validate(r)
 	return err
 }
