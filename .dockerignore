@@ -1,9 +1,4 @@
 backend/pki-rest-interface/pki-rest-interface
 backend/domain-rest-interface/domain-rest-interface
 backend/pki-handler/pki-handler
-**/.idea
-**/.env
-**/__debug_bin
-**/*.sqlite3
-**/*.db
-backend/domain-rest-interface/coverage.txt
+.git

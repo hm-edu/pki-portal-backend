@@ -56,18 +56,37 @@ func parseCertificates(cert []byte) ([]*x509.Certificate, error) {
 	return certs, nil
 }
 
+func (s *sslAPIServer) CertificateDetails(ctx context.Context, req *pb.CertificateDetailsRequest) (*pb.SslCertificateDetails, error) {
+	x, err := s.db.Certificate.Query().WithDomains().Where(certificate.Serial(req.Serial)).First(ctx)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "Certificate not found")
+	}
+	var nbf *timestamppb.Timestamp
+	if x.NotBefore != nil {
+		nbf = timestamppb.New(*x.NotBefore)
+	}
+	return &pb.SslCertificateDetails{
+		Id:                      int32(x.SslId),
+		CommonName:              x.CommonName,
+		SubjectAlternativeNames: helper.Map(x.Edges.Domains, func(t *ent.Domain) string { return t.Fqdn }),
+		Serial:                  x.Serial,
+		Expires:                 timestamppb.New(x.NotAfter),
+		NotBefore:               nbf,
+	}, nil
+}
+
 func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequest) (*pb.ListSslResponse, error) {
 	certificates, err := s.db.Certificate.Query().WithDomains().Where(certificate.HasDomainsWith(domain.FqdnIn(req.Domains...))).All(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "Error querying certificates")
 	}
-	return &pb.ListSslResponse{Items: helper.Map(certificates, func(x *ent.Certificate) *pb.ListSslResponse_CertificateDetails {
+	return &pb.ListSslResponse{Items: helper.Map(certificates, func(x *ent.Certificate) *pb.SslCertificateDetails {
 
 		var nbf *timestamppb.Timestamp
 		if x.NotBefore != nil {
 			nbf = timestamppb.New(*x.NotBefore)
 		}
-		return &pb.ListSslResponse_CertificateDetails{
+		return &pb.SslCertificateDetails{
 			Id:                      int32(x.SslId),
 			CommonName:              x.CommonName,
 			SubjectAlternativeNames: helper.Map(x.Edges.Domains, func(t *ent.Domain) string { return t.Fqdn }),

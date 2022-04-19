@@ -7,8 +7,9 @@ import (
 
 // User contains the basic user data provided using OIDC/OAuth2 Access Tokens
 type User struct {
-	Firstname  string `validate:"required"`
-	Lastname   string `validate:"required"`
+	FirstName  string `validate:"required"`
+	LastName   string `validate:"required"`
+	MiddleName string
 	Email      string `validate:"required"`
 	CommonName string `validate:"required"`
 }
@@ -18,8 +19,8 @@ func (r *User) Bind(c echo.Context, v *Validator) error {
 	token := c.Get("user").(*jwt.Token)
 	claims := token.Claims.(jwt.MapClaims)
 	r = &User{
-		Firstname:  claims["given_name"].(string),
-		Lastname:   claims["family_name"].(string),
+		FirstName:  claims["given_name"].(string),
+		LastName:   claims["family_name"].(string),
 		CommonName: claims["name"].(string),
 		Email:      claims["email"].(string),
 	}

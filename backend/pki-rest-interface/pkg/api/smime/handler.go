@@ -9,14 +9,16 @@ import (
 // Handler is a wrapper around the domainstore and a validator.
 type Handler struct {
 	validator *model.Validator
-	ssl       pb.SSLServiceClient
+	smime     pb.SmimeServiceClient
 	logger    *zap.Logger
 }
 
 // NewHandler generates a new handler for acting on the domain storage.
-func NewHandler(pb.SmimeServiceClient, *zap.Logger) *Handler {
+func NewHandler(smime pb.SmimeServiceClient, logger *zap.Logger) *Handler {
 	v := model.NewValidator()
 	return &Handler{
 		validator: v,
+		logger:    logger,
+		smime:     smime,
 	}
 }
