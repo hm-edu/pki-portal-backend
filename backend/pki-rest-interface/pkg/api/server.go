@@ -4,6 +4,7 @@ package api
 import (
 	"context"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/brpaz/echozap"
@@ -160,23 +161,31 @@ func smimeClient(host string) (pb.SmimeServiceClient, error) {
 func connect(host string) (*grpc.ClientConn, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*3)
 	defer cancel()
-	creds, err := xds.NewClientCredentials(xds.ClientOptions{
-		FallbackCreds: insecure.NewCredentials(),
-	})
-	if err != nil {
-		return nil, err
+	if strings.HasPrefix(host, "xds") {
+		creds, err := xds.NewClientCredentials(xds.ClientOptions{
+			FallbackCreds: insecure.NewCredentials(),
+		})
+		if err != nil {
+			return nil, err
+		}
+		conn, err := grpc.DialContext(
+			ctx,
+			host,
+			grpc.WithTransportCredentials(creds),
+			grpc.WithBlock(),
+			grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
+		)
+		if err != nil {
+			return nil, err
+		}
+		return conn, nil
 	}
-	conn, err := grpc.DialContext(
-		ctx,
-		host,
-		grpc.WithTransportCredentials(creds),
-		grpc.WithBlock(),
-		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
-	)
+	conn, err := grpc.DialContext(ctx, host, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		return nil, err
 	}
 	return conn, nil
+
 }
 
 func sslClient(host string) (pb.SSLServiceClient, error) {

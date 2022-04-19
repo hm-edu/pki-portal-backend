@@ -81,6 +81,7 @@ func init() {
 
 	runCmd.Flags().String("host", "", "Host to bind service to")
 	runCmd.Flags().Int("grpc-port", 8081, "GRPC port to bind service to")
+	runCmd.Flags().Bool("xds", true, "Enable XDS")
 	runCmd.Flags().String("sectigo_user", "", "The sectigo user")
 	runCmd.Flags().String("sectigo_password", "", "The password for the sectigo user")
 	runCmd.Flags().String("sectigo_customeruri", "", "The sectigo customerUri")

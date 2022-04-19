@@ -12,6 +12,7 @@ import (
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"github.com/hm-edu/pki-handler/ent"
 	"github.com/hm-edu/pki-handler/pkg/cfg"
+	"github.com/hm-edu/portal-common/helper"
 	"github.com/hm-edu/portal-common/tracing"
 	"github.com/hm-edu/sectigo-client/sectigo"
 	"go.uber.org/zap"
@@ -36,6 +37,7 @@ type Server struct {
 type Config struct {
 	Port        int    `mapstructure:"grpc-port"`
 	ServiceName string `mapstructure:"grpc-rest-interface-name"`
+	XDS         bool   `mapstructure:"xds"`
 }
 
 // NewServer creates a new GRPC server
@@ -58,14 +60,19 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	if err != nil {
 		s.logger.Fatal("failed to listen", zap.Int("port", s.config.Port))
 	}
-	creds, err := creds.NewServerCredentials(creds.ServerOptions{FallbackCreds: insecure.NewCredentials()})
-	if err != nil {
-		s.logger.Fatal("failed to get credentials")
+	var srv helper.ServerWrapper
+	if s.config.XDS {
+		creds, err := creds.NewServerCredentials(creds.ServerOptions{FallbackCreds: insecure.NewCredentials()})
+		if err != nil {
+			s.logger.Fatal("failed to get credentials")
+		}
+		srv = xds.NewGRPCServer(
+			grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(grpc_recovery.UnaryServerInterceptor(), tracing.NewGRPUnaryServerInterceptor(), grpc_zap.UnaryServerInterceptor(s.logger))),
+			grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(grpc_recovery.StreamServerInterceptor(), tracing.NewGRPCStreamServerInterceptor(), grpc_zap.StreamServerInterceptor(s.logger))), grpc.Creds(creds))
+	} else {
+		srv = grpc.NewServer(grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(grpc_recovery.UnaryServerInterceptor(), tracing.NewGRPUnaryServerInterceptor(), grpc_zap.UnaryServerInterceptor(s.logger))),
+			grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(grpc_recovery.StreamServerInterceptor(), tracing.NewGRPCStreamServerInterceptor(), grpc_zap.StreamServerInterceptor(s.logger))))
 	}
-	srv := xds.NewGRPCServer(
-		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(grpc_recovery.UnaryServerInterceptor(), tracing.NewGRPUnaryServerInterceptor(), grpc_zap.UnaryServerInterceptor(s.logger))),
-		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(grpc_recovery.StreamServerInterceptor(), tracing.NewGRPCStreamServerInterceptor(), grpc_zap.StreamServerInterceptor(s.logger))), grpc.Creds(creds))
-
 	server := health.NewServer()
 	reflection.Register(srv)
 
@@ -86,6 +93,7 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 		if err := srv.Serve(listener); err != nil {
 			s.logger.Error("failed to serve", zap.Error(err))
 		}
+
 	}()
 	_ = <-stopCh
 	s.logger.Info("Stopping GRPC server")
