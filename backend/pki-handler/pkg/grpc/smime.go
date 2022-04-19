@@ -34,6 +34,7 @@ func newSmimeAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration) *s
 }
 
 func (s *smimeAPIServer) ListCertificates(_ context.Context, req *pb.ListSmimeRequest) (*pb.ListSmimeResponse, error) {
+	s.logger.Debug("Requesting smime certificates", zap.String("user", req.Email))
 	items, err := s.client.ClientService.ListByEmail(req.Email)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())

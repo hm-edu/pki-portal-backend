@@ -8,6 +8,7 @@ import (
 	commonnModel "github.com/hm-edu/portal-common/model"
 	"github.com/labstack/echo/v4"
 	"go.opentelemetry.io/otel"
+	"go.uber.org/zap"
 )
 
 // List godoc
@@ -26,6 +27,7 @@ func (h *Handler) List(c echo.Context) error {
 		span.RecordError(err)
 		return err
 	}
+	h.logger.Debug("Requesting smime certificates", zap.String("user", user.Email))
 	certs, err := h.smime.ListCertificates(ctx, &pb.ListSmimeRequest{Email: user.Email})
 	if err != nil {
 		span.RecordError(err)
