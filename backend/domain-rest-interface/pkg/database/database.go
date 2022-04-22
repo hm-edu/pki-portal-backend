@@ -2,10 +2,16 @@ package database
 
 import (
 	"context"
+	"database/sql"
 
+	"entgo.io/ent/dialect"
 	"github.com/hm-edu/domain-rest-interface/ent"
-	// Importing the go-sqlite3 is required to create a sqlite3 database.
-	_ "github.com/mattn/go-sqlite3"
+
+	// Importing the pgx/v4/stdlib is required to create a pg database.
+	_ "github.com/jackc/pgx/v4/stdlib"
+
+	// Imprting the runtime is required to get the default hooks working.
+	entsql "entgo.io/ent/dialect/sql"
 	"go.uber.org/zap"
 )
 
@@ -17,14 +23,22 @@ type DbInstance struct {
 // DB is a globally accessible domain instance.
 var DB DbInstance
 
-// ConnectDb establishs a new database connection.
-func ConnectDb(log *zap.Logger) {
-
-	client, err := ent.Open("sqlite3", "file:db.sqlite3?cache=shared&_fk=1")
-
+// Open creates a new databse client
+func Open(log *zap.Logger, connectionString string) *ent.Client {
+	db, err := sql.Open("pgx", connectionString)
 	if err != nil {
-		log.Fatal("failed opening DB Connection", zap.Error(err))
+		log.Fatal("Error connecting to database", zap.Error(err))
 	}
+
+	// Create an ent.Driver from `db`.
+	drv := entsql.OpenDB(dialect.Postgres, db)
+	return ent.NewClient(ent.Driver(drv))
+}
+
+// ConnectDb establishs a new database connection.
+func ConnectDb(log *zap.Logger, connectionString string) {
+
+	client := Open(log, connectionString)
 
 	// Run the auto migration tool.
 	if err := client.Schema.Create(context.Background()); err != nil {

@@ -11,9 +11,10 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 
 	// Imprting the runtime is required to get the default hooks working.
+	_ "github.com/hm-edu/pki-service/ent/runtime"
+
 	entsql "entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/schema"
-	_ "github.com/hm-edu/pki-service/ent/runtime"
 	"go.uber.org/zap"
 )
 

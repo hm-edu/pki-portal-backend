@@ -2,17 +2,14 @@ package cmd
 
 import (
 	"context"
-	"fmt"
-	"os"
 
 	"github.com/hm-edu/pki-rest-interface/pkg/api"
 	"github.com/hm-edu/pki-rest-interface/pkg/cfg"
 	"github.com/hm-edu/pki-rest-interface/pkg/grpc"
 	commonApi "github.com/hm-edu/portal-common/api"
-	"github.com/hm-edu/portal-common/logging"
+	"github.com/hm-edu/portal-common/helper"
 	"github.com/hm-edu/portal-common/signals"
 	"github.com/hm-edu/portal-common/tracing"
-	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -25,25 +22,8 @@ var runCmd = &cobra.Command{
 	Long:  `Starts the HTTP and the GRPC server`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		err := viper.BindPFlags(cmd.Flags())
-		if err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n", err.Error())
-			os.Exit(1)
-		}
-		err = godotenv.Load()
-		if err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "Hint: %s\n", err.Error())
-		}
-		viper.AutomaticEnv()
-
-		// configure logging
-		logger, _ := logging.InitZap(viper.GetString("level"))
-		zap.ReplaceGlobals(logger)
-		defer func(logger *zap.Logger) {
-			_ = logger.Sync()
-		}(logger)
-		stdLog := zap.RedirectStdLog(logger)
-		defer stdLog()
+		logger, deferFunc := helper.PrepareEnv(cmd)
+		defer deferFunc(logger)
 
 		var grpcCfg grpc.Config
 		if err := viper.Unmarshal(&grpcCfg); err != nil {

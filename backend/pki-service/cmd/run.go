@@ -2,51 +2,25 @@ package cmd
 
 import (
 	"context"
-	"fmt"
-	"os"
 
 	"github.com/hm-edu/pki-service/pkg/cfg"
 	"github.com/hm-edu/pki-service/pkg/database"
 	"github.com/hm-edu/pki-service/pkg/grpc"
-	"github.com/hm-edu/portal-common/logging"
+	"github.com/hm-edu/portal-common/helper"
 	"github.com/hm-edu/portal-common/signals"
 	"github.com/hm-edu/portal-common/tracing"
-	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
 
-func prepareEnv(cmd *cobra.Command) (*zap.Logger, func(*zap.Logger)) {
-	err := viper.BindPFlags(cmd.Flags())
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n", err.Error())
-		os.Exit(1)
-	}
-	err = godotenv.Load()
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Hint: %s\n", err.Error())
-	}
-	viper.AutomaticEnv()
-
-	// configure logging
-	logger, _ := logging.InitZap(viper.GetString("level"))
-	zap.ReplaceGlobals(logger)
-	stdLog := zap.RedirectStdLog(logger)
-
-	return logger, func(logger *zap.Logger) {
-		_ = logger.Sync()
-		stdLog()
-	}
-}
-
 // runCmd represents the run command
 var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Starts the servers",
-	Long:  `Starts the HTTP and the GRPC server`,
+	Long:  `Starts the GRPC server`,
 	Run: func(cmd *cobra.Command, args []string) {
-		logger, deferFunc := prepareEnv(cmd)
+		logger, deferFunc := helper.PrepareEnv(cmd)
 		defer deferFunc(logger)
 		var grpcCfg grpc.Config
 		if err := viper.Unmarshal(&grpcCfg); err != nil {

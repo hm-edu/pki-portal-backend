@@ -14,6 +14,9 @@
         },
         {
             "path": "backend/pki-service"
+        },
+        {
+            "path": "backend/dns-service"
         }
     ],
     "settings": {
