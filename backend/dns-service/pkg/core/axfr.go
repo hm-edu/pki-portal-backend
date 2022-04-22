@@ -83,6 +83,19 @@ func (r AxfrProvider) Delete(entries []dns.RR) error {
 	return r.sendMessage(m)
 }
 
+// Update updates the given records in the zone.
+func (r AxfrProvider) Update(entries []UpdateSet) error {
+	m := new(dns.Msg)
+	m.SetUpdate(r.zoneName)
+
+	for _, entry := range entries {
+		m.Remove(entry.Old)
+		m.Insert(entry.New)
+	}
+
+	return r.sendMessage(m)
+}
+
 func (r AxfrProvider) sendMessage(msg *dns.Msg) error {
 
 	c := new(dns.Client)
