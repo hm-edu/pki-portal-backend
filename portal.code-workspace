@@ -13,7 +13,7 @@
             "path": "backend/pki-rest-interface"
         },
         {
-            "path": "backend/pki-handler"
+            "path": "backend/pki-service"
         }
     ],
     "settings": {

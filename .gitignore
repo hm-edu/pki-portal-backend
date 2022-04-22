@@ -1,6 +1,6 @@
 backend/pki-rest-interface/pki-rest-interface
 backend/domain-rest-interface/domain-rest-interface
-backend/pki-handler/pki-handler
+backend/pki-service/pki-service
 **/.idea
 **/.env
 **/__debug_bin

@@ -86,7 +86,7 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 	})
 	if err != nil {
 		span.RecordError(err)
-		return err
+		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
 	}
 
 	return c.JSON(http.StatusOK, cert.Certificate)

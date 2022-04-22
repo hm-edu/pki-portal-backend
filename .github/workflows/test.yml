@@ -10,7 +10,7 @@ jobs:
       matrix:
         dir: 
           - backend/pki-rest-interface
-          - backend/pki-handler
+          - backend/pki-service
           - backend/domain-rest-interface
           - backend/common
     steps:
