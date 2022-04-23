@@ -32,7 +32,7 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/hm-edu/portal-apis v0.0.0-20220422174919-c02244a537c5
+	github.com/hm-edu/portal-apis v0.0.0-20220423043142-0bc86b4fe28e
 	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect

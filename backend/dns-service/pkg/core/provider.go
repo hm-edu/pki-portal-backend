@@ -10,8 +10,8 @@ type UpdateSet struct {
 
 // DNSProvider provides the basic interface for an
 type DNSProvider interface {
-	List() ([]dns.RR, error)
-	Add([]dns.RR) error
-	Update([]UpdateSet) error
-	Delete([]dns.RR) error
+	List(string) ([]dns.RR, error)
+	Add(string, []dns.RR) error
+	Update(string, []UpdateSet) error
+	Delete(string, []dns.RR) error
 }

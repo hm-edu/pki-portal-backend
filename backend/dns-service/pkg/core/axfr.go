@@ -22,7 +22,6 @@ const (
 type AxfrProvider struct {
 	log           *zap.Logger
 	nameserver    string
-	zoneName      string
 	tsigKeyName   string
 	tsigSecret    string
 	tsigSecretAlg string
@@ -37,12 +36,12 @@ func (r AxfrProvider) incomeTransfer(m *dns.Msg, _ string) (env chan *dns.Envelo
 }
 
 // List returns the current list of records.
-func (r AxfrProvider) List() ([]dns.RR, error) {
+func (r AxfrProvider) List(zoneName string) ([]dns.RR, error) {
 
-	r.log.Sugar().Debugf("Fetching records for '%s'", r.zoneName)
+	r.log.Sugar().Debugf("Fetching records for '%s'", zoneName)
 
 	m := new(dns.Msg)
-	m.SetAxfr(r.zoneName)
+	m.SetAxfr(zoneName)
 	m.SetTsig(r.tsigKeyName, r.tsigSecretAlg, clockSkew, time.Now().Unix())
 
 	env, err := r.incomeTransfer(m, r.nameserver)
@@ -67,26 +66,26 @@ func (r AxfrProvider) List() ([]dns.RR, error) {
 }
 
 // Add adds the given records to the zone.
-func (r AxfrProvider) Add(entries []dns.RR) error {
+func (r AxfrProvider) Add(zoneName string, entries []dns.RR) error {
 	m := new(dns.Msg)
-	m.SetUpdate(r.zoneName)
+	m.SetUpdate(zoneName)
 	m.Insert(entries)
 	return r.sendMessage(m)
 
 }
 
 // Delete removes the given records from the zone.
-func (r AxfrProvider) Delete(entries []dns.RR) error {
+func (r AxfrProvider) Delete(zoneName string, entries []dns.RR) error {
 	m := new(dns.Msg)
-	m.SetUpdate(r.zoneName)
+	m.SetUpdate(zoneName)
 	m.Remove(entries)
 	return r.sendMessage(m)
 }
 
 // Update updates the given records in the zone.
-func (r AxfrProvider) Update(entries []UpdateSet) error {
+func (r AxfrProvider) Update(zoneName string, entries []UpdateSet) error {
 	m := new(dns.Msg)
-	m.SetUpdate(r.zoneName)
+	m.SetUpdate(zoneName)
 
 	for _, entry := range entries {
 		m.Remove(entry.Old)

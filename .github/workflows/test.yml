@@ -11,6 +11,7 @@ jobs:
         dir: 
           - backend/pki-rest-interface
           - backend/pki-service
+          - dns-service
           - backend/domain-rest-interface
           - backend/common
     steps:
