@@ -137,7 +137,11 @@ func (s *smimeAPIServer) RevokeCertificate(_ context.Context, req *pb.RevokeSmim
 		}
 		return &emptypb.Empty{}, nil
 	case *pb.RevokeSmimeRequest_Serial:
-		return nil, status.Errorf(codes.Unimplemented, "method RevokeCertificate not implemented")
+		err := s.client.ClientService.RevokeBySerial(client.RevokeBySerialRequest{Serial: req.GetSerial(), Reason: req.GetReason()})
+		if err != nil {
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+		return &emptypb.Empty{}, nil
 	}
 	return nil, status.Errorf(codes.Unimplemented, "method RevokeCertificate not implemented")
 }

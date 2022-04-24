@@ -181,12 +181,12 @@ const docTemplate = `{
                 "summary": "SMIME Revoke Endpoint",
                 "parameters": [
                     {
-                        "description": "The serial of the certificate to revoke",
-                        "name": "serial",
+                        "description": "The serial of the certificate to revoke and the reason",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/model.RevokeRequest"
                         }
                     }
                 ],
@@ -258,12 +258,12 @@ const docTemplate = `{
                 "summary": "SSL Revoke Endpoint",
                 "parameters": [
                     {
-                        "description": "The Serial of the certificate to revoke",
-                        "name": "serial",
+                        "description": "The serial of the certificate to revoke and the reason",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/model.RevokeRequest"
                         }
                     }
                 ],
@@ -337,6 +337,21 @@ const docTemplate = `{
             ],
             "properties": {
                 "csr": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.RevokeRequest": {
+            "type": "object",
+            "required": [
+                "reason",
+                "serial"
+            ],
+            "properties": {
+                "reason": {
+                    "type": "string"
+                },
+                "serial": {
                     "type": "string"
                 }
             }

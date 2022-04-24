@@ -5,6 +5,7 @@ import (
 
 	"github.com/hm-edu/pki-rest-interface/pkg/model"
 	pb "github.com/hm-edu/portal-apis"
+	"github.com/hm-edu/portal-common/helper"
 	commonnModel "github.com/hm-edu/portal-common/model"
 	"github.com/labstack/echo/v4"
 	"go.opentelemetry.io/otel"
@@ -42,11 +43,40 @@ func (h *Handler) List(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Router /smime/revoke [post]
-// @Param serial body string true "The serial of the certificate to revoke"
+// @Param request body model.RevokeRequest true "The serial of the certificate to revoke and the reason"
 // @Security API
 // @Success 204
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) Revoke(c echo.Context) error {
+	ctx, span := otel.GetTracerProvider().Tracer("smime").Start(c.Request().Context(), "revoke")
+	defer span.End()
+	req := &model.RevokeRequest{}
+	if err := req.Bind(c, h.validator); err != nil {
+		span.RecordError(err)
+		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
+	}
+	user := commonnModel.User{}
+	if err := user.Bind(c, h.validator); err != nil {
+		span.RecordError(err)
+		return err
+	}
+	certs, err := h.smime.ListCertificates(ctx, &pb.ListSmimeRequest{Email: user.Email})
+
+	if err != nil {
+		span.RecordError(err)
+		return &echo.HTTPError{Code: http.StatusInternalServerError, Internal: err, Message: "Error processing the request"}
+	}
+
+	if !helper.Contains(helper.Map(certs.Certificates, func(t *pb.ListSmimeResponse_CertificateDetails) string { return t.Serial }), req.Serial) {
+		h.logger.Warn("Certificate not found", zap.String("serial", req.Serial))
+		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
+	}
+
+	_, err = h.smime.RevokeCertificate(ctx, &pb.RevokeSmimeRequest{Reason: req.Reason, Identifier: &pb.RevokeSmimeRequest_Serial{Serial: req.Serial}})
+	if err != nil {
+		span.RecordError(err)
+		return &echo.HTTPError{Code: http.StatusInternalServerError, Internal: err, Message: "Error processing the request"}
+	}
 	return c.NoContent(http.StatusNoContent)
 }
 

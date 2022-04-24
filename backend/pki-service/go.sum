@@ -240,8 +240,8 @@ github.com/hashicorp/hcl/v2 v2.10.0 h1:1S1UnuhDGlv3gRFV4+0EdwB+znNP5HmcGbIqwnSCB
 github.com/hashicorp/hcl/v2 v2.10.0/go.mod h1:FwWsfWEjyV/CMj8s/gqAuiviY72rJ1/oayI9WftqcKg=
 github.com/hm-edu/portal-apis v0.0.0-20220419103504-24320f185a74 h1:Od5XXyoSFT4IVwnaICgFeOGdUvcEfIfCKlxCG17rrgw=
 github.com/hm-edu/portal-apis v0.0.0-20220419103504-24320f185a74/go.mod h1:m5sljdCnWRuLK4HUFJaC+dz6WfRjg47gS47Yai5Wdrw=
-github.com/hm-edu/sectigo-client v0.0.0-20220416173800-3b90aae52576 h1:HXyAn4b5p0ZYDYEvJSQXnVO4xzwlgBkTetWZbXWMrtI=
-github.com/hm-edu/sectigo-client v0.0.0-20220416173800-3b90aae52576/go.mod h1:Sd9RYOQ9sngEkDHWipUsPsptKgB+Oc6QOyvF0D+2pJ0=
+github.com/hm-edu/sectigo-client v0.0.0-20220424060623-04974884d58d h1:aXCmcQuvwz7VSFmJPjUfPP2aX/QJWwW0dcgdWOEir1c=
+github.com/hm-edu/sectigo-client v0.0.0-20220424060623-04974884d58d/go.mod h1:Sd9RYOQ9sngEkDHWipUsPsptKgB+Oc6QOyvF0D+2pJ0=
 github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/ianlancetaylor/demangle v0.0.0-20200824232613-28f6c0f3b639/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NHg9XEKhtSvM=
