@@ -7,7 +7,6 @@ import (
 
 	"github.com/hm-edu/dns-service/pkg/core"
 	pb "github.com/hm-edu/portal-apis"
-	"github.com/hm-edu/portal-common/helper"
 	"github.com/miekg/dns"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
@@ -37,11 +36,17 @@ func (s *DNSServer) List(_ context.Context, req *pb.ListRequest) (*pb.ListRespon
 		s.logger.Error("failed to list RR", zap.Error(err))
 		return nil, status.Error(codes.Internal, fmt.Sprintf("failed to list RR: %v", err))
 	}
-	entries := helper.Map(rrs, parseRR)
+	entries := []*pb.DNSRecord{}
+	for _, e := range rrs {
+		x := s.parseRR(e)
+		if x != nil {
+			entries = append(entries, x)
+		}
+	}
 	return &pb.ListResponse{Records: entries}, nil
 }
 
-func parseRR(rr dns.RR) *pb.DNSRecord {
+func (s *DNSServer) parseRR(rr dns.RR) *pb.DNSRecord {
 	if rr.Header().Class != dns.ClassINET {
 		return nil
 	}
@@ -69,7 +74,14 @@ func parseRR(rr dns.RR) *pb.DNSRecord {
 	case dns.TypeMX:
 		rrValues = rr.(*dns.MX).Mx
 		rrType = "MX"
+	case dns.TypeNSEC, dns.TypeNSEC3, dns.TypeRRSIG, dns.TypeDNSKEY:
+		s.logger.Debug("Ignoring DNSSEC record", zap.String("record", rr.String()))
+		return nil
+	case dns.TypeSOA:
+		s.logger.Debug("Ignoring SOA record", zap.String("record", rr.String()))
+		return nil
 	default:
+		s.logger.Warn("Ignoring record", zap.String("record", rr.String()))
 		return nil
 	}
 	return &pb.DNSRecord{
