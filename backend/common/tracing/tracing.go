@@ -79,7 +79,10 @@ func InitTracer(logger *zap.Logger, name string) *sdktrace.TracerProvider {
 	)
 	global.SetMeterProvider(pusher)
 
-	go pusher.Start(context.Background())
+	go func() {
+		err := pusher.Start(context.Background())
+		logger.Fatal("Error starting metric pusher.", zap.Error(err))
+	}()
 
 	otel.SetTracerProvider(tp)
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))

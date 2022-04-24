@@ -2,7 +2,8 @@ package core
 
 import (
 	"crypto/hmac"
-	"crypto/md5"
+	// Required due to the use in the MWN
+	"crypto/md5" //#nosec
 	"encoding/base64"
 	"encoding/hex"
 	"hash"
