@@ -81,7 +81,9 @@ func InitTracer(logger *zap.Logger, name string) *sdktrace.TracerProvider {
 
 	go func() {
 		err := pusher.Start(context.Background())
-		logger.Fatal("Error starting metric pusher.", zap.Error(err))
+		if err != nil {
+			logger.Fatal("Error starting pusher.", zap.Error(err))
+		}
 	}()
 
 	otel.SetTracerProvider(tp)

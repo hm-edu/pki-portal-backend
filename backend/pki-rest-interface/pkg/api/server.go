@@ -4,7 +4,6 @@ package api
 import (
 	"context"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/brpaz/echozap"
@@ -19,15 +18,12 @@ import (
 	"github.com/hm-edu/pki-rest-interface/pkg/api/ssl"
 	"github.com/hm-edu/pki-rest-interface/pkg/cfg"
 	pb "github.com/hm-edu/portal-apis"
+	"github.com/hm-edu/portal-common/api"
 	commonApi "github.com/hm-edu/portal-common/api"
 	commonAuth "github.com/hm-edu/portal-common/auth"
 
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/zap"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/credentials/xds"
 
 	// Required for the xds connections
 	_ "google.golang.org/grpc/xds"
@@ -143,7 +139,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 }
 
 func domainClient(host string) (pb.DomainServiceClient, error) {
-	conn, err := connect(host)
+	conn, err := api.ConnectGRPC(host)
 	if err != nil {
 		return nil, err
 	}
@@ -151,45 +147,15 @@ func domainClient(host string) (pb.DomainServiceClient, error) {
 }
 
 func smimeClient(host string) (pb.SmimeServiceClient, error) {
-	conn, err := connect(host)
+	conn, err := api.ConnectGRPC(host)
 	if err != nil {
 		return nil, err
 	}
 	return pb.NewSmimeServiceClient(conn), nil
 }
 
-func connect(host string) (*grpc.ClientConn, error) {
-	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*3)
-	defer cancel()
-	if strings.HasPrefix(host, "xds") {
-		creds, err := xds.NewClientCredentials(xds.ClientOptions{
-			FallbackCreds: insecure.NewCredentials(),
-		})
-		if err != nil {
-			return nil, err
-		}
-		conn, err := grpc.DialContext(
-			ctx,
-			host,
-			grpc.WithTransportCredentials(creds),
-			grpc.WithBlock(),
-			grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
-		)
-		if err != nil {
-			return nil, err
-		}
-		return conn, nil
-	}
-	conn, err := grpc.DialContext(ctx, host, grpc.WithInsecure(), grpc.WithBlock())
-	if err != nil {
-		return nil, err
-	}
-	return conn, nil
-
-}
-
 func sslClient(host string) (pb.SSLServiceClient, error) {
-	conn, err := connect(host)
+	conn, err := api.ConnectGRPC(host)
 	if err != nil {
 		return nil, err
 	}

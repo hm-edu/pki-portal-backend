@@ -1,6 +1,8 @@
 package helper
 
-import "strings"
+import (
+	"strings"
+)
 
 // NormalizeSerial removes all colons and transforms the serial number to lowercase.
 func NormalizeSerial(serial string) string {

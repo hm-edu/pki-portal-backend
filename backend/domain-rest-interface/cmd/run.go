@@ -12,7 +12,6 @@ import (
 	"github.com/hm-edu/portal-common/signals"
 	"github.com/hm-edu/portal-common/tracing"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
 
@@ -23,7 +22,7 @@ var runCmd = &cobra.Command{
 	Long:  `Starts the HTTP and the GRPC server`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		logger, deferFunc := helper.PrepareEnv(cmd)
+		logger, deferFunc, viper := helper.PrepareEnv(cmd)
 		defer deferFunc(logger)
 
 		var grpcCfg grpc.Config

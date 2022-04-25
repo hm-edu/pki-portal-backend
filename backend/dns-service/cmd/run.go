@@ -4,10 +4,9 @@ import (
 	"context"
 
 	"github.com/hm-edu/dns-service/pkg/grpc"
-	"github.com/hm-edu/portal-common/helper"
+	"github.com/hm-edu/portal-common/api"
 	"github.com/hm-edu/portal-common/signals"
 	"github.com/hm-edu/portal-common/tracing"
-	"github.com/ory/viper"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -15,7 +14,7 @@ import (
 var stopCh = signals.SetupSignalHandler()
 
 func prepare(cmd *cobra.Command, _ []string) (grpc.Config, *zap.Logger, func()) {
-	logger, deferLoggerFunc := helper.PrepareEnv(cmd)
+	logger, deferLoggerFunc, viper := api.PrepareEnv(cmd)
 
 	var grpcCfg grpc.Config
 	if err := viper.Unmarshal(&grpcCfg); err != nil {

@@ -1,0 +1,66 @@
+package cmd
+
+import (
+	"context"
+	"net/http"
+
+	"github.com/hm-edu/pki-service/pkg/cfg"
+	"github.com/hm-edu/pki-service/pkg/worker"
+	pb "github.com/hm-edu/portal-apis"
+	"github.com/hm-edu/portal-common/api"
+	"github.com/hm-edu/portal-common/tracing"
+	"github.com/hm-edu/sectigo-client/sectigo"
+	"github.com/spf13/cobra"
+	"go.uber.org/zap"
+)
+
+// validateCmd represents the validate command
+var validateCmd = &cobra.Command{
+	Use:   "validate",
+	Short: "Syncs the database with the Sectigo API",
+	Long:  `Adds all missing entries from the Sectigo API to the database`,
+	Run: func(cmd *cobra.Command, args []string) {
+
+		logger, deferFunc, viper := api.PrepareEnv(cmd)
+		defer deferFunc(logger)
+
+		// load HTTP server config
+		var sectigoCfg cfg.SectigoConfiguration
+		if err := viper.Unmarshal(&sectigoCfg); err != nil {
+			logger.Panic("config unmarshal failed", zap.Error(err))
+		}
+
+		tp := tracing.InitTracer(logger, "pki-service")
+
+		defer func() {
+			if err := tp.Shutdown(context.Background()); err != nil {
+				logger.Fatal("Error shutting down tracer provider.", zap.Error(err))
+			}
+		}()
+
+		conn, err := api.ConnectGRPC(viper.GetString("dns_service"))
+		if err != nil {
+			logger.Fatal("Could not connect to gRPC server", zap.Error(err))
+		}
+
+		validator := worker.DomainValidator{
+			Client:     sectigo.NewClient(http.DefaultClient, logger, sectigoCfg.User, sectigoCfg.Password, sectigoCfg.CustomerURI),
+			Force:      viper.GetBool("force"),
+			DNSService: pb.NewDNSServiceClient(conn),
+			Domains:    viper.GetStringSlice("domains"),
+		}
+		validator.ValidateDomains()
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(validateCmd)
+
+	validateCmd.Flags().String("sectigo_user", "", "The sectigo user")
+	validateCmd.Flags().String("sectigo_password", "", "The password for the sectigo user")
+	validateCmd.Flags().String("sectigo_customeruri", "", "The sectigo customerUri")
+	validateCmd.Flags().Bool("force", false, "Force the DCV validation")
+	validateCmd.Flags().String("dns_service", "", "The dns service to use")
+	validateCmd.Flags().StringSlice("domains", nil, "The domains to validate")
+	validateCmd.Flags().String("level", "info", "log level debug, info, warn, error, flat or panic")
+}

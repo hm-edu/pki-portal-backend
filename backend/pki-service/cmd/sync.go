@@ -2,48 +2,27 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/hm-edu/pki-service/pkg/cfg"
 	"github.com/hm-edu/pki-service/pkg/database"
 	"github.com/hm-edu/pki-service/pkg/worker"
-	"github.com/hm-edu/portal-common/logging"
+	"github.com/hm-edu/portal-common/api"
 	"github.com/hm-edu/portal-common/tracing"
 	"github.com/hm-edu/sectigo-client/sectigo"
-	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
 
-// runCmd represents the run command
+// syncCmd represents the sync command
 var syncCmd = &cobra.Command{
 	Use:   "sync",
 	Short: "Syncs the database with the Sectigo API",
 	Long:  `Adds all missing entries from the Sectigo API to the database`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		err := viper.BindPFlags(cmd.Flags())
-		if err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n", err.Error())
-			os.Exit(1)
-		}
-		err = godotenv.Load()
-		if err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "Hint: %s\n", err.Error())
-		}
-		viper.AutomaticEnv()
-
-		// configure logging
-		logger, _ := logging.InitZap(viper.GetString("level"))
-		zap.ReplaceGlobals(logger)
-		defer func(logger *zap.Logger) {
-			_ = logger.Sync()
-		}(logger)
-		stdLog := zap.RedirectStdLog(logger)
-		defer stdLog()
+		logger, deferFunc, viper := api.PrepareEnv(cmd)
+		defer deferFunc(logger)
 
 		// load HTTP server config
 		var sectigoCfg cfg.SectigoConfiguration

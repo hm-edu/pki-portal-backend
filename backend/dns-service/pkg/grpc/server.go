@@ -11,7 +11,7 @@ import (
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 
-	"github.com/hm-edu/portal-common/helper"
+	"github.com/hm-edu/portal-common/api"
 	"github.com/hm-edu/portal-common/tracing"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -57,7 +57,7 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	if err != nil {
 		s.logger.Fatal("failed to listen", zap.Int("port", s.config.Port))
 	}
-	var srv helper.ServerWrapper
+	var srv api.ServerWrapper
 	if !s.config.NoXDS {
 		creds, err := creds.NewServerCredentials(creds.ServerOptions{FallbackCreds: insecure.NewCredentials()})
 		if err != nil {
