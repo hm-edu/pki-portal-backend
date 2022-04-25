@@ -8,7 +8,6 @@ import (
 	"github.com/hm-edu/domain-rest-interface/pkg/grpc"
 	"github.com/hm-edu/domain-rest-interface/pkg/store"
 	commonApi "github.com/hm-edu/portal-common/api"
-	"github.com/hm-edu/portal-common/helper"
 	"github.com/hm-edu/portal-common/signals"
 	"github.com/hm-edu/portal-common/tracing"
 	"github.com/spf13/cobra"
@@ -22,7 +21,7 @@ var runCmd = &cobra.Command{
 	Long:  `Starts the HTTP and the GRPC server`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		logger, deferFunc, viper := helper.PrepareEnv(cmd)
+		logger, deferFunc, viper := commonApi.PrepareEnv(cmd)
 		defer deferFunc(logger)
 
 		var grpcCfg grpc.Config
