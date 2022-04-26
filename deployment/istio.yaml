@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: portal
+  labels:
+    istio-injection: enabled
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: domain-rest-interface
+  name: domain-rest-interface
+  namespace: portal
+spec:
+  selector:
+    app: domain-rest-interface
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  - name: grpc
+    port: 8081
+    targetPort: 8081
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: pki-service
+  name: pki-service
+  namespace: portal
+spec:
+  selector:
+    app: pki-service
+  type: ClusterIP
+  ports:
+  - name: grpc
+    port: 8081
+    targetPort: 8081
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: pki-rest-interface
+  name: pki-rest-interface
+  namespace: portal
+spec:
+  selector:
+    app: pki-rest-interface
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: pki-service-mtls
+  namespace: portal
+spec:
+  host: pki-service.portal.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: domain-rest-interface-mtls
+  namespace: portal
+spec:
+  host: domain-rest-interface.portal.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+---
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: portal-mtls
+  namespace: portal
+spec:
+  mtls:
+    mode: STRICT

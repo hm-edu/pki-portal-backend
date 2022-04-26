@@ -1,18 +1,19 @@
 package tracing
 
 import (
-	"context"
-	"time"
+	"net/http"
 
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/metric/global"
 	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/sdk/metric/aggregator/histogram"
 	controller "go.opentelemetry.io/otel/sdk/metric/controller/basic"
+	"go.opentelemetry.io/otel/sdk/metric/export/aggregation"
 	processor "go.opentelemetry.io/otel/sdk/metric/processor/basic"
-	"go.opentelemetry.io/otel/sdk/metric/selector/simple"
+	selector "go.opentelemetry.io/otel/sdk/metric/selector/simple"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
@@ -45,11 +46,7 @@ func NewGRPCStreamServerInterceptor() grpc.StreamServerInterceptor {
 func InitTracer(logger *zap.Logger, name string) *sdktrace.TracerProvider {
 	//exporter, err := stdout.New(stdout.WithPrettyPrint())
 	logger.Debug("Setting up tracing provider")
-	exporter, err := otlptracegrpc.New(context.Background(), otlptracegrpc.WithInsecure())
-	if err != nil {
-		logger.Fatal("Error creating collector.", zap.Error(err))
-	}
-	exporterMeter, err := otlpmetricgrpc.New(context.Background(), otlpmetricgrpc.WithInsecure())
+	exporter, err := jaeger.New(jaeger.WithCollectorEndpoint())
 	if err != nil {
 		logger.Fatal("Error creating collector.", zap.Error(err))
 	}
@@ -62,31 +59,32 @@ func InitTracer(logger *zap.Logger, name string) *sdktrace.TracerProvider {
 				semconv.ServiceNameKey.String(name),
 			)),
 	)
-
-	pusher := controller.New(
+	config := prometheus.Config{
+		DefaultHistogramBoundaries: []float64{1, 2, 5, 10, 20, 50},
+	}
+	c := controller.New(
 		processor.NewFactory(
-			simple.NewWithHistogramDistribution(),
-			exporterMeter,
+			selector.NewWithHistogramDistribution(
+				histogram.WithExplicitBoundaries(config.DefaultHistogramBoundaries),
+			),
+			aggregation.CumulativeTemporalitySelector(),
+			processor.WithMemory(true),
 		),
-		controller.WithExporter(exporterMeter),
-		controller.WithCollectPeriod(1*time.Minute),
-		controller.WithCollectTimeout(1*time.Minute),
-		controller.WithResource(
-			resource.NewWithAttributes(
-				semconv.SchemaURL,
-				semconv.ServiceNameKey.String(name),
-			)),
 	)
-	global.SetMeterProvider(pusher)
+	prom, err := prometheus.New(config, c)
+	if err != nil {
+		logger.Panic("failed to initialize prometheus exporter", zap.Error(err))
+	}
 
-	go func() {
-		err := pusher.Start(context.Background())
-		if err != nil {
-			logger.Fatal("Error starting pusher.", zap.Error(err))
-		}
-	}()
+	global.SetMeterProvider(prom.MeterProvider())
 
 	otel.SetTracerProvider(tp)
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
+	http.HandleFunc("/", prom.ServeHTTP)
+	go func() {
+		_ = http.ListenAndServe(":2222", nil)
+	}()
+
+	logger.Info("Prometheus server running on :2222")
 	return tp
 }

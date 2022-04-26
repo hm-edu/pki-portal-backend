@@ -8,3 +8,4 @@ backend/dns-service/dns-service
 **/*.sqlite3
 **/*.db
 backend/domain-rest-interface/coverage.txt
+deployment/portal.yaml
