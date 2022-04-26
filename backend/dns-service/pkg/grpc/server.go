@@ -11,7 +11,6 @@ import (
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 
-	"github.com/hm-edu/portal-common/api"
 	"github.com/hm-edu/portal-common/tracing"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -53,7 +52,7 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	if err != nil {
 		s.logger.Fatal("failed to listen", zap.Int("port", s.config.Port))
 	}
-	var srv api.ServerWrapper
+	var srv *grpc.Server
 
 	srv = grpc.NewServer(grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(grpc_recovery.UnaryServerInterceptor(), tracing.NewGRPUnaryServerInterceptor(), grpc_zap.UnaryServerInterceptor(s.logger))),
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(grpc_recovery.StreamServerInterceptor(), tracing.NewGRPCStreamServerInterceptor(), grpc_zap.StreamServerInterceptor(s.logger))))
