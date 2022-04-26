@@ -141,7 +141,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	ids := []int{}
 
 	for _, fqdn := range sans {
-		id, err := s.db.Domain.Create().SetFqdn(fqdn).OnConflict().Ignore().ID(ctx)
+		id, err := s.db.Domain.Create().SetFqdn(fqdn).OnConflictColumns(domain.FieldFqdn).Ignore().ID(ctx)
 
 		if err != nil {
 			return s.handleError("Error while creating certificate", span, err)
