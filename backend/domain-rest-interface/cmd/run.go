@@ -46,7 +46,7 @@ var runCmd = &cobra.Command{
 		database.ConnectDb(logger, viper.GetString("db"))
 
 		store := store.NewDomainStore(database.DB.Db)
-
+		store.Preseed(logger)
 		stopCh := signals.SetupSignalHandler()
 
 		// start gRPC server
@@ -70,5 +70,6 @@ func init() {
 	runCmd.Flags().String("jwks_uri", "", "The location of the jwk set")
 	runCmd.Flags().String("audience", "", "The expected audience")
 	runCmd.Flags().String("db", "", "connection string for the database")
+	runCmd.Flags().String("preseed", "", "path to the preseed file")
 	runCmd.Flags().String("level", "info", "log level debug, info, warn, error, flat or panic")
 }
