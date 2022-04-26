@@ -67,7 +67,6 @@ func init() {
 	runCmd.Flags().String("host", "", "Host to bind service to")
 	runCmd.Flags().Int("port", 8080, "HTTP port to bind service to")
 	runCmd.Flags().Int("grpc-port", 8081, "GRPC port to bind service to")
-	runCmd.Flags().Bool("no-xds", false, "Disable XDS")
 	runCmd.Flags().String("jwks_uri", "", "The location of the jwk set")
 	runCmd.Flags().String("audience", "", "The expected audience")
 	runCmd.Flags().String("db", "", "connection string for the database")

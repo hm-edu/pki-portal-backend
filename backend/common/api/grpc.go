@@ -3,9 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
-	"net"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/hm-edu/portal-common/logging"
@@ -15,19 +13,7 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/credentials/xds"
-	"google.golang.org/grpc/reflection"
 )
-
-// ServerWrapper is the basic structure of the GRPC server.
-type ServerWrapper interface {
-	grpc.ServiceRegistrar
-	reflection.ServiceInfoProvider
-
-	Serve(net.Listener) error
-	GracefulStop()
-}
 
 // PrepareEnv loads the basic data and e.g. configures the logger.
 func PrepareEnv(cmd *cobra.Command) (*zap.Logger, func(*zap.Logger), *viper.Viper) {
@@ -57,26 +43,8 @@ func PrepareEnv(cmd *cobra.Command) (*zap.Logger, func(*zap.Logger), *viper.Vipe
 func ConnectGRPC(host string) (*grpc.ClientConn, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*3)
 	defer cancel()
-	if strings.HasPrefix(host, "xds") {
-		creds, err := xds.NewClientCredentials(xds.ClientOptions{
-			FallbackCreds: insecure.NewCredentials(),
-		})
-		if err != nil {
-			return nil, err
-		}
-		conn, err := grpc.DialContext(
-			ctx,
-			host,
-			grpc.WithTransportCredentials(creds),
-			grpc.WithBlock(),
-			grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
-		)
-		if err != nil {
-			return nil, err
-		}
-		return conn, nil
-	}
-	conn, err := grpc.DialContext(ctx, host, grpc.WithInsecure(), grpc.WithBlock())
+	conn, err := grpc.DialContext(ctx, host, grpc.WithInsecure(), grpc.WithBlock(),
+		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()))
 	if err != nil {
 		return nil, err
 	}

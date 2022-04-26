@@ -25,9 +25,6 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
 	"go.uber.org/zap"
 
-	// Required for the xds connections
-	_ "google.golang.org/grpc/xds"
-
 	// Required for the generation of swagger docs
 	_ "github.com/hm-edu/pki-rest-interface/pkg/api/docs"
 )

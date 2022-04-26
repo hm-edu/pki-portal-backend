@@ -40,7 +40,6 @@ var runCmd = &cobra.Command{
 
 func registerFlags(runCmd *cobra.Command) {
 	runCmd.Flags().Int("grpc-port", 8081, "GRPC port to bind service to")
-	runCmd.Flags().Bool("no-xds", false, "Disable XDS")
 	runCmd.Flags().String("level", "info", "log level debug, info, warn, error, flat or panic")
 }
 
