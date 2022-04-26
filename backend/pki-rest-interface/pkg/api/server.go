@@ -132,7 +132,8 @@ func (api *Server) wireRoutesAndMiddleware() {
 		group.POST("/revoke", handler.Revoke)
 		group.POST("/csr", handler.HandleCsr)
 	}
-
+	ready = 1
+	healthy = 1
 }
 
 func domainClient(host string) (pb.DomainServiceClient, error) {
