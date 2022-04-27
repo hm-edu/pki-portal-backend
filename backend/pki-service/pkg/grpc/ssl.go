@@ -141,6 +141,8 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	}
 	ids := []int{}
 
+	s.logger.Debug("Issuing certificate", zap.String("common_name", csr.Subject.CommonName), zap.Strings("subject_alternative_names", sans))
+
 	for _, fqdn := range sans {
 		id, err := s.db.Domain.Create().SetFqdn(fqdn).OnConflictColumns(domain.FieldFqdn).Ignore().ID(ctx)
 
