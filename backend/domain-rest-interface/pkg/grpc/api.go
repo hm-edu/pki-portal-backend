@@ -9,15 +9,17 @@ import (
 	"github.com/hm-edu/domain-rest-interface/pkg/store"
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/helper"
+	"go.uber.org/zap"
 )
 
 type domainAPIServer struct {
 	pb.UnimplementedDomainServiceServer
-	store *store.DomainStore
+	store  *store.DomainStore
+	logger *zap.Logger
 }
 
-func newDomainAPIServer(store *store.DomainStore) *domainAPIServer {
-	return &domainAPIServer{store: store}
+func newDomainAPIServer(store *store.DomainStore, logger *zap.Logger) *domainAPIServer {
+	return &domainAPIServer{store: store, logger: logger}
 }
 
 func (api *domainAPIServer) CheckPermission(ctx context.Context, req *pb.CheckPermissionRequest) (*pb.CheckPermissionResponse, error) {
@@ -51,6 +53,7 @@ func (api *domainAPIServer) CheckRegistration(ctx context.Context, req *pb.Check
 			return d == t
 		})
 	})
+	api.logger.Info("Checking registration", zap.Strings("domains", req.Domains), zap.Strings("missing", missing))
 	return &pb.CheckRegistrationResponse{Missing: missing}, nil
 }
 
