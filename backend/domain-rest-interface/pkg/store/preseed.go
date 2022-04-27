@@ -27,11 +27,13 @@ func (store *DomainStore) Preseed(logger *zap.Logger) {
 	for key, value := range preseed {
 		exists, _ := database.DB.Db.Domain.Query().Where(domain.Fqdn(key)).Exist(context.Background())
 		if exists {
+			logger.Info("Domain already exists", zap.String("domain", key))
 			continue
 		}
 		_, err = store.Create(context.Background(), &ent.Domain{Fqdn: key, Owner: value, Approved: true})
 		if err != nil {
 			logger.Fatal("Error creating domain", zap.Error(err))
 		}
+		logger.Info("Domain created", zap.String("domain", key))
 	}
 }
