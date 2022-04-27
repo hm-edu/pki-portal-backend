@@ -154,7 +154,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		}
 		ids = append(ids, id)
 	}
-	entry, err := s.db.Certificate.Create().SetCommonName(csr.Subject.CommonName).AddDomainIDs(ids...).Save(ctx)
+	entry, err := s.db.Certificate.Create().SetCommonName(sans[0]).AddDomainIDs(ids...).Save(ctx)
 	if err != nil {
 		return s.handleError("Error while creating certificate", span, err)
 	}
