@@ -50,7 +50,7 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 		instrument.WithDescription("Issue time for SSL Certificates"),
 	)
 
-	return &sslAPIServer{client: client, cfg: cfg, logger: zap.L(), db: db, duration: durRecorder}
+	return &sslAPIServer{client: client, cfg: cfg, logger: zap.L(), db: db, duration: durRecorder, pendingValidations: make(map[string]interface{})}
 }
 
 func parseCertificates(cert []byte) ([]*x509.Certificate, error) {
