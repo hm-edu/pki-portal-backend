@@ -132,10 +132,13 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		span.RecordError(err)
 		return nil, status.Errorf(codes.InvalidArgument, "invalid CSR")
 	}
-	sans := []string{csr.Subject.CommonName}
+	var sans []string
+	if csr.Subject.CommonName != "" {
+		sans = []string{csr.Subject.CommonName}
+	}
 
 	for _, domain := range req.SubjectAlternativeNames {
-		if domain != csr.Subject.CommonName {
+		if domain != csr.Subject.CommonName && domain != "" {
 			sans = append(sans, domain)
 		}
 	}
