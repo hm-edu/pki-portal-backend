@@ -34,11 +34,12 @@ var meter = global.MeterProvider().Meter("pki-service")
 
 type sslAPIServer struct {
 	pb.UnimplementedSSLServiceServer
-	client   *sectigo.Client
-	db       *ent.Client
-	cfg      *cfg.SectigoConfiguration
-	logger   *zap.Logger
-	duration syncint64.Histogram
+	client             *sectigo.Client
+	db                 *ent.Client
+	cfg                *cfg.SectigoConfiguration
+	logger             *zap.Logger
+	duration           syncint64.Histogram
+	pendingValidations map[string]interface{}
 }
 
 func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *ent.Client) *sslAPIServer {
@@ -144,78 +145,84 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	}
 	ids := []int{}
 
-	s.logger.Debug("Issuing certificate", zap.String("common_name", csr.Subject.CommonName), zap.Strings("subject_alternative_names", sans))
+	if _, ok := s.pendingValidations[req.Csr]; ok {
+		return nil, status.Errorf(codes.AlreadyExists, "Outstanding validation for this CSR")
+	} else {
+		s.logger.Debug("Issuing certificate", zap.String("common_name", csr.Subject.CommonName), zap.Strings("subject_alternative_names", sans))
 
-	for _, fqdn := range sans {
-		id, err := s.db.Domain.Create().SetFqdn(fqdn).OnConflictColumns(domain.FieldFqdn).Ignore().ID(ctx)
+		for _, fqdn := range sans {
+			id, err := s.db.Domain.Create().SetFqdn(fqdn).OnConflictColumns(domain.FieldFqdn).Ignore().ID(ctx)
 
+			if err != nil {
+				return s.handleError("Error while creating certificate", span, err)
+			}
+			ids = append(ids, id)
+		}
+		entry, err := s.db.Certificate.Create().SetCommonName(sans[0]).AddDomainIDs(ids...).Save(ctx)
 		if err != nil {
 			return s.handleError("Error while creating certificate", span, err)
 		}
-		ids = append(ids, id)
-	}
-	entry, err := s.db.Certificate.Create().SetCommonName(sans[0]).AddDomainIDs(ids...).Save(ctx)
-	if err != nil {
-		return s.handleError("Error while creating certificate", span, err)
-	}
 
-	start := time.Now()
+		start := time.Now()
 
-	enrollment, err := s.client.SslService.Enroll(ssl.EnrollmentRequest{
-		OrgID:        s.cfg.SslOrgID,
-		Csr:          req.Csr,
-		Term:         s.cfg.SslTerm,
-		CertType:     s.cfg.SslProfile,
-		SubjAltNames: strings.Join(req.SubjectAlternativeNames, ","),
-	})
-
-	span.AddEvent("Enrollment request sent")
-	if err != nil {
-		return s.handleError("Error while requesting certificate", span, err)
-	}
-
-	entry, err = s.db.Certificate.UpdateOneID(entry.ID).SetStatus(certificate.StatusRequested).SetSslId(enrollment.SslID).Save(ctx)
-	if err != nil {
-		return s.handleError("Error while storing certificate", span, err)
-	}
-
-	cert := ""
-	err = helper.WaitFor(10*time.Minute, 10*time.Second, func() (bool, error) {
-		c, err := s.client.SslService.Collect(enrollment.SslID, "x509")
+		enrollment, err := s.client.SslService.Enroll(ssl.EnrollmentRequest{
+			OrgID:        s.cfg.SslOrgID,
+			Csr:          req.Csr,
+			Term:         s.cfg.SslTerm,
+			CertType:     s.cfg.SslProfile,
+			SubjAltNames: strings.Join(req.SubjectAlternativeNames, ","),
+		})
+		s.pendingValidations[req.Csr] = nil
+		defer func() {
+			delete(s.pendingValidations, req.Csr)
+		}()
+		span.AddEvent("Enrollment request sent")
 		if err != nil {
-			if e, ok := err.(*sectigo.ErrorResponse); ok {
-				if e.Code == 0 && e.Description == "Being processed by Sectigo" {
-					span.AddEvent("Certificate not ready yet")
-					s.logger.Info("Certificate not ready", zap.Int("id", enrollment.SslID), zap.Strings("subject_alternative_names", req.SubjectAlternativeNames))
-					return false, nil
-				}
-			}
-			return false, err
+			return s.handleError("Error while requesting certificate", span, err)
 		}
-		span.AddEvent("Certificate ready")
-		cert = *c
-		return true, nil
-	})
 
-	if err != nil {
-		return s.handleError("Error while collecting certificate", span, err)
+		entry, err = s.db.Certificate.UpdateOneID(entry.ID).SetStatus(certificate.StatusRequested).SetSslId(enrollment.SslID).Save(ctx)
+		if err != nil {
+			return s.handleError("Error while storing certificate", span, err)
+		}
+
+		cert := ""
+		err = helper.WaitFor(10*time.Minute, 10*time.Second, func() (bool, error) {
+			c, err := s.client.SslService.Collect(enrollment.SslID, "x509")
+			if err != nil {
+				if e, ok := err.(*sectigo.ErrorResponse); ok {
+					if e.Code == 0 && e.Description == "Being processed by Sectigo" {
+						span.AddEvent("Certificate not ready yet")
+						s.logger.Info("Certificate not ready", zap.Int("id", enrollment.SslID), zap.Strings("subject_alternative_names", req.SubjectAlternativeNames))
+						return false, nil
+					}
+				}
+				return false, err
+			}
+			span.AddEvent("Certificate ready")
+			cert = *c
+			return true, nil
+		})
+
+		if err != nil {
+			return s.handleError("Error while collecting certificate", span, err)
+		}
+
+		stop := time.Now()
+		s.duration.Record(ctx, stop.Sub(start).Milliseconds())
+
+		certs, err := parseCertificates([]byte(cert))
+		if err != nil {
+			return s.handleError("Error while collecting certificate", span, err)
+		}
+		pem := certs[len(certs)-1]
+		s.logger.Info("Certificate issued", zap.Int("id", enrollment.SslID), zap.Strings("subject_alternative_names", req.SubjectAlternativeNames), zap.Duration("duration", stop.Sub(start)), zap.String("certificate", fmt.Sprintf("%032x", pem.SerialNumber)))
+		_, err = s.db.Certificate.UpdateOneID(entry.ID).SetSerial(pkiHelper.NormalizeSerial(fmt.Sprintf("%032x", pem.SerialNumber))).SetStatus(certificate.StatusIssued).SetNotAfter(pem.NotAfter).SetNotBefore(pem.NotBefore).Save(ctx)
+		if err != nil {
+			return s.handleError("Error while collecting certificate", span, err)
+		}
+		return &pb.IssueSslResponse{Certificate: cert}, nil
 	}
-
-	stop := time.Now()
-	s.duration.Record(ctx, stop.Sub(start).Milliseconds())
-
-	certs, err := parseCertificates([]byte(cert))
-	if err != nil {
-		return s.handleError("Error while collecting certificate", span, err)
-	}
-	pem := certs[len(certs)-1]
-	s.logger.Info("Certificate issued", zap.Int("id", enrollment.SslID), zap.Strings("subject_alternative_names", req.SubjectAlternativeNames), zap.Duration("duration", stop.Sub(start)), zap.String("certificate", fmt.Sprintf("%032x", pem.SerialNumber)))
-	_, err = s.db.Certificate.UpdateOneID(entry.ID).SetSerial(pkiHelper.NormalizeSerial(fmt.Sprintf("%032x", pem.SerialNumber))).SetStatus(certificate.StatusIssued).SetNotAfter(pem.NotAfter).SetNotBefore(pem.NotBefore).Save(ctx)
-	if err != nil {
-		return s.handleError("Error while collecting certificate", span, err)
-	}
-
-	return &pb.IssueSslResponse{Certificate: cert}, nil
 }
 
 func (s *sslAPIServer) handleError(msg string, span trace.Span, err error) (*pb.IssueSslResponse, error) {
