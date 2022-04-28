@@ -6,6 +6,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/hm-edu/pki-service/ent"
@@ -164,14 +165,13 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 
 		start := time.Now()
 
-		// enrollment, err := s.client.SslService.Enroll(ssl.EnrollmentRequest{
-		// 	OrgID:        s.cfg.SslOrgID,
-		// 	Csr:          req.Csr,
-		// 	Term:         s.cfg.SslTerm,
-		// 	CertType:     s.cfg.SslProfile,
-		// 	SubjAltNames: strings.Join(req.SubjectAlternativeNames, ","),
-		// })
-		enrollment := &ssl.EnrollmentResponse{SslID: 3469533}
+		enrollment, err := s.client.SslService.Enroll(ssl.EnrollmentRequest{
+			OrgID:        s.cfg.SslOrgID,
+			Csr:          req.Csr,
+			Term:         s.cfg.SslTerm,
+			CertType:     s.cfg.SslProfile,
+			SubjAltNames: strings.Join(req.SubjectAlternativeNames, ","),
+		})
 		s.pendingValidations[req.Csr] = nil
 		defer func() {
 			delete(s.pendingValidations, req.Csr)
