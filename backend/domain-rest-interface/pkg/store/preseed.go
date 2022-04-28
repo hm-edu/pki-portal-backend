@@ -17,6 +17,9 @@ func (store *DomainStore) Preseed(logger *zap.Logger) {
 
 	data, err := os.ReadFile(viper.GetString("preseed"))
 	if err != nil {
+		if os.IsNotExist(err) {
+			return
+		}
 		logger.Fatal("Error reading preseed file", zap.Error(err))
 	}
 	var preseed map[string]string
