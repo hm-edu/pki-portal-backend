@@ -2,13 +2,23 @@ package grpc
 
 import (
 	"context"
+	"crypto"
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
 	"crypto/x509"
+	"encoding/json"
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"strings"
+	"os"
+	"path/filepath"
 	"time"
 
+	"github.com/go-acme/lego/v4/certcrypto"
+	legoCert "github.com/go-acme/lego/v4/certificate"
+	"github.com/go-acme/lego/v4/lego"
+	"github.com/go-acme/lego/v4/registration"
 	"github.com/hm-edu/pki-service/ent"
 	"github.com/hm-edu/pki-service/ent/certificate"
 	"github.com/hm-edu/pki-service/ent/domain"
@@ -17,7 +27,6 @@ import (
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/helper"
 	"github.com/hm-edu/sectigo-client/sectigo"
-	"github.com/hm-edu/sectigo-client/sectigo/ssl"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/metric/global"
 	"go.opentelemetry.io/otel/metric/instrument"
@@ -36,21 +45,126 @@ type sslAPIServer struct {
 	pb.UnimplementedSSLServiceServer
 	client             *sectigo.Client
 	db                 *ent.Client
+	legoClient         *lego.Client
 	cfg                *cfg.SectigoConfiguration
 	logger             *zap.Logger
 	duration           syncint64.Histogram
 	pendingValidations map[string]interface{}
 }
 
-func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *ent.Client) *sslAPIServer {
+func registerAcme(client *lego.Client, config *cfg.SectigoConfiguration, account pkiHelper.User, accountFile string, keyFile string) error {
+	reg, err := client.Registration.RegisterWithExternalAccountBinding(registration.RegisterEABOptions{
+		TermsOfServiceAgreed: true,
+		Kid:                  config.EabKid,
+		HmacEncoded:          config.EabHmac,
+	})
+	if err != nil {
+		return err
+	}
+	account.Registration = reg
+	data, err := json.Marshal(account)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(accountFile, data, 0644)
+	if err != nil {
+		return err
+	}
+	certOut, err := os.OpenFile(keyFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+	if err != nil {
+		return err
+	}
+	defer func(certOut *os.File) {
+		_ = certOut.Close()
+	}(certOut)
 
+	pemKey := certcrypto.PEMBlock(account.Key)
+	err = pem.Encode(certOut, pemKey)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func fileExists(name string) (bool, error) {
+	_, err := os.Stat(name)
+	if err == nil {
+		return true, nil
+	}
+	if errors.Is(err, os.ErrNotExist) {
+		return false, nil
+	}
+	return false, err
+}
+
+func loadPrivateKey(file string) (crypto.PrivateKey, error) {
+	keyBytes, err := os.ReadFile(file)
+	if err != nil {
+		return nil, err
+	}
+
+	keyBlock, _ := pem.Decode(keyBytes)
+
+	switch keyBlock.Type {
+	case "RSA PRIVATE KEY":
+		return x509.ParsePKCS1PrivateKey(keyBlock.Bytes)
+	case "EC PRIVATE KEY":
+		return x509.ParseECPrivateKey(keyBlock.Bytes)
+	}
+
+	return nil, errors.New("unknown private key type")
+}
+func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *ent.Client) *sslAPIServer {
+	accountFile := filepath.Join(cfg.AcmeStorage, "reg.json")
+	keyFile := filepath.Join(cfg.AcmeStorage, "reg.key")
+
+	var account pkiHelper.User
+	if ok, _ := fileExists(accountFile); !ok {
+		// Actually we would not need a private key but the lego API requires one.
+		privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+		if err != nil {
+			return nil
+		}
+
+		account = pkiHelper.User{
+			Key: privateKey,
+		}
+
+	} else {
+		data, err := os.ReadFile(accountFile)
+		if err != nil {
+			return nil
+		}
+		err = json.Unmarshal(data, &account)
+		if err != nil {
+			return nil
+		}
+		account.Key, err = loadPrivateKey(keyFile)
+		if err != nil {
+			return nil
+		}
+
+	}
+	legoCfg := lego.NewConfig(&account)
+	legoCfg.CADirURL = "https://acme.sectigo.com/v2/OV"
+	legoCfg.Certificate.Timeout = time.Duration(10) * time.Minute
+	legoClient, err := lego.NewClient(legoCfg)
+	if err != nil {
+		return nil
+	}
+	if account.Registration == nil {
+		err = registerAcme(legoClient, cfg, account, accountFile, keyFile)
+		if err != nil {
+			return nil
+		}
+	}
 	durRecorder, _ := meter.SyncInt64().Histogram(
 		"ssl.issue.duration",
 		instrument.WithUnit("milliseconds"),
 		instrument.WithDescription("Issue time for SSL Certificates"),
 	)
 
-	return &sslAPIServer{client: client, cfg: cfg, logger: zap.L(), db: db, duration: durRecorder, pendingValidations: make(map[string]interface{})}
+	return &sslAPIServer{client: client, legoClient: legoClient, cfg: cfg, logger: zap.L(), db: db, duration: durRecorder, pendingValidations: make(map[string]interface{})}
 }
 
 func parseCertificates(cert []byte) ([]*x509.Certificate, error) {
@@ -164,46 +278,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	}
 
 	start := time.Now()
-
-	enrollment, err := s.client.SslService.Enroll(ssl.EnrollmentRequest{
-		OrgID:        s.cfg.SslOrgID,
-		Csr:          req.Csr,
-		Term:         s.cfg.SslTerm,
-		CertType:     s.cfg.SslProfile,
-		SubjAltNames: strings.Join(req.SubjectAlternativeNames, ","),
-	})
-	s.pendingValidations[req.Csr] = nil
-	defer func() {
-		delete(s.pendingValidations, req.Csr)
-	}()
-	span.AddEvent("Enrollment request sent")
-	if err != nil {
-		return s.handleError("Error while requesting certificate", span, err)
-	}
-
-	entry, err = s.db.Certificate.UpdateOneID(entry.ID).SetStatus(certificate.StatusRequested).SetSslId(enrollment.SslID).Save(ctx)
-	if err != nil {
-		return s.handleError("Error while storing certificate", span, err)
-	}
-
-	cert := ""
-	err = helper.WaitFor(10*time.Minute, 10*time.Second, func() (bool, error) {
-		c, err := s.client.SslService.Collect(enrollment.SslID, "x509")
-		if err != nil {
-			if e, ok := err.(*sectigo.ErrorResponse); ok {
-				if e.Code == 0 && e.Description == "Being processed by Sectigo" {
-					span.AddEvent("Certificate not ready yet")
-					s.logger.Info("Certificate not ready", zap.Int("id", enrollment.SslID), zap.Strings("subject_alternative_names", req.SubjectAlternativeNames))
-					return false, nil
-				}
-			}
-			return false, err
-		}
-		span.AddEvent("Certificate ready")
-		cert = *c
-		return true, nil
-	})
-
+	certificates, err := s.legoClient.Certificate.ObtainForCSR(legoCert.ObtainForCSRRequest{CSR: csr, Bundle: true})
 	if err != nil {
 		return s.handleError("Error while collecting certificate", span, err)
 	}
@@ -211,18 +286,17 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	stop := time.Now()
 	s.duration.Record(ctx, stop.Sub(start).Milliseconds())
 
-	certs, err := parseCertificates([]byte(cert))
+	certs, err := parseCertificates(certificates.Certificate)
 	if err != nil {
 		return s.handleError("Error while collecting certificate", span, err)
 	}
 	pem := certs[len(certs)-1]
-	s.logger.Info("Certificate issued", zap.Int("id", enrollment.SslID), zap.Strings("subject_alternative_names", req.SubjectAlternativeNames), zap.Duration("duration", stop.Sub(start)), zap.String("certificate", fmt.Sprintf("%032x", pem.SerialNumber)))
+	s.logger.Info("Certificate issued", zap.Strings("subject_alternative_names", req.SubjectAlternativeNames), zap.Duration("duration", stop.Sub(start)), zap.String("certificate", fmt.Sprintf("%032x", pem.SerialNumber)))
 	_, err = s.db.Certificate.UpdateOneID(entry.ID).SetSerial(pkiHelper.NormalizeSerial(fmt.Sprintf("%032x", pem.SerialNumber))).SetStatus(certificate.StatusIssued).SetNotAfter(pem.NotAfter).SetNotBefore(pem.NotBefore).Save(ctx)
 	if err != nil {
 		return s.handleError("Error while collecting certificate", span, err)
 	}
-	return &pb.IssueSslResponse{Certificate: cert}, nil
-
+	return &pb.IssueSslResponse{Certificate: string(certificates.Certificate)}, nil
 }
 
 func (s *sslAPIServer) handleError(msg string, span trace.Span, err error) (*pb.IssueSslResponse, error) {
