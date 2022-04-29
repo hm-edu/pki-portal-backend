@@ -10,6 +10,7 @@ data:
   POSTGRES_DB: postgresdb
   POSTGRES_USER: postgresadmin
   POSTGRES_PASSWORD: admin123
+  PGDATA: /var/lib/postgresql/data/pgdata
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
@@ -75,8 +76,9 @@ spec:
             - configMapRef:
                 name: postgres-config
           volumeMounts:
-            - mountPath: /var/lib/postgresql
-              name: postgredb
+            - name: postgredb
+              mountPath: /var/lib/postgresql/data
+              subPath: pgdata
             - mountPath: /docker-entrypoint-initdb.d
               name: postgresinit
       volumes:

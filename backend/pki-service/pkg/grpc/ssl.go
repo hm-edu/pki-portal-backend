@@ -18,7 +18,9 @@ import (
 	"github.com/go-acme/lego/v4/certcrypto"
 	legoCert "github.com/go-acme/lego/v4/certificate"
 	"github.com/go-acme/lego/v4/lego"
+	legoLog "github.com/go-acme/lego/v4/log"
 	"github.com/go-acme/lego/v4/registration"
+
 	"github.com/hm-edu/pki-service/ent"
 	"github.com/hm-edu/pki-service/ent/certificate"
 	"github.com/hm-edu/pki-service/ent/domain"
@@ -27,12 +29,15 @@ import (
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/helper"
 	"github.com/hm-edu/sectigo-client/sectigo"
+
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/metric/global"
 	"go.opentelemetry.io/otel/metric/instrument"
 	"go.opentelemetry.io/otel/metric/instrument/syncint64"
 	"go.opentelemetry.io/otel/trace"
+
 	"go.uber.org/zap"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -66,11 +71,11 @@ func registerAcme(client *lego.Client, config *cfg.SectigoConfiguration, account
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(accountFile, data, 0644)
+	err = os.WriteFile(accountFile, data, 0600)
 	if err != nil {
 		return err
 	}
-	certOut, err := os.OpenFile(keyFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+	certOut, err := os.OpenFile(keyFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600) //#nosec
 	if err != nil {
 		return err
 	}
@@ -98,7 +103,7 @@ func fileExists(name string) (bool, error) {
 }
 
 func loadPrivateKey(file string) (crypto.PrivateKey, error) {
-	keyBytes, err := os.ReadFile(file)
+	keyBytes, err := os.ReadFile(file) //#nosec
 	if err != nil {
 		return nil, err
 	}
@@ -131,7 +136,7 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 		}
 
 	} else {
-		data, err := os.ReadFile(accountFile)
+		data, err := os.ReadFile(accountFile) //#nosec
 		if err != nil {
 			return nil
 		}
@@ -147,8 +152,10 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 	}
 	legoCfg := lego.NewConfig(&account)
 	legoCfg.CADirURL = "https://acme.sectigo.com/v2/OV"
+	legoLog.Logger = pkiHelper.NewZapLogger(zap.L())
 	legoCfg.Certificate.Timeout = time.Duration(10) * time.Minute
 	legoClient, err := lego.NewClient(legoCfg)
+
 	if err != nil {
 		return nil
 	}
@@ -158,6 +165,7 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 			return nil
 		}
 	}
+
 	durRecorder, _ := meter.SyncInt64().Histogram(
 		"ssl.issue.duration",
 		instrument.WithUnit("milliseconds"),
