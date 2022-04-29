@@ -48,13 +48,13 @@ var meter = global.MeterProvider().Meter("pki-service")
 
 type sslAPIServer struct {
 	pb.UnimplementedSSLServiceServer
-	client     *sectigo.Client
-	db         *ent.Client
-	legoClient *lego.Client
-	cfg        *cfg.SectigoConfiguration
-	logger     *zap.Logger
-	gauge      asyncint64.Gauge
-	gaugeLast  asyncint64.Gauge
+	client    *sectigo.Client
+	db        *ent.Client
+	legoCfg   *lego.Config
+	cfg       *cfg.SectigoConfiguration
+	logger    *zap.Logger
+	gauge     asyncint64.Gauge
+	gaugeLast asyncint64.Gauge
 
 	pendingValidations map[string]interface{}
 }
@@ -155,13 +155,13 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 	legoCfg := lego.NewConfig(&account)
 	legoCfg.CADirURL = "https://acme.sectigo.com/v2/OV"
 	legoLog.Logger = pkiHelper.NewZapLogger(zap.L())
-	legoCfg.Certificate.Timeout = time.Duration(10) * time.Minute
-	legoClient, err := lego.NewClient(legoCfg)
-
-	if err != nil {
-		return nil
-	}
+	legoCfg.Certificate.Timeout = time.Duration(5) * time.Minute
 	if account.Registration == nil {
+		legoClient, err := lego.NewClient(legoCfg)
+
+		if err != nil {
+			return nil
+		}
 		err = registerAcme(legoClient, cfg, account, accountFile, keyFile)
 		if err != nil {
 			return nil
@@ -180,7 +180,7 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 		instrument.WithDescription("Issue timestamp for last SSL Certificates"),
 	)
 
-	return &sslAPIServer{client: client, legoClient: legoClient, cfg: cfg, logger: zap.L(), db: db, gauge: gauge, gaugeLast: gaugeLast, pendingValidations: make(map[string]interface{})}
+	return &sslAPIServer{client: client, legoCfg: legoCfg, cfg: cfg, logger: zap.L(), db: db, gauge: gauge, gaugeLast: gaugeLast, pendingValidations: make(map[string]interface{})}
 }
 
 func parseCertificates(cert []byte) ([]*x509.Certificate, error) {
@@ -294,7 +294,12 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	}
 
 	start := time.Now()
-	certificates, err := s.legoClient.Certificate.ObtainForCSR(legoCert.ObtainForCSRRequest{CSR: csr, Bundle: true})
+	client, err := lego.NewClient(s.legoCfg)
+	if err != nil {
+		return s.handleError("Error while creating client", span, err)
+	}
+
+	certificates, err := client.Certificate.ObtainForCSR(legoCert.ObtainForCSRRequest{CSR: csr, Bundle: true})
 	if err != nil {
 		return s.handleError("Error while collecting certificate", span, err)
 	}
