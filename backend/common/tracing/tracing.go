@@ -9,7 +9,6 @@ import (
 	"go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/metric/global"
 	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/sdk/metric/aggregator/histogram"
 	controller "go.opentelemetry.io/otel/sdk/metric/controller/basic"
 	"go.opentelemetry.io/otel/sdk/metric/export/aggregation"
 	processor "go.opentelemetry.io/otel/sdk/metric/processor/basic"
@@ -59,14 +58,10 @@ func InitTracer(logger *zap.Logger, name string) *sdktrace.TracerProvider {
 				semconv.ServiceNameKey.String(name),
 			)),
 	)
-	config := prometheus.Config{
-		DefaultHistogramBoundaries: []float64{10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000},
-	}
+	config := prometheus.Config{}
 	c := controller.New(
 		processor.NewFactory(
-			selector.NewWithHistogramDistribution(
-				histogram.WithExplicitBoundaries(config.DefaultHistogramBoundaries),
-			),
+			selector.NewWithHistogramDistribution(),
 			aggregation.CumulativeTemporalitySelector(),
 			processor.WithMemory(false),
 		),

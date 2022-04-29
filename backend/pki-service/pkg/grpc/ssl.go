@@ -34,7 +34,6 @@ import (
 	"go.opentelemetry.io/otel/metric/global"
 	"go.opentelemetry.io/otel/metric/instrument"
 	"go.opentelemetry.io/otel/metric/instrument/asyncint64"
-	"go.opentelemetry.io/otel/metric/instrument/syncint64"
 	"go.opentelemetry.io/otel/trace"
 
 	"go.uber.org/zap"
@@ -54,8 +53,8 @@ type sslAPIServer struct {
 	legoClient *lego.Client
 	cfg        *cfg.SectigoConfiguration
 	logger     *zap.Logger
-	durHist    syncint64.Histogram
 	gauge      asyncint64.Gauge
+	gaugeLast  asyncint64.Gauge
 
 	pendingValidations map[string]interface{}
 }
@@ -169,19 +168,19 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 		}
 	}
 
-	durHist, _ := meter.SyncInt64().Histogram(
-		"ssl.issue.duration",
+	gauge, _ := meter.AsyncInt64().Gauge(
+		"ssl.issue.last.time",
 		instrument.WithUnit("seconds"),
-		instrument.WithDescription("Issue time for SSL Certificates"),
+		instrument.WithDescription("Required time for last SSL Certificates"),
 	)
 
-	gauge, _ := meter.AsyncInt64().Gauge(
+	gaugeLast, _ := meter.AsyncInt64().Gauge(
 		"ssl.issue.last",
 		instrument.WithUnit("seconds"),
-		instrument.WithDescription("Issue time for SSL Certificates"),
+		instrument.WithDescription("Issue timestamp for last SSL Certificates"),
 	)
 
-	return &sslAPIServer{client: client, legoClient: legoClient, cfg: cfg, logger: zap.L(), db: db, durHist: durHist, gauge: gauge, pendingValidations: make(map[string]interface{})}
+	return &sslAPIServer{client: client, legoClient: legoClient, cfg: cfg, logger: zap.L(), db: db, gauge: gauge, gaugeLast: gaugeLast, pendingValidations: make(map[string]interface{})}
 }
 
 func parseCertificates(cert []byte) ([]*x509.Certificate, error) {
@@ -301,9 +300,9 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	}
 
 	stop := time.Now()
-	s.durHist.Record(ctx, int64(stop.Sub(start).Seconds()))
-	err = meter.RegisterCallback([]instrument.Asynchronous{s.gauge}, func(ctx context.Context) {
+	err = meter.RegisterCallback([]instrument.Asynchronous{s.gauge, s.gaugeLast}, func(ctx context.Context) {
 		s.gauge.Observe(ctx, int64(stop.Sub(start).Seconds()))
+		s.gaugeLast.Observe(ctx, time.Now().UnixNano())
 	})
 	if err != nil {
 		s.logger.Error("Error while registering callback", zap.Error(err))
