@@ -169,14 +169,14 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 	}
 
 	gauge, _ := meter.AsyncInt64().Gauge(
-		"ssl.issue.last.time",
+		"ssl.issue.last.duration",
 		instrument.WithUnit("seconds"),
 		instrument.WithDescription("Required time for last SSL Certificates"),
 	)
 
 	gaugeLast, _ := meter.AsyncInt64().Gauge(
-		"ssl.issue.last",
-		instrument.WithUnit("seconds"),
+		"ssl.issue.last.unix",
+		instrument.WithUnit("unixMilli"),
 		instrument.WithDescription("Issue timestamp for last SSL Certificates"),
 	)
 
@@ -302,7 +302,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	stop := time.Now()
 	err = meter.RegisterCallback([]instrument.Asynchronous{s.gauge, s.gaugeLast}, func(ctx context.Context) {
 		s.gauge.Observe(ctx, int64(stop.Sub(start).Seconds()))
-		s.gaugeLast.Observe(ctx, time.Now().UnixNano())
+		s.gaugeLast.Observe(ctx, stop.UnixMilli())
 	})
 	if err != nil {
 		s.logger.Error("Error while registering callback", zap.Error(err))
