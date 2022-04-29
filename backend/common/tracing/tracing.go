@@ -60,7 +60,7 @@ func InitTracer(logger *zap.Logger, name string) *sdktrace.TracerProvider {
 			)),
 	)
 	config := prometheus.Config{
-		DefaultHistogramBoundaries: []float64{1, 2, 5, 10, 20, 50},
+		DefaultHistogramBoundaries: []float64{10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000},
 	}
 	c := controller.New(
 		processor.NewFactory(
@@ -68,10 +68,17 @@ func InitTracer(logger *zap.Logger, name string) *sdktrace.TracerProvider {
 				histogram.WithExplicitBoundaries(config.DefaultHistogramBoundaries),
 			),
 			aggregation.CumulativeTemporalitySelector(),
-			processor.WithMemory(true),
+			processor.WithMemory(false),
+		),
+		controller.WithResource(
+			resource.NewWithAttributes(
+				semconv.SchemaURL,
+				semconv.ServiceNameKey.String(name),
+			),
 		),
 	)
 	prom, err := prometheus.New(config, c)
+
 	if err != nil {
 		logger.Panic("failed to initialize prometheus exporter", zap.Error(err))
 	}

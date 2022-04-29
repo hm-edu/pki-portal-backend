@@ -33,6 +33,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/metric/global"
 	"go.opentelemetry.io/otel/metric/instrument"
+	"go.opentelemetry.io/otel/metric/instrument/asyncint64"
 	"go.opentelemetry.io/otel/metric/instrument/syncint64"
 	"go.opentelemetry.io/otel/trace"
 
@@ -48,12 +49,14 @@ var meter = global.MeterProvider().Meter("pki-service")
 
 type sslAPIServer struct {
 	pb.UnimplementedSSLServiceServer
-	client             *sectigo.Client
-	db                 *ent.Client
-	legoClient         *lego.Client
-	cfg                *cfg.SectigoConfiguration
-	logger             *zap.Logger
-	duration           syncint64.Histogram
+	client     *sectigo.Client
+	db         *ent.Client
+	legoClient *lego.Client
+	cfg        *cfg.SectigoConfiguration
+	logger     *zap.Logger
+	durHist    syncint64.Histogram
+	gauge      asyncint64.Gauge
+
 	pendingValidations map[string]interface{}
 }
 
@@ -166,13 +169,19 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 		}
 	}
 
-	durRecorder, _ := meter.SyncInt64().Histogram(
+	durHist, _ := meter.SyncInt64().Histogram(
 		"ssl.issue.duration",
-		instrument.WithUnit("milliseconds"),
+		instrument.WithUnit("seconds"),
 		instrument.WithDescription("Issue time for SSL Certificates"),
 	)
 
-	return &sslAPIServer{client: client, legoClient: legoClient, cfg: cfg, logger: zap.L(), db: db, duration: durRecorder, pendingValidations: make(map[string]interface{})}
+	gauge, _ := meter.AsyncInt64().Gauge(
+		"ssl.issue.last",
+		instrument.WithUnit("seconds"),
+		instrument.WithDescription("Issue time for SSL Certificates"),
+	)
+
+	return &sslAPIServer{client: client, legoClient: legoClient, cfg: cfg, logger: zap.L(), db: db, durHist: durHist, gauge: gauge, pendingValidations: make(map[string]interface{})}
 }
 
 func parseCertificates(cert []byte) ([]*x509.Certificate, error) {
@@ -292,8 +301,13 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	}
 
 	stop := time.Now()
-	s.duration.Record(ctx, stop.Sub(start).Milliseconds())
-
+	s.durHist.Record(ctx, int64(stop.Sub(start).Seconds()))
+	err = meter.RegisterCallback([]instrument.Asynchronous{s.gauge}, func(ctx context.Context) {
+		s.gauge.Observe(ctx, int64(stop.Sub(start).Seconds()))
+	})
+	if err != nil {
+		s.logger.Error("Error while registering callback", zap.Error(err))
+	}
 	certs, err := parseCertificates(certificates.Certificate)
 	if err != nil {
 		return s.handleError("Error while collecting certificate", span, err)
