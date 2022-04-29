@@ -298,7 +298,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	if err != nil {
 		return s.handleError("Error while collecting certificate", span, err)
 	}
-	pem := certs[1]
+	pem := certs[0]
 	s.logger.Info("Certificate issued", zap.Strings("subject_alternative_names", req.SubjectAlternativeNames), zap.Duration("duration", stop.Sub(start)), zap.String("certificate", fmt.Sprintf("%032x", pem.SerialNumber)))
 	_, err = s.db.Certificate.UpdateOneID(entry.ID).SetSerial(pkiHelper.NormalizeSerial(fmt.Sprintf("%032x", pem.SerialNumber))).SetStatus(certificate.StatusIssued).SetNotAfter(pem.NotAfter).SetNotBefore(pem.NotBefore).Save(ctx)
 	if err != nil {
