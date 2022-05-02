@@ -55,8 +55,8 @@ type sslAPIServer struct {
 
 	pendingValidations map[string]interface{}
 
-	last     time.Time
-	duration time.Duration
+	last     *time.Time
+	duration *time.Duration
 }
 
 func registerAcme(client *lego.Client, config *cfg.SectigoConfiguration, account pkiHelper.User, accountFile string, keyFile string) error {
@@ -180,9 +180,11 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 		instrument.WithDescription("Issue timestamp for last SSL Certificates"),
 	)
 	instance := &sslAPIServer{client: client, legoCfg: legoCfg, cfg: cfg, logger: zap.L(), db: db, pendingValidations: make(map[string]interface{})}
-	err := meter.RegisterCallback([]instrument.Asynchronous{s.gauge, s.gaugeLast}, func(ctx context.Context) {
-		gauge.Observe(ctx, int64(instance.duration.Seconds()))
-		gaugeLast.Observe(ctx, instance.last.UnixMilli())
+	err := meter.RegisterCallback([]instrument.Asynchronous{gauge, gaugeLast}, func(ctx context.Context) {
+		if instance.last != nil {
+			gauge.Observe(ctx, int64(instance.duration.Seconds()))
+			gaugeLast.Observe(ctx, instance.last.UnixMilli())
+		}
 	})
 	if err != nil {
 		zap.L().Error("Failed to register callback", zap.Error(err))
@@ -312,9 +314,9 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	}
 
 	stop := time.Now()
-
-	s.duration = stop.Sub(start)
-	s.last = stop
+	duration := stop.Sub(start)
+	s.duration = &duration
+	s.last = &stop
 
 	if err != nil {
 		s.logger.Error("Error while registering callback", zap.Error(err))
