@@ -33,7 +33,6 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/metric/global"
 	"go.opentelemetry.io/otel/metric/instrument"
-	"go.opentelemetry.io/otel/metric/instrument/asyncint64"
 	"go.opentelemetry.io/otel/trace"
 
 	"go.uber.org/zap"
@@ -48,15 +47,16 @@ var meter = global.MeterProvider().Meter("pki-service")
 
 type sslAPIServer struct {
 	pb.UnimplementedSSLServiceServer
-	client    *sectigo.Client
-	db        *ent.Client
-	legoCfg   *lego.Config
-	cfg       *cfg.SectigoConfiguration
-	logger    *zap.Logger
-	gauge     asyncint64.Gauge
-	gaugeLast asyncint64.Gauge
+	client  *sectigo.Client
+	db      *ent.Client
+	legoCfg *lego.Config
+	cfg     *cfg.SectigoConfiguration
+	logger  *zap.Logger
 
 	pendingValidations map[string]interface{}
+
+	last     time.Time
+	duration time.Duration
 }
 
 func registerAcme(client *lego.Client, config *cfg.SectigoConfiguration, account pkiHelper.User, accountFile string, keyFile string) error {
@@ -179,8 +179,15 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 		instrument.WithUnit("unixMilli"),
 		instrument.WithDescription("Issue timestamp for last SSL Certificates"),
 	)
-
-	return &sslAPIServer{client: client, legoCfg: legoCfg, cfg: cfg, logger: zap.L(), db: db, gauge: gauge, gaugeLast: gaugeLast, pendingValidations: make(map[string]interface{})}
+	instance := &sslAPIServer{client: client, legoCfg: legoCfg, cfg: cfg, logger: zap.L(), db: db, pendingValidations: make(map[string]interface{})}
+	err := meter.RegisterCallback([]instrument.Asynchronous{s.gauge, s.gaugeLast}, func(ctx context.Context) {
+		gauge.Observe(ctx, int64(instance.duration.Seconds()))
+		gaugeLast.Observe(ctx, instance.last.UnixMilli())
+	})
+	if err != nil {
+		zap.L().Error("Failed to register callback", zap.Error(err))
+	}
+	return instance
 }
 
 func parseCertificates(cert []byte) ([]*x509.Certificate, error) {
@@ -305,10 +312,10 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	}
 
 	stop := time.Now()
-	err = meter.RegisterCallback([]instrument.Asynchronous{s.gauge, s.gaugeLast}, func(ctx context.Context) {
-		s.gauge.Observe(ctx, int64(stop.Sub(start).Seconds()))
-		s.gaugeLast.Observe(ctx, stop.UnixMilli())
-	})
+
+	s.duration = stop.Sub(start)
+	s.last = stop
+
 	if err != nil {
 		s.logger.Error("Error while registering callback", zap.Error(err))
 	}
