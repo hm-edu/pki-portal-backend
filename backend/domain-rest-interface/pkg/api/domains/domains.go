@@ -11,6 +11,7 @@ import (
 	"github.com/hm-edu/portal-common/auth"
 	"github.com/hm-edu/portal-common/helper"
 	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
 )
 
 // ListDomains godoc
@@ -26,6 +27,7 @@ import (
 func (h *Handler) ListDomains(c echo.Context) error {
 	domains, err := h.domainStore.ListDomains(c.Request().Context(), auth.UserFromRequest(c), false)
 	if err != nil {
+		h.logger.Error("Listing domains failed", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
 	}
 	return c.JSON(http.StatusOK, helper.Map(domains, model.DomainToOutput))
@@ -45,6 +47,7 @@ func (h *Handler) ListDomains(c echo.Context) error {
 func (h *Handler) CreateDomain(c echo.Context) error {
 	req := &model.DomainRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
+		h.logger.Error("Binding request failed", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
 	}
 	domain := ent.Domain{Owner: auth.UserFromRequest(c), Fqdn: req.FQDN}
