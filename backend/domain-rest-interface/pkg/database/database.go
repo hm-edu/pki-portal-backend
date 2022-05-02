@@ -17,28 +17,28 @@ import (
 
 // DbInstance is a wrapper around a entgo database client.
 type DbInstance struct {
-	Db *ent.Client
+	Db       *ent.Client
+	Internal *sql.DB
 }
 
 // DB is a globally accessible domain instance.
 var DB DbInstance
 
 // Open creates a new databse client
-func Open(log *zap.Logger, connectionString string) *ent.Client {
+func Open(log *zap.Logger, connectionString string) (*ent.Client, *sql.DB) {
 	db, err := sql.Open("pgx", connectionString)
 	if err != nil {
 		log.Fatal("Error connecting to database", zap.Error(err))
 	}
-
 	// Create an ent.Driver from `db`.
 	drv := entsql.OpenDB(dialect.Postgres, db)
-	return ent.NewClient(ent.Driver(drv))
+	return ent.NewClient(ent.Driver(drv)), db
 }
 
 // ConnectDb establishs a new database connection.
 func ConnectDb(log *zap.Logger, connectionString string) {
 
-	client := Open(log, connectionString)
+	client, db := Open(log, connectionString)
 
 	// Run the auto migration tool.
 	if err := client.Schema.Create(context.Background()); err != nil {
@@ -46,6 +46,7 @@ func ConnectDb(log *zap.Logger, connectionString string) {
 	}
 
 	DB = DbInstance{
-		Db: client,
+		Db:       client,
+		Internal: db,
 	}
 }
