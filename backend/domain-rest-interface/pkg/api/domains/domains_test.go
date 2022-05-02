@@ -8,9 +8,11 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/hm-edu/domain-rest-interface/ent"
 	"github.com/hm-edu/domain-rest-interface/ent/enttest"
+	"github.com/hm-edu/domain-rest-interface/pkg/database"
 	"github.com/hm-edu/domain-rest-interface/pkg/store"
 	"github.com/hm-edu/portal-common/helper"
 	"github.com/labstack/echo/v4"
@@ -26,6 +28,8 @@ func TestCreateDomainsWithoutTokenAndMiddleware(t *testing.T) {
 	defer func(*ent.Client) {
 		_ = client.Close()
 	}(client)
+	database.DB.Internal, _, _ = sqlmock.New()
+
 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(`{"fqdn":"example.com"}`))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
@@ -41,6 +45,7 @@ func TestCreateDomainsFqdns(t *testing.T) {
 	defer func(*ent.Client) {
 		_ = client.Close()
 	}(client)
+	database.DB.Internal, _, _ = sqlmock.New()
 
 	testcases := []string{"{}", "{fqdn:1}", `{fqdn:"%:"}`}
 	for _, tc := range testcases {
@@ -65,6 +70,8 @@ func TestCreateDomainsWithToken(t *testing.T) {
 	defer func(*ent.Client) {
 		_ = client.Close()
 	}(client)
+	database.DB.Internal, _, _ = sqlmock.New()
+
 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(`{"fqdn":"example.com"}`))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
@@ -86,6 +93,8 @@ func TestCreateDomainsTwice(t *testing.T) {
 	defer func(*ent.Client) {
 		_ = client.Close()
 	}(client)
+	database.DB.Internal, _, _ = sqlmock.New()
+
 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(`{"fqdn":"example.com"}`))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
@@ -114,6 +123,7 @@ func TestCreateDomainsAutoApprove(t *testing.T) {
 	defer func(*ent.Client) {
 		_ = client.Close()
 	}(client)
+	database.DB.Internal, _, _ = sqlmock.New()
 
 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(`{"fqdn":"foo.example.com"}`))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -139,6 +149,8 @@ func TestCreateDomainsNoAutoApproveOtherUser(t *testing.T) {
 	defer func(*ent.Client) {
 		_ = client.Close()
 	}(client)
+	database.DB.Internal, _, _ = sqlmock.New()
+
 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(`{"fqdn":"foo.example.com"}`))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
@@ -163,6 +175,7 @@ func TestCreateDomainsNoAutoApproveOtherUserChild(t *testing.T) {
 	defer func(*ent.Client) {
 		_ = client.Close()
 	}(client)
+	database.DB.Internal, _, _ = sqlmock.New()
 
 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(`{"fqdn":"foo.example.com"}`))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -220,6 +233,7 @@ func TestApproveDomainsNotAllowed(t *testing.T) {
 	defer func(*ent.Client) {
 		_ = client.Close()
 	}(client)
+	database.DB.Internal, _, _ = sqlmock.New()
 
 	st := store.NewDomainStore(client)
 	_, err := st.Create(context.Background(), &ent.Domain{Fqdn: "example.com", Owner: "test", Approved: true})
@@ -266,6 +280,7 @@ func TestApproveMissingId(t *testing.T) {
 	defer func(*ent.Client) {
 		_ = client.Close()
 	}(client)
+	database.DB.Internal, _, _ = sqlmock.New()
 
 	st := store.NewDomainStore(client)
 	_, err := st.Create(context.Background(), &ent.Domain{Fqdn: "example.com", Owner: "test", Approved: true})
@@ -286,6 +301,7 @@ func TestApproveDomainsAllowed(t *testing.T) {
 	defer func(*ent.Client) {
 		_ = client.Close()
 	}(client)
+	database.DB.Internal, _, _ = sqlmock.New()
 
 	st := store.NewDomainStore(client)
 	_, err := st.Create(context.Background(), &ent.Domain{Fqdn: "example.com", Owner: "test", Approved: true})

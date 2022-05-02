@@ -58,6 +58,7 @@ require (
 
 require (
 	entgo.io/ent v0.10.1
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/brpaz/echozap v1.1.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/hm-edu/portal-apis v0.0.0-20220413135645-44f42dd816bf
@@ -65,6 +66,7 @@ require (
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/lestrrat-go/jwx v1.2.21
 	github.com/mattn/go-sqlite3 v1.14.12
+	github.com/ory/viper v1.7.5
 	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.7.1
 	github.com/swaggo/echo-swagger v1.3.0
@@ -87,7 +89,6 @@ require (
 	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
 	github.com/jackc/pgtype v1.11.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
-	github.com/ory/viper v1.7.5 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.12.1 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
