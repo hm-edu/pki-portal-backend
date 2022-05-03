@@ -42,16 +42,12 @@ func (s *DomainStore) ListDomains(ctx context.Context, owner string, approved bo
 	if err := database.DB.Internal.Ping(); err != nil {
 		return nil, fmt.Errorf("pinging the database: %w", err)
 	}
-	tx, err := s.db.Tx(ctx)
-	if err != nil {
-		return nil, err
-	}
 
 	predicates := domain.Or(domain.HasDelegationsWith(delegation.User(owner)), domain.Owner(owner))
 	if approved {
 		predicates = domain.And(predicates, domain.Approved(true))
 	}
-	domains, err := tx.Domain.Query().WithDelegations().Where(predicates).All(ctx)
+	domains, err := s.db.Domain.Query().WithDelegations().Where(predicates).All(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -60,16 +56,11 @@ func (s *DomainStore) ListDomains(ctx context.Context, owner string, approved bo
 	ids := helper.Map(domains, func(d *ent.Domain) int { return d.ID })
 
 	if len(fqdns) != 0 {
-		childs, err := tx.Domain.Query().WithDelegations().Where(domain.And(domain.Or(fqdns...), domain.IDNotIn(ids...))).All(ctx)
+		childs, err := s.db.Domain.Query().WithDelegations().Where(domain.And(domain.Or(fqdns...), domain.IDNotIn(ids...))).All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		domains = append(domains, childs...)
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return nil, err
 	}
 	return domains, nil
 }
