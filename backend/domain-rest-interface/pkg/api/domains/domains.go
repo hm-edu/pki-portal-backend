@@ -60,7 +60,7 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 	if helper.Any(domains, func(i *ent.Domain) bool { return i.Approved && strings.HasSuffix(domain.Fqdn, "."+i.Fqdn) }) {
 		domain.Approved = true
 	}
-
+	h.logger.Info("Creating domain", zap.String("fqdn", domain.Fqdn), zap.Bool("approved", domain.Approved), zap.String("owner", domain.Owner))
 	created, err := h.domainStore.Create(c.Request().Context(), &domain)
 	if err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest}
@@ -85,7 +85,7 @@ func (h *Handler) DeleteDomains(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-
+	h.logger.Info("Deleting domain", zap.String("fqdn", domain.Fqdn))
 	if err := h.domainStore.Delete(c.Request().Context(), []*ent.Domain{domain}); err != nil {
 		h.logger.Error("Deleting domain failed", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Error while deleting domains"}
@@ -105,12 +105,12 @@ func (h *Handler) DeleteDomains(c echo.Context) error {
 // @Success 200 {object} model.Domain The updated domain
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) ApproveDomain(c echo.Context) error {
-
 	_, domain, err := h.extractData(c)
 	if err != nil {
 		return err
 	}
 
+	h.logger.Info("Approving domain", zap.String("fqdn", domain.Fqdn))
 	updated, err := h.domainStore.Approve(c.Request().Context(), domain)
 	if err != nil {
 		h.logger.Error("Approving domain failed", zap.Error(err))
@@ -170,7 +170,7 @@ func (h *Handler) TransferDomain(c echo.Context) error {
 	}) {
 		return &echo.HTTPError{Code: http.StatusForbidden, Message: "You are not responsible for this zone"}
 	}
-
+	h.logger.Info("Transferring domain", zap.String("fqdn", domain.Fqdn), zap.String("owner", req.Owner))
 	updated, err := h.domainStore.Owner(c.Request().Context(), domain, req.Owner)
 	if err != nil {
 		h.logger.Error("Transferring domain failed", zap.Error(err))
@@ -208,7 +208,7 @@ func (h *Handler) DeleteDelegation(c echo.Context) error {
 		h.logger.Error("Delegation not found", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusNotFound, Message: "Delegation not found"}
 	}
-
+	h.logger.Info("Deleting delegation", zap.String("fqdn", domain.Fqdn), zap.Int("delegation", delegationID), zap.String("owner", delegated.User))
 	updated, err := h.domainStore.DeleteDelegation(c.Request().Context(), domain, delegated)
 	if err != nil {
 		h.logger.Error("Deleting delegation failed", zap.Error(err))
@@ -241,7 +241,7 @@ func (h *Handler) AddDelegation(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-
+	h.logger.Info("Adding delegation", zap.String("fqdn", domain.Fqdn), zap.String("owner", req.User))
 	updated, err := h.domainStore.AddDelegation(c.Request().Context(), domain, req.User)
 	if err != nil {
 		h.logger.Error("Adding delegation failed", zap.Error(err))
