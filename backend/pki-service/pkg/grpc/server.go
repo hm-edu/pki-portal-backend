@@ -3,9 +3,9 @@ package grpc
 import (
 	"fmt"
 	"net"
+	"net/http"
 
 	pb "github.com/hm-edu/portal-apis"
-	"github.com/hm-edu/sectigo-client/sectigo"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
@@ -13,6 +13,7 @@ import (
 	"github.com/hm-edu/pki-service/ent"
 	"github.com/hm-edu/pki-service/pkg/cfg"
 	"github.com/hm-edu/portal-common/tracing"
+	"github.com/hm-edu/sectigo-client/sectigo"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health/grpc_health_v1"
@@ -21,11 +22,10 @@ import (
 
 // Server is the basic structure of the GRPC server.
 type Server struct {
-	logger        *zap.Logger
-	config        *Config
-	sectigoCfg    *cfg.SectigoConfiguration
-	sectigoClient *sectigo.Client
-	db            *ent.Client
+	logger     *zap.Logger
+	config     *Config
+	sectigoCfg *cfg.SectigoConfiguration
+	db         *ent.Client
 }
 
 // Config is the basic structure of the GRPC configuration
@@ -35,13 +35,12 @@ type Config struct {
 }
 
 // NewServer creates a new GRPC server
-func NewServer(config *Config, logger *zap.Logger, sectigoCfg *cfg.SectigoConfiguration, sectigoClient *sectigo.Client, db *ent.Client) (*Server, error) {
+func NewServer(config *Config, logger *zap.Logger, sectigoCfg *cfg.SectigoConfiguration, db *ent.Client) (*Server, error) {
 	srv := &Server{
-		logger:        logger,
-		sectigoCfg:    sectigoCfg,
-		sectigoClient: sectigoClient,
-		config:        config,
-		db:            db,
+		logger:     logger,
+		sectigoCfg: sectigoCfg,
+		config:     config,
+		db:         db,
 	}
 
 	return srv, nil
@@ -62,9 +61,15 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	server := NewHealthChecker()
 	reflection.Register(srv)
 
-	ssl := newSslAPIServer(s.sectigoClient, s.sectigoCfg, s.db)
+	// According to https://go.dev/src/net/http/client.go:
+	// "Clients are safe for concurrent use by multiple goroutines."
+	// => one http client is fine ;)
+
+	c := sectigo.NewClient(http.DefaultClient, s.logger, s.sectigoCfg.User, s.sectigoCfg.Password, s.sectigoCfg.CustomerURI)
+
+	ssl := newSslAPIServer(c, s.sectigoCfg, s.db)
 	pb.RegisterSSLServiceServer(srv, ssl)
-	smime := newSmimeAPIServer(s.sectigoClient, s.sectigoCfg)
+	smime := newSmimeAPIServer(c, s.sectigoCfg)
 	pb.RegisterSmimeServiceServer(srv, smime)
 	grpc_health_v1.RegisterHealthServer(srv, server)
 

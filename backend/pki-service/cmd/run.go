@@ -2,16 +2,13 @@ package cmd
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/hm-edu/pki-service/pkg/cfg"
 	"github.com/hm-edu/pki-service/pkg/database"
 	"github.com/hm-edu/pki-service/pkg/grpc"
-	"github.com/hm-edu/pki-service/pkg/worker"
 	"github.com/hm-edu/portal-common/api"
 	"github.com/hm-edu/portal-common/signals"
 	"github.com/hm-edu/portal-common/tracing"
-	"github.com/hm-edu/sectigo-client/sectigo"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -48,19 +45,9 @@ var runCmd = &cobra.Command{
 		sectigoCfg.CheckSectigoConfiguration()
 
 		database.ConnectDb(logger, viper.GetString("db"))
-
-		// According to https://go.dev/src/net/http/client.go:
-		// "Clients are safe for concurrent use by multiple goroutines."
-		// => one http client is fine ;)
-
-		client := sectigo.NewClient(http.DefaultClient, logger, sectigoCfg.User, sectigoCfg.Password, sectigoCfg.CustomerURI)
-
-		w := worker.Syncer{Client: client, Db: database.DB.Db}
-		w.SyncCertificates()
-
 		// start gRPC server
 		if grpcCfg.Port > 0 {
-			grpcSrv, _ := grpc.NewServer(&grpcCfg, logger, &sectigoCfg, client, database.DB.Db)
+			grpcSrv, _ := grpc.NewServer(&grpcCfg, logger, &sectigoCfg, database.DB.Db)
 			grpcSrv.ListenAndServe(stopCh)
 		}
 	},
