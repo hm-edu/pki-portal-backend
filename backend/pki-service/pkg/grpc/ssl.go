@@ -194,23 +194,6 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 	return instance
 }
 
-func parseCertificates(cert []byte) ([]*x509.Certificate, error) {
-	var certs []*x509.Certificate
-	for block, rest := pem.Decode(cert); block != nil; block, rest = pem.Decode(rest) {
-		switch block.Type {
-		case "CERTIFICATE":
-			cert, err := x509.ParseCertificate(block.Bytes)
-			if err != nil {
-				return nil, err
-			}
-			certs = append(certs, cert)
-		default:
-			return nil, errors.New("Unknown entry in cert chain")
-		}
-	}
-	return certs, nil
-}
-
 func (s *sslAPIServer) CertificateDetails(ctx context.Context, req *pb.CertificateDetailsRequest) (*pb.SslCertificateDetails, error) {
 	x, err := s.db.Certificate.Query().WithDomains().Where(certificate.Serial(req.Serial)).First(ctx)
 	if err != nil {
@@ -323,7 +306,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	if err != nil {
 		s.logger.Error("Error while registering callback", zap.Error(err))
 	}
-	certs, err := parseCertificates(certificates.Certificate)
+	certs, err := pkiHelper.ParseCertificates(certificates.Certificate)
 	if err != nil {
 		return s.handleError("Error while collecting certificate", span, err)
 	}

@@ -1,4 +1,4 @@
-package grpc
+package helper
 
 import (
 	"fmt"
@@ -106,7 +106,7 @@ ZXN0LmRlMAoGCCqGSM49BAMCA0gAMEUCIFUQcnoZg32tUrBAe8kgYiOzL3sDwrxi
 P6q6wVTtStlKAiEApNAfxM117NR/FlnwMUOSJtKEWNwAqwpNLUzQ+4PlqVg=
 -----END CERTIFICATE-----`
 
-	certs, err := parseCertificates([]byte(cert))
+	certs, err := ParseCertificates([]byte(cert))
 	assert.NoError(t, err)
 	assert.Len(t, certs, 4)
 	assert.Len(t, certs[0:len(certs)-1], 3)
