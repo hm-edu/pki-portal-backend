@@ -26,7 +26,6 @@ import (
 )
 
 var (
-	healthy     int32
 	ready       int32
 	openAPISpec *openapi3.T
 )
@@ -131,7 +130,6 @@ func (api *Server) ListenAndServe(stopCh <-chan struct{}) {
 	}()
 
 	ready = 1
-	healthy = 1
 
 	_ = <-stopCh
 	err := api.app.Shutdown(context.Background())

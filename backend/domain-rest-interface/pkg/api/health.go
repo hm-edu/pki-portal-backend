@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"sync/atomic"
 
+	"github.com/hm-edu/domain-rest-interface/pkg/database"
 	"github.com/labstack/echo/v4"
 )
 
@@ -13,10 +14,11 @@ type healthResponse struct {
 
 // healthzHandler godoc
 func (s *Server) healthzHandler(c echo.Context) (err error) {
-	if atomic.LoadInt32(&healthy) == 1 {
-		return c.JSON(http.StatusOK, healthResponse{Status: "OK"})
+	err = database.DB.Internal.Ping()
+	if err != nil {
+		return c.JSON(http.StatusServiceUnavailable, healthResponse{Status: "Service Unavailable"})
 	}
-	return c.JSON(http.StatusServiceUnavailable, healthResponse{Status: "Service Unavailable"})
+	return c.JSON(http.StatusOK, healthResponse{Status: "OK"})
 }
 
 // readyzHandler godoc
