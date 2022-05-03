@@ -1,0 +1,31 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: acme-cluster
+  namespace: istio-system
+spec:
+  acme:
+    server: https://acme.hmtest.de/acme/acme/directory
+    privateKeySecretRef:
+      name: acme-prod-cluster
+    solvers:
+    - http01:
+        ingress:
+          serviceType: ClusterIP
+          class: istio
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: portal-cert
+  namespace: istio-system
+spec:
+  secretName: portal-cert
+  dnsNames:
+    - "my.hmtest.de"
+    - "domain.api.hmtest.de"
+    - "pki.api.hmtest.de"
+  issuerRef:
+    name: acme-cluster
+    kind: ClusterIssuer
+    group: cert-manager.io
