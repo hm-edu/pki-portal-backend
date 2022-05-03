@@ -143,18 +143,12 @@ func (s *DomainStore) Delete(ctx context.Context, d []*ent.Domain) error {
 	if err := database.DB.Internal.Ping(); err != nil {
 		return fmt.Errorf("pinging the database: %w", err)
 	}
-	tx, err := s.db.Tx(ctx)
-	if err != nil {
-		return fmt.Errorf("starting a transaction: %w", err)
-	}
 
-	_, err = s.db.Domain.Delete().Where(domain.IDIn(helper.Map(d, func(domain *ent.Domain) int { return domain.ID })...)).Exec(ctx)
+	_, err := s.db.Domain.Delete().Where(domain.IDIn(helper.Map(d, func(domain *ent.Domain) int { return domain.ID })...)).Exec(ctx)
 
 	if err != nil {
-		if rerr := tx.Rollback(); rerr != nil {
-			return fmt.Errorf("%w: %v", err, rerr)
-		}
+		return err
 	}
 
-	return tx.Commit()
+	return nil
 }
