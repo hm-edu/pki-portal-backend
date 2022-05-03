@@ -13,7 +13,7 @@ type HealthChecker struct{}
 
 // Check performs a single health check.
 func (s *HealthChecker) Check(ctx context.Context, _ *grpc_health_v1.HealthCheckRequest) (*grpc_health_v1.HealthCheckResponse, error) {
-	zap.L().Info("Serving the Check request for health check")
+	zap.L().Debug("Serving the Check request for health check")
 	err := database.DB.Internal.PingContext(ctx)
 	if err != nil {
 		zap.L().Error("Failed to ping the database", zap.Error(err))
@@ -26,7 +26,7 @@ func (s *HealthChecker) Check(ctx context.Context, _ *grpc_health_v1.HealthCheck
 
 // Watch implements the Watch method of the HealthServer interface.
 func (s *HealthChecker) Watch(_ *grpc_health_v1.HealthCheckRequest, server grpc_health_v1.Health_WatchServer) error {
-	zap.L().Info("Serving the Watch request for health check")
+	zap.L().Debug("Serving the Watch request for health check")
 	return server.Send(&grpc_health_v1.HealthCheckResponse{
 		Status: grpc_health_v1.HealthCheckResponse_SERVING,
 	})
