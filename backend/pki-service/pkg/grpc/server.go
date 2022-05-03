@@ -16,7 +16,6 @@ import (
 	"github.com/hm-edu/sectigo-client/sectigo"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 )
@@ -59,7 +58,7 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	srv = grpc.NewServer(grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(grpc_recovery.UnaryServerInterceptor(), tracing.NewGRPUnaryServerInterceptor(), grpc_zap.UnaryServerInterceptor(s.logger))),
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(grpc_recovery.StreamServerInterceptor(), tracing.NewGRPCStreamServerInterceptor(), grpc_zap.StreamServerInterceptor(s.logger))))
 
-	server := health.NewServer()
+	server := NewHealthChecker()
 	reflection.Register(srv)
 
 	// According to https://go.dev/src/net/http/client.go:
@@ -73,7 +72,6 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	smime := newSmimeAPIServer(c, s.sectigoCfg)
 	pb.RegisterSmimeServiceServer(srv, smime)
 	grpc_health_v1.RegisterHealthServer(srv, server)
-	server.SetServingStatus(s.config.ServiceName, grpc_health_v1.HealthCheckResponse_SERVING)
 
 	go func() {
 		if err := srv.Serve(listener); err != nil {

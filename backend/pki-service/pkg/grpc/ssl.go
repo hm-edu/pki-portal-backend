@@ -29,6 +29,7 @@ import (
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/helper"
 	"github.com/hm-edu/sectigo-client/sectigo"
+	"github.com/hm-edu/sectigo-client/sectigo/ssl"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/metric/global"
@@ -121,6 +122,7 @@ func loadPrivateKey(file string) (crypto.PrivateKey, error) {
 
 	return nil, errors.New("unknown private key type")
 }
+
 func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *ent.Client) *sslAPIServer {
 	accountFile := filepath.Join(cfg.AcmeStorage, "reg.json")
 	keyFile := filepath.Join(cfg.AcmeStorage, "reg.key")
@@ -326,11 +328,29 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		return s.handleError("Error while collecting certificate", span, err)
 	}
 	pem := certs[0]
+	serial := fmt.Sprintf("%032x", pem.SerialNumber)
 	s.logger.Info("Certificate issued", zap.Strings("subject_alternative_names", req.SubjectAlternativeNames), zap.Duration("duration", stop.Sub(start)), zap.String("certificate", fmt.Sprintf("%032x", pem.SerialNumber)))
-	_, err = s.db.Certificate.UpdateOneID(entry.ID).SetSerial(pkiHelper.NormalizeSerial(fmt.Sprintf("%032x", pem.SerialNumber))).SetStatus(certificate.StatusIssued).SetNotAfter(pem.NotAfter).SetNotBefore(pem.NotBefore).Save(ctx)
+	_, err = s.db.Certificate.UpdateOneID(entry.ID).SetSerial(pkiHelper.NormalizeSerial(serial)).SetStatus(certificate.StatusIssued).SetNotAfter(pem.NotAfter).SetNotBefore(pem.NotBefore).Save(ctx)
 	if err != nil {
 		return s.handleError("Error while collecting certificate", span, err)
 	}
+	go func() {
+		data, _, err := s.client.SslService.List(&ssl.ListSSLRequest{SerialNumber: serial})
+		if err != nil {
+			s.logger.Error("Error while listing certificates", zap.Error(err))
+			return
+		}
+		if len(*data) == 0 {
+			s.logger.Warn("No certificates found")
+			return
+		}
+		cert := (*data)[0]
+		_, err = s.db.Certificate.UpdateOneID(entry.ID).SetSslId(cert.SslID).Save(context.Background())
+		if err != nil {
+			s.logger.Error("Error while updating certificate", zap.Error(err))
+		}
+	}()
+
 	return &pb.IssueSslResponse{Certificate: string(certificates.Certificate)}, nil
 }
 

@@ -3,7 +3,7 @@ module github.com/hm-edu/pki-service
 go 1.18
 
 require (
-	github.com/hm-edu/sectigo-client v0.0.0-20220424131854-596e4576c3df
+	github.com/hm-edu/sectigo-client v0.0.0-20220503083431-b925421654ca
 	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.7.1
 	go.uber.org/zap v1.21.0
