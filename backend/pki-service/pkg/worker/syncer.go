@@ -41,8 +41,8 @@ func (s *Syncer) SyncCertificates() {
 					logger.Error("Error while getting certificate details", zap.Error(err), zap.Int("id", cert.SslID))
 					return
 				}
-				// In the (most) cases an unmanaged certificate is an ACME certificate
-				if item.Status == ssl.Unmanaged {
+				// In the the requested time is empty due to the ACME issuance.
+				if item.Requested == nil {
 					cert, err := s.Client.SslService.Collect(item.SslID, "x509CO")
 					if err != nil {
 						logger.Error("Error while collecting certificate", zap.Error(err), zap.Int("id", item.SslID))
