@@ -87,6 +87,7 @@ func (h *Handler) DeleteDomains(c echo.Context) error {
 	}
 
 	if err := h.domainStore.Delete(c.Request().Context(), []*ent.Domain{domain}); err != nil {
+		h.logger.Error("Deleting domain failed", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Error while deleting domains"}
 	}
 	return c.NoContent(http.StatusNoContent)
@@ -112,6 +113,7 @@ func (h *Handler) ApproveDomain(c echo.Context) error {
 
 	updated, err := h.domainStore.Approve(c.Request().Context(), domain)
 	if err != nil {
+		h.logger.Error("Approving domain failed", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while approving domain"}
 	}
 
@@ -121,11 +123,13 @@ func (h *Handler) ApproveDomain(c echo.Context) error {
 func (h *Handler) extractData(c echo.Context) ([]*ent.Domain, *ent.Domain, error) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
+		h.logger.Error("Invalid domain id", zap.Error(err))
 		return nil, nil, &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid domain ID"}
 	}
 
 	domains, err := h.domainStore.ListDomains(c.Request().Context(), auth.UserFromRequest(c), true)
 	if err != nil {
+		h.logger.Error("Listing domains failed", zap.Error(err))
 		return nil, nil, &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while fetching domains"}
 	}
 
@@ -169,6 +173,7 @@ func (h *Handler) TransferDomain(c echo.Context) error {
 
 	updated, err := h.domainStore.Owner(c.Request().Context(), domain, req.Owner)
 	if err != nil {
+		h.logger.Error("Transferring domain failed", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest}
 	}
 
@@ -200,11 +205,13 @@ func (h *Handler) DeleteDelegation(c echo.Context) error {
 
 	delegated, err := domain.QueryDelegations().Where(delegation.ID(delegationID)).First(c.Request().Context())
 	if err != nil {
+		h.logger.Error("Delegation not found", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusNotFound, Message: "Delegation not found"}
 	}
 
 	updated, err := h.domainStore.DeleteDelegation(c.Request().Context(), domain, delegated)
 	if err != nil {
+		h.logger.Error("Deleting delegation failed", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusNotFound, Message: "Deleting delegation failed"}
 	}
 
@@ -237,6 +244,7 @@ func (h *Handler) AddDelegation(c echo.Context) error {
 
 	updated, err := h.domainStore.AddDelegation(c.Request().Context(), domain, req.User)
 	if err != nil {
+		h.logger.Error("Adding delegation failed", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusNotFound, Message: "Adding delegation failed"}
 	}
 
