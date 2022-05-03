@@ -53,7 +53,7 @@ func (s *Syncer) SyncCertificates() {
 						logger.Error("Error while parsing certificate", zap.Error(err), zap.Int("id", item.SslID))
 						return
 					}
-					item.Requested.Time = certs[0].NotBefore
+					item.Requested = &ssl.JSONDate{Time: certs[0].NotBefore}
 				}
 				details = append(details, item)
 			}(cert)
@@ -61,6 +61,9 @@ func (s *Syncer) SyncCertificates() {
 		wg.Wait()
 		logger.Info("Got certificate details for certificates", zap.Int("count", len(details)))
 		for _, item := range details {
+			if item.SerialNumber == "" {
+				continue
+			}
 			logger.Info("Updating certificate", zap.Int("id", item.SslID), zap.String("serial", item.SerialNumber))
 			sans := []string{item.CommonName}
 
