@@ -14,6 +14,7 @@ import (
 	"github.com/hm-edu/pki-service/pkg/cfg"
 )
 
+// RegisterAcme performs a new registration and stores the registration in the given file.
 func RegisterAcme(client *lego.Client, config *cfg.SectigoConfiguration, account User, accountFile string, keyFile string) error {
 	reg, err := client.Registration.RegisterWithExternalAccountBinding(registration.RegisterEABOptions{
 		TermsOfServiceAgreed: true,
@@ -50,6 +51,7 @@ func RegisterAcme(client *lego.Client, config *cfg.SectigoConfiguration, account
 	return nil
 }
 
+// FileExists checks whether a file exists.
 func FileExists(name string) (bool, error) {
 	_, err := os.Stat(name)
 	if err == nil {
@@ -61,6 +63,7 @@ func FileExists(name string) (bool, error) {
 	return false, err
 }
 
+// LoadPrivateKey loads a private key from a file.
 func LoadPrivateKey(file string) (crypto.PrivateKey, error) {
 	keyBytes, err := os.ReadFile(file) //#nosec
 	if err != nil {
