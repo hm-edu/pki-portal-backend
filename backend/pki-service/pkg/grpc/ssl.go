@@ -2,24 +2,20 @@ package grpc
 
 import (
 	"context"
-	"crypto"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"time"
 
-	"github.com/go-acme/lego/v4/certcrypto"
 	legoCert "github.com/go-acme/lego/v4/certificate"
 	"github.com/go-acme/lego/v4/lego"
 	legoLog "github.com/go-acme/lego/v4/log"
-	"github.com/go-acme/lego/v4/registration"
 
 	"github.com/hm-edu/pki-service/ent"
 	"github.com/hm-edu/pki-service/ent/certificate"
@@ -60,75 +56,12 @@ type sslAPIServer struct {
 	duration *time.Duration
 }
 
-func registerAcme(client *lego.Client, config *cfg.SectigoConfiguration, account pkiHelper.User, accountFile string, keyFile string) error {
-	reg, err := client.Registration.RegisterWithExternalAccountBinding(registration.RegisterEABOptions{
-		TermsOfServiceAgreed: true,
-		Kid:                  config.EabKid,
-		HmacEncoded:          config.EabHmac,
-	})
-	if err != nil {
-		return err
-	}
-	account.Registration = reg
-	data, err := json.Marshal(account)
-	if err != nil {
-		return err
-	}
-	err = os.WriteFile(accountFile, data, 0600)
-	if err != nil {
-		return err
-	}
-	certOut, err := os.OpenFile(keyFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600) //#nosec
-	if err != nil {
-		return err
-	}
-	defer func(certOut *os.File) {
-		_ = certOut.Close()
-	}(certOut)
-
-	pemKey := certcrypto.PEMBlock(account.Key)
-	err = pem.Encode(certOut, pemKey)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func fileExists(name string) (bool, error) {
-	_, err := os.Stat(name)
-	if err == nil {
-		return true, nil
-	}
-	if errors.Is(err, os.ErrNotExist) {
-		return false, nil
-	}
-	return false, err
-}
-
-func loadPrivateKey(file string) (crypto.PrivateKey, error) {
-	keyBytes, err := os.ReadFile(file) //#nosec
-	if err != nil {
-		return nil, err
-	}
-
-	keyBlock, _ := pem.Decode(keyBytes)
-
-	switch keyBlock.Type {
-	case "RSA PRIVATE KEY":
-		return x509.ParsePKCS1PrivateKey(keyBlock.Bytes)
-	case "EC PRIVATE KEY":
-		return x509.ParseECPrivateKey(keyBlock.Bytes)
-	}
-
-	return nil, errors.New("unknown private key type")
-}
-
 func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *ent.Client) *sslAPIServer {
 	accountFile := filepath.Join(cfg.AcmeStorage, "reg.json")
 	keyFile := filepath.Join(cfg.AcmeStorage, "reg.key")
 
 	var account pkiHelper.User
-	if ok, _ := fileExists(accountFile); !ok {
+	if ok, _ := pkiHelper.FileExists(accountFile); !ok {
 		// Actually we would not need a private key but the lego API requires one.
 		privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 		if err != nil {
@@ -148,7 +81,7 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 		if err != nil {
 			return nil
 		}
-		account.Key, err = loadPrivateKey(keyFile)
+		account.Key, err = pkiHelper.LoadPrivateKey(keyFile)
 		if err != nil {
 			return nil
 		}
@@ -164,7 +97,7 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 		if err != nil {
 			return nil
 		}
-		err = registerAcme(legoClient, cfg, account, accountFile, keyFile)
+		err = pkiHelper.RegisterAcme(legoClient, cfg, account, accountFile, keyFile)
 		if err != nil {
 			return nil
 		}
@@ -273,17 +206,28 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	if _, ok := s.pendingValidations[req.Csr]; ok {
 		return nil, status.Errorf(codes.AlreadyExists, "Outstanding validation for this CSR")
 	}
-	s.logger.Debug("Issuing certificate", zap.String("common_name", csr.Subject.CommonName), zap.Strings("subject_alternative_names", sans))
+	s.logger.Debug("Issuing certificate",
+		zap.String("common_name", csr.Subject.CommonName),
+		zap.Strings("subject_alternative_names", sans))
 
 	for _, fqdn := range sans {
-		id, err := s.db.Domain.Create().SetFqdn(fqdn).OnConflictColumns(domain.FieldFqdn).Ignore().ID(ctx)
+		id, err := s.db.Domain.Create().
+			SetFqdn(fqdn).
+			OnConflictColumns(domain.FieldFqdn).
+			Ignore().
+			ID(ctx)
 
 		if err != nil {
 			return s.handleError("Error while creating certificate", span, err)
 		}
 		ids = append(ids, id)
 	}
-	entry, err := s.db.Certificate.Create().SetCommonName(sans[0]).AddDomainIDs(ids...).Save(ctx)
+
+	entry, err := s.db.Certificate.Create().
+		SetCommonName(sans[0]).
+		AddDomainIDs(ids...).
+		Save(ctx)
+
 	if err != nil {
 		return s.handleError("Error while creating certificate", span, err)
 	}
@@ -313,26 +257,47 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	}
 	pem := certs[0]
 	serial := fmt.Sprintf("%032x", pem.SerialNumber)
-	s.logger.Info("Certificate issued", zap.Strings("subject_alternative_names", req.SubjectAlternativeNames), zap.Duration("duration", stop.Sub(start)), zap.String("certificate", fmt.Sprintf("%032x", pem.SerialNumber)))
-	_, err = s.db.Certificate.UpdateOneID(entry.ID).SetSerial(pkiHelper.NormalizeSerial(serial)).SetStatus(certificate.StatusIssued).SetNotAfter(pem.NotAfter).SetNotBefore(pem.NotBefore).Save(ctx)
+	s.logger.Info("Certificate issued",
+		zap.Strings("subject_alternative_names", req.SubjectAlternativeNames),
+		zap.Duration("duration", stop.Sub(start)),
+		zap.String("certificate", serial))
+
+	_, err = s.db.Certificate.UpdateOneID(entry.ID).
+		SetSerial(pkiHelper.NormalizeSerial(serial)).
+		SetStatus(certificate.StatusIssued).
+		SetNotAfter(pem.NotAfter).
+		SetNotBefore(pem.NotBefore).
+		Save(ctx)
+
 	if err != nil {
 		return s.handleError("Error while collecting certificate", span, err)
 	}
+
 	go func() {
-		data, _, err := s.client.SslService.List(&ssl.ListSSLRequest{SerialNumber: serial})
+		err := helper.WaitFor(10*time.Minute, 10*time.Second, func() (bool, error) {
+			data, _, err := s.client.SslService.List(&ssl.ListSSLRequest{SerialNumber: serial})
+			if err != nil {
+				s.logger.Error("Error while listing certificates", zap.Error(err))
+				return false, err
+			}
+			if len(*data) == 0 {
+				s.logger.Warn("No certificates found")
+				return false, nil
+			}
+			cert := (*data)[0]
+			_, err = s.db.Certificate.UpdateOneID(entry.ID).SetSslId(cert.SslID).Save(context.Background())
+			if err != nil {
+				s.logger.Error("Error while updating certificate", zap.Error(err))
+				return true, err
+			}
+			return true, nil
+		})
 		if err != nil {
-			s.logger.Error("Error while listing certificates", zap.Error(err))
-			return
+			s.logger.Error("Error while extending information for certificate",
+				zap.String("certificate", serial),
+				zap.Error(err))
 		}
-		if len(*data) == 0 {
-			s.logger.Warn("No certificates found")
-			return
-		}
-		cert := (*data)[0]
-		_, err = s.db.Certificate.UpdateOneID(entry.ID).SetSslId(cert.SslID).Save(context.Background())
-		if err != nil {
-			s.logger.Error("Error while updating certificate", zap.Error(err))
-		}
+
 	}()
 
 	return &pb.IssueSslResponse{Certificate: string(certificates.Certificate)}, nil
@@ -362,7 +327,12 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 		}
 	case *pb.RevokeSslRequest_CommonName:
 		s.logger.Info("Revoking certificate by common name", zap.String("common_name", req.GetCommonName()))
-		certs, err := s.db.Certificate.Query().Where(certificate.And(certificate.HasDomainsWith(domain.FqdnEQ(req.GetCommonName())), certificate.StatusNEQ(certificate.StatusRevoked), certificate.NotAfterGT(time.Now()))).All(ctx)
+		certs, err := s.db.Certificate.Query().
+			Where(certificate.And(certificate.HasDomainsWith(domain.FqdnEQ(req.GetCommonName())),
+				certificate.StatusNEQ(certificate.StatusRevoked),
+				certificate.NotAfterGT(time.Now()))).
+			All(ctx)
+
 		if err != nil {
 			return nil, status.Error(codes.Internal, "Error querying certificates")
 		}
