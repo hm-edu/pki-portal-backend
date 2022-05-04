@@ -231,6 +231,7 @@ func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequ
 			Serial:                  x.Serial,
 			Expires:                 timestamppb.New(x.NotAfter),
 			NotBefore:               nbf,
+			Status:                  string(x.Status),
 		}
 	})}, nil
 }
