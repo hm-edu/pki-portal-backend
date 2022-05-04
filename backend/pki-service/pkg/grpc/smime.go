@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/hm-edu/pki-service/pkg/cfg"
@@ -123,6 +124,9 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 		span.RecordError(err)
 		return nil, status.Error(codes.Internal, "Error obtaining certificate")
 	}
+
+	cert = strings.ReplaceAll(cert, "-----BEGIN PKCS7-----\n", "")
+	cert = strings.ReplaceAll(cert, "-----END PKCS7-----\n", "")
 
 	return &pb.IssueSmimeResponse{Certificate: cert}, nil
 
