@@ -25,7 +25,29 @@ spec:
     - "my.hmtest.de"
     - "domain.api.hmtest.de"
     - "pki.api.hmtest.de"
+    - "monitoring.hmtest.de"
+    - "grafana.monitoring.hmtest.de"
   issuerRef:
     name: acme-cluster
     kind: ClusterIssuer
     group: cert-manager.io
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: general-gateway
+  namespace: istio-system
+  labels:
+    app: ingressgateway
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 80
+        protocol: HTTP
+        name: http
+      hosts:
+        - "*"
+      tls:
+        httpsRedirect: true

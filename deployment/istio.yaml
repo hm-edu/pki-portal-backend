@@ -113,16 +113,6 @@ spec:
     istio: ingressgateway
   servers:
   - port:
-      number: 80
-      name: http
-      protocol: HTTP
-    hosts:
-    - "my.hmtest.de"
-    - "domain.api.hmtest.de"
-    - "pki.api.hmtest.de"
-    tls:
-      httpsRedirect: true # sends 301 redirect for http requests
-  - port:
       number: 443
       name: https
       protocol: HTTPS
