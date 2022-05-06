@@ -27,6 +27,6 @@ type Delegation struct {
 }
 
 // DelegationToOutput converts the internal delegation model to the REST representation.
-func DelegationToOutput(d *ent.Delegation) Delegation {
-	return Delegation{ID: d.ID, User: d.User}
+func DelegationToOutput(d *ent.Delegation) *Delegation {
+	return &Delegation{ID: d.ID, User: d.User}
 }

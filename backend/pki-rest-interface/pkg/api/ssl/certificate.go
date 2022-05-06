@@ -24,7 +24,7 @@ import (
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) List(c echo.Context) error {
 
-	domains, err := h.domain.ListDomains(c.Request().Context(), &pb.ListDomainsRequest{User: auth.UserFromRequest(c)})
+	domains, err := h.domain.ListDomains(c.Request().Context(), &pb.ListDomainsRequest{User: auth.UserFromRequest(c), Approved: true})
 	if err != nil {
 		h.logger.Error("Error getting domains", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while listing certificates"}

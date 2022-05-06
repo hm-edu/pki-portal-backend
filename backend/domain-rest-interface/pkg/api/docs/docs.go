@@ -424,6 +424,9 @@ const docTemplate = `{
                 },
                 "owner": {
                     "type": "string"
+                },
+                "permissions": {
+                    "$ref": "#/definitions/model.Permissions"
                 }
             }
         },
@@ -435,6 +438,23 @@ const docTemplate = `{
             "properties": {
                 "fqdn": {
                     "type": "string"
+                }
+            }
+        },
+        "model.Permissions": {
+            "type": "object",
+            "properties": {
+                "can_approve": {
+                    "type": "boolean"
+                },
+                "can_delegate": {
+                    "type": "boolean"
+                },
+                "can_delete": {
+                    "type": "boolean"
+                },
+                "can_transfer": {
+                    "type": "boolean"
                 }
             }
         },

@@ -107,7 +107,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 		v1.GET("/", h.ListDomains)
 		v1.POST("/", h.CreateDomain)
 		{
-			v1.DELETE("/:id", h.DeleteDomains)
+			v1.DELETE("/:id", h.DeleteDomain)
 			v1.POST("/:id/approve", h.ApproveDomain)
 			v1.POST("/:id/transfer", h.TransferDomain)
 			v1.POST("/:id/delegation", h.AddDelegation)

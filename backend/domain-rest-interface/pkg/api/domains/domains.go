@@ -1,12 +1,12 @@
 package domains
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/hm-edu/domain-rest-interface/ent"
-	"github.com/hm-edu/domain-rest-interface/ent/delegation"
 	"github.com/hm-edu/domain-rest-interface/pkg/model"
 	"github.com/hm-edu/portal-common/auth"
 	"github.com/hm-edu/portal-common/helper"
@@ -25,12 +25,55 @@ import (
 // @Success 200 {object} []model.Domain
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) ListDomains(c echo.Context) error {
-	domains, err := h.domainStore.ListDomains(c.Request().Context(), auth.UserFromRequest(c), false)
+	domains, err := h.enumerateDomains(c.Request().Context(), auth.UserFromRequest(c))
+
+	if err != nil {
+		return &echo.HTTPError{Internal: err, Code: http.StatusInternalServerError, Message: "Error while listing domains"}
+	}
+
+	return c.JSON(http.StatusOK, domains)
+}
+
+func (h *Handler) enumerateDomains(ctx context.Context, user string) ([]*model.Domain, error) {
+
+	domains, err := h.domainStore.ListDomains(ctx, user, false)
 	if err != nil {
 		h.logger.Error("Listing domains failed", zap.Error(err))
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
+		return nil, err
 	}
-	return c.JSON(http.StatusOK, helper.Map(domains, model.DomainToOutput))
+
+	approvedDomains, err := h.domainStore.ListDomains(ctx, user, true)
+	if err != nil {
+		h.logger.Error("Listing domains failed", zap.Error(err))
+		return nil, err
+	}
+	results := []*model.Domain{}
+
+	for _, domain := range domains {
+		item := model.DomainToOutput(domain)
+		// Users may always delete there own domains and transfer it.
+		if item.Owner == user {
+			item.Permissions.CanDelete = true
+			if item.Approved {
+				item.Permissions.CanTransfer = true
+				item.Permissions.CanDelegate = true
+			}
+
+		}
+		// Users may transfer or delete child domains
+		if helper.Any(approvedDomains, func(i *ent.Domain) bool { return i.Approved && strings.HasSuffix(domain.Fqdn, "."+i.Fqdn) }) {
+			// Users may approve child domains
+			if !item.Approved {
+				item.Permissions.CanApprove = true
+			}
+			item.Permissions.CanDelete = true
+			item.Permissions.CanTransfer = true
+			item.Permissions.CanDelegate = true
+		}
+
+		results = append(results, &item)
+	}
+	return results, nil
 }
 
 // CreateDomain godoc
@@ -65,10 +108,17 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 	if err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest}
 	}
-	return c.JSON(http.StatusCreated, model.DomainToOutput(created))
+	item := model.DomainToOutput(created)
+	item.Permissions.CanDelete = true
+	if item.Approved {
+		item.Permissions.CanTransfer = true
+		item.Permissions.CanDelegate = true
+	}
+
+	return c.JSON(http.StatusCreated, item)
 }
 
-// DeleteDomains godoc
+// DeleteDomain godoc
 // @Summary Delete a domain
 // @Description Deletes a domain. Existing certificates are not are not longer accessible.
 // @Tags Domains
@@ -79,18 +129,39 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 // @Security API
 // @Success 204
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) DeleteDomains(c echo.Context) error {
-
-	_, domain, err := h.extractData(c)
+func (h *Handler) DeleteDomain(c echo.Context) error {
+	item, err := h.evaluatePermission(c, func(d *model.Domain) bool { return d.Permissions.CanDelete })
 	if err != nil {
 		return err
 	}
-	h.logger.Info("Deleting domain", zap.String("fqdn", domain.Fqdn))
-	if err := h.domainStore.Delete(c.Request().Context(), []*ent.Domain{domain}); err != nil {
+
+	h.logger.Info("Deleting domain", zap.String("fqdn", item.FQDN))
+	if err := h.domainStore.Delete(c.Request().Context(), item.ID); err != nil {
 		h.logger.Error("Deleting domain failed", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Error while deleting domains"}
 	}
 	return c.NoContent(http.StatusNoContent)
+}
+
+func (h *Handler) evaluatePermission(c echo.Context, predicate func(*model.Domain) bool) (*model.Domain, error) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		h.logger.Error("Invalid domain id", zap.Error(err))
+		return nil, &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid domain ID"}
+	}
+	domains, err := h.enumerateDomains(c.Request().Context(), auth.UserFromRequest(c))
+	if err != nil {
+		return nil, &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error listing domains"}
+	}
+
+	item := helper.First(domains, func(i *model.Domain) bool { return i.ID == id })
+	if item == nil {
+		return nil, &echo.HTTPError{Code: http.StatusNotFound, Message: "Domain not found"}
+	}
+	if !predicate(item) {
+		return nil, &echo.HTTPError{Code: http.StatusForbidden, Message: "Operation not allowed"}
+	}
+	return item, nil
 }
 
 // ApproveDomain godoc
@@ -105,40 +176,20 @@ func (h *Handler) DeleteDomains(c echo.Context) error {
 // @Success 200 {object} model.Domain The updated domain
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) ApproveDomain(c echo.Context) error {
-	_, domain, err := h.extractData(c)
+
+	item, err := h.evaluatePermission(c, func(d *model.Domain) bool { return d.Permissions.CanApprove })
 	if err != nil {
 		return err
 	}
 
-	h.logger.Info("Approving domain", zap.String("fqdn", domain.Fqdn))
-	updated, err := h.domainStore.Approve(c.Request().Context(), domain)
+	h.logger.Info("Approving domain", zap.String("fqdn", item.FQDN))
+	updated, err := h.domainStore.Approve(c.Request().Context(), item.ID)
 	if err != nil {
 		h.logger.Error("Approving domain failed", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while approving domain"}
 	}
 
 	return c.JSON(http.StatusOK, model.DomainToOutput(updated))
-}
-
-func (h *Handler) extractData(c echo.Context) ([]*ent.Domain, *ent.Domain, error) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		h.logger.Error("Invalid domain id", zap.Error(err))
-		return nil, nil, &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid domain ID"}
-	}
-
-	domains, err := h.domainStore.ListDomains(c.Request().Context(), auth.UserFromRequest(c), true)
-	if err != nil {
-		h.logger.Error("Listing domains failed", zap.Error(err))
-		return nil, nil, &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while fetching domains"}
-	}
-
-	var domain *ent.Domain
-	domain = helper.First(domains, func(i *ent.Domain) bool { return i.ID == id })
-	if domain == nil {
-		return nil, nil, &echo.HTTPError{Code: http.StatusNotFound, Message: "Domain not found"}
-	}
-	return domains, domain, nil
 }
 
 // TransferDomain godoc
@@ -160,18 +211,13 @@ func (h *Handler) TransferDomain(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusBadRequest}
 	}
 
-	domains, domain, err := h.extractData(c)
+	item, err := h.evaluatePermission(c, func(d *model.Domain) bool { return d.Permissions.CanTransfer })
 	if err != nil {
 		return err
 	}
+	h.logger.Info("Transferring domain", zap.String("fqdn", item.FQDN), zap.String("owner", req.Owner))
 
-	if !helper.Any(domains, func(i *ent.Domain) bool {
-		return i.Approved && (strings.HasSuffix(domain.Fqdn, "."+i.Fqdn) || (domain.Fqdn == i.Fqdn && req.Owner == auth.UserFromRequest(c)))
-	}) {
-		return &echo.HTTPError{Code: http.StatusForbidden, Message: "You are not responsible for this zone"}
-	}
-	h.logger.Info("Transferring domain", zap.String("fqdn", domain.Fqdn), zap.String("owner", req.Owner))
-	updated, err := h.domainStore.Owner(c.Request().Context(), domain, req.Owner)
+	updated, err := h.domainStore.Owner(c.Request().Context(), item.ID, req.Owner)
 	if err != nil {
 		h.logger.Error("Transferring domain failed", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest}
@@ -193,7 +239,8 @@ func (h *Handler) TransferDomain(c echo.Context) error {
 // @Success 200 {object} model.Domain The updated domain
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) DeleteDelegation(c echo.Context) error {
-	_, domain, err := h.extractData(c)
+
+	item, err := h.evaluatePermission(c, func(d *model.Domain) bool { return d.Permissions.CanDelegate })
 	if err != nil {
 		return err
 	}
@@ -203,13 +250,13 @@ func (h *Handler) DeleteDelegation(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusBadRequest}
 	}
 
-	delegated, err := domain.QueryDelegations().Where(delegation.ID(delegationID)).First(c.Request().Context())
-	if err != nil {
+	delegation := helper.First(item.Delegations, func(t *model.Delegation) bool { return delegationID == t.ID })
+	if delegation != nil {
 		h.logger.Error("Delegation not found", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusNotFound, Message: "Delegation not found"}
 	}
-	h.logger.Info("Deleting delegation", zap.String("fqdn", domain.Fqdn), zap.Int("delegation", delegationID), zap.String("owner", delegated.User))
-	updated, err := h.domainStore.DeleteDelegation(c.Request().Context(), domain, delegated)
+	h.logger.Info("Deleting delegation", zap.String("fqdn", item.FQDN), zap.Int("delegation", delegationID), zap.String("owner", delegation.User))
+	updated, err := h.domainStore.DeleteDelegation(c.Request().Context(), item.ID, delegationID)
 	if err != nil {
 		h.logger.Error("Deleting delegation failed", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusNotFound, Message: "Deleting delegation failed"}
@@ -236,13 +283,12 @@ func (h *Handler) AddDelegation(c echo.Context) error {
 	if err := req.Bind(c, h.validator); err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
 	}
-
-	_, domain, err := h.extractData(c)
+	item, err := h.evaluatePermission(c, func(d *model.Domain) bool { return d.Permissions.CanDelegate })
 	if err != nil {
 		return err
 	}
-	h.logger.Info("Adding delegation", zap.String("fqdn", domain.Fqdn), zap.String("owner", req.User))
-	updated, err := h.domainStore.AddDelegation(c.Request().Context(), domain, req.User)
+	h.logger.Info("Adding delegation", zap.String("fqdn", item.FQDN), zap.String("owner", req.User))
+	updated, err := h.domainStore.AddDelegation(c.Request().Context(), item.ID, req.User)
 	if err != nil {
 		h.logger.Error("Adding delegation failed", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusNotFound, Message: "Adding delegation failed"}
