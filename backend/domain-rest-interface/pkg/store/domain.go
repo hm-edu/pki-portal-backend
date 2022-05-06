@@ -57,9 +57,8 @@ func (s *DomainStore) ListDomains(ctx context.Context, user string, requireAppro
 		fqdns := helper.Map(domains, func(d *ent.Domain) predicate.Domain {
 			if d.Approved {
 				return domain.FqdnHasSuffix("." + d.Fqdn)
-			} else {
-				return predicate.Domain(func(s *sql.Selector) { s.Where(sql.False()) })
 			}
+			return predicate.Domain(func(s *sql.Selector) { s.Where(sql.False()) })
 		})
 		ids := helper.Map(domains, func(d *ent.Domain) int { return d.ID })
 		childs, err := s.db.Domain.Query().WithDelegations().Where(domain.And(domain.Or(fqdns...), domain.IDNotIn(ids...))).All(ctx)

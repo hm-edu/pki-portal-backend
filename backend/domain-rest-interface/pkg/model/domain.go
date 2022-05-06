@@ -36,6 +36,7 @@ type Domain struct {
 	Permissions Permissions   `json:"permissions,omitempty"`
 }
 
+// Permissions holds the informations about the permissions on the domain
 type Permissions struct {
 	CanDelete   bool `json:"can_delete"`
 	CanApprove  bool `json:"can_approve"`
