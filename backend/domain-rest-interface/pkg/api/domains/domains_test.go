@@ -64,7 +64,7 @@ func TestDeletePermissions(t *testing.T) {
 		ID      int
 		User    string
 		Success bool
-	}{{ID: 3, User: "max", Success: true}, {ID: 3, User: "test", Success: false}, {ID: 4, User: "test", Success: false}, {ID: 5, User: "test", Success: false}, {ID: 1, User: "max", Success: true}}
+	}{{ID: 3, User: "max", Success: false}, {ID: 4, User: "max", Success: true}, {ID: 3, User: "test", Success: false}, {ID: 4, User: "test", Success: false}, {ID: 5, User: "test", Success: false}, {ID: 1, User: "max", Success: true}}
 
 	for _, c := range tc {
 

@@ -70,7 +70,9 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string) ([]*model.D
 			item.Permissions.CanTransfer = true
 			item.Permissions.CanDelegate = true
 		}
-
+		if item.Permissions.CanDelete && item.Approved && !helper.Any(approvedDomains, func(i *ent.Domain) bool { return i.Approved && strings.HasSuffix(domain.Fqdn, "."+i.Fqdn) }) {
+			item.Permissions.CanDelete = false
+		}
 		results = append(results, &item)
 	}
 	return results, nil
