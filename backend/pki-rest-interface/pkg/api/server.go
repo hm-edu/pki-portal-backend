@@ -4,6 +4,7 @@ package api
 import (
 	"context"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/brpaz/echozap"
@@ -84,9 +85,11 @@ func (api *Server) wireRoutesAndMiddleware() {
 	jwtMiddleware := middleware.JWTWithConfig(config)
 
 	api.app.Use(middleware.RequestID())
-	api.app.Use(otelecho.Middleware("pki-rest-interface"))
-	api.app.Use(middleware.Recover())
 	api.app.Use(echozap.ZapLogger(api.logger))
+	api.app.Use(otelecho.Middleware("pki-rest-interface", otelecho.WithSkipper(func(c echo.Context) bool {
+		return strings.Contains(c.Path(), "/docs") || strings.Contains(c.Path(), "/healthz")
+	})))
+	api.app.Use(middleware.Recover())
 	api.app.GET("/docs/spec.json", func(c echo.Context) error {
 		if openAPISpec == nil {
 			spec, err := commonApi.ToOpenAPI3(docs.SwaggerInfo)
