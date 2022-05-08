@@ -46,6 +46,7 @@ func (api *domainAPIServer) CheckPermission(ctx context.Context, req *pb.CheckPe
 func (api *domainAPIServer) CheckRegistration(ctx context.Context, req *pb.CheckRegistrationRequest) (*pb.CheckRegistrationResponse, error) {
 	domains, err := api.store.ListAllDomains(ctx, true)
 	if err != nil {
+		api.logger.Error("Checking registrations failed", zap.Strings("domains", req.Domains), zap.Error(err))
 		return nil, err
 	}
 	missing := helper.Where(req.Domains, func(t string) bool {
@@ -60,6 +61,7 @@ func (api *domainAPIServer) CheckRegistration(ctx context.Context, req *pb.Check
 func (api *domainAPIServer) ListDomains(ctx context.Context, req *pb.ListDomainsRequest) (*pb.ListDomainsResponse, error) {
 	domains, err := api.store.ListDomains(ctx, req.User, req.Approved)
 	if err != nil {
+		api.logger.Error("Listing domains failed", zap.String("user", req.User), zap.Error(err))
 		return nil, err
 	}
 

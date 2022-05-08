@@ -7,13 +7,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/brpaz/echozap"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/hm-edu/domain-rest-interface/pkg/api/docs"
 	"github.com/hm-edu/domain-rest-interface/pkg/api/domains"
 	"github.com/hm-edu/domain-rest-interface/pkg/store"
 	commonApi "github.com/hm-edu/portal-common/api"
 	commonAuth "github.com/hm-edu/portal-common/auth"
+	"github.com/hm-edu/portal-common/logging"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/lestrrat-go/jwx/jwk"
@@ -80,10 +80,10 @@ func (api *Server) wireRoutesAndMiddleware() {
 	jwtMiddleware := middleware.JWTWithConfig(config)
 
 	api.app.Use(middleware.RequestID())
-	api.app.Use(echozap.ZapLogger(api.logger))
 	api.app.Use(otelecho.Middleware("domain-rest-interface", otelecho.WithSkipper(func(c echo.Context) bool {
 		return strings.Contains(c.Path(), "/docs") || strings.Contains(c.Path(), "/healthz")
 	})))
+	api.app.Use(logging.ZapLogger(api.logger))
 	api.app.Use(middleware.Recover())
 	api.app.GET("/docs/spec.json", func(c echo.Context) error {
 		if openAPISpec == nil {

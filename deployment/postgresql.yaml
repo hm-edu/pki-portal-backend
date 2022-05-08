@@ -103,6 +103,7 @@ spec:
   type: ClusterIP
   ports:
    - port: 5432
+     appProtocol: TCP
   selector:
    app: postgres
 ---

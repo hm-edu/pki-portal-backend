@@ -3,7 +3,6 @@ module github.com/hm-edu/pki-rest-interface
 go 1.18
 
 require (
-	github.com/brpaz/echozap v1.1.2
 	github.com/getkin/kin-openapi v0.94.0
 	github.com/hm-edu/portal-apis v0.0.0-20220419103504-24320f185a74
 	github.com/hm-edu/portal-common v0.0.0-20220404094030-9bf17529d940
@@ -90,7 +89,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/swaggo/swag v1.8.1
 	go.opentelemetry.io/otel/sdk v1.6.3 // indirect
-	go.opentelemetry.io/otel/trace v1.7.0 // indirect
+	go.opentelemetry.io/otel/trace v1.7.0
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/net v0.0.0-20220418201149-a630d4f3e7a2 // indirect

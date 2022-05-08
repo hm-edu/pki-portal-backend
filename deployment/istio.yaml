@@ -152,6 +152,7 @@ spec:
       allowCredentials: false
       allowHeaders:
       - Authorization
+      - Content-Type
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -198,3 +199,4 @@ spec:
       allowCredentials: false
       allowHeaders:
       - Authorization
+      - Content-Type

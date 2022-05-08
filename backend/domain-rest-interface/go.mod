@@ -59,7 +59,6 @@ require (
 require (
 	entgo.io/ent v0.10.1
 	github.com/DATA-DOG/go-sqlmock v1.5.0
-	github.com/brpaz/echozap v1.1.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/hm-edu/portal-apis v0.0.0-20220413135645-44f42dd816bf
 	github.com/jackc/pgx/v4 v4.16.0
