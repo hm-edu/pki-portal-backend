@@ -11,6 +11,7 @@ import (
 	"github.com/hm-edu/portal-common/auth"
 	"github.com/hm-edu/portal-common/helper"
 	"github.com/labstack/echo/v4"
+	"go.opentelemetry.io/otel/attribute"
 	"go.uber.org/zap"
 )
 
@@ -25,9 +26,16 @@ import (
 // @Success 200 {object} []model.Domain
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) ListDomains(c echo.Context) error {
-	domains, err := h.enumerateDomains(c.Request().Context(), auth.UserFromRequest(c))
+	ctx, span := h.tracer.Start(c.Request().Context(), "list")
+	defer span.End()
 
+	user := auth.UserFromRequest(c)
+	span.SetAttributes(attribute.String("user", user))
+
+	domains, err := h.enumerateDomains(ctx, user)
 	if err != nil {
+		h.logger.Error("Listing domains failed", zap.Error(err))
+		span.RecordError(err)
 		return &echo.HTTPError{Internal: err, Code: http.StatusInternalServerError, Message: "Error while listing domains"}
 	}
 
@@ -35,6 +43,9 @@ func (h *Handler) ListDomains(c echo.Context) error {
 }
 
 func (h *Handler) enumerateDomains(ctx context.Context, user string) ([]*model.Domain, error) {
+
+	ctx, span := h.tracer.Start(ctx, "enumerating")
+	defer span.End()
 
 	domains, err := h.domainStore.ListDomains(ctx, user, false)
 	if err != nil {
@@ -90,6 +101,13 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string) ([]*model.D
 // @Success 201 {object} model.Domain
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) CreateDomain(c echo.Context) error {
+
+	ctx, span := h.tracer.Start(c.Request().Context(), "create")
+	defer span.End()
+
+	user := auth.UserFromRequest(c)
+	span.SetAttributes(attribute.String("user", user))
+
 	req := &model.DomainRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
 		h.logger.Error("Binding request failed", zap.Error(err))
@@ -97,7 +115,7 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 	}
 	domain := ent.Domain{Owner: auth.UserFromRequest(c), Fqdn: req.FQDN}
 
-	domains, err := h.domainStore.ListDomains(c.Request().Context(), auth.UserFromRequest(c), true)
+	domains, err := h.domainStore.ListDomains(ctx, auth.UserFromRequest(c), true)
 	if err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
 	}
@@ -106,7 +124,7 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 		domain.Approved = true
 	}
 	h.logger.Info("Creating domain", zap.String("fqdn", domain.Fqdn), zap.Bool("approved", domain.Approved), zap.String("owner", domain.Owner))
-	created, err := h.domainStore.Create(c.Request().Context(), &domain)
+	created, err := h.domainStore.Create(ctx, &domain)
 	if err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest}
 	}
@@ -132,26 +150,30 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 // @Success 204
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) DeleteDomain(c echo.Context) error {
-	item, err := h.evaluatePermission(c, func(d *model.Domain) bool { return d.Permissions.CanDelete })
+
+	ctx, span := h.tracer.Start(c.Request().Context(), "delete")
+	defer span.End()
+
+	item, err := h.evaluatePermission(ctx, c, func(d *model.Domain) bool { return d.Permissions.CanDelete })
 	if err != nil {
 		return err
 	}
 
 	h.logger.Info("Deleting domain", zap.String("fqdn", item.FQDN))
-	if err := h.domainStore.Delete(c.Request().Context(), item.ID); err != nil {
+	if err := h.domainStore.Delete(ctx, item.ID); err != nil {
 		h.logger.Error("Deleting domain failed", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Error while deleting domains"}
 	}
 	return c.NoContent(http.StatusNoContent)
 }
 
-func (h *Handler) evaluatePermission(c echo.Context, predicate func(*model.Domain) bool) (*model.Domain, error) {
+func (h *Handler) evaluatePermission(ctx context.Context, c echo.Context, predicate func(*model.Domain) bool) (*model.Domain, error) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		h.logger.Error("Invalid domain id", zap.Error(err))
 		return nil, &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid domain ID"}
 	}
-	domains, err := h.enumerateDomains(c.Request().Context(), auth.UserFromRequest(c))
+	domains, err := h.enumerateDomains(ctx, auth.UserFromRequest(c))
 	if err != nil {
 		return nil, &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error listing domains"}
 	}
@@ -178,14 +200,16 @@ func (h *Handler) evaluatePermission(c echo.Context, predicate func(*model.Domai
 // @Success 200 {object} model.Domain The updated domain
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) ApproveDomain(c echo.Context) error {
+	ctx, span := h.tracer.Start(c.Request().Context(), "approve")
+	defer span.End()
 
-	item, err := h.evaluatePermission(c, func(d *model.Domain) bool { return d.Permissions.CanApprove })
+	item, err := h.evaluatePermission(ctx, c, func(d *model.Domain) bool { return d.Permissions.CanApprove })
 	if err != nil {
 		return err
 	}
 
 	h.logger.Info("Approving domain", zap.String("fqdn", item.FQDN))
-	updated, err := h.domainStore.Approve(c.Request().Context(), item.ID)
+	updated, err := h.domainStore.Approve(ctx, item.ID)
 	if err != nil {
 		h.logger.Error("Approving domain failed", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while approving domain"}
@@ -207,19 +231,21 @@ func (h *Handler) ApproveDomain(c echo.Context) error {
 // @Success 200 {object} model.Domain The updated domain
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) TransferDomain(c echo.Context) error {
+	ctx, span := h.tracer.Start(c.Request().Context(), "transfer")
+	defer span.End()
 
 	req := &model.TransferRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest}
 	}
 
-	item, err := h.evaluatePermission(c, func(d *model.Domain) bool { return d.Permissions.CanTransfer })
+	item, err := h.evaluatePermission(ctx, c, func(d *model.Domain) bool { return d.Permissions.CanTransfer })
 	if err != nil {
 		return err
 	}
 	h.logger.Info("Transferring domain", zap.String("fqdn", item.FQDN), zap.String("owner", req.Owner))
 
-	updated, err := h.domainStore.Owner(c.Request().Context(), item.ID, req.Owner)
+	updated, err := h.domainStore.Owner(ctx, item.ID, req.Owner)
 	if err != nil {
 		h.logger.Error("Transferring domain failed", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest}
@@ -241,8 +267,10 @@ func (h *Handler) TransferDomain(c echo.Context) error {
 // @Success 200 {object} model.Domain The updated domain
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) DeleteDelegation(c echo.Context) error {
+	ctx, span := h.tracer.Start(c.Request().Context(), "deleteDelegation")
+	defer span.End()
 
-	item, err := h.evaluatePermission(c, func(d *model.Domain) bool { return d.Permissions.CanDelegate })
+	item, err := h.evaluatePermission(ctx, c, func(d *model.Domain) bool { return d.Permissions.CanDelegate })
 	if err != nil {
 		return err
 	}
@@ -258,7 +286,7 @@ func (h *Handler) DeleteDelegation(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusNotFound, Message: "Delegation not found"}
 	}
 	h.logger.Info("Deleting delegation", zap.String("fqdn", item.FQDN), zap.Int("delegation", delegationID), zap.String("owner", delegation.User))
-	updated, err := h.domainStore.DeleteDelegation(c.Request().Context(), item.ID, delegationID)
+	updated, err := h.domainStore.DeleteDelegation(ctx, item.ID, delegationID)
 	if err != nil {
 		h.logger.Error("Deleting delegation failed", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusNotFound, Message: "Deleting delegation failed"}
@@ -280,17 +308,19 @@ func (h *Handler) DeleteDelegation(c echo.Context) error {
 // @Success 200 {object} model.Domain The updated domain
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) AddDelegation(c echo.Context) error {
+	ctx, span := h.tracer.Start(c.Request().Context(), "addDelegation")
+	defer span.End()
 
 	req := &model.DelegationRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
 	}
-	item, err := h.evaluatePermission(c, func(d *model.Domain) bool { return d.Permissions.CanDelegate })
+	item, err := h.evaluatePermission(ctx, c, func(d *model.Domain) bool { return d.Permissions.CanDelegate })
 	if err != nil {
 		return err
 	}
 	h.logger.Info("Adding delegation", zap.String("fqdn", item.FQDN), zap.String("owner", req.User))
-	updated, err := h.domainStore.AddDelegation(c.Request().Context(), item.ID, req.User)
+	updated, err := h.domainStore.AddDelegation(ctx, item.ID, req.User)
 	if err != nil {
 		h.logger.Error("Adding delegation failed", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusNotFound, Message: "Adding delegation failed"}
