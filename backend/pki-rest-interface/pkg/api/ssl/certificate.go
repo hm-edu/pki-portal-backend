@@ -7,6 +7,7 @@ import (
 	"github.com/hm-edu/portal-common/auth"
 	"github.com/hm-edu/portal-common/helper"
 	"github.com/hm-edu/portal-common/logging"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 
 	pb "github.com/hm-edu/portal-apis"
@@ -24,13 +25,18 @@ import (
 // @Success 200 {object} []pb.SslCertificateDetails "Certificates"
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) List(c echo.Context) error {
-	ctx, span := h.tracer.Start(c.Request().Context(), "revoke")
+	ctx, span := h.tracer.Start(c.Request().Context(), "list")
 	defer span.End()
-	domains, err := h.domain.ListDomains(ctx, &pb.ListDomainsRequest{User: auth.UserFromRequest(c), Approved: true})
+	user := auth.UserFromRequest(c)
+	span.SetAttributes(attribute.String("user", user))
+
+	span.AddEvent("fetching domains")
+	domains, err := h.domain.ListDomains(ctx, &pb.ListDomainsRequest{User: user, Approved: true})
 	if err != nil {
 		h.logger.Error("Error getting domains", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while listing certificates"}
 	}
+	span.AddEvent("fetching certificates")
 	certs, err := h.ssl.ListCertificates(ctx, &pb.ListSslRequest{Domains: domains.Domains})
 	if err != nil {
 		h.logger.Error("Error while listing certificates", zap.Error(err))
@@ -52,6 +58,9 @@ func (h *Handler) List(c echo.Context) error {
 func (h *Handler) Revoke(c echo.Context) error {
 	ctx, span := h.tracer.Start(c.Request().Context(), "revoke")
 	defer span.End()
+	user := auth.UserFromRequest(c)
+	span.SetAttributes(attribute.String("user", user))
+
 	req := &model.RevokeRequest{}
 	span.AddEvent("validating request")
 	if err := req.Bind(c, h.validator); err != nil {
