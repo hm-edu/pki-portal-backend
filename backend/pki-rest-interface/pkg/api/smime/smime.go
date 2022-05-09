@@ -8,7 +8,6 @@ import (
 	"github.com/hm-edu/portal-common/helper"
 	commonnModel "github.com/hm-edu/portal-common/model"
 	"github.com/labstack/echo/v4"
-	"go.opentelemetry.io/otel"
 	"go.uber.org/zap"
 )
 
@@ -22,7 +21,8 @@ import (
 // @Success 200 {object} []pb.ListSmimeResponse_CertificateDetails "certificates"
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) List(c echo.Context) error {
-	ctx, span := otel.GetTracerProvider().Tracer("smime").Start(c.Request().Context(), "handleCsr")
+	ctx, span := h.tracer.Start(c.Request().Context(), "list")
+	defer span.End()
 	user := commonnModel.User{}
 	if err := user.Bind(c, h.validator); err != nil {
 		span.RecordError(err)
@@ -48,7 +48,7 @@ func (h *Handler) List(c echo.Context) error {
 // @Success 204
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) Revoke(c echo.Context) error {
-	ctx, span := otel.GetTracerProvider().Tracer("smime").Start(c.Request().Context(), "revoke")
+	ctx, span := h.tracer.Start(c.Request().Context(), "revoke")
 	defer span.End()
 	req := &model.RevokeRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
@@ -94,7 +94,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 // @Success 200 {string} string "certificate"
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) HandleCsr(c echo.Context) error {
-	ctx, span := otel.GetTracerProvider().Tracer("smime").Start(c.Request().Context(), "handleCsr")
+	ctx, span := h.tracer.Start(c.Request().Context(), "handleCsr")
 	defer span.End()
 	user := commonnModel.User{}
 	if err := user.Bind(c, h.validator); err != nil {

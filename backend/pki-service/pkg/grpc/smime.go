@@ -16,6 +16,7 @@ import (
 	"github.com/hm-edu/sectigo-client/sectigo/client"
 
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -28,16 +29,23 @@ type smimeAPIServer struct {
 	client *sectigo.Client
 	cfg    *cfg.SectigoConfiguration
 	logger *zap.Logger
+
+	tracer trace.Tracer
 }
 
 func newSmimeAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration) *smimeAPIServer {
-	return &smimeAPIServer{client: client, cfg: cfg, logger: zap.L()}
+	tracer := otel.GetTracerProvider().Tracer("smime")
+	return &smimeAPIServer{client: client, cfg: cfg, logger: zap.L(), tracer: tracer}
 }
 
-func (s *smimeAPIServer) ListCertificates(_ context.Context, req *pb.ListSmimeRequest) (*pb.ListSmimeResponse, error) {
+func (s *smimeAPIServer) ListCertificates(ctx context.Context, req *pb.ListSmimeRequest) (*pb.ListSmimeResponse, error) {
+	_, span := s.tracer.Start(ctx, "listCertificates")
+	defer span.End()
+
 	s.logger.Debug("Requesting smime certificates", zap.String("user", req.Email))
 	items, err := s.client.ClientService.ListByEmail(req.Email)
 	if err != nil {
+		span.RecordError(err)
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &pb.ListSmimeResponse{Certificates: helper.Map(*items, func(t client.ListItem) *pb.ListSmimeResponse_CertificateDetails {
@@ -51,7 +59,7 @@ func (s *smimeAPIServer) ListCertificates(_ context.Context, req *pb.ListSmimeRe
 }
 func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmimeRequest) (*pb.IssueSmimeResponse, error) {
 
-	_, span := otel.GetTracerProvider().Tracer("smime").Start(ctx, "handleCsr")
+	_, span := s.tracer.Start(ctx, "handleCsr")
 	defer span.End()
 	span.AddEvent("Validating csr")
 
