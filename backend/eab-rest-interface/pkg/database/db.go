@@ -32,7 +32,7 @@ type DbInstance struct {
 var DB DbInstance
 
 func openNoSQL(log *zap.Logger, connectionString string) (*nosql.DB, nosqlDb.DB) {
-	connection, err := nosqlDb.New("postgres", connectionString)
+	connection, err := nosqlDb.New("postgresql", connectionString)
 	if err != nil {
 		log.Fatal("Error connecting to database", zap.Error(err))
 		return nil, nil
