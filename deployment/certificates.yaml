@@ -21,7 +21,7 @@ metadata:
 data:
   ca.json: |
     {
-      "address": "127.0.0.1:8443",
+      "address": ":8443",
       "publicAddress": ":443",
       "commonName": "acme.hmtest.de",
       "dnsNames": [
@@ -31,9 +31,9 @@ data:
         "format": "json"
       },
       "db": {
-        "type": "badgerv2",
-        "dataSource": "/opt/step/db",
-        "badgerFileLoadingMode": ""
+        "type": "postgresql",
+        "dataSource": "postgresql://acme:acme@postgres.portal.svc.cluster.local/",
+        "database": "acme"
       },
       "authority": {
         "type": "sectigocas",
@@ -89,6 +89,16 @@ spec:
           ports:
           - containerPort: 443
             protocol: TCP
+          - containerPort: 8443
+            protocol: TCP
+          
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8443
+              scheme: HTTPS            
+            periodSeconds: 30
+            initialDelaySeconds: 10
           volumeMounts:
             - mountPath: /opt/step
               name: cert

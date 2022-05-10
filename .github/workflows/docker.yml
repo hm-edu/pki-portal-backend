@@ -16,6 +16,7 @@ jobs:
           - pki-rest-interface
           - pki-service
           - dns-service
+          - eab-rest-interface
           - domain-rest-interface
     env:
       # Use docker.io for Docker Hub if empty
