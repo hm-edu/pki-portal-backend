@@ -80,7 +80,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/acme.ExternalAccountKey"
+                            "$ref": "#/definitions/models.EAB"
                         }
                     },
                     "default": {
@@ -192,6 +192,20 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "message": {}
+            }
+        },
+        "models.EAB": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "keyBytes": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
             }
         }
     },
