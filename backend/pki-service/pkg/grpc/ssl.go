@@ -44,11 +44,11 @@ var meter = global.MeterProvider().Meter("pki-service")
 
 type sslAPIServer struct {
 	pb.UnimplementedSSLServiceServer
-	client  *sectigo.Client
-	db      *ent.Client
-	legoCfg *lego.Config
-	cfg     *cfg.SectigoConfiguration
-	logger  *zap.Logger
+	client     *sectigo.Client
+	db         *ent.Client
+	legoClient *lego.Client
+	cfg        *cfg.SectigoConfiguration
+	logger     *zap.Logger
 
 	pendingValidations map[string]interface{}
 
@@ -103,6 +103,10 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 		}
 	}
 
+	legoClient, err := lego.NewClient(legoCfg)
+	if err != nil {
+		zap.L().Fatal("Failed to create lego client", zap.Error(err))
+	}
 	gauge, _ := meter.AsyncInt64().Gauge(
 		"ssl.issue.last.duration",
 		instrument.WithUnit("seconds"),
@@ -114,8 +118,8 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 		instrument.WithUnit("unixMilli"),
 		instrument.WithDescription("Issue timestamp for last SSL Certificates"),
 	)
-	instance := &sslAPIServer{client: client, legoCfg: legoCfg, cfg: cfg, logger: zap.L(), db: db, pendingValidations: make(map[string]interface{})}
-	err := meter.RegisterCallback([]instrument.Asynchronous{gauge, gaugeLast}, func(ctx context.Context) {
+	instance := &sslAPIServer{client: client, legoClient: legoClient, cfg: cfg, logger: zap.L(), db: db, pendingValidations: make(map[string]interface{})}
+	err = meter.RegisterCallback([]instrument.Asynchronous{gauge, gaugeLast}, func(ctx context.Context) {
 		if instance.last != nil {
 			gauge.Observe(ctx, int64(instance.duration.Seconds()))
 			gaugeLast.Observe(ctx, instance.last.UnixMilli())
@@ -233,12 +237,8 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	}
 
 	start := time.Now()
-	client, err := lego.NewClient(s.legoCfg)
-	if err != nil {
-		return s.handleError("Error while creating client", span, err)
-	}
 
-	certificates, err := client.Certificate.ObtainForCSR(legoCert.ObtainForCSRRequest{CSR: csr, Bundle: true})
+	certificates, err := s.legoClient.Certificate.ObtainForCSR(legoCert.ObtainForCSRRequest{CSR: csr, Bundle: true})
 	if err != nil {
 		return s.handleError("Error while collecting certificate", span, err)
 	}
@@ -251,6 +251,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	if err != nil {
 		s.logger.Error("Error while registering callback", zap.Error(err))
 	}
+
 	certs, err := pkiHelper.ParseCertificates(certificates.Certificate)
 	if err != nil {
 		return s.handleError("Error while collecting certificate", span, err)
@@ -270,7 +271,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		Save(ctx)
 
 	if err != nil {
-		return s.handleError("Error while collecting certificate", span, err)
+		return s.handleError("Error while saving collected certificate", span, err)
 	}
 
 	go func() {
@@ -281,7 +282,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 				return false, err
 			}
 			if len(*data) == 0 {
-				s.logger.Warn("No certificates found")
+				s.logger.Debug("No certificates found")
 				return false, nil
 			}
 			cert := (*data)[0]
