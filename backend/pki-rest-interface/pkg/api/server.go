@@ -174,7 +174,7 @@ func (api *Server) ListenAndServe(stopCh <-chan struct{}) {
 			api.logger.Fatal("HTTP server crashed", zap.Error(err))
 		}
 	}()
-	_ = <-stopCh
+	<-stopCh
 	err := api.app.Shutdown(context.Background())
 	if err != nil {
 		api.logger.Fatal("Stopping http server failed", zap.Error(err))

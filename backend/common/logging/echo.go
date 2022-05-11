@@ -10,6 +10,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+// AddMetadata places some common http request information in zap fields.
 func AddMetadata(c echo.Context, user bool) (fields []zapcore.Field) {
 	req := c.Request()
 	id := req.Header.Get(echo.HeaderXRequestID)

@@ -13,6 +13,7 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 // PrepareEnv loads the basic data and e.g. configures the logger.
@@ -43,7 +44,7 @@ func PrepareEnv(cmd *cobra.Command) (*zap.Logger, func(*zap.Logger), *viper.Vipe
 func ConnectGRPC(host string) (*grpc.ClientConn, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*3)
 	defer cancel()
-	conn, err := grpc.DialContext(ctx, host, grpc.WithInsecure(), grpc.WithBlock(),
+	conn, err := grpc.DialContext(ctx, host, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock(),
 		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()))
 	if err != nil {
 		return nil, err

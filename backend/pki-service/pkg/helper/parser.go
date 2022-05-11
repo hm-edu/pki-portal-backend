@@ -137,7 +137,7 @@ func loadFromPem(filename, desc string, skip int) ([]byte, error) {
 	defer pemFile.Close()
 
 	pemfileinfo, _ := pemFile.Stat()
-	var size int64 = pemfileinfo.Size()
+	var size = pemfileinfo.Size()
 	pemBytes := make([]byte, size)
 	buffer := bufio.NewReader(pemFile)
 	_, err = buffer.Read(pemBytes)

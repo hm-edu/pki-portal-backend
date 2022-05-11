@@ -6,7 +6,6 @@ import (
 	"crypto/md5" //#nosec
 	"encoding/base64"
 	"encoding/hex"
-	"hash"
 
 	"github.com/miekg/dns"
 )
@@ -27,8 +26,7 @@ func (key md5provider) Generate(msg []byte, _ *dns.TSIG) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	var h hash.Hash
-	h = hmac.New(md5.New, rawsecret)
+	h := hmac.New(md5.New, rawsecret)
 
 	h.Write(msg)
 	return h.Sum(nil), nil
