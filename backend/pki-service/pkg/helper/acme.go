@@ -1,83 +1,90 @@
 package helper
 
 import (
-	"crypto"
+	"context"
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
 	"crypto/x509"
-	"encoding/json"
-	"encoding/pem"
-	"errors"
-	"os"
+	"time"
 
-	"github.com/go-acme/lego/v4/certcrypto"
-	"github.com/go-acme/lego/v4/lego"
-	"github.com/go-acme/lego/v4/registration"
-	"github.com/hm-edu/pki-service/pkg/cfg"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
+	"go.uber.org/zap"
+	"golang.org/x/crypto/acme"
 )
 
-// RegisterAcme performs a new registration and stores the registration in the given file.
-func RegisterAcme(client *lego.Client, config *cfg.SectigoConfiguration, account User, accountFile string, keyFile string) error {
-	reg, err := client.Registration.RegisterWithExternalAccountBinding(registration.RegisterEABOptions{
-		TermsOfServiceAgreed: true,
-		Kid:                  config.EabKid,
-		HmacEncoded:          config.EabHmac,
-	})
-	if err != nil {
-		return err
-	}
-
-	account.Registration = reg
-	data, err := json.Marshal(account)
-	if err != nil {
-		return err
-	}
-	err = os.WriteFile(accountFile, data, 0600)
-	if err != nil {
-		return err
-	}
-	certOut, err := os.OpenFile(keyFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600) //#nosec
-	if err != nil {
-		return err
-	}
-
-	defer func(certOut *os.File) {
-		_ = certOut.Close()
-	}(certOut)
-
-	pemKey := certcrypto.PEMBlock(account.Key)
-	err = pem.Encode(certOut, pemKey)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// FileExists checks whether a file exists.
-func FileExists(name string) (bool, error) {
-	_, err := os.Stat(name)
-	if err == nil {
-		return true, nil
-	}
-	if errors.Is(err, os.ErrNotExist) {
-		return false, nil
-	}
-	return false, err
-}
-
-// LoadPrivateKey loads a private key from a file.
-func LoadPrivateKey(file string) (crypto.PrivateKey, error) {
-	keyBytes, err := os.ReadFile(file) //#nosec
+// LoadAccount loads an account from the given file
+func LoadAccount(ctx context.Context, accountFile string, acmeDirectory string) (*acme.Client, error) {
+	akey, err := LoadKeyFromPEMFile(accountFile, 0)
 	if err != nil {
 		return nil, err
 	}
 
-	keyBlock, _ := pem.Decode(keyBytes)
+	client := &acme.Client{Key: akey, DirectoryURL: acmeDirectory}
+	_, err = client.GetReg(ctx, "")
 
-	switch keyBlock.Type {
-	case "RSA PRIVATE KEY":
-		return x509.ParsePKCS1PrivateKey(keyBlock.Bytes)
-	case "EC PRIVATE KEY":
-		return x509.ParseECPrivateKey(keyBlock.Bytes)
+	return client, err
+}
+
+// RegisterAccount registers an account with the ACME server
+func RegisterAccount(ctx context.Context, accountFile string, acmeDirectory string, eab acme.ExternalAccountBinding) (*acme.Client, error) {
+	akey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil, errors.New("unknown private key type")
+	client := &acme.Client{Key: akey, DirectoryURL: acmeDirectory, KID: acme.KeyID(eab.KID)}
+	_, err = client.Register(ctx, &acme.Account{ExternalAccountBinding: &eab}, acme.AcceptTOS)
+	if err != nil {
+		return nil, err
+	}
+
+	err = SaveToPEMFile(accountFile, akey, nil)
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
+}
+
+type issueResult struct {
+	certs [][]byte
+	err   error
+}
+
+// RequestCertificate runs the acme flow to request a certificate with the desired contents
+func RequestCertificate(ctx context.Context, span trace.Span, client *acme.Client, csr *x509.CertificateRequest, domains []string) ([][]byte, error) {
+
+	span.AddEvent("Sending AuthorizeOrder Request")
+	zap.L().Info("Sending AuthorizeOrder Request", zap.Strings("domains", domains))
+	order, err := client.AuthorizeOrder(ctx, acme.DomainIDs(domains...))
+	if err != nil {
+		return nil, err
+	}
+
+	span.AddEvent("Received AuthorizeOrder Response. Requesting Certificate")
+	zap.L().Info("Requesting certificate", zap.Strings("domains", domains))
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Minute)
+	defer cancel()
+	// Create a channel to received a signal that work is done.
+	ch := make(chan issueResult, 1)
+	go func() {
+		crts, _, err := client.CreateOrderCert(ctx, order.FinalizeURL, csr.Raw, true)
+		// Report the work is done.
+		ch <- issueResult{crts, err}
+	}()
+	select {
+	case d := <-ch:
+		if d.err != nil {
+			return nil, d.err
+		}
+		span.AddEvent("Certificate received")
+		zap.L().Info("Certificate received", zap.Strings("domains", domains))
+		return d.certs, nil
+	case <-ctx.Done():
+		zap.L().Warn("Timeout waiting for certificate")
+		span.AddEvent("Timeout waiting for certificate")
+		span.SetStatus(codes.Error, "Timeout waiting for certificate")
+		return nil, ctx.Err()
+	}
 }

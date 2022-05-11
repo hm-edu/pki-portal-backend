@@ -2,20 +2,14 @@ package grpc
 
 import (
 	"context"
-	"crypto/ecdsa"
-	"crypto/elliptic"
-	"crypto/rand"
 	"crypto/x509"
-	"encoding/json"
+	"encoding/base64"
 	"encoding/pem"
 	"fmt"
-	"os"
 	"path/filepath"
 	"time"
 
-	legoCert "github.com/go-acme/lego/v4/certificate"
-	"github.com/go-acme/lego/v4/lego"
-	legoLog "github.com/go-acme/lego/v4/log"
+	"golang.org/x/crypto/acme"
 
 	"github.com/hm-edu/pki-service/ent"
 	"github.com/hm-edu/pki-service/ent/certificate"
@@ -28,6 +22,7 @@ import (
 	"github.com/hm-edu/sectigo-client/sectigo/ssl"
 
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric/global"
 	"go.opentelemetry.io/otel/metric/instrument"
 	"go.opentelemetry.io/otel/trace"
@@ -44,11 +39,12 @@ var meter = global.MeterProvider().Meter("pki-service")
 
 type sslAPIServer struct {
 	pb.UnimplementedSSLServiceServer
-	client     *sectigo.Client
-	db         *ent.Client
-	legoClient *lego.Client
-	cfg        *cfg.SectigoConfiguration
-	logger     *zap.Logger
+	client *sectigo.Client
+	db     *ent.Client
+	cfg    *cfg.SectigoConfiguration
+	logger *zap.Logger
+
+	acmeClient *acme.Client
 
 	pendingValidations map[string]interface{}
 
@@ -57,56 +53,26 @@ type sslAPIServer struct {
 }
 
 func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *ent.Client) *sslAPIServer {
-	accountFile := filepath.Join(cfg.AcmeStorage, "reg.json")
-	keyFile := filepath.Join(cfg.AcmeStorage, "reg.key")
+	keyFile := filepath.Join(cfg.AcmeStorage, "acme.key")
 
-	var account pkiHelper.User
-	if ok, _ := pkiHelper.FileExists(accountFile); !ok {
-		// Actually we would not need a private key but the lego API requires one.
-		privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-		if err != nil {
-			return nil
-		}
+	var acmeClient *acme.Client
+	var err error
+	ctx := context.Background()
 
-		account = pkiHelper.User{
-			Key: privateKey,
-		}
+	sectigoDiectory := "https://acme.sectigo.com/v2/OV"
 
-	} else {
-		data, err := os.ReadFile(accountFile) //#nosec
-		if err != nil {
-			return nil
-		}
-		err = json.Unmarshal(data, &account)
-		if err != nil {
-			return nil
-		}
-		account.Key, err = pkiHelper.LoadPrivateKey(keyFile)
-		if err != nil {
-			return nil
-		}
-
-	}
-	legoCfg := lego.NewConfig(&account)
-	legoCfg.CADirURL = "https://acme.sectigo.com/v2/OV"
-	legoLog.Logger = pkiHelper.NewZapLogger(zap.L())
-	legoCfg.Certificate.Timeout = time.Duration(5) * time.Minute
-	if account.Registration == nil {
-		legoClient, err := lego.NewClient(legoCfg)
-
-		if err != nil {
-			return nil
-		}
-		err = pkiHelper.RegisterAcme(legoClient, cfg, account, accountFile, keyFile)
-		if err != nil {
-			return nil
-		}
-	}
-
-	legoClient, err := lego.NewClient(legoCfg)
+	acmeClient, err = pkiHelper.LoadAccount(ctx, keyFile, sectigoDiectory)
 	if err != nil {
-		zap.L().Fatal("Failed to create lego client", zap.Error(err))
+		hmac, err := base64.RawURLEncoding.DecodeString(cfg.EabHmac)
+		if err != nil {
+			zap.L().Fatal("Failed to decode hmac", zap.Error(err))
+		}
+		acmeClient, err = pkiHelper.RegisterAccount(ctx, keyFile, sectigoDiectory, acme.ExternalAccountBinding{KID: cfg.EabKid, Key: hmac})
+		if err != nil {
+			zap.L().Fatal("Error registering ACME account", zap.Error(err))
+		}
 	}
+
 	gauge, _ := meter.AsyncInt64().Gauge(
 		"ssl.issue.last.duration",
 		instrument.WithUnit("seconds"),
@@ -118,7 +84,7 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 		instrument.WithUnit("unixMilli"),
 		instrument.WithDescription("Issue timestamp for last SSL Certificates"),
 	)
-	instance := &sslAPIServer{client: client, legoClient: legoClient, cfg: cfg, logger: zap.L(), db: db, pendingValidations: make(map[string]interface{})}
+	instance := &sslAPIServer{client: client, acmeClient: acmeClient, cfg: cfg, logger: zap.L(), db: db, pendingValidations: make(map[string]interface{})}
 	err = meter.RegisterCallback([]instrument.Asynchronous{gauge, gaugeLast}, func(ctx context.Context) {
 		if instance.last != nil {
 			gauge.Observe(ctx, int64(instance.duration.Seconds()))
@@ -210,10 +176,11 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	if _, ok := s.pendingValidations[req.Csr]; ok {
 		return nil, status.Errorf(codes.AlreadyExists, "Outstanding validation for this CSR")
 	}
-	s.logger.Debug("Issuing certificate",
+	s.logger.Info("Issuing certificate",
 		zap.String("common_name", csr.Subject.CommonName),
 		zap.Strings("subject_alternative_names", sans))
 
+	span.SetAttributes(attribute.StringSlice("subject_alternative_names", sans))
 	for _, fqdn := range sans {
 		id, err := s.db.Domain.Create().
 			SetFqdn(fqdn).
@@ -237,8 +204,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	}
 
 	start := time.Now()
-
-	certificates, err := s.legoClient.Certificate.ObtainForCSR(legoCert.ObtainForCSRRequest{CSR: csr, Bundle: true})
+	certificates, err := pkiHelper.RequestCertificate(ctx, span, s.acmeClient, csr, sans)
 	if err != nil {
 		return s.handleError("Error while collecting certificate", span, err)
 	}
@@ -251,8 +217,8 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	if err != nil {
 		s.logger.Error("Error while registering callback", zap.Error(err))
 	}
-
-	certs, err := pkiHelper.ParseCertificates(certificates.Certificate)
+	s.logger.Info("Certificate issued", zap.Strings("sans", sans))
+	certs, err := pkiHelper.LoadDER(certificates)
 	if err != nil {
 		return s.handleError("Error while collecting certificate", span, err)
 	}
@@ -301,7 +267,16 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 
 	}()
 
-	return &pb.IssueSslResponse{Certificate: string(certificates.Certificate)}, nil
+	return &pb.IssueSslResponse{Certificate: flattenCertificates(certs)}, nil
+}
+
+func flattenCertificates(certs []*x509.Certificate) string {
+	var result []byte
+	for _, cert := range certs {
+		c := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw})
+		result = append(result, c...)
+	}
+	return string(result)
 }
 
 func (s *sslAPIServer) handleError(msg string, span trace.Span, err error) (*pb.IssueSslResponse, error) {
