@@ -16,14 +16,36 @@ import (
 	"github.com/hm-edu/domain-rest-interface/pkg/database"
 	"github.com/hm-edu/domain-rest-interface/pkg/model"
 	"github.com/hm-edu/domain-rest-interface/pkg/store"
+	pb "github.com/hm-edu/portal-apis"
+
 	"github.com/hm-edu/portal-common/helper"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	// Importing the go-sqlite3 is required to create a sqlite3 database.
 	_ "github.com/mattn/go-sqlite3"
 )
 
+type MockPkiService struct {
+}
+
+func (s *MockPkiService) RevokeCertificate(ctx context.Context, req *pb.RevokeSslRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	return &emptypb.Empty{}, nil
+}
+
+func (s *MockPkiService) IssueCertificate(ctx context.Context, req *pb.IssueSslRequest, opts ...grpc.CallOption) (*pb.IssueSslResponse, error) {
+	return &pb.IssueSslResponse{}, nil
+}
+
+func (s *MockPkiService) ListCertificates(ctx context.Context, req *pb.ListSslRequest, opts ...grpc.CallOption) (*pb.ListSslResponse, error) {
+	return &pb.ListSslResponse{}, nil
+}
+
+func (s *MockPkiService) CertificateDetails(ctx context.Context, req *pb.CertificateDetailsRequest, opts ...grpc.CallOption) (*pb.SslCertificateDetails, error) {
+	return &pb.SslCertificateDetails{}, nil
+}
 func TestCreateDomainsWithoutTokenAndMiddleware(t *testing.T) {
 	e := echo.New()
 	client := enttest.Open(t, "sqlite3", "file:db?mode=memory&cache=shared&_fk=1")
@@ -37,7 +59,7 @@ func TestCreateDomainsWithoutTokenAndMiddleware(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	h := NewHandler(store.NewDomainStore(client))
+	h := NewHandler(store.NewDomainStore(client), &MockPkiService{})
 	assert.Panics(t, func() { _ = h.CreateDomain(c) })
 }
 
@@ -48,7 +70,7 @@ func TestSimplePermssions(t *testing.T) {
 	}(client)
 	database.DB.Internal, _, _ = sqlmock.New()
 	st := store.NewDomainStore(client)
-	h := NewHandler(st)
+	h := NewHandler(st, &MockPkiService{})
 
 	_, _ = st.Create(context.Background(), &ent.Domain{Fqdn: "example.com", Owner: "test", Approved: false})
 
@@ -76,7 +98,7 @@ func TestDeletePermissions(t *testing.T) {
 			}(client)
 			database.DB.Internal, _, _ = sqlmock.New()
 			st := store.NewDomainStore(client)
-			h := NewHandler(st)
+			h := NewHandler(st, &MockPkiService{})
 
 			_, _ = st.Create(context.Background(), &ent.Domain{Fqdn: "bar.example.com", Owner: "test", Approved: false})
 			_, _ = st.Create(context.Background(), &ent.Domain{Fqdn: "foo.example.com", Owner: "test", Approved: true})
@@ -112,7 +134,7 @@ func TestListHandler(t *testing.T) {
 	}(client)
 	database.DB.Internal, _, _ = sqlmock.New()
 	st := store.NewDomainStore(client)
-	h := NewHandler(st)
+	h := NewHandler(st, &MockPkiService{})
 	_, _ = st.Create(context.Background(), &ent.Domain{Fqdn: "bar.example.com", Owner: "test", Approved: false})
 	_, _ = st.Create(context.Background(), &ent.Domain{Fqdn: "foo.example.com", Owner: "test", Approved: true})
 	_, _ = st.Create(context.Background(), &ent.Domain{Fqdn: "example.com", Owner: "max", Approved: true})
@@ -148,7 +170,7 @@ func TestCreateDomainsFqdns(t *testing.T) {
 			rec := httptest.NewRecorder()
 			c := e.NewContext(req, rec)
 			c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "test"}})
-			h := NewHandler(store.NewDomainStore(client))
+			h := NewHandler(store.NewDomainStore(client), &MockPkiService{})
 			resp := h.CreateDomain(c)
 			if assert.Error(t, resp) {
 				assert.Equal(t, http.StatusBadRequest, resp.(*echo.HTTPError).Code)
@@ -170,7 +192,7 @@ func TestCreateDomainsWithToken(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "test"}})
-	h := NewHandler(store.NewDomainStore(client))
+	h := NewHandler(store.NewDomainStore(client), &MockPkiService{})
 	resp := h.CreateDomain(c)
 	if assert.NoError(t, resp) {
 		assert.Equal(t, http.StatusCreated, rec.Code)
@@ -193,7 +215,7 @@ func TestCreateDomainsTwice(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "test"}})
-	h := NewHandler(store.NewDomainStore(client))
+	h := NewHandler(store.NewDomainStore(client), &MockPkiService{})
 	resp := h.CreateDomain(c)
 	if assert.NoError(t, resp) {
 		assert.Equal(t, http.StatusCreated, rec.Code)
@@ -226,7 +248,7 @@ func TestCreateDomainsAutoApprove(t *testing.T) {
 	st := store.NewDomainStore(client)
 	_, err := st.Create(c.Request().Context(), &ent.Domain{Fqdn: "example.com", Owner: "test", Approved: true})
 	assert.NoError(t, err)
-	h := NewHandler(st)
+	h := NewHandler(st, &MockPkiService{})
 	resp := h.CreateDomain(c)
 	if assert.NoError(t, resp) {
 		assert.Equal(t, http.StatusCreated, rec.Code)
@@ -252,7 +274,7 @@ func TestCreateDomainsNoAutoApproveOtherUser(t *testing.T) {
 	st := store.NewDomainStore(client)
 	_, err := st.Create(c.Request().Context(), &ent.Domain{Fqdn: "example.com", Owner: "test", Approved: true})
 	assert.NoError(t, err)
-	h := NewHandler(st)
+	h := NewHandler(st, &MockPkiService{})
 	resp := h.CreateDomain(c)
 	if assert.NoError(t, resp) {
 		assert.Equal(t, http.StatusCreated, rec.Code)
@@ -280,7 +302,7 @@ func TestCreateDomainsNoAutoApproveOtherUserChild(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "max"}})
-	h := NewHandler(st)
+	h := NewHandler(st, &MockPkiService{})
 	resp := h.CreateDomain(c)
 	if assert.NoError(t, resp) {
 		assert.Equal(t, http.StatusCreated, rec.Code)
@@ -315,13 +337,13 @@ func TestCreateDomainsNoAutoApproveOtherUserChild(t *testing.T) {
 `, rec.Body.String())
 	}
 
-	list, err := st.ListDomains(c.Request().Context(), "test", false)
+	list, err := st.ListDomains(c.Request().Context(), "test", false, true)
 	assert.NoError(t, err)
 	assert.Len(t, list, 4)
 	assert.False(t, helper.First(list, func(d *ent.Domain) bool { return d.Fqdn == "foo.example.com" }).Approved)
 	assert.False(t, helper.First(list, func(d *ent.Domain) bool { return d.Fqdn == "2.mail.foo.example.com" }).Approved)
 
-	list, err = st.ListDomains(c.Request().Context(), "max", false)
+	list, err = st.ListDomains(c.Request().Context(), "max", false, true)
 	assert.NoError(t, err)
 	assert.Len(t, list, 2)
 	assert.False(t, helper.First(list, func(d *ent.Domain) bool { return d.Fqdn == "foo.example.com" }).Approved)
@@ -346,7 +368,7 @@ func TestApproveDomainsNotAllowed(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "max"}})
 	assert.NoError(t, err)
-	h := NewHandler(st)
+	h := NewHandler(st, &MockPkiService{})
 	_ = h.CreateDomain(c)
 
 	req = httptest.NewRequest(http.MethodPost, "/", strings.NewReader(`{"fqdn":"mail.foo.example.com"}`))
@@ -392,7 +414,7 @@ func TestApproveMissingId(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "test"}})
-	h := NewHandler(st)
+	h := NewHandler(st, &MockPkiService{})
 	resp := h.ApproveDomain(c)
 	assert.Error(t, resp)
 }
@@ -414,7 +436,7 @@ func TestApproveDomainsAllowed(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "max"}})
-	h := NewHandler(st)
+	h := NewHandler(st, &MockPkiService{})
 	_ = h.CreateDomain(c)
 
 	req = httptest.NewRequest(http.MethodPost, "/", strings.NewReader(`{"fqdn":"mail.foo.example.com"}`))

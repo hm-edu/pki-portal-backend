@@ -8,12 +8,15 @@ import (
 	"time"
 
 	"github.com/getkin/kin-openapi/openapi3"
+
 	"github.com/hm-edu/domain-rest-interface/pkg/api/docs"
 	"github.com/hm-edu/domain-rest-interface/pkg/api/domains"
 	"github.com/hm-edu/domain-rest-interface/pkg/store"
+	pb "github.com/hm-edu/portal-apis"
 	commonApi "github.com/hm-edu/portal-common/api"
 	commonAuth "github.com/hm-edu/portal-common/auth"
 	"github.com/hm-edu/portal-common/logging"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/lestrrat-go/jwx/jwk"
@@ -47,15 +50,16 @@ var (
 
 // Server is the basic structure of the users' REST-API server
 type Server struct {
-	app    *echo.Echo
-	logger *zap.Logger
-	config *commonApi.Config
-	store  *store.DomainStore
+	app        *echo.Echo
+	logger     *zap.Logger
+	config     *commonApi.Config
+	store      *store.DomainStore
+	pkiSerivce pb.SSLServiceClient
 }
 
 // NewServer creates a new server
-func NewServer(logger *zap.Logger, config *commonApi.Config, store *store.DomainStore) *Server {
-	return &Server{app: echo.New(), logger: logger, config: config, store: store}
+func NewServer(logger *zap.Logger, config *commonApi.Config, store *store.DomainStore, pkiSerivce pb.SSLServiceClient) *Server {
+	return &Server{app: echo.New(), logger: logger, config: config, store: store, pkiSerivce: pkiSerivce}
 }
 
 func (api *Server) wireRoutesAndMiddleware() {
@@ -105,7 +109,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 
 	v1 := api.app.Group("/domains")
 	{
-		h := domains.NewHandler(api.store)
+		h := domains.NewHandler(api.store, api.pkiSerivce)
 		v1.Use(jwtMiddleware)
 		v1.GET("/", h.ListDomains)
 		v1.POST("/", h.CreateDomain)

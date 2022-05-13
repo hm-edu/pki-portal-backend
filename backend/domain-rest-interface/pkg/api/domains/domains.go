@@ -8,8 +8,10 @@ import (
 
 	"github.com/hm-edu/domain-rest-interface/ent"
 	"github.com/hm-edu/domain-rest-interface/pkg/model"
+	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/auth"
 	"github.com/hm-edu/portal-common/helper"
+
 	"github.com/labstack/echo/v4"
 	"go.opentelemetry.io/otel/attribute"
 	"go.uber.org/zap"
@@ -47,32 +49,40 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string) ([]*model.D
 	ctx, span := h.tracer.Start(ctx, "enumerating")
 	defer span.End()
 
-	domains, err := h.domainStore.ListDomains(ctx, user, false)
+	domains, err := h.domainStore.ListDomains(ctx, user, false, true)
 	if err != nil {
 		h.logger.Error("Listing domains failed", zap.Error(err))
 		return nil, err
 	}
 
-	approvedDomains, err := h.domainStore.ListDomains(ctx, user, true)
+	approvedDomains, err := h.domainStore.ListDomains(ctx, user, true, true)
 	if err != nil {
 		h.logger.Error("Listing domains failed", zap.Error(err))
 		return nil, err
 	}
 	results := []*model.Domain{}
 
+	filtered := helper.Where(approvedDomains, func(t *ent.Domain) bool { return t.Approved })
+
+	certificates, err := h.pkiService.ListCertificates(ctx, &pb.ListSslRequest{Domains: helper.Map(filtered, func(t *ent.Domain) string { return t.Fqdn })})
+	if err != nil {
+		h.logger.Error("Listing certificates failed", zap.Error(err))
+		return nil, err
+	}
+
 	for _, domain := range domains {
 		item := model.DomainToOutput(domain)
-		// Users may always delete there own domains and transfer it.
+		// Users may always delete their own domains and transfer it.
 		if item.Owner == user {
 			item.Permissions.CanDelete = true
 			if item.Approved {
 				item.Permissions.CanTransfer = true
 				item.Permissions.CanDelegate = true
 			}
-
 		}
+
 		// Users may transfer or delete child domains
-		if helper.Any(approvedDomains, func(i *ent.Domain) bool { return i.Approved && strings.HasSuffix(domain.Fqdn, "."+i.Fqdn) }) {
+		if helper.Any(filtered, func(i *ent.Domain) bool { return strings.HasSuffix(domain.Fqdn, "."+i.Fqdn) }) {
 			// Users may approve child domains
 			if !item.Approved {
 				item.Permissions.CanApprove = true
@@ -80,9 +90,29 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string) ([]*model.D
 			item.Permissions.CanDelete = true
 			item.Permissions.CanTransfer = true
 			item.Permissions.CanDelegate = true
+		} else {
+			// There is no upper domain for this user -> Prevent deletion
+			if item.Permissions.CanDelete && item.Approved {
+				item.Permissions.CanDelete = false
+			}
 		}
-		if item.Permissions.CanDelete && item.Approved && !helper.Any(approvedDomains, func(i *ent.Domain) bool { return i.Approved && strings.HasSuffix(domain.Fqdn, "."+i.Fqdn) }) {
-			item.Permissions.CanDelete = false
+		if item.Permissions.CanDelete {
+			matchingCerts := helper.Where(certificates.Items, func(t *pb.SslCertificateDetails) bool {
+				return t.Status != "Revoked" && helper.Contains(t.SubjectAlternativeNames, item.FQDN)
+			})
+			if len(matchingCerts) > 0 {
+				for _, cert := range matchingCerts {
+					for _, name := range cert.SubjectAlternativeNames {
+						if !helper.Any(filtered, func(i *ent.Domain) bool { return i.Fqdn == name }) {
+							item.Permissions.CanDelete = false
+							break
+						}
+					}
+					if !item.Permissions.CanDelete {
+						break
+					}
+				}
+			}
 		}
 		results = append(results, &item)
 	}
@@ -115,7 +145,7 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 	}
 	domain := ent.Domain{Owner: auth.UserFromRequest(c), Fqdn: req.FQDN}
 
-	domains, err := h.domainStore.ListDomains(ctx, auth.UserFromRequest(c), true)
+	domains, err := h.domainStore.ListDomains(ctx, auth.UserFromRequest(c), true, true)
 	if err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
 	}

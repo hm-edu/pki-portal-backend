@@ -30,7 +30,7 @@ func newDomainAPIServer(store *store.DomainStore, logger *zap.Logger) *domainAPI
 
 func (api *domainAPIServer) CheckPermission(ctx context.Context, req *pb.CheckPermissionRequest) (*pb.CheckPermissionResponse, error) {
 
-	domains, err := api.store.ListDomains(ctx, req.User, true)
+	domains, err := api.store.ListDomains(ctx, req.User, true, false)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (api *domainAPIServer) ListDomains(ctx context.Context, req *pb.ListDomains
 	ctx, span := api.tracer.Start(ctx, "ListDomains")
 	defer span.End()
 
-	domains, err := api.store.ListDomains(ctx, req.User, req.Approved)
+	domains, err := api.store.ListDomains(ctx, req.User, req.Approved, true)
 	if err != nil {
 		span.RecordError(err)
 		api.logger.Error("Listing domains failed", zap.String("user", req.User), zap.Error(err))

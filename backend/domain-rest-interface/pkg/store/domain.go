@@ -39,7 +39,7 @@ func (s *DomainStore) ListAllDomains(ctx context.Context, approved bool) ([]stri
 }
 
 // ListDomains returns all domains that are owned or delegated to one user
-func (s *DomainStore) ListDomains(ctx context.Context, user string, requireApproval bool) ([]*ent.Domain, error) {
+func (s *DomainStore) ListDomains(ctx context.Context, user string, requireApproval, includeChilds bool) ([]*ent.Domain, error) {
 	if err := database.DB.Internal.Ping(); err != nil {
 		return nil, fmt.Errorf("pinging the database: %w", err)
 	}
@@ -53,7 +53,7 @@ func (s *DomainStore) ListDomains(ctx context.Context, user string, requireAppro
 		return nil, err
 	}
 
-	if len(domains) != 0 {
+	if len(domains) != 0 && includeChilds {
 		fqdns := helper.Map(domains, func(d *ent.Domain) predicate.Domain {
 			if d.Approved {
 				return domain.FqdnHasSuffix("." + d.Fqdn)
