@@ -130,11 +130,11 @@ func LoadCertFromPEMFile(filename string, skip int) (*x509.Certificate, error) {
 }
 
 func loadFromPem(filename, desc string, skip int) ([]byte, error) {
-	pemFile, err := os.Open(filename)
+	pemFile, err := os.Open(filename) //#nosec
 	if err != nil {
 		return nil, err
 	}
-	defer pemFile.Close()
+	defer func() { _ = pemFile.Close() }()
 
 	pemfileinfo, _ := pemFile.Stat()
 	var size = pemfileinfo.Size()
