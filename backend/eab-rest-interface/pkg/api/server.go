@@ -46,14 +46,15 @@ var (
 
 // Server is the basic structure of the users' REST-API server
 type Server struct {
-	app    *echo.Echo
-	logger *zap.Logger
-	config *commonApi.Config
+	app           *echo.Echo
+	logger        *zap.Logger
+	config        *commonApi.Config
+	provisionerId string
 }
 
 // NewServer creates a new server
-func NewServer(logger *zap.Logger, config *commonApi.Config) *Server {
-	return &Server{app: echo.New(), logger: logger, config: config}
+func NewServer(logger *zap.Logger, config *commonApi.Config, provisionerId string) *Server {
+	return &Server{app: echo.New(), logger: logger, config: config, provisionerId: provisionerId}
 }
 
 func (api *Server) wireRoutesAndMiddleware() {
@@ -103,7 +104,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 
 	v1 := api.app.Group("/eab")
 	{
-		h := eab.NewHandler()
+		h := eab.NewHandler(api.provisionerId)
 		v1.Use(jwtMiddleware)
 		v1.GET("/", h.GetExternalAccountKeys)
 		v1.POST("/", h.CreateNewKey)

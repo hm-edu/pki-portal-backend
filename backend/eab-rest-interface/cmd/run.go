@@ -41,7 +41,7 @@ var runCmd = &cobra.Command{
 		stopCh := signals.SetupSignalHandler()
 
 		// start HTTP server
-		srv := api.NewServer(logger, &srvCfg)
+		srv := api.NewServer(logger, &srvCfg, viper.GetString("provisioner_id"))
 		srv.ListenAndServe(stopCh)
 	},
 }
@@ -56,5 +56,6 @@ func init() {
 	runCmd.Flags().String("db", "", "connection string for the database")
 	runCmd.Flags().String("acme_db", "", "connection string for the acme database")
 	runCmd.Flags().String("preseed", "", "path to the preseed file")
+	runCmd.Flags().String("provisioner_id", "", "id of the smallstep provisioner to configure")
 	runCmd.Flags().String("level", "info", "log level debug, info, warn, error, flat or panic")
 }
