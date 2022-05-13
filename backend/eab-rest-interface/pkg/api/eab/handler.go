@@ -13,7 +13,7 @@ type Handler struct {
 	validator     *model.Validator
 	logger        *zap.Logger
 	tracer        trace.Tracer
-	ProvisionerID string
+	provisionerID string
 }
 
 // NewHandler generates a new handler for acting on the domain storage.
@@ -24,6 +24,6 @@ func NewHandler(ProvisionerID string) *Handler {
 		validator:     v,
 		logger:        zap.L(),
 		tracer:        tracer,
-		ProvisionerID: ProvisionerID,
+		provisionerID: ProvisionerID,
 	}
 }

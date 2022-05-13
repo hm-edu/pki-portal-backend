@@ -49,12 +49,12 @@ type Server struct {
 	app           *echo.Echo
 	logger        *zap.Logger
 	config        *commonApi.Config
-	provisionerId string
+	provisionerID string
 }
 
 // NewServer creates a new server
-func NewServer(logger *zap.Logger, config *commonApi.Config, provisionerId string) *Server {
-	return &Server{app: echo.New(), logger: logger, config: config, provisionerId: provisionerId}
+func NewServer(logger *zap.Logger, config *commonApi.Config, provisionerID string) *Server {
+	return &Server{app: echo.New(), logger: logger, config: config, provisionerID: provisionerID}
 }
 
 func (api *Server) wireRoutesAndMiddleware() {
@@ -104,7 +104,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 
 	v1 := api.app.Group("/eab")
 	{
-		h := eab.NewHandler(api.provisionerId)
+		h := eab.NewHandler(api.provisionerID)
 		v1.Use(jwtMiddleware)
 		v1.GET("/", h.GetExternalAccountKeys)
 		v1.POST("/", h.CreateNewKey)

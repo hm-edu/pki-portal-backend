@@ -29,7 +29,7 @@ func (h *Handler) GetExternalAccountKeys(c echo.Context) error {
 	ctx, span := h.tracer.Start(c.Request().Context(), "list")
 	defer span.End()
 	h.logger.Info("Requesting external account keys")
-	keys, _, err := database.DB.NoSQL.GetExternalAccountKeys(ctx, h.ProvisionerID, "", -1)
+	keys, _, err := database.DB.NoSQL.GetExternalAccountKeys(ctx, h.provisionerID, "", -1)
 	if err != nil {
 		h.logger.Error("Failed to get external account keys", zap.Error(err))
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to get external account keys")
@@ -60,7 +60,7 @@ func (h *Handler) CreateNewKey(c echo.Context) error {
 	ctx, span := h.tracer.Start(c.Request().Context(), "add")
 	defer span.End()
 	h.logger.Info("Requesting external account keys")
-	key, err := database.DB.NoSQL.CreateExternalAccountKey(ctx, h.ProvisionerID, "")
+	key, err := database.DB.NoSQL.CreateExternalAccountKey(ctx, h.provisionerID, "")
 
 	if err != nil {
 		h.logger.Error("Failed to create new external account key", zap.Error(err))
@@ -102,7 +102,7 @@ func (h *Handler) DeleteKey(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusForbidden, "You are not allowed to delete this key")
 	}
 
-	err = database.DB.NoSQL.DeleteExternalAccountKey(ctx, h.ProvisionerID, key)
+	err = database.DB.NoSQL.DeleteExternalAccountKey(ctx, h.provisionerID, key)
 	if err != nil {
 		h.logger.Error("Failed to delete external account key", zap.Error(err))
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to delete external account key")
