@@ -31,19 +31,19 @@ import (
 type MockPkiService struct {
 }
 
-func (s *MockPkiService) RevokeCertificate(ctx context.Context, req *pb.RevokeSslRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (s *MockPkiService) RevokeCertificate(context.Context, *pb.RevokeSslRequest, ...grpc.CallOption) (*emptypb.Empty, error) {
 	return &emptypb.Empty{}, nil
 }
 
-func (s *MockPkiService) IssueCertificate(ctx context.Context, req *pb.IssueSslRequest, opts ...grpc.CallOption) (*pb.IssueSslResponse, error) {
+func (s *MockPkiService) IssueCertificate(context.Context, *pb.IssueSslRequest, ...grpc.CallOption) (*pb.IssueSslResponse, error) {
 	return &pb.IssueSslResponse{}, nil
 }
 
-func (s *MockPkiService) ListCertificates(ctx context.Context, req *pb.ListSslRequest, opts ...grpc.CallOption) (*pb.ListSslResponse, error) {
+func (s *MockPkiService) ListCertificates(context.Context, *pb.ListSslRequest, ...grpc.CallOption) (*pb.ListSslResponse, error) {
 	return &pb.ListSslResponse{}, nil
 }
 
-func (s *MockPkiService) CertificateDetails(ctx context.Context, req *pb.CertificateDetailsRequest, opts ...grpc.CallOption) (*pb.SslCertificateDetails, error) {
+func (s *MockPkiService) CertificateDetails(context.Context, *pb.CertificateDetailsRequest, ...grpc.CallOption) (*pb.SslCertificateDetails, error) {
 	return &pb.SslCertificateDetails{}, nil
 }
 func TestCreateDomainsWithoutTokenAndMiddleware(t *testing.T) {

@@ -11,11 +11,11 @@ install_dependencies() {
     rm $VERSION
 
     go install github.com/swaggo/swag/cmd/swag@latest
-    
+
     go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
     go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
     go install github.com/golang/mock/mockgen@latest
-    go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest    
+    go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
 }
 
 go_protoc() {

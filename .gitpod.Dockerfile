@@ -6,5 +6,5 @@ RUN PB_REL="https://github.com/protocolbuffers/protobuf/releases" && \
     mkdir -p $HOME/.local/protoc && \
     unzip $VERSION -d $HOME/.local/protoc && \
     rm $VERSION
-    
+
 ENV PATH=$PATH:$HOME/.local/protoc/bin

@@ -25,7 +25,7 @@ spec:
   resources:
     requests:
       storage: 5Gi
---- 
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -35,7 +35,7 @@ data:
   docker_postgres_init.sql: |
     CREATE USER acme WITH PASSWORD 'acme' CREATEDB;
     CREATE DATABASE acme
-      WITH 
+      WITH
       OWNER = acme
       ENCODING = 'UTF8'
       LC_COLLATE = 'en_US.utf8'
@@ -43,7 +43,7 @@ data:
       TABLESPACE = pg_default
       CONNECTION LIMIT = -1;
     CREATE DATABASE eab
-      WITH 
+      WITH
       OWNER = acme
       ENCODING = 'UTF8'
       LC_COLLATE = 'en_US.utf8'
@@ -52,7 +52,7 @@ data:
       CONNECTION LIMIT = -1;
     CREATE USER pki WITH PASSWORD 'pki' CREATEDB;
     CREATE DATABASE domain
-      WITH 
+      WITH
       OWNER = pki
       ENCODING = 'UTF8'
       LC_COLLATE = 'en_US.utf8'
@@ -60,7 +60,7 @@ data:
       TABLESPACE = pg_default
       CONNECTION LIMIT = -1;
     CREATE DATABASE certificates
-      WITH 
+      WITH
       OWNER = pki
       ENCODING = 'UTF8'
       LC_COLLATE = 'en_US.utf8'

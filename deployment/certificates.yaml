@@ -12,7 +12,7 @@ spec:
   resources:
     requests:
       storage: 5Gi
---- 
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -41,6 +41,11 @@ data:
           {
             "type": "ACME",
             "name": "acme"
+          },
+          {
+            "type": "ACME",
+            "name": "eab",
+            "requireEAB": true
           }
         ],
         "template": {},
@@ -91,12 +96,12 @@ spec:
             protocol: TCP
           - containerPort: 8443
             protocol: TCP
-          
+
           livenessProbe:
             httpGet:
               path: /health
               port: 8443
-              scheme: HTTPS            
+              scheme: HTTPS
             periodSeconds: 30
             initialDelaySeconds: 10
           volumeMounts:

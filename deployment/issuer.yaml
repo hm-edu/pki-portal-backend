@@ -24,6 +24,7 @@ spec:
   dnsNames:
     - "my.hmtest.de"
     - "domain.api.hmtest.de"
+    - "eab.api.hmtest.de"
     - "pki.api.hmtest.de"
     - "monitoring.hmtest.de"
     - "grafana.monitoring.hmtest.de"
