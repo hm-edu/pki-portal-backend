@@ -63,14 +63,17 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 
 	acmeClient, err = pkiHelper.LoadAccount(ctx, keyFile, sectigoDiectory)
 	if err != nil {
+		zap.L().Info("Found no ACME account, creating one.")
 		hmac, err := base64.RawURLEncoding.DecodeString(cfg.EabHmac)
 		if err != nil {
 			zap.L().Fatal("Failed to decode hmac", zap.Error(err))
 		}
+
 		acmeClient, err = pkiHelper.RegisterAccount(ctx, keyFile, sectigoDiectory, acme.ExternalAccountBinding{KID: cfg.EabKid, Key: hmac})
 		if err != nil {
 			zap.L().Fatal("Error registering ACME account", zap.Error(err))
 		}
+		zap.L().Info("Registered ACME account", zap.String("kid", cfg.EabKid))
 	}
 
 	gauge, _ := meter.AsyncInt64().Gauge(

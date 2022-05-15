@@ -35,6 +35,7 @@ func RegisterAccount(ctx context.Context, accountFile string, acmeDirectory stri
 	}
 
 	client := &acme.Client{Key: akey, DirectoryURL: acmeDirectory, KID: acme.KeyID(eab.KID)}
+	zap.L().Info("Registering ACME Account", zap.String("kid", eab.KID))
 	_, err = client.Register(ctx, &acme.Account{ExternalAccountBinding: &eab}, acme.AcceptTOS)
 	if err != nil {
 		return nil, err

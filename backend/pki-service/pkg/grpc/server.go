@@ -55,8 +55,23 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 		s.logger.Fatal("failed to listen", zap.Int("port", s.config.Port))
 	}
 
-	srv := grpc.NewServer(grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(grpc_recovery.UnaryServerInterceptor(), tracing.NewGRPUnaryServerInterceptor(), grpc_zap.UnaryServerInterceptor(s.logger))),
-		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(grpc_recovery.StreamServerInterceptor(), tracing.NewGRPCStreamServerInterceptor(), grpc_zap.StreamServerInterceptor(s.logger))))
+	srv := grpc.NewServer(
+		grpc.UnaryInterceptor(
+			grpc_middleware.ChainUnaryServer(
+				grpc_recovery.UnaryServerInterceptor(),
+				tracing.NewGRPUnaryServerInterceptor(),
+				grpc_zap.UnaryServerInterceptor(s.logger,
+					grpc_zap.WithDecider(func(fullMethodName string, err error) bool {
+						if fullMethodName == "/grpc.health.v1.Health/Check" && err == nil {
+							return false
+						}
+						return true
+					})))),
+		grpc.StreamInterceptor(
+			grpc_middleware.ChainStreamServer(
+				grpc_recovery.StreamServerInterceptor(),
+				tracing.NewGRPCStreamServerInterceptor(),
+				grpc_zap.StreamServerInterceptor(s.logger))))
 
 	server := NewHealthChecker()
 	reflection.Register(srv)

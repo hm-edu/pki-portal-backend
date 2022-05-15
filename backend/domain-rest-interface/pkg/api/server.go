@@ -87,7 +87,9 @@ func (api *Server) wireRoutesAndMiddleware() {
 	api.app.Use(otelecho.Middleware("domain-rest-interface", otelecho.WithSkipper(func(c echo.Context) bool {
 		return strings.Contains(c.Path(), "/docs") || strings.Contains(c.Path(), "/healthz")
 	})))
-	api.app.Use(logging.ZapLogger(api.logger))
+	api.app.Use(logging.ZapLogger(api.logger, logging.WithSkipper(func(c echo.Context) bool {
+		return strings.Contains(c.Path(), "/docs") || strings.Contains(c.Path(), "/healthz")
+	})))
 	api.app.Use(middleware.Recover())
 	api.app.GET("/docs/spec.json", func(c echo.Context) error {
 		if openAPISpec == nil {
