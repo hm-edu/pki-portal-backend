@@ -45,6 +45,11 @@ func (s *smimeAPIServer) ListCertificates(ctx context.Context, req *pb.ListSmime
 	s.logger.Debug("Requesting smime certificates", zap.String("user", req.Email))
 	items, err := s.client.ClientService.ListByEmail(req.Email)
 	if err != nil {
+		if sectigoError, ok := err.(*sectigo.ErrorResponse); ok {
+			if sectigoError.Code == -105 {
+				return &pb.ListSmimeResponse{Certificates: []*pb.ListSmimeResponse_CertificateDetails{}}, nil
+			}
+		}
 		span.RecordError(err)
 		return nil, status.Error(codes.Internal, err.Error())
 	}
