@@ -10,3 +10,4 @@ backend/eab-rest-interface/eab-rest-interface
 **/*.db
 backend/domain-rest-interface/coverage.txt
 deployment/portal.yaml
+backend/pki-service/acme.key
