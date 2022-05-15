@@ -48,7 +48,7 @@ jobs:
             type=ref,event=branch
             type=ref,event=tag
             type=ref,event=pr
-            type=raw,value={{branch}}-{{sha}}-{{date 'Z'}}
+            type=raw,value={{branch}}-{{sha}}-{{date 'X'}}
 
       - name: Build and push
         uses: docker/build-push-action@v2
