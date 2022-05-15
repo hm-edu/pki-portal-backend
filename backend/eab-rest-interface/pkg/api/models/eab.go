@@ -12,6 +12,6 @@ type EAB struct {
 func NewEAB(key *acme.ExternalAccountKey) *EAB {
 	return &EAB{
 		ID:       key.ID,
-		KeyBytes: key.KeyBytes,
+		KeyBytes: key.HmacKey,
 	}
 }
