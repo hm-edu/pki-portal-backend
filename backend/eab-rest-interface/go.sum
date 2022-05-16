@@ -375,8 +375,8 @@ github.com/hm-edu/certificates v0.0.0-20220514050812-781013b4a009 h1:vtWczt03m6v
 github.com/hm-edu/certificates v0.0.0-20220514050812-781013b4a009/go.mod h1:gjTJBB+WShWVkHy+4w0lbZ9DE8mivQARJCCCUhS9j54=
 github.com/hm-edu/nosql v0.4.1-0.20220510094234-1fbe0ffbb194 h1:4wA73z2RPNS7+b/Jqq1XArLfgavlCYqXr6imJZD9LnM=
 github.com/hm-edu/nosql v0.4.1-0.20220510094234-1fbe0ffbb194/go.mod h1:yKZT5h7cdIVm6wEKM9+jN5dgK80Hljpuy8HNsnI7Gzo=
-github.com/hm-edu/portal-apis v0.0.0-20220516043247-61d4a62c4d0a h1:AafmiLuINXO/cWL1rR1YWLnp+V2F7W434oBSJygcGfo=
-github.com/hm-edu/portal-apis v0.0.0-20220516043247-61d4a62c4d0a/go.mod h1:QojwCqAAoU0G/zBizlkIlHbdn5zFilZrh7Qm3+2xOUA=
+github.com/hm-edu/portal-apis v0.0.0-20220516061919-a4ea5ed352fe h1:ALxvLgUCfGKjXMfUfKGKBeDP6DDH7qwwhiO35pQWAd8=
+github.com/hm-edu/portal-apis v0.0.0-20220516061919-a4ea5ed352fe/go.mod h1:o2FYTwt6w4uXfIoPAFRQpxbOOhGjde0PiGZlErVVyZk=
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
 github.com/huandu/xstrings v1.3.1/go.mod h1:y5/lhBue+AyNmUVz9RLU9xbLR0o4KIIExikq4ovT0aE=
 github.com/huandu/xstrings v1.3.2 h1:L18LIDzqlW6xN2rEkpdV8+oL/IXWJ1APd+vsdYy4Wdw=
