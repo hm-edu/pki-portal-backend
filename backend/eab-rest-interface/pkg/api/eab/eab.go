@@ -23,7 +23,7 @@ import (
 // @Produce json
 // @Router /eab/ [get]
 // @Security API
-// @Success 200 {object} []acme.ExternalAccountKey
+// @Success 200 {object} []models.EAB
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) GetExternalAccountKeys(c echo.Context) error {
 	ctx, span := h.tracer.Start(c.Request().Context(), "list")
@@ -43,7 +43,7 @@ func (h *Handler) GetExternalAccountKeys(c echo.Context) error {
 	keys = helper.Where(keys, func(key *acme.ExternalAccountKey) bool {
 		return helper.Any(mappedKeys, func(x *ent.EABKey) bool { return key.ID == x.EabKey })
 	})
-	return c.JSON(http.StatusOK, keys)
+	return c.JSON(http.StatusOK, helper.Map(keys, models.NewEAB))
 }
 
 // CreateNewKey godoc
@@ -77,13 +77,13 @@ func (h *Handler) CreateNewKey(c echo.Context) error {
 }
 
 // DeleteKey godoc
-// @Summary Deletes an EAB Key a domain.
+// @Summary Deletes an EAB Key.
 // @Description Delete an existing EAB Key.
 // @Tags EAB
 // @Accept json
 // @Produce json
 // @Router /eab/{id} [DELETE]
-// @Param id path int true "Domain ID"
+// @Param id path string true "EAB ID"
 // @Security API
 // @Success 204
 // @Response default {object} echo.HTTPError "Error processing the request"
@@ -92,14 +92,10 @@ func (h *Handler) DeleteKey(c echo.Context) error {
 	defer span.End()
 	h.logger.Info("Requesting external account keys")
 	key := c.Param("id")
-	mappedKeys, err := database.DB.Db.EABKey.Query().Where(eabkey.User(auth.UserFromRequest(c))).All(ctx)
+	mapping, err := database.DB.Db.EABKey.Query().Where(eabkey.And(eabkey.User(auth.UserFromRequest(c)), eabkey.EabKey(key))).First(ctx)
 	if err != nil {
 		h.logger.Error("Failed to get external account keys", zap.Error(err))
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to get external account keys")
-	}
-	mapping := helper.First(mappedKeys, func(x *ent.EABKey) bool { return x.EabKey == key })
-	if mapping == nil {
-		return echo.NewHTTPError(http.StatusForbidden, "You are not allowed to delete this key")
 	}
 
 	err = database.DB.NoSQL.DeleteExternalAccountKey(ctx, h.provisionerID, key)

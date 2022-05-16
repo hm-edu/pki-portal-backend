@@ -47,7 +47,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/acme.ExternalAccountKey"
+                                "$ref": "#/definitions/models.EAB"
                             }
                         }
                     },
@@ -109,11 +109,11 @@ const docTemplate = `{
                 "tags": [
                     "EAB"
                 ],
-                "summary": "Deletes an EAB Key a domain.",
+                "summary": "Deletes an EAB Key.",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "Domain ID",
+                        "type": "string",
+                        "description": "EAB ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -168,68 +168,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "acme.ExternalAccountKey": {
-            "type": "object",
-            "properties": {
-                "boundAt": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "policy": {
-                    "$ref": "#/definitions/acme.Policy"
-                },
-                "provisionerID": {
-                    "type": "string"
-                },
-                "reference": {
-                    "type": "string"
-                }
-            }
-        },
-        "acme.Policy": {
-            "type": "object",
-            "properties": {
-                "x509": {
-                    "$ref": "#/definitions/acme.X509Policy"
-                }
-            }
-        },
-        "acme.PolicyNames": {
-            "type": "object",
-            "properties": {
-                "dns": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "ips": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            }
-        },
-        "acme.X509Policy": {
-            "type": "object",
-            "properties": {
-                "allow": {
-                    "$ref": "#/definitions/acme.PolicyNames"
-                },
-                "allowWildcardNames": {
-                    "type": "boolean"
-                },
-                "deny": {
-                    "$ref": "#/definitions/acme.PolicyNames"
-                }
-            }
-        },
         "echo.HTTPError": {
             "type": "object",
             "properties": {
@@ -239,10 +177,13 @@ const docTemplate = `{
         "models.EAB": {
             "type": "object",
             "properties": {
+                "bound_at": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
-                "keyBytes": {
+                "key_bytes": {
                     "type": "array",
                     "items": {
                         "type": "integer"
