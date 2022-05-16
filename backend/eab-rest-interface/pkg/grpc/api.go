@@ -1,0 +1,66 @@
+package grpc
+
+import (
+	"context"
+
+	"github.com/hm-edu/eab-rest-interface/ent"
+	"github.com/hm-edu/eab-rest-interface/ent/eabkey"
+	"github.com/hm-edu/eab-rest-interface/pkg/database"
+	pb "github.com/hm-edu/portal-apis"
+	"github.com/hm-edu/portal-common/helper"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
+	"go.uber.org/zap"
+)
+
+type eabAPIServer struct {
+	pb.UnimplementedEABServiceServer
+	domainService pb.DomainServiceClient
+	logger        *zap.Logger
+	tracer        trace.Tracer
+}
+
+func newEabAPIServer(domainService pb.DomainServiceClient, logger *zap.Logger) *eabAPIServer {
+	tracer := otel.GetTracerProvider().Tracer("eab")
+	return &eabAPIServer{domainService: domainService, logger: logger, tracer: tracer}
+}
+
+// CheckEABPermissions resolves the user and validates the issue permission for the requested domains.
+func (api *eabAPIServer) CheckEABPermissions(ctx context.Context, req *pb.CheckEABPermissionRequest) (*pb.CheckEABPermissionResponse, error) {
+
+	ctx, span := api.tracer.Start(ctx, "CheckEABPermissions")
+	defer span.End()
+	span.SetAttributes(attribute.String("key", req.EabKey), attribute.StringSlice("domains", req.Domains))
+	key, err := database.DB.Db.EABKey.Query().Where(eabkey.EabKey(req.EabKey)).First(ctx)
+
+	if err != nil {
+		if _, ok := err.(*ent.NotFoundError); ok {
+			span.AddEvent("Key not found")
+			api.logger.Warn("Key not found", zap.String("key", key.EabKey), zap.Error(err))
+			return nil, status.Error(codes.Unauthenticated, "Key not found")
+		}
+		span.RecordError(err)
+		span.AddEvent("Error looking up user")
+		api.logger.Error("Error looking up user", zap.String("key", key.EabKey), zap.Error(err))
+		return nil, status.Error(codes.Internal, "Error looking up user")
+	}
+
+	span.SetAttributes(attribute.String("key", req.EabKey), attribute.StringSlice("domains", req.Domains), attribute.String("user", key.User))
+	api.logger.Info("Checking registrations for user", zap.String("key", key.EabKey), zap.String("user", key.User), zap.Strings("domains", req.Domains))
+	permissions, err := api.domainService.CheckPermission(ctx, &pb.CheckPermissionRequest{User: key.User, Domains: req.Domains})
+	if err != nil {
+		span.RecordError(err)
+		span.AddEvent("Error checking permissions")
+		api.logger.Error("Error checking permissions", zap.Error(err))
+		return nil, status.Error(codes.Internal, "Error checking permissions")
+	}
+
+	missing := helper.Map(helper.Where(permissions.Permissions, func(t *pb.Permission) bool { return !t.Granted }), func(t *pb.Permission) string { return t.Domain })
+	span.SetAttributes(attribute.String("key", req.EabKey), attribute.StringSlice("domains", req.Domains), attribute.String("user", key.User), attribute.StringSlice("missing", missing))
+	api.logger.Info("Permissions checked", zap.Strings("missing", missing), zap.String("key", key.EabKey), zap.String("user", key.User))
+	return &pb.CheckEABPermissionResponse{Missing: missing}, nil
+}

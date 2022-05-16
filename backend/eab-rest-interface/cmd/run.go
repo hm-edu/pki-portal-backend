@@ -5,6 +5,7 @@ import (
 
 	"github.com/hm-edu/eab-rest-interface/pkg/api"
 	"github.com/hm-edu/eab-rest-interface/pkg/database"
+	"github.com/hm-edu/eab-rest-interface/pkg/grpc"
 	commonApi "github.com/hm-edu/portal-common/api"
 	"github.com/hm-edu/portal-common/signals"
 	"github.com/hm-edu/portal-common/tracing"
@@ -21,6 +22,11 @@ var runCmd = &cobra.Command{
 
 		logger, deferFunc, viper := commonApi.PrepareEnv(cmd)
 		defer deferFunc(logger)
+
+		var grpcCfg grpc.Config
+		if err := viper.Unmarshal(&grpcCfg); err != nil {
+			logger.Panic("config unmarshal failed", zap.Error(err))
+		}
 
 		// load HTTP server config
 		var srvCfg commonApi.Config
@@ -40,6 +46,12 @@ var runCmd = &cobra.Command{
 
 		stopCh := signals.SetupSignalHandler()
 
+		// start gRPC server
+		if grpcCfg.Port > 0 {
+			grpcSrv, _ := grpc.NewServer(&grpcCfg, logger)
+			go grpcSrv.ListenAndServe(stopCh)
+		}
+
 		// start HTTP server
 		srv := api.NewServer(logger, &srvCfg, viper.GetString("provisioner_id"))
 		srv.ListenAndServe(stopCh)
@@ -51,11 +63,13 @@ func init() {
 
 	runCmd.Flags().String("host", "", "Host to bind service to")
 	runCmd.Flags().Int("port", 8080, "HTTP port to bind service to")
+	runCmd.Flags().Int("grpc-port", 8081, "GRPC port to bind service to")
 	runCmd.Flags().String("jwks_uri", "", "The location of the jwk set")
 	runCmd.Flags().String("audience", "", "The expected audience")
 	runCmd.Flags().String("db", "", "connection string for the database")
 	runCmd.Flags().String("acme_db", "", "connection string for the acme database")
 	runCmd.Flags().String("preseed", "", "path to the preseed file")
 	runCmd.Flags().String("provisioner_id", "", "id of the smallstep provisioner to configure")
+	runCmd.Flags().String("domain_service", "", "The domain service to use")
 	runCmd.Flags().String("level", "info", "log level debug, info, warn, error, flat or panic")
 }

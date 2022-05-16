@@ -180,11 +180,53 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "policy": {
+                    "$ref": "#/definitions/acme.Policy"
+                },
                 "provisionerID": {
                     "type": "string"
                 },
                 "reference": {
                     "type": "string"
+                }
+            }
+        },
+        "acme.Policy": {
+            "type": "object",
+            "properties": {
+                "x509": {
+                    "$ref": "#/definitions/acme.X509Policy"
+                }
+            }
+        },
+        "acme.PolicyNames": {
+            "type": "object",
+            "properties": {
+                "dns": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "ips": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "acme.X509Policy": {
+            "type": "object",
+            "properties": {
+                "allow": {
+                    "$ref": "#/definitions/acme.PolicyNames"
+                },
+                "allowWildcardNames": {
+                    "type": "boolean"
+                },
+                "deny": {
+                    "$ref": "#/definitions/acme.PolicyNames"
                 }
             }
         },

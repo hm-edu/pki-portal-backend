@@ -8,7 +8,7 @@ require (
 	github.com/smallstep/certificates v0.19.0
 	go.opentelemetry.io/otel v1.7.0
 	go.uber.org/zap v1.21.0
-	google.golang.org/grpc v1.46.2 // indirect
+	google.golang.org/grpc v1.46.2
 )
 
 require (
@@ -57,6 +57,8 @@ require (
 
 require (
 	entgo.io/ent v0.10.1
+	github.com/grpc-ecosystem/go-grpc-middleware v1.0.1-0.20190118093823-f849b5445de4
+	github.com/hm-edu/portal-apis v0.0.0-20220516043247-61d4a62c4d0a
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/lestrrat-go/jwx v1.2.24
 	github.com/smallstep/nosql v0.4.0

@@ -2,8 +2,6 @@ package grpc
 
 import (
 	"context"
-	"fmt"
-	"strings"
 
 	"github.com/hm-edu/domain-rest-interface/ent"
 	"github.com/hm-edu/domain-rest-interface/pkg/store"
@@ -23,22 +21,21 @@ type domainAPIServer struct {
 }
 
 func newDomainAPIServer(store *store.DomainStore, logger *zap.Logger) *domainAPIServer {
-
 	tracer := otel.GetTracerProvider().Tracer("domains")
 	return &domainAPIServer{store: store, logger: logger, tracer: tracer}
 }
 
 func (api *domainAPIServer) CheckPermission(ctx context.Context, req *pb.CheckPermissionRequest) (*pb.CheckPermissionResponse, error) {
 
+	ctx, span := api.tracer.Start(ctx, "CheckPermission")
+	defer span.End()
 	domains, err := api.store.ListDomains(ctx, req.User, true, false)
 	if err != nil {
 		return nil, err
 	}
 
 	permissions := helper.Map(req.Domains, func(t string) *pb.Permission {
-		if helper.Any(domains, func(d *ent.Domain) bool {
-			return d.Fqdn == t || strings.HasSuffix(t, fmt.Sprintf(".%s", d.Fqdn))
-		}) {
+		if helper.Any(domains, func(d *ent.Domain) bool { return d.Fqdn == t }) {
 			return &pb.Permission{Domain: t, Granted: true}
 		}
 		return &pb.Permission{Domain: t, Granted: false}
