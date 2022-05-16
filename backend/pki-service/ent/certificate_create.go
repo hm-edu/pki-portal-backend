@@ -113,6 +113,26 @@ func (cc *CertificateCreate) SetNillableNotAfter(t *time.Time) *CertificateCreat
 	return cc
 }
 
+// SetIssuedBy sets the "issuedBy" field.
+func (cc *CertificateCreate) SetIssuedBy(s string) *CertificateCreate {
+	cc.mutation.SetIssuedBy(s)
+	return cc
+}
+
+// SetCreated sets the "created" field.
+func (cc *CertificateCreate) SetCreated(t time.Time) *CertificateCreate {
+	cc.mutation.SetCreated(t)
+	return cc
+}
+
+// SetNillableCreated sets the "created" field if the given value is not nil.
+func (cc *CertificateCreate) SetNillableCreated(t *time.Time) *CertificateCreate {
+	if t != nil {
+		cc.SetCreated(*t)
+	}
+	return cc
+}
+
 // SetStatus sets the "status" field.
 func (cc *CertificateCreate) SetStatus(c certificate.Status) *CertificateCreate {
 	cc.mutation.SetStatus(c)
@@ -252,6 +272,9 @@ func (cc *CertificateCreate) check() error {
 			return &ValidationError{Name: "commonName", err: fmt.Errorf(`ent: validator failed for field "Certificate.commonName": %w`, err)}
 		}
 	}
+	if _, ok := cc.mutation.IssuedBy(); !ok {
+		return &ValidationError{Name: "issuedBy", err: errors.New(`ent: missing required field "Certificate.issuedBy"`)}
+	}
 	if _, ok := cc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Certificate.status"`)}
 	}
@@ -343,6 +366,22 @@ func (cc *CertificateCreate) createSpec() (*Certificate, *sqlgraph.CreateSpec) {
 			Column: certificate.FieldNotAfter,
 		})
 		_node.NotAfter = value
+	}
+	if value, ok := cc.mutation.IssuedBy(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: certificate.FieldIssuedBy,
+		})
+		_node.IssuedBy = value
+	}
+	if value, ok := cc.mutation.Created(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: certificate.FieldCreated,
+		})
+		_node.Created = &value
 	}
 	if value, ok := cc.mutation.Status(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -539,6 +578,36 @@ func (u *CertificateUpsert) ClearNotAfter() *CertificateUpsert {
 	return u
 }
 
+// SetIssuedBy sets the "issuedBy" field.
+func (u *CertificateUpsert) SetIssuedBy(v string) *CertificateUpsert {
+	u.Set(certificate.FieldIssuedBy, v)
+	return u
+}
+
+// UpdateIssuedBy sets the "issuedBy" field to the value that was provided on create.
+func (u *CertificateUpsert) UpdateIssuedBy() *CertificateUpsert {
+	u.SetExcluded(certificate.FieldIssuedBy)
+	return u
+}
+
+// SetCreated sets the "created" field.
+func (u *CertificateUpsert) SetCreated(v time.Time) *CertificateUpsert {
+	u.Set(certificate.FieldCreated, v)
+	return u
+}
+
+// UpdateCreated sets the "created" field to the value that was provided on create.
+func (u *CertificateUpsert) UpdateCreated() *CertificateUpsert {
+	u.SetExcluded(certificate.FieldCreated)
+	return u
+}
+
+// ClearCreated clears the value of the "created" field.
+func (u *CertificateUpsert) ClearCreated() *CertificateUpsert {
+	u.SetNull(certificate.FieldCreated)
+	return u
+}
+
 // SetStatus sets the "status" field.
 func (u *CertificateUpsert) SetStatus(v certificate.Status) *CertificateUpsert {
 	u.Set(certificate.FieldStatus, v)
@@ -728,6 +797,41 @@ func (u *CertificateUpsertOne) UpdateNotAfter() *CertificateUpsertOne {
 func (u *CertificateUpsertOne) ClearNotAfter() *CertificateUpsertOne {
 	return u.Update(func(s *CertificateUpsert) {
 		s.ClearNotAfter()
+	})
+}
+
+// SetIssuedBy sets the "issuedBy" field.
+func (u *CertificateUpsertOne) SetIssuedBy(v string) *CertificateUpsertOne {
+	return u.Update(func(s *CertificateUpsert) {
+		s.SetIssuedBy(v)
+	})
+}
+
+// UpdateIssuedBy sets the "issuedBy" field to the value that was provided on create.
+func (u *CertificateUpsertOne) UpdateIssuedBy() *CertificateUpsertOne {
+	return u.Update(func(s *CertificateUpsert) {
+		s.UpdateIssuedBy()
+	})
+}
+
+// SetCreated sets the "created" field.
+func (u *CertificateUpsertOne) SetCreated(v time.Time) *CertificateUpsertOne {
+	return u.Update(func(s *CertificateUpsert) {
+		s.SetCreated(v)
+	})
+}
+
+// UpdateCreated sets the "created" field to the value that was provided on create.
+func (u *CertificateUpsertOne) UpdateCreated() *CertificateUpsertOne {
+	return u.Update(func(s *CertificateUpsert) {
+		s.UpdateCreated()
+	})
+}
+
+// ClearCreated clears the value of the "created" field.
+func (u *CertificateUpsertOne) ClearCreated() *CertificateUpsertOne {
+	return u.Update(func(s *CertificateUpsert) {
+		s.ClearCreated()
 	})
 }
 
@@ -1086,6 +1190,41 @@ func (u *CertificateUpsertBulk) UpdateNotAfter() *CertificateUpsertBulk {
 func (u *CertificateUpsertBulk) ClearNotAfter() *CertificateUpsertBulk {
 	return u.Update(func(s *CertificateUpsert) {
 		s.ClearNotAfter()
+	})
+}
+
+// SetIssuedBy sets the "issuedBy" field.
+func (u *CertificateUpsertBulk) SetIssuedBy(v string) *CertificateUpsertBulk {
+	return u.Update(func(s *CertificateUpsert) {
+		s.SetIssuedBy(v)
+	})
+}
+
+// UpdateIssuedBy sets the "issuedBy" field to the value that was provided on create.
+func (u *CertificateUpsertBulk) UpdateIssuedBy() *CertificateUpsertBulk {
+	return u.Update(func(s *CertificateUpsert) {
+		s.UpdateIssuedBy()
+	})
+}
+
+// SetCreated sets the "created" field.
+func (u *CertificateUpsertBulk) SetCreated(v time.Time) *CertificateUpsertBulk {
+	return u.Update(func(s *CertificateUpsert) {
+		s.SetCreated(v)
+	})
+}
+
+// UpdateCreated sets the "created" field to the value that was provided on create.
+func (u *CertificateUpsertBulk) UpdateCreated() *CertificateUpsertBulk {
+	return u.Update(func(s *CertificateUpsert) {
+		s.UpdateCreated()
+	})
+}
+
+// ClearCreated clears the value of the "created" field.
+func (u *CertificateUpsertBulk) ClearCreated() *CertificateUpsertBulk {
+	return u.Update(func(s *CertificateUpsert) {
+		s.ClearCreated()
 	})
 }
 

@@ -18,6 +18,8 @@ var (
 		{Name: "common_name", Type: field.TypeString},
 		{Name: "not_before", Type: field.TypeTime, Nullable: true},
 		{Name: "not_after", Type: field.TypeTime, Nullable: true},
+		{Name: "issued_by", Type: field.TypeString},
+		{Name: "created", Type: field.TypeTime, Nullable: true},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"Invalid", "Requested", "Approved", "Declined", "Applied", "Issued", "Revoked", "Expired", "Replaced", "Rejected", "Unmanaged", "SAApproved", "Init"}, Default: "Invalid"},
 	}
 	// CertificatesTable holds the schema information for the "certificates" table.

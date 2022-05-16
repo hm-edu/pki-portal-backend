@@ -84,7 +84,7 @@ require (
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
-	github.com/hm-edu/portal-apis v0.0.0-20220423043142-0bc86b4fe28e
+	github.com/hm-edu/portal-apis v0.0.0-20220516043247-61d4a62c4d0a
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.32.0 // indirect
 	go.opentelemetry.io/otel v1.7.0
 	go.opentelemetry.io/otel/sdk v1.7.0 // indirect

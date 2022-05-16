@@ -128,6 +128,32 @@ func (cu *CertificateUpdate) ClearNotAfter() *CertificateUpdate {
 	return cu
 }
 
+// SetIssuedBy sets the "issuedBy" field.
+func (cu *CertificateUpdate) SetIssuedBy(s string) *CertificateUpdate {
+	cu.mutation.SetIssuedBy(s)
+	return cu
+}
+
+// SetCreated sets the "created" field.
+func (cu *CertificateUpdate) SetCreated(t time.Time) *CertificateUpdate {
+	cu.mutation.SetCreated(t)
+	return cu
+}
+
+// SetNillableCreated sets the "created" field if the given value is not nil.
+func (cu *CertificateUpdate) SetNillableCreated(t *time.Time) *CertificateUpdate {
+	if t != nil {
+		cu.SetCreated(*t)
+	}
+	return cu
+}
+
+// ClearCreated clears the value of the "created" field.
+func (cu *CertificateUpdate) ClearCreated() *CertificateUpdate {
+	cu.mutation.ClearCreated()
+	return cu
+}
+
 // SetStatus sets the "status" field.
 func (cu *CertificateUpdate) SetStatus(c certificate.Status) *CertificateUpdate {
 	cu.mutation.SetStatus(c)
@@ -364,6 +390,26 @@ func (cu *CertificateUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: certificate.FieldNotAfter,
 		})
 	}
+	if value, ok := cu.mutation.IssuedBy(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: certificate.FieldIssuedBy,
+		})
+	}
+	if value, ok := cu.mutation.Created(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: certificate.FieldCreated,
+		})
+	}
+	if cu.mutation.CreatedCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: certificate.FieldCreated,
+		})
+	}
 	if value, ok := cu.mutation.Status(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeEnum,
@@ -540,6 +586,32 @@ func (cuo *CertificateUpdateOne) SetNillableNotAfter(t *time.Time) *CertificateU
 // ClearNotAfter clears the value of the "notAfter" field.
 func (cuo *CertificateUpdateOne) ClearNotAfter() *CertificateUpdateOne {
 	cuo.mutation.ClearNotAfter()
+	return cuo
+}
+
+// SetIssuedBy sets the "issuedBy" field.
+func (cuo *CertificateUpdateOne) SetIssuedBy(s string) *CertificateUpdateOne {
+	cuo.mutation.SetIssuedBy(s)
+	return cuo
+}
+
+// SetCreated sets the "created" field.
+func (cuo *CertificateUpdateOne) SetCreated(t time.Time) *CertificateUpdateOne {
+	cuo.mutation.SetCreated(t)
+	return cuo
+}
+
+// SetNillableCreated sets the "created" field if the given value is not nil.
+func (cuo *CertificateUpdateOne) SetNillableCreated(t *time.Time) *CertificateUpdateOne {
+	if t != nil {
+		cuo.SetCreated(*t)
+	}
+	return cuo
+}
+
+// ClearCreated clears the value of the "created" field.
+func (cuo *CertificateUpdateOne) ClearCreated() *CertificateUpdateOne {
+	cuo.mutation.ClearCreated()
 	return cuo
 }
 
@@ -801,6 +873,26 @@ func (cuo *CertificateUpdateOne) sqlSave(ctx context.Context) (_node *Certificat
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Column: certificate.FieldNotAfter,
+		})
+	}
+	if value, ok := cuo.mutation.IssuedBy(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: certificate.FieldIssuedBy,
+		})
+	}
+	if value, ok := cuo.mutation.Created(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: certificate.FieldCreated,
+		})
+	}
+	if cuo.mutation.CreatedCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: certificate.FieldCreated,
 		})
 	}
 	if value, ok := cuo.mutation.Status(); ok {

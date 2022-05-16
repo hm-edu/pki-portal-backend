@@ -313,11 +313,17 @@ const docTemplate = `{
                 "common_name": {
                     "type": "string"
                 },
+                "created": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
                 "expires": {
                     "$ref": "#/definitions/timestamppb.Timestamp"
                 },
                 "id": {
                     "type": "integer"
+                },
+                "issued_by": {
+                    "type": "string"
                 },
                 "notBefore": {
                     "$ref": "#/definitions/timestamppb.Timestamp"

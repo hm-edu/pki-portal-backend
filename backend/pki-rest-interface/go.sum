@@ -253,8 +253,8 @@ github.com/hashicorp/golang-lru v0.5.0/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ
 github.com/hashicorp/golang-lru v0.5.1/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ4Ao+sR/qLZy8=
 github.com/hashicorp/hcl v1.0.0 h1:0Anlzjpi4vEasTeNFn2mLJgTSwt0+6sfsiTG8qcWGx4=
 github.com/hashicorp/hcl v1.0.0/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T20WEQ=
-github.com/hm-edu/portal-apis v0.0.0-20220419103504-24320f185a74 h1:Od5XXyoSFT4IVwnaICgFeOGdUvcEfIfCKlxCG17rrgw=
-github.com/hm-edu/portal-apis v0.0.0-20220419103504-24320f185a74/go.mod h1:m5sljdCnWRuLK4HUFJaC+dz6WfRjg47gS47Yai5Wdrw=
+github.com/hm-edu/portal-apis v0.0.0-20220516043247-61d4a62c4d0a h1:AafmiLuINXO/cWL1rR1YWLnp+V2F7W434oBSJygcGfo=
+github.com/hm-edu/portal-apis v0.0.0-20220516043247-61d4a62c4d0a/go.mod h1:QojwCqAAoU0G/zBizlkIlHbdn5zFilZrh7Qm3+2xOUA=
 github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/ianlancetaylor/demangle v0.0.0-20200824232613-28f6c0f3b639/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NHg9XEKhtSvM=

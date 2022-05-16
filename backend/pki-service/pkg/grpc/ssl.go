@@ -130,6 +130,10 @@ func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequ
 		if x.NotBefore != nil {
 			nbf = timestamppb.New(*x.NotBefore)
 		}
+		var created *timestamppb.Timestamp
+		if x.Created != nil {
+			created = timestamppb.New(*x.Created)
+		}
 		return &pb.SslCertificateDetails{
 			Id:                      int32(x.SslId),
 			CommonName:              x.CommonName,
@@ -138,6 +142,8 @@ func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequ
 			Expires:                 timestamppb.New(x.NotAfter),
 			NotBefore:               nbf,
 			Status:                  string(x.Status),
+			IssuedBy:                x.IssuedBy,
+			Created:                 created,
 		}
 	})}, nil
 }
@@ -199,6 +205,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 
 	entry, err := s.db.Certificate.Create().
 		SetCommonName(sans[0]).
+		SetIssuedBy(req.Issuer).
 		AddDomainIDs(ids...).
 		Save(ctx)
 
@@ -237,6 +244,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		SetStatus(certificate.StatusIssued).
 		SetNotAfter(pem.NotAfter).
 		SetNotBefore(pem.NotBefore).
+		SetCreated(stop).
 		Save(ctx)
 
 	if err != nil {

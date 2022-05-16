@@ -142,6 +142,20 @@ func NotAfter(v time.Time) predicate.Certificate {
 	})
 }
 
+// IssuedBy applies equality check predicate on the "issuedBy" field. It's identical to IssuedByEQ.
+func IssuedBy(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldIssuedBy), v))
+	})
+}
+
+// Created applies equality check predicate on the "created" field. It's identical to CreatedEQ.
+func Created(v time.Time) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldCreated), v))
+	})
+}
+
 // CreateTimeEQ applies the EQ predicate on the "create_time" field.
 func CreateTimeEQ(v time.Time) predicate.Certificate {
 	return predicate.Certificate(func(s *sql.Selector) {
@@ -797,6 +811,207 @@ func NotAfterIsNil() predicate.Certificate {
 func NotAfterNotNil() predicate.Certificate {
 	return predicate.Certificate(func(s *sql.Selector) {
 		s.Where(sql.NotNull(s.C(FieldNotAfter)))
+	})
+}
+
+// IssuedByEQ applies the EQ predicate on the "issuedBy" field.
+func IssuedByEQ(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldIssuedBy), v))
+	})
+}
+
+// IssuedByNEQ applies the NEQ predicate on the "issuedBy" field.
+func IssuedByNEQ(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldIssuedBy), v))
+	})
+}
+
+// IssuedByIn applies the In predicate on the "issuedBy" field.
+func IssuedByIn(vs ...string) predicate.Certificate {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Certificate(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldIssuedBy), v...))
+	})
+}
+
+// IssuedByNotIn applies the NotIn predicate on the "issuedBy" field.
+func IssuedByNotIn(vs ...string) predicate.Certificate {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Certificate(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldIssuedBy), v...))
+	})
+}
+
+// IssuedByGT applies the GT predicate on the "issuedBy" field.
+func IssuedByGT(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldIssuedBy), v))
+	})
+}
+
+// IssuedByGTE applies the GTE predicate on the "issuedBy" field.
+func IssuedByGTE(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldIssuedBy), v))
+	})
+}
+
+// IssuedByLT applies the LT predicate on the "issuedBy" field.
+func IssuedByLT(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldIssuedBy), v))
+	})
+}
+
+// IssuedByLTE applies the LTE predicate on the "issuedBy" field.
+func IssuedByLTE(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldIssuedBy), v))
+	})
+}
+
+// IssuedByContains applies the Contains predicate on the "issuedBy" field.
+func IssuedByContains(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldIssuedBy), v))
+	})
+}
+
+// IssuedByHasPrefix applies the HasPrefix predicate on the "issuedBy" field.
+func IssuedByHasPrefix(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldIssuedBy), v))
+	})
+}
+
+// IssuedByHasSuffix applies the HasSuffix predicate on the "issuedBy" field.
+func IssuedByHasSuffix(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldIssuedBy), v))
+	})
+}
+
+// IssuedByEqualFold applies the EqualFold predicate on the "issuedBy" field.
+func IssuedByEqualFold(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldIssuedBy), v))
+	})
+}
+
+// IssuedByContainsFold applies the ContainsFold predicate on the "issuedBy" field.
+func IssuedByContainsFold(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldIssuedBy), v))
+	})
+}
+
+// CreatedEQ applies the EQ predicate on the "created" field.
+func CreatedEQ(v time.Time) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldCreated), v))
+	})
+}
+
+// CreatedNEQ applies the NEQ predicate on the "created" field.
+func CreatedNEQ(v time.Time) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldCreated), v))
+	})
+}
+
+// CreatedIn applies the In predicate on the "created" field.
+func CreatedIn(vs ...time.Time) predicate.Certificate {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Certificate(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldCreated), v...))
+	})
+}
+
+// CreatedNotIn applies the NotIn predicate on the "created" field.
+func CreatedNotIn(vs ...time.Time) predicate.Certificate {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Certificate(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldCreated), v...))
+	})
+}
+
+// CreatedGT applies the GT predicate on the "created" field.
+func CreatedGT(v time.Time) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldCreated), v))
+	})
+}
+
+// CreatedGTE applies the GTE predicate on the "created" field.
+func CreatedGTE(v time.Time) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldCreated), v))
+	})
+}
+
+// CreatedLT applies the LT predicate on the "created" field.
+func CreatedLT(v time.Time) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldCreated), v))
+	})
+}
+
+// CreatedLTE applies the LTE predicate on the "created" field.
+func CreatedLTE(v time.Time) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldCreated), v))
+	})
+}
+
+// CreatedIsNil applies the IsNil predicate on the "created" field.
+func CreatedIsNil() predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldCreated)))
+	})
+}
+
+// CreatedNotNil applies the NotNil predicate on the "created" field.
+func CreatedNotNil() predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldCreated)))
 	})
 }
 
