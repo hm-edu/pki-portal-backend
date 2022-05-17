@@ -46,7 +46,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.7.0
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
-	golang.org/x/net v0.0.0-20220513224357-95641704303c // indirect
+	golang.org/x/net v0.0.0-20220516155154-20f960328961 // indirect
 	golang.org/x/sys v0.0.0-20220513210249-45d2b4557a2a // indirect
 	golang.org/x/text v0.3.8-0.20211004125949-5bd84dd9b33b // indirect
 	golang.org/x/tools v0.1.10 // indirect
@@ -58,7 +58,7 @@ require (
 require (
 	entgo.io/ent v0.10.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.1-0.20190118093823-f849b5445de4
-	github.com/hm-edu/portal-apis v0.0.0-20220516061919-a4ea5ed352fe
+	github.com/hm-edu/portal-apis v0.0.0-20220517041651-934dc36f0473
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/lestrrat-go/jwx v1.2.24
 	github.com/smallstep/nosql v0.4.0
@@ -169,4 +169,4 @@ replace github.com/hm-edu/portal-common => ../common
 
 replace github.com/smallstep/nosql => github.com/hm-edu/nosql v0.4.1-0.20220510094234-1fbe0ffbb194
 
-replace github.com/smallstep/certificates => github.com/hm-edu/certificates v0.0.0-20220514050812-781013b4a009
+replace github.com/smallstep/certificates => github.com/hm-edu/certificates v0.0.0-20220517045123-d0ead780acbf

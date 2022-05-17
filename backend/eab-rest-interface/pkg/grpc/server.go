@@ -21,8 +21,9 @@ import (
 
 // Server is the basic structure of the GRPC server.
 type Server struct {
-	logger *zap.Logger
-	config *Config
+	logger        *zap.Logger
+	config        *Config
+	provisionerID string
 }
 
 // Config is the basic structure of the GRPC configuration
@@ -33,10 +34,11 @@ type Config struct {
 }
 
 // NewServer creates a new GRPC server
-func NewServer(config *Config, logger *zap.Logger) (*Server, error) {
+func NewServer(config *Config, logger *zap.Logger, provisionerID string) (*Server, error) {
 	srv := &Server{
-		logger: logger,
-		config: config,
+		logger:        logger,
+		config:        config,
+		provisionerID: provisionerID,
 	}
 
 	return srv, nil
@@ -62,7 +64,7 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 		s.logger.Fatal("failed to create domain client", zap.Error(err))
 	}
 
-	api := newEabAPIServer(domainClient, s.logger)
+	api := newEabAPIServer(domainClient, s.logger, s.provisionerID)
 	pb.RegisterEABServiceServer(srv, api)
 	grpc_health_v1.RegisterHealthServer(srv, server)
 	server.SetServingStatus(s.config.ServiceName, grpc_health_v1.HealthCheckResponse_SERVING)

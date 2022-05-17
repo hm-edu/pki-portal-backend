@@ -22,11 +22,39 @@ type eabAPIServer struct {
 	domainService pb.DomainServiceClient
 	logger        *zap.Logger
 	tracer        trace.Tracer
+	provisionerID string
 }
 
-func newEabAPIServer(domainService pb.DomainServiceClient, logger *zap.Logger) *eabAPIServer {
+func newEabAPIServer(domainService pb.DomainServiceClient, logger *zap.Logger, provisionerID string) *eabAPIServer {
 	tracer := otel.GetTracerProvider().Tracer("eab")
-	return &eabAPIServer{domainService: domainService, logger: logger, tracer: tracer}
+	return &eabAPIServer{domainService: domainService, logger: logger, tracer: tracer, provisionerID: provisionerID}
+}
+
+// ResolveAccountId resolves the user using the provided account id and returns the EAB ID and the username.
+func (api *eabAPIServer) ResolveAccountId(ctx context.Context, req *pb.ResolveAccountIdRequest) (*pb.ResolveAccountIdResponse, error) { // nolint
+	ctx, span := api.tracer.Start(ctx, "CheckEABPermissions")
+	defer span.End()
+	eak, err := database.DB.NoSQL.GetExternalAccountKeyByAccountID(ctx, api.provisionerID, req.AccountId)
+	if err != nil {
+		span.RecordError(err)
+		span.AddEvent("Error looking up user")
+		api.logger.Error("Error looking up user", zap.String("acc", req.AccountId), zap.Error(err))
+		return nil, status.Error(codes.Internal, "Error looking up user")
+	}
+	key, err := database.DB.Db.EABKey.Query().Where(eabkey.EabKey(eak.ID)).First(ctx)
+
+	if err != nil {
+		if _, ok := err.(*ent.NotFoundError); ok {
+			span.AddEvent("Key not found")
+			api.logger.Warn("Key not found", zap.String("key", eak.ID), zap.Error(err))
+			return nil, status.Error(codes.Unauthenticated, "Key not found")
+		}
+		span.RecordError(err)
+		span.AddEvent("Error looking up user")
+		api.logger.Error("Error looking up user", zap.String("key", eak.ID), zap.Error(err))
+		return nil, status.Error(codes.Internal, "Error looking up user")
+	}
+	return &pb.ResolveAccountIdResponse{User: key.User, EabKey: eak.ID}, nil
 }
 
 // CheckEABPermissions resolves the user and validates the issue permission for the requested domains.
@@ -40,12 +68,12 @@ func (api *eabAPIServer) CheckEABPermissions(ctx context.Context, req *pb.CheckE
 	if err != nil {
 		if _, ok := err.(*ent.NotFoundError); ok {
 			span.AddEvent("Key not found")
-			api.logger.Warn("Key not found", zap.String("key", key.EabKey), zap.Error(err))
+			api.logger.Warn("Key not found", zap.String("key", req.EabKey), zap.Error(err))
 			return nil, status.Error(codes.Unauthenticated, "Key not found")
 		}
 		span.RecordError(err)
 		span.AddEvent("Error looking up user")
-		api.logger.Error("Error looking up user", zap.String("key", key.EabKey), zap.Error(err))
+		api.logger.Error("Error looking up user", zap.String("key", req.EabKey), zap.Error(err))
 		return nil, status.Error(codes.Internal, "Error looking up user")
 	}
 

@@ -45,15 +45,15 @@ var runCmd = &cobra.Command{
 		}()
 
 		stopCh := signals.SetupSignalHandler()
-
+		prov := viper.GetString("provisioner_id")
 		// start gRPC server
 		if grpcCfg.Port > 0 {
-			grpcSrv, _ := grpc.NewServer(&grpcCfg, logger)
+			grpcSrv, _ := grpc.NewServer(&grpcCfg, logger, prov)
 			go grpcSrv.ListenAndServe(stopCh)
 		}
 
 		// start HTTP server
-		srv := api.NewServer(logger, &srvCfg, viper.GetString("provisioner_id"))
+		srv := api.NewServer(logger, &srvCfg, prov)
 		srv.ListenAndServe(stopCh)
 	},
 }
