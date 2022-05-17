@@ -19,7 +19,6 @@ import (
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/helper"
 	"github.com/hm-edu/sectigo-client/sectigo"
-	"github.com/hm-edu/sectigo-client/sectigo/ssl"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -120,7 +119,12 @@ func (s *sslAPIServer) CertificateDetails(ctx context.Context, req *pb.Certifica
 }
 
 func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequest) (*pb.ListSslResponse, error) {
-	certificates, err := s.db.Certificate.Query().WithDomains().Where(certificate.HasDomainsWith(domain.FqdnIn(req.Domains...))).All(ctx)
+
+	certificates, err := s.db.Certificate.Query().WithDomains().Where(
+		certificate.And(
+			certificate.HasDomainsWith(domain.FqdnIn(req.Domains...)),
+			certificate.Not(certificate.HasDomainsWith(domain.FqdnNotIn(req.Domains...))))).
+		All(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "Error querying certificates")
 	}
@@ -254,33 +258,6 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	if err != nil {
 		return s.handleError("Error while saving collected certificate", span, err)
 	}
-
-	go func() {
-		err := helper.WaitFor(10*time.Minute, 10*time.Second, func() (bool, error) {
-			data, _, err := s.client.SslService.List(&ssl.ListSSLRequest{SerialNumber: serial})
-			if err != nil {
-				s.logger.Error("Error while listing certificates", zap.Error(err))
-				return false, err
-			}
-			if len(*data) == 0 {
-				s.logger.Debug("No certificates found")
-				return false, nil
-			}
-			cert := (*data)[0]
-			_, err = s.db.Certificate.UpdateOneID(entry.ID).SetSslId(cert.SslID).Save(context.Background())
-			if err != nil {
-				s.logger.Error("Error while updating certificate", zap.Error(err))
-				return true, err
-			}
-			return true, nil
-		})
-		if err != nil {
-			s.logger.Error("Error while extending information for certificate",
-				zap.String("certificate", serial),
-				zap.Error(err))
-		}
-
-	}()
 
 	return &pb.IssueSslResponse{Certificate: flattenCertificates(certs)}, nil
 }

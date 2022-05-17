@@ -59,6 +59,7 @@ var runCmd = &cobra.Command{
 		// start HTTP server
 		srv := api.NewServer(logger, &srvCfg, &handlerCfg)
 		srv.ListenAndServe(stopCh)
+
 	},
 }
 

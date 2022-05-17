@@ -19,8 +19,8 @@ type Syncer struct {
 	Db     *ent.Client
 }
 
-// SyncCertificates downloads all available information from the Sectigo API and stores it in the database.
-func (s *Syncer) SyncCertificates() {
+// SyncAllCertificates downloads all available information from the Sectigo API and stores it in the database.
+func (s *Syncer) SyncAllCertificates() {
 	logger := zap.L()
 	ctx := context.Background()
 	certs, certificates, err := s.Client.SslService.List(&ssl.ListSSLRequest{Size: 200})
@@ -111,5 +111,39 @@ func (s *Syncer) SyncCertificates() {
 			return
 		}
 	}
+
+}
+
+// SyncPendingCertificates downloads all available information from the Sectigo API and stores it in the database.
+func (s *Syncer) SyncPendingCertificates() {
+	logger := zap.L()
+	certs, err := s.Db.Certificate.Query().Where(certificate.SslIdIsNil()).All(context.Background())
+
+	if err != nil {
+		logger.Fatal("Error while listing certificates", zap.Error(err))
+		return
+	}
+	var wg sync.WaitGroup
+	for _, cert := range certs {
+		wg.Add(1)
+		go func(cert *ent.Certificate) {
+			defer wg.Done()
+			data, _, err := s.Client.SslService.List(&ssl.ListSSLRequest{SerialNumber: cert.Serial})
+			if err != nil {
+				logger.Error("Error while listing certificates", zap.Error(err), zap.String("serial", cert.Serial))
+				return
+			}
+			if len(*data) == 0 {
+				logger.Debug("No certificates found", zap.String("serial", cert.Serial))
+				return
+			}
+			item := (*data)[0]
+			_, err = s.Db.Certificate.UpdateOneID(cert.ID).SetSslId(item.SslID).Save(context.Background())
+			if err != nil {
+				logger.Error("Error while updating certificate", zap.Error(err), zap.String("serial", cert.Serial))
+			}
+		}(cert)
+	}
+	wg.Wait()
 
 }
