@@ -31,7 +31,7 @@ type Certificate struct {
 	// NotAfter holds the value of the "notAfter" field.
 	NotAfter time.Time `json:"notAfter,omitempty"`
 	// IssuedBy holds the value of the "issuedBy" field.
-	IssuedBy string `json:"issuedBy,omitempty"`
+	IssuedBy *string `json:"issuedBy,omitempty"`
 	// Created holds the value of the "created" field.
 	Created *time.Time `json:"created,omitempty"`
 	// Status holds the value of the "status" field.
@@ -138,7 +138,8 @@ func (c *Certificate) assignValues(columns []string, values []interface{}) error
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field issuedBy", values[i])
 			} else if value.Valid {
-				c.IssuedBy = value.String
+				c.IssuedBy = new(string)
+				*c.IssuedBy = value.String
 			}
 		case certificate.FieldCreated:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -202,8 +203,10 @@ func (c *Certificate) String() string {
 	}
 	builder.WriteString(", notAfter=")
 	builder.WriteString(c.NotAfter.Format(time.ANSIC))
-	builder.WriteString(", issuedBy=")
-	builder.WriteString(c.IssuedBy)
+	if v := c.IssuedBy; v != nil {
+		builder.WriteString(", issuedBy=")
+		builder.WriteString(*v)
+	}
 	if v := c.Created; v != nil {
 		builder.WriteString(", created=")
 		builder.WriteString(v.Format(time.ANSIC))

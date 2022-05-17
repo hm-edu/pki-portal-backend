@@ -495,7 +495,7 @@ func (m *CertificateMutation) IssuedBy() (r string, exists bool) {
 // OldIssuedBy returns the old "issuedBy" field's value of the Certificate entity.
 // If the Certificate object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CertificateMutation) OldIssuedBy(ctx context.Context) (v string, err error) {
+func (m *CertificateMutation) OldIssuedBy(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldIssuedBy is only allowed on UpdateOne operations")
 	}
@@ -509,9 +509,22 @@ func (m *CertificateMutation) OldIssuedBy(ctx context.Context) (v string, err er
 	return oldValue.IssuedBy, nil
 }
 
+// ClearIssuedBy clears the value of the "issuedBy" field.
+func (m *CertificateMutation) ClearIssuedBy() {
+	m.issuedBy = nil
+	m.clearedFields[certificate.FieldIssuedBy] = struct{}{}
+}
+
+// IssuedByCleared returns if the "issuedBy" field was cleared in this mutation.
+func (m *CertificateMutation) IssuedByCleared() bool {
+	_, ok := m.clearedFields[certificate.FieldIssuedBy]
+	return ok
+}
+
 // ResetIssuedBy resets all changes to the "issuedBy" field.
 func (m *CertificateMutation) ResetIssuedBy() {
 	m.issuedBy = nil
+	delete(m.clearedFields, certificate.FieldIssuedBy)
 }
 
 // SetCreated sets the "created" field.
@@ -896,6 +909,9 @@ func (m *CertificateMutation) ClearedFields() []string {
 	if m.FieldCleared(certificate.FieldNotAfter) {
 		fields = append(fields, certificate.FieldNotAfter)
 	}
+	if m.FieldCleared(certificate.FieldIssuedBy) {
+		fields = append(fields, certificate.FieldIssuedBy)
+	}
 	if m.FieldCleared(certificate.FieldCreated) {
 		fields = append(fields, certificate.FieldCreated)
 	}
@@ -924,6 +940,9 @@ func (m *CertificateMutation) ClearField(name string) error {
 		return nil
 	case certificate.FieldNotAfter:
 		m.ClearNotAfter()
+		return nil
+	case certificate.FieldIssuedBy:
+		m.ClearIssuedBy()
 		return nil
 	case certificate.FieldCreated:
 		m.ClearCreated()

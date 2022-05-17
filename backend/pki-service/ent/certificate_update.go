@@ -134,6 +134,20 @@ func (cu *CertificateUpdate) SetIssuedBy(s string) *CertificateUpdate {
 	return cu
 }
 
+// SetNillableIssuedBy sets the "issuedBy" field if the given value is not nil.
+func (cu *CertificateUpdate) SetNillableIssuedBy(s *string) *CertificateUpdate {
+	if s != nil {
+		cu.SetIssuedBy(*s)
+	}
+	return cu
+}
+
+// ClearIssuedBy clears the value of the "issuedBy" field.
+func (cu *CertificateUpdate) ClearIssuedBy() *CertificateUpdate {
+	cu.mutation.ClearIssuedBy()
+	return cu
+}
+
 // SetCreated sets the "created" field.
 func (cu *CertificateUpdate) SetCreated(t time.Time) *CertificateUpdate {
 	cu.mutation.SetCreated(t)
@@ -397,6 +411,12 @@ func (cu *CertificateUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: certificate.FieldIssuedBy,
 		})
 	}
+	if cu.mutation.IssuedByCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: certificate.FieldIssuedBy,
+		})
+	}
 	if value, ok := cu.mutation.Created(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -592,6 +612,20 @@ func (cuo *CertificateUpdateOne) ClearNotAfter() *CertificateUpdateOne {
 // SetIssuedBy sets the "issuedBy" field.
 func (cuo *CertificateUpdateOne) SetIssuedBy(s string) *CertificateUpdateOne {
 	cuo.mutation.SetIssuedBy(s)
+	return cuo
+}
+
+// SetNillableIssuedBy sets the "issuedBy" field if the given value is not nil.
+func (cuo *CertificateUpdateOne) SetNillableIssuedBy(s *string) *CertificateUpdateOne {
+	if s != nil {
+		cuo.SetIssuedBy(*s)
+	}
+	return cuo
+}
+
+// ClearIssuedBy clears the value of the "issuedBy" field.
+func (cuo *CertificateUpdateOne) ClearIssuedBy() *CertificateUpdateOne {
+	cuo.mutation.ClearIssuedBy()
 	return cuo
 }
 
@@ -879,6 +913,12 @@ func (cuo *CertificateUpdateOne) sqlSave(ctx context.Context) (_node *Certificat
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Value:  value,
+			Column: certificate.FieldIssuedBy,
+		})
+	}
+	if cuo.mutation.IssuedByCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
 			Column: certificate.FieldIssuedBy,
 		})
 	}

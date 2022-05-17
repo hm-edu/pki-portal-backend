@@ -134,6 +134,10 @@ func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequ
 		if x.Created != nil {
 			created = timestamppb.New(*x.Created)
 		}
+		issuedBy := ""
+		if x.IssuedBy != nil {
+			issuedBy = *x.IssuedBy
+		}
 		return &pb.SslCertificateDetails{
 			Id:                      int32(x.SslId),
 			CommonName:              x.CommonName,
@@ -142,7 +146,7 @@ func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequ
 			Expires:                 timestamppb.New(x.NotAfter),
 			NotBefore:               nbf,
 			Status:                  string(x.Status),
-			IssuedBy:                x.IssuedBy,
+			IssuedBy:                issuedBy,
 			Created:                 created,
 		}
 	})}, nil

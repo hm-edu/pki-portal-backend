@@ -119,6 +119,14 @@ func (cc *CertificateCreate) SetIssuedBy(s string) *CertificateCreate {
 	return cc
 }
 
+// SetNillableIssuedBy sets the "issuedBy" field if the given value is not nil.
+func (cc *CertificateCreate) SetNillableIssuedBy(s *string) *CertificateCreate {
+	if s != nil {
+		cc.SetIssuedBy(*s)
+	}
+	return cc
+}
+
 // SetCreated sets the "created" field.
 func (cc *CertificateCreate) SetCreated(t time.Time) *CertificateCreate {
 	cc.mutation.SetCreated(t)
@@ -272,9 +280,6 @@ func (cc *CertificateCreate) check() error {
 			return &ValidationError{Name: "commonName", err: fmt.Errorf(`ent: validator failed for field "Certificate.commonName": %w`, err)}
 		}
 	}
-	if _, ok := cc.mutation.IssuedBy(); !ok {
-		return &ValidationError{Name: "issuedBy", err: errors.New(`ent: missing required field "Certificate.issuedBy"`)}
-	}
 	if _, ok := cc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Certificate.status"`)}
 	}
@@ -373,7 +378,7 @@ func (cc *CertificateCreate) createSpec() (*Certificate, *sqlgraph.CreateSpec) {
 			Value:  value,
 			Column: certificate.FieldIssuedBy,
 		})
-		_node.IssuedBy = value
+		_node.IssuedBy = &value
 	}
 	if value, ok := cc.mutation.Created(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -587,6 +592,12 @@ func (u *CertificateUpsert) SetIssuedBy(v string) *CertificateUpsert {
 // UpdateIssuedBy sets the "issuedBy" field to the value that was provided on create.
 func (u *CertificateUpsert) UpdateIssuedBy() *CertificateUpsert {
 	u.SetExcluded(certificate.FieldIssuedBy)
+	return u
+}
+
+// ClearIssuedBy clears the value of the "issuedBy" field.
+func (u *CertificateUpsert) ClearIssuedBy() *CertificateUpsert {
+	u.SetNull(certificate.FieldIssuedBy)
 	return u
 }
 
@@ -811,6 +822,13 @@ func (u *CertificateUpsertOne) SetIssuedBy(v string) *CertificateUpsertOne {
 func (u *CertificateUpsertOne) UpdateIssuedBy() *CertificateUpsertOne {
 	return u.Update(func(s *CertificateUpsert) {
 		s.UpdateIssuedBy()
+	})
+}
+
+// ClearIssuedBy clears the value of the "issuedBy" field.
+func (u *CertificateUpsertOne) ClearIssuedBy() *CertificateUpsertOne {
+	return u.Update(func(s *CertificateUpsert) {
+		s.ClearIssuedBy()
 	})
 }
 
@@ -1204,6 +1222,13 @@ func (u *CertificateUpsertBulk) SetIssuedBy(v string) *CertificateUpsertBulk {
 func (u *CertificateUpsertBulk) UpdateIssuedBy() *CertificateUpsertBulk {
 	return u.Update(func(s *CertificateUpsert) {
 		s.UpdateIssuedBy()
+	})
+}
+
+// ClearIssuedBy clears the value of the "issuedBy" field.
+func (u *CertificateUpsertBulk) ClearIssuedBy() *CertificateUpsertBulk {
+	return u.Update(func(s *CertificateUpsert) {
+		s.ClearIssuedBy()
 	})
 }
 

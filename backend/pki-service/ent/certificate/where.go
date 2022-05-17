@@ -911,6 +911,20 @@ func IssuedByHasSuffix(v string) predicate.Certificate {
 	})
 }
 
+// IssuedByIsNil applies the IsNil predicate on the "issuedBy" field.
+func IssuedByIsNil() predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldIssuedBy)))
+	})
+}
+
+// IssuedByNotNil applies the NotNil predicate on the "issuedBy" field.
+func IssuedByNotNil() predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldIssuedBy)))
+	})
+}
+
 // IssuedByEqualFold applies the EqualFold predicate on the "issuedBy" field.
 func IssuedByEqualFold(v string) predicate.Certificate {
 	return predicate.Certificate(func(s *sql.Selector) {
