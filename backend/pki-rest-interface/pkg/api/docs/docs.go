@@ -325,7 +325,7 @@ const docTemplate = `{
                 "issued_by": {
                     "type": "string"
                 },
-                "notBefore": {
+                "not_before": {
                     "$ref": "#/definitions/timestamppb.Timestamp"
                 },
                 "serial": {
