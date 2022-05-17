@@ -110,7 +110,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 		v1.Use(jwtMiddleware)
 		v1.GET("/", h.GetExternalAccountKeys)
 		v1.POST("/", h.CreateNewKey)
-		v1.DELETE("/{id}", h.DeleteKey)
+		v1.DELETE("/:id", h.DeleteKey)
 	}
 
 }
