@@ -45,7 +45,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.7.0
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
-	golang.org/x/net v0.0.0-20220513224357-95641704303c // indirect
+	golang.org/x/net v0.0.0-20220517181318-183a9ca12b87 // indirect
 	golang.org/x/sys v0.0.0-20220513210249-45d2b4557a2a // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.10 // indirect
@@ -58,7 +58,7 @@ require (
 	entgo.io/ent v0.10.1
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
-	github.com/hm-edu/portal-apis v0.0.0-20220513172709-837817d5cc39
+	github.com/hm-edu/portal-apis v0.0.0-20220517182537-e93c840ce8e9
 	github.com/jackc/pgx/v4 v4.16.0
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/lestrrat-go/jwx v1.2.24

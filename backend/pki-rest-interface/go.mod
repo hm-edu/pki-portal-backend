@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/getkin/kin-openapi v0.94.0
-	github.com/hm-edu/portal-apis v0.0.0-20220517120621-3b42ca82ea71
+	github.com/hm-edu/portal-apis v0.0.0-20220517182537-e93c840ce8e9
 	github.com/hm-edu/portal-common v0.0.0-20220404094030-9bf17529d940
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/lestrrat-go/jwx v1.2.24
@@ -91,7 +91,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.7.0
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
-	golang.org/x/net v0.0.0-20220516155154-20f960328961 // indirect
+	golang.org/x/net v0.0.0-20220517181318-183a9ca12b87 // indirect
 	golang.org/x/sys v0.0.0-20220513210249-45d2b4557a2a // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.10 // indirect

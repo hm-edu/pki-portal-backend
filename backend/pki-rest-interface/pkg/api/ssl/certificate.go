@@ -37,7 +37,7 @@ func (h *Handler) List(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while listing certificates"}
 	}
 	span.AddEvent("fetching certificates")
-	certs, err := h.ssl.ListCertificates(ctx, &pb.ListSslRequest{Domains: domains.Domains})
+	certs, err := h.ssl.ListCertificates(ctx, &pb.ListSslRequest{IncludePartial: false, Domains: domains.Domains})
 	if err != nil {
 		h.logger.Error("Error while listing certificates", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while listing certificates"}

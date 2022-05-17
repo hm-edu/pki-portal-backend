@@ -64,7 +64,7 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string) ([]*model.D
 
 	filtered := helper.Where(approvedDomains, func(t *ent.Domain) bool { return t.Approved })
 
-	certificates, err := h.pkiService.ListCertificates(ctx, &pb.ListSslRequest{Domains: helper.Map(filtered, func(t *ent.Domain) string { return t.Fqdn })})
+	certificates, err := h.pkiService.ListCertificates(ctx, &pb.ListSslRequest{IncludePartial: true, Domains: helper.Map(filtered, func(t *ent.Domain) string { return t.Fqdn })})
 	if err != nil {
 		h.logger.Error("Listing certificates failed", zap.Error(err))
 		return nil, err
