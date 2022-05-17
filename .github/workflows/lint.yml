@@ -21,7 +21,7 @@ jobs:
         with:
           go-version: '1.18'
       - name: golangci-lint       
-        uses: golangci/golangci-lint-action@v3.1.0
+        uses: golangci/golangci-lint-action@v3.2.0
         with:
            working-directory: ${{ matrix.dir }}
            args: --timeout 240s
