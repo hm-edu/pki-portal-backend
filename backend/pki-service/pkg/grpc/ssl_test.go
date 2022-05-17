@@ -50,7 +50,7 @@ func TestListCertificates(t *testing.T) {
 		t.Error(err)
 	}
 	if len(ret.Items) != 3 {
-		t.Error("Expected 2 certificate, got", len(ret.Items))
+		t.Error("Expected 3 certificate, got", len(ret.Items))
 	}
 	ret, err = server.ListCertificates(context.TODO(), &pb.ListSslRequest{Domains: []string{"test.com"}})
 	if err != nil {
@@ -58,5 +58,12 @@ func TestListCertificates(t *testing.T) {
 	}
 	if len(ret.Items) != 1 {
 		t.Error("Expected 1 certificate, got", len(ret.Items))
+	}
+	ret, err = server.ListCertificates(context.TODO(), &pb.ListSslRequest{Domains: []string{"test.com"}, IncludePartial: true})
+	if err != nil {
+		t.Error(err)
+	}
+	if len(ret.Items) != 2 {
+		t.Error("Expected 2 certificate, got", len(ret.Items))
 	}
 }

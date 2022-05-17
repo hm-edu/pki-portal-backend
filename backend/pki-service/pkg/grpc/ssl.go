@@ -14,6 +14,7 @@ import (
 	"github.com/hm-edu/pki-service/ent"
 	"github.com/hm-edu/pki-service/ent/certificate"
 	"github.com/hm-edu/pki-service/ent/domain"
+	"github.com/hm-edu/pki-service/ent/predicate"
 	"github.com/hm-edu/pki-service/pkg/cfg"
 	pkiHelper "github.com/hm-edu/pki-service/pkg/helper"
 	pb "github.com/hm-edu/portal-apis"
@@ -120,11 +121,16 @@ func (s *sslAPIServer) CertificateDetails(ctx context.Context, req *pb.Certifica
 
 func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequest) (*pb.ListSslResponse, error) {
 
-	certificates, err := s.db.Certificate.Query().WithDomains().Where(
-		certificate.And(
+	var cond predicate.Certificate
+	if req.IncludePartial {
+		cond = certificate.HasDomainsWith(domain.FqdnIn(req.Domains...))
+	} else {
+		cond = certificate.And(
 			certificate.HasDomainsWith(domain.FqdnIn(req.Domains...)),
-			certificate.Not(certificate.HasDomainsWith(domain.FqdnNotIn(req.Domains...))))).
-		All(ctx)
+			certificate.Not(certificate.HasDomainsWith(domain.FqdnNotIn(req.Domains...))),
+		)
+	}
+	certificates, err := s.db.Certificate.Query().WithDomains().Where(cond).All(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "Error querying certificates")
 	}
