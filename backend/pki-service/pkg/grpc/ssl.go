@@ -37,6 +37,49 @@ import (
 
 var meter = global.MeterProvider().Meter("pki-service")
 
+func mapCertificate(x *ent.Certificate) *pb.SslCertificateDetails {
+
+	var nbf *timestamppb.Timestamp
+	if x.NotBefore != nil {
+		nbf = timestamppb.New(*x.NotBefore)
+	}
+	var created *timestamppb.Timestamp
+	if x.Created != nil {
+		created = timestamppb.New(*x.Created)
+	}
+	issuedBy := ""
+	if x.IssuedBy != nil {
+		issuedBy = *x.IssuedBy
+	}
+	return &pb.SslCertificateDetails{
+		Id:                      int32(x.SslId),
+		CommonName:              x.CommonName,
+		SubjectAlternativeNames: helper.Map(x.Edges.Domains, func(t *ent.Domain) string { return t.Fqdn }),
+		Serial:                  x.Serial,
+		Expires:                 timestamppb.New(x.NotAfter),
+		NotBefore:               nbf,
+		Status:                  string(x.Status),
+		IssuedBy:                issuedBy,
+		Created:                 created,
+	}
+}
+
+func flattenCertificates(certs []*x509.Certificate) string {
+	var result []byte
+	for _, cert := range certs {
+		c := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw})
+		result = append(result, c...)
+	}
+	return string(result)
+}
+
+func (s *sslAPIServer) handleError(msg string, span trace.Span, err error) (*pb.IssueSslResponse, error) {
+	span.RecordError(err)
+	span.AddEvent(msg)
+	s.logger.Error(msg, zap.Error(err))
+	return nil, status.Errorf(codes.Internal, msg)
+}
+
 type sslAPIServer struct {
 	pb.UnimplementedSSLServiceServer
 	client *sectigo.Client
@@ -105,18 +148,7 @@ func (s *sslAPIServer) CertificateDetails(ctx context.Context, req *pb.Certifica
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "Certificate not found")
 	}
-	var nbf *timestamppb.Timestamp
-	if x.NotBefore != nil {
-		nbf = timestamppb.New(*x.NotBefore)
-	}
-	return &pb.SslCertificateDetails{
-		Id:                      int32(x.SslId),
-		CommonName:              x.CommonName,
-		SubjectAlternativeNames: helper.Map(x.Edges.Domains, func(t *ent.Domain) string { return t.Fqdn }),
-		Serial:                  x.Serial,
-		Expires:                 timestamppb.New(x.NotAfter),
-		NotBefore:               nbf,
-	}, nil
+	return mapCertificate(x), nil
 }
 
 func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequest) (*pb.ListSslResponse, error) {
@@ -134,32 +166,7 @@ func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequ
 	if err != nil {
 		return nil, status.Error(codes.Internal, "Error querying certificates")
 	}
-	return &pb.ListSslResponse{Items: helper.Map(certificates, func(x *ent.Certificate) *pb.SslCertificateDetails {
-
-		var nbf *timestamppb.Timestamp
-		if x.NotBefore != nil {
-			nbf = timestamppb.New(*x.NotBefore)
-		}
-		var created *timestamppb.Timestamp
-		if x.Created != nil {
-			created = timestamppb.New(*x.Created)
-		}
-		issuedBy := ""
-		if x.IssuedBy != nil {
-			issuedBy = *x.IssuedBy
-		}
-		return &pb.SslCertificateDetails{
-			Id:                      int32(x.SslId),
-			CommonName:              x.CommonName,
-			SubjectAlternativeNames: helper.Map(x.Edges.Domains, func(t *ent.Domain) string { return t.Fqdn }),
-			Serial:                  x.Serial,
-			Expires:                 timestamppb.New(x.NotAfter),
-			NotBefore:               nbf,
-			Status:                  string(x.Status),
-			IssuedBy:                issuedBy,
-			Created:                 created,
-		}
-	})}, nil
+	return &pb.ListSslResponse{Items: helper.Map(certificates, mapCertificate)}, nil
 }
 
 func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslRequest) (*pb.IssueSslResponse, error) {
@@ -268,22 +275,6 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	return &pb.IssueSslResponse{Certificate: flattenCertificates(certs)}, nil
 }
 
-func flattenCertificates(certs []*x509.Certificate) string {
-	var result []byte
-	for _, cert := range certs {
-		c := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw})
-		result = append(result, c...)
-	}
-	return string(result)
-}
-
-func (s *sslAPIServer) handleError(msg string, span trace.Span, err error) (*pb.IssueSslResponse, error) {
-	span.RecordError(err)
-	span.AddEvent(msg)
-	s.logger.Error(msg, zap.Error(err))
-	return nil, status.Errorf(codes.Internal, msg)
-}
-
 func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslRequest) (*emptypb.Empty, error) {
 
 	errorReturn := func(err error) (*emptypb.Empty, error) {
@@ -295,7 +286,15 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 	case *pb.RevokeSslRequest_Serial:
 		serial := req.GetSerial()
 		s.logger.Info("Revoking certificate by serial", zap.String("serial", serial))
-		err := s.client.SslService.Revoke(serial, req.Reason)
+		c, err := s.db.Certificate.Query().Where(certificate.Serial(serial)).First(ctx)
+		if err != nil {
+			return errorReturn(err)
+		}
+		err = s.client.SslService.Revoke(serial, req.Reason)
+		if err != nil {
+			return errorReturn(err)
+		}
+		_, err = s.db.Certificate.UpdateOneID(c.ID).SetStatus(certificate.StatusRevoked).Save(ctx)
 		if err != nil {
 			return errorReturn(err)
 		}
