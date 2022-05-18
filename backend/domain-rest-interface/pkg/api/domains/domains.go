@@ -102,8 +102,13 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string) ([]*model.D
 			})
 			if len(matchingCerts) > 0 {
 				for _, cert := range matchingCerts {
+					if cert.Id == 0 {
+						h.logger.Info("Certificate has no ID; Denying deletion of domain.", zap.String("serial", cert.Serial), zap.String("domain", domain.Fqdn), zap.String("user", user))
+						item.Permissions.CanDelete = false
+					}
 					for _, name := range cert.SubjectAlternativeNames {
 						if !helper.Any(filtered, func(i *ent.Domain) bool { return i.Fqdn == name }) {
+							h.logger.Info("Certificate has SAN without grant for user; Denying deletion of domain.", zap.String("serial", cert.Serial), zap.String("domain", domain.Fqdn), zap.String("san", name), zap.String("user", user))
 							item.Permissions.CanDelete = false
 							break
 						}

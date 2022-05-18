@@ -7,9 +7,12 @@ import (
 	"github.com/hm-edu/pki-service/ent"
 	"github.com/hm-edu/pki-service/ent/certificate"
 	"github.com/hm-edu/pki-service/ent/domain"
-	"github.com/hm-edu/pki-service/pkg/helper"
+	"github.com/hm-edu/portal-common/helper"
+
+	pkiHelper "github.com/hm-edu/pki-service/pkg/helper"
 	"github.com/hm-edu/sectigo-client/sectigo"
 	"github.com/hm-edu/sectigo-client/sectigo/ssl"
+
 	"go.uber.org/zap"
 )
 
@@ -48,7 +51,7 @@ func (s *Syncer) SyncAllCertificates() {
 						logger.Error("Error while collecting certificate", zap.Error(err), zap.Int("id", item.SslID))
 						return
 					}
-					certs, err := helper.ParseCertificates([]byte(*cert))
+					certs, err := pkiHelper.ParseCertificates([]byte(*cert))
 					if err != nil {
 						logger.Error("Error while parsing certificate", zap.Error(err), zap.Int("id", item.SslID))
 						return
@@ -84,7 +87,7 @@ func (s *Syncer) SyncAllCertificates() {
 				ids = append(ids, id)
 			}
 
-			creator := s.Db.Certificate.Create().SetCommonName(item.CommonName).SetSslId(item.SslID).SetNotAfter(item.Expires.Time).SetSerial(helper.NormalizeSerial(item.SerialNumber))
+			creator := s.Db.Certificate.Create().SetCommonName(item.CommonName).SetSslId(item.SslID).SetNotAfter(item.Expires.Time).SetSerial(pkiHelper.NormalizeSerial(item.SerialNumber))
 
 			if item.Requested != nil {
 				creator.SetNotBefore(item.Requested.Time)
@@ -117,6 +120,7 @@ func (s *Syncer) SyncAllCertificates() {
 // SyncPendingCertificates downloads all available information from the Sectigo API and stores it in the database.
 func (s *Syncer) SyncPendingCertificates() {
 	logger := zap.L()
+	logger.Info("Syncing pending certificates")
 	certs, err := s.Db.Certificate.Query().Where(certificate.SslIdIsNil()).All(context.Background())
 
 	if err != nil {
@@ -124,6 +128,7 @@ func (s *Syncer) SyncPendingCertificates() {
 		return
 	}
 	var wg sync.WaitGroup
+	logger.Info("Got pending certificates", zap.Int("count", len(certs)), zap.Strings("certificates", helper.Map(certs, func(cert *ent.Certificate) string { return cert.Serial })))
 	for _, cert := range certs {
 		wg.Add(1)
 		go func(cert *ent.Certificate) {
@@ -139,6 +144,7 @@ func (s *Syncer) SyncPendingCertificates() {
 			}
 			item := (*data)[0]
 			_, err = s.Db.Certificate.UpdateOneID(cert.ID).SetSslId(item.SslID).Save(context.Background())
+			logger.Info("Updated certificate", zap.String("serial", cert.Serial), zap.Int("id", item.SslID))
 			if err != nil {
 				logger.Error("Error while updating certificate", zap.Error(err), zap.String("serial", cert.Serial))
 			}
