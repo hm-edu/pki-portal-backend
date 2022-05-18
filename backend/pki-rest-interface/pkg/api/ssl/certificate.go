@@ -25,21 +25,26 @@ import (
 // @Success 200 {object} []pb.SslCertificateDetails "Certificates"
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) List(c echo.Context) error {
+	logger := h.logger.With(logging.AddMetadata(c)...)
 	ctx, span := h.tracer.Start(c.Request().Context(), "list")
 	defer span.End()
-	user := auth.UserFromRequest(c)
+	user, err := auth.UserFromRequest(c)
+	if err != nil {
+		h.logger.Error("Error getting user from request", zap.Error(err))
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
+	}
 	span.SetAttributes(attribute.String("user", user))
-
+	logger = logger.With(zap.String("user", user))
 	span.AddEvent("fetching domains")
 	domains, err := h.domain.ListDomains(ctx, &pb.ListDomainsRequest{User: user, Approved: true})
 	if err != nil {
-		h.logger.Error("Error getting domains", zap.Error(err))
+		logger.Error("Error getting domains", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while listing certificates"}
 	}
 	span.AddEvent("fetching certificates")
 	certs, err := h.ssl.ListCertificates(ctx, &pb.ListSslRequest{IncludePartial: false, Domains: domains.Domains})
 	if err != nil {
-		h.logger.Error("Error while listing certificates", zap.Error(err))
+		logger.Error("Error while listing certificates", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while listing certificates"}
 	}
 	return c.JSON(http.StatusOK, certs.Items)
@@ -56,10 +61,16 @@ func (h *Handler) List(c echo.Context) error {
 // @Success 204
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) Revoke(c echo.Context) error {
+	logger := h.logger.With(logging.AddMetadata(c)...)
 	ctx, span := h.tracer.Start(c.Request().Context(), "revoke")
 	defer span.End()
-	user := auth.UserFromRequest(c)
+	user, err := auth.UserFromRequest(c)
+	if err != nil {
+		h.logger.Error("Error getting user from request", zap.Error(err))
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
+	}
 	span.SetAttributes(attribute.String("user", user))
+	logger = logger.With(zap.String("user", user))
 
 	req := &model.RevokeRequest{}
 	span.AddEvent("validating request")
@@ -69,28 +80,28 @@ func (h *Handler) Revoke(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
 	}
 
-	h.logger.Info("trying to revoke certificate", append(logging.AddMetadata(c, true), zap.String("serial", req.Serial), zap.String("reason", req.Reason))...)
+	logger.Info("trying to revoke certificate", zap.String("serial", req.Serial), zap.String("reason", req.Reason))
 
 	span.AddEvent("obtaining certificate details")
 	details, err := h.ssl.CertificateDetails(ctx, &pb.CertificateDetailsRequest{Serial: req.Serial})
 
 	if err != nil {
 		span.RecordError(err)
-		h.logger.Error("Error while revoking certificate", append(logging.AddMetadata(c, true), zap.Error(err))...)
+		logger.Error("Error while revoking certificate", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while revoking certificate"}
 	}
 	span.AddEvent("fetching domains")
-	domains, err := h.domain.ListDomains(ctx, &pb.ListDomainsRequest{User: auth.UserFromRequest(c), Approved: true})
+	domains, err := h.domain.ListDomains(ctx, &pb.ListDomainsRequest{User: user, Approved: true})
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, "error listing domains")
-		h.logger.Error("Error listing domains for certificate revocation", append(logging.AddMetadata(c, true), zap.Error(err))...)
+		logger.Error("Error listing domains for certificate revocation", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while revoking certificate"}
 	}
 
 	for _, certDomain := range details.SubjectAlternativeNames {
 		if !helper.Contains(domains.Domains, certDomain) {
-			h.logger.Warn("Domain not found. Revocation not allowed.", append(logging.AddMetadata(c, true), zap.String("domain", certDomain))...)
+			logger.Warn("Domain not found. Revocation not allowed.", zap.String("domain", certDomain))
 			return &echo.HTTPError{Code: http.StatusUnauthorized, Message: "You are not authorized to revoke this certificate"}
 		}
 	}
@@ -99,7 +110,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, "error revoking certificate")
-		h.logger.Error("Error while revoking certificate", append(logging.AddMetadata(c, true), zap.Error(err))...)
+		logger.Error("Error while revoking certificate", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while revoking certificate"}
 	}
 

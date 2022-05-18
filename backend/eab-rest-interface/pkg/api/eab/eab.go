@@ -9,6 +9,7 @@ import (
 	"github.com/hm-edu/eab-rest-interface/pkg/database"
 	"github.com/hm-edu/portal-common/auth"
 	"github.com/hm-edu/portal-common/helper"
+	"github.com/hm-edu/portal-common/logging"
 	"github.com/smallstep/certificates/acme"
 
 	"github.com/labstack/echo/v4"
@@ -26,18 +27,25 @@ import (
 // @Success 200 {object} []models.EAB
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) GetExternalAccountKeys(c echo.Context) error {
+	logger := h.logger.With(logging.AddMetadata(c)...)
 	ctx, span := h.tracer.Start(c.Request().Context(), "list")
 	defer span.End()
-	h.logger.Info("Requesting external account keys")
+	user, err := auth.UserFromRequest(c)
+	if err != nil {
+		h.logger.Error("Error getting user from request", zap.Error(err))
+		return echo.NewHTTPError(http.StatusInternalServerError, "Error getting user from request")
+	}
+	logger = logger.With(zap.String("user", user))
+	logger.Info("Requesting external account keys")
 	keys, _, err := database.DB.NoSQL.GetExternalAccountKeys(ctx, h.provisionerID, "", -1)
 	if err != nil {
-		h.logger.Error("Failed to get external account keys", zap.Error(err))
+		logger.Error("Failed to get external account keys", zap.Error(err))
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to get external account keys")
 	}
 
-	mappedKeys, err := database.DB.Db.EABKey.Query().Where(eabkey.User(auth.UserFromRequest(c))).All(ctx)
+	mappedKeys, err := database.DB.Db.EABKey.Query().Where(eabkey.User(user)).All(ctx)
 	if err != nil {
-		h.logger.Error("Failed to get external account keys", zap.Error(err))
+		logger.Error("Failed to get external account keys", zap.Error(err))
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to get external account keys")
 	}
 	keys = helper.Where(keys, func(key *acme.ExternalAccountKey) bool {
@@ -57,19 +65,26 @@ func (h *Handler) GetExternalAccountKeys(c echo.Context) error {
 // @Success 201 {object} models.EAB
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) CreateNewKey(c echo.Context) error {
+	logger := h.logger.With(logging.AddMetadata(c)...)
 	ctx, span := h.tracer.Start(c.Request().Context(), "add")
 	defer span.End()
-	h.logger.Info("Requesting external account keys")
+	user, err := auth.UserFromRequest(c)
+	if err != nil {
+		logger.Error("Error getting user from request", zap.Error(err))
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
+	}
+	logger = logger.With(zap.String("user", user))
+	logger.Info("Requesting new external account key")
 	key, err := database.DB.NoSQL.CreateExternalAccountKey(ctx, h.provisionerID, "")
 
 	if err != nil {
-		h.logger.Error("Failed to create new external account key", zap.Error(err))
+		logger.Error("Failed to create new external account key", zap.Error(err))
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to get external account keys")
 	}
 
-	_, err = database.DB.Db.EABKey.Create().SetEabKey(key.ID).SetUser(auth.UserFromRequest(c)).Save(ctx)
+	_, err = database.DB.Db.EABKey.Create().SetEabKey(key.ID).SetUser(user).Save(ctx)
 	if err != nil {
-		h.logger.Error("Failed to create new external account key", zap.Error(err))
+		logger.Error("Failed to create new external account key", zap.Error(err))
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to get external account keys")
 	}
 
@@ -88,25 +103,32 @@ func (h *Handler) CreateNewKey(c echo.Context) error {
 // @Success 204
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) DeleteKey(c echo.Context) error {
+	logger := h.logger.With(logging.AddMetadata(c)...)
 	ctx, span := h.tracer.Start(c.Request().Context(), "delete")
 	defer span.End()
-	h.logger.Info("Requesting external account keys")
-	key := c.Param("id")
-	mapping, err := database.DB.Db.EABKey.Query().Where(eabkey.And(eabkey.User(auth.UserFromRequest(c)), eabkey.EabKey(key))).First(ctx)
+	user, err := auth.UserFromRequest(c)
 	if err != nil {
-		h.logger.Error("Failed to get external account keys", zap.Error(err))
+		logger.Error("Failed to get user from request", zap.Error(err))
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
+	}
+	logger = logger.With(zap.String("user", user))
+	logger.Info("Requesting deletion of external account key")
+	key := c.Param("id")
+	mapping, err := database.DB.Db.EABKey.Query().Where(eabkey.And(eabkey.User(user), eabkey.EabKey(key))).First(ctx)
+	if err != nil {
+		logger.Error("Failed to get external account keys", zap.Error(err))
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to get external account keys")
 	}
 
 	err = database.DB.NoSQL.DeleteExternalAccountKey(ctx, h.provisionerID, key)
 	if err != nil {
-		h.logger.Error("Failed to delete external account key", zap.Error(err))
+		logger.Error("Failed to delete external account key", zap.Error(err))
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to delete external account key")
 	}
 
 	err = database.DB.Db.EABKey.DeleteOne(mapping).Exec(ctx)
 	if err != nil {
-		h.logger.Error("Failed to delete external account key", zap.Error(err))
+		logger.Error("Failed to delete external account key", zap.Error(err))
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to delete external account key")
 	}
 

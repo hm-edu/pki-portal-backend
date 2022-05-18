@@ -17,6 +17,7 @@ import (
 	"github.com/hm-edu/domain-rest-interface/pkg/model"
 	"github.com/hm-edu/domain-rest-interface/pkg/store"
 	pb "github.com/hm-edu/portal-apis"
+	"go.uber.org/zap"
 
 	"github.com/hm-edu/portal-common/helper"
 	"github.com/labstack/echo/v4"
@@ -74,7 +75,7 @@ func TestSimplePermssions(t *testing.T) {
 
 	_, _ = st.Create(context.Background(), &ent.Domain{Fqdn: "example.com", Owner: "test", Approved: false})
 
-	domains, err := h.enumerateDomains(context.Background(), "test")
+	domains, err := h.enumerateDomains(context.Background(), "test", zap.L())
 	assert.NoError(t, err)
 	assert.Len(t, domains, 1)
 	assert.Equal(t, &model.Domain{Delegations: []*model.Delegation{}, FQDN: "example.com", ID: 1, Owner: "test", Approved: false, Permissions: model.Permissions{CanDelete: true, CanTransfer: false, CanApprove: false, CanDelegate: false}}, domains[0])

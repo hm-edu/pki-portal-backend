@@ -4,25 +4,23 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hm-edu/portal-common/auth"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
 // AddMetadata places some common http request information in zap fields.
-func AddMetadata(c echo.Context, user bool) (fields []zapcore.Field) {
+func AddMetadata(c echo.Context) (fields []zapcore.Field) {
 	req := c.Request()
 	id := req.Header.Get(echo.HeaderXRequestID)
 	if id != "" {
 		fields = append(fields, zap.String("request_id", id))
 	}
-	if user {
-		name := auth.UserFromRequest(c)
-		if name != "" {
-			fields = append(fields, zap.String("user", name))
-		}
+	trace := trace.SpanFromContext(req.Context()).SpanContext().TraceID().String()
+	if trace != "" {
+		fields = append(fields, zap.String("trace_id", trace))
 	}
 	return
 }

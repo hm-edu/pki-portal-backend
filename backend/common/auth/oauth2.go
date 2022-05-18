@@ -10,10 +10,16 @@ import (
 )
 
 // UserFromRequest extracts username (or email) from the previously claimset.
-func UserFromRequest(c echo.Context) string {
-	token := c.Get("user").(*jwt.Token)
-	user := token.Claims.(jwt.MapClaims)["email"].(string)
-	return user
+func UserFromRequest(c echo.Context) (string, error) {
+	token, ok := c.Get("user").(*jwt.Token)
+	if ok {
+		user, ok := token.Claims.(jwt.MapClaims)
+		if ok {
+			return user["email"].(string), nil
+		}
+	}
+
+	return "", errors.New("unable to extract user from request")
 }
 
 // GetToken extracts the JWT Token from header and also performs a check on the passed audience.

@@ -6,6 +6,7 @@ import (
 	"github.com/hm-edu/pki-rest-interface/pkg/model"
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/helper"
+	"github.com/hm-edu/portal-common/logging"
 	commonnModel "github.com/hm-edu/portal-common/model"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
@@ -21,6 +22,7 @@ import (
 // @Success 200 {object} []pb.ListSmimeResponse_CertificateDetails "certificates"
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) List(c echo.Context) error {
+	logger := h.logger.With(logging.AddMetadata(c)...)
 	ctx, span := h.tracer.Start(c.Request().Context(), "list")
 	defer span.End()
 	user := commonnModel.User{}
@@ -28,9 +30,10 @@ func (h *Handler) List(c echo.Context) error {
 		span.RecordError(err)
 		return err
 	}
-	h.logger.Debug("Requesting smime certificates", zap.String("user", user.Email))
+	logger.Debug("Requesting smime certificates", zap.String("user", user.Email))
 	certs, err := h.smime.ListCertificates(ctx, &pb.ListSmimeRequest{Email: user.Email})
 	if err != nil {
+		logger.Error("Error requesting smime certificates", zap.Error(err))
 		span.RecordError(err)
 		return err
 	}
@@ -48,6 +51,7 @@ func (h *Handler) List(c echo.Context) error {
 // @Success 204
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) Revoke(c echo.Context) error {
+	logger := h.logger.With(logging.AddMetadata(c)...)
 	ctx, span := h.tracer.Start(c.Request().Context(), "revoke")
 	defer span.End()
 	req := &model.RevokeRequest{}
@@ -60,6 +64,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 		span.RecordError(err)
 		return err
 	}
+	logger.Debug("Requesting smime certificate revocation", zap.String("user", user.Email))
 	certs, err := h.smime.ListCertificates(ctx, &pb.ListSmimeRequest{Email: user.Email})
 
 	if err != nil {
@@ -68,12 +73,13 @@ func (h *Handler) Revoke(c echo.Context) error {
 	}
 
 	if !helper.Contains(helper.Map(certs.Certificates, func(t *pb.ListSmimeResponse_CertificateDetails) string { return t.Serial }), req.Serial) {
-		h.logger.Warn("Certificate not found", zap.String("serial", req.Serial))
+		logger.Warn("Certificate not found", zap.String("serial", req.Serial))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
 	}
 
 	_, err = h.smime.RevokeCertificate(ctx, &pb.RevokeSmimeRequest{Reason: req.Reason, Identifier: &pb.RevokeSmimeRequest_Serial{Serial: req.Serial}})
 	if err != nil {
+		logger.Error("Error requesting smime certificate revocation", zap.Error(err))
 		span.RecordError(err)
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Internal: err, Message: "Error processing the request"}
 	}
@@ -94,6 +100,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 // @Success 200 {string} string "certificate"
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) HandleCsr(c echo.Context) error {
+	logger := h.logger.With(logging.AddMetadata(c)...)
 	ctx, span := h.tracer.Start(c.Request().Context(), "handleCsr")
 	defer span.End()
 	user := commonnModel.User{}
@@ -101,6 +108,7 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 		span.RecordError(err)
 		return err
 	}
+	logger.Info("Requesting smime certificate", zap.String("user", user.Email))
 	req := &model.CsrRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
 		span.RecordError(err)
@@ -115,6 +123,7 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 		CommonName: user.CommonName,
 	})
 	if err != nil {
+		logger.Error("Error requesting smime certificate", zap.Error(err))
 		span.RecordError(err)
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
 	}

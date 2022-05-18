@@ -18,7 +18,9 @@ import (
 // @Success 200 {string} string "Username"
 // @Failure 400 {object} echo.HTTPError "Bad Request"
 func (s *Server) whoamiHandler(c echo.Context) (err error) {
-	sub := auth.UserFromRequest(c)
-
+	sub, err := auth.UserFromRequest(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "Bad Request")
+	}
 	return c.JSON(http.StatusOK, sub)
 }
