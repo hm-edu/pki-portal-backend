@@ -61,7 +61,7 @@ func TestCreateDomainsWithoutTokenAndMiddleware(t *testing.T) {
 	c := e.NewContext(req, rec)
 
 	h := NewHandler(store.NewDomainStore(client), &MockPkiService{})
-	assert.Panics(t, func() { _ = h.CreateDomain(c) })
+	assert.Error(t, h.CreateDomain(c))
 }
 
 func TestSimplePermssions(t *testing.T) {
