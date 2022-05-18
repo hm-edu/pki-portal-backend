@@ -121,6 +121,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 		group.Use(jwtMiddleware)
 		group.GET("/", ssl.List)
 		group.POST("/revoke", ssl.Revoke)
+		group.POST("/csr", ssl.HandleCsr)
 	}
 
 	group = api.app.Group("/smime")

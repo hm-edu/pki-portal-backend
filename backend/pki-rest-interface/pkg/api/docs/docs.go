@@ -181,6 +181,51 @@ const docTemplate = `{
                 }
             }
         },
+        "/ssl/csr": {
+            "post": {
+                "security": [
+                    {
+                        "API": []
+                    }
+                ],
+                "description": "This endpoint handles a provided CSR. The validity of the CSR is checked and passed to the sectigo server.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SSL"
+                ],
+                "summary": "SSL CSR Endpoint",
+                "parameters": [
+                    {
+                        "description": "The CSR",
+                        "name": "csr",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.CsrRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "certificate",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "default": {
+                        "description": "Error processing the request",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/ssl/revoke": {
             "post": {
                 "security": [

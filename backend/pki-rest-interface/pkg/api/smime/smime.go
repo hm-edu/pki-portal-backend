@@ -108,6 +108,7 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 		span.RecordError(err)
 		return err
 	}
+
 	logger.Info("Requesting smime certificate", zap.String("user", user.Email))
 	req := &model.CsrRequest{}
 	if err := req.Bind(c, h.validator); err != nil {

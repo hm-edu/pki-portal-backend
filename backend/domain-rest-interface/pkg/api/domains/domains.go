@@ -35,7 +35,7 @@ func (h *Handler) ListDomains(c echo.Context) error {
 
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
-		h.logger.Error("Failed to get user from request", zap.Error(err))
+		logger.Error("Failed to get user from request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
 	span.SetAttributes(attribute.String("user", user))
@@ -47,7 +47,7 @@ func (h *Handler) ListDomains(c echo.Context) error {
 		span.RecordError(err)
 		return &echo.HTTPError{Internal: err, Code: http.StatusInternalServerError, Message: "Error while listing domains"}
 	}
-
+	logger.Debug("Listing domains", zap.Int("count", len(domains)), zap.Any("domains", domains))
 	return c.JSON(http.StatusOK, domains)
 }
 

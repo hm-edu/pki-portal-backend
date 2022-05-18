@@ -73,10 +73,10 @@ func flattenCertificates(certs []*x509.Certificate) string {
 	return string(result)
 }
 
-func (s *sslAPIServer) handleError(msg string, span trace.Span, err error) (*pb.IssueSslResponse, error) {
+func (s *sslAPIServer) handleError(msg string, span trace.Span, err error, logger *zap.Logger) (*pb.IssueSslResponse, error) {
 	span.RecordError(err)
 	span.AddEvent(msg)
-	s.logger.Error(msg, zap.Error(err))
+	logger.Error(msg, zap.Error(err))
 	return nil, status.Errorf(codes.Internal, msg)
 }
 
@@ -173,6 +173,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 
 	_, span := otel.GetTracerProvider().Tracer("ssl").Start(ctx, "handleCsr")
 	defer span.End()
+	logger := s.logger.With(zap.String("trace_id", span.SpanContext().TraceID().String()))
 
 	block, _ := pem.Decode([]byte(req.Csr))
 
@@ -206,7 +207,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	if _, ok := s.pendingValidations[req.Csr]; ok {
 		return nil, status.Errorf(codes.AlreadyExists, "Outstanding validation for this CSR")
 	}
-	s.logger.Info("Issuing certificate",
+	logger.Info("Issuing certificate",
 		zap.String("common_name", csr.Subject.CommonName),
 		zap.Strings("subject_alternative_names", sans))
 
@@ -219,7 +220,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 			ID(ctx)
 
 		if err != nil {
-			return s.handleError("Error while creating certificate", span, err)
+			return s.handleError("Error while creating certificate", span, err, logger)
 		}
 		ids = append(ids, id)
 	}
@@ -231,13 +232,13 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		Save(ctx)
 
 	if err != nil {
-		return s.handleError("Error while creating certificate", span, err)
+		return s.handleError("Error while creating certificate", span, err, logger)
 	}
 
 	start := time.Now()
 	certificates, err := pkiHelper.RequestCertificate(ctx, span, s.acmeClient, csr, sans)
 	if err != nil {
-		return s.handleError("Error while collecting certificate", span, err)
+		return s.handleError("Error while collecting certificate", span, err, logger)
 	}
 
 	stop := time.Now()
@@ -246,16 +247,16 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	s.last = &stop
 
 	if err != nil {
-		s.logger.Error("Error while registering callback", zap.Error(err))
+		logger.Error("Error while registering callback", zap.Error(err))
 	}
-	s.logger.Info("Certificate issued", zap.Strings("sans", sans))
+	logger.Info("Certificate issued", zap.Strings("sans", sans))
 	certs, err := pkiHelper.LoadDER(certificates)
 	if err != nil {
-		return s.handleError("Error while collecting certificate", span, err)
+		return s.handleError("Error while collecting certificate", span, err, logger)
 	}
 	pem := certs[0]
 	serial := fmt.Sprintf("%032x", pem.SerialNumber)
-	s.logger.Info("Certificate issued",
+	logger.Info("Certificate issued",
 		zap.Strings("subject_alternative_names", req.SubjectAlternativeNames),
 		zap.Duration("duration", stop.Sub(start)),
 		zap.String("certificate", serial))
@@ -269,7 +270,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		Save(ctx)
 
 	if err != nil {
-		return s.handleError("Error while saving collected certificate", span, err)
+		return s.handleError("Error while saving collected certificate", span, err, logger)
 	}
 
 	return &pb.IssueSslResponse{Certificate: flattenCertificates(certs)}, nil
@@ -277,15 +278,19 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 
 func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslRequest) (*emptypb.Empty, error) {
 
+	_, span := otel.GetTracerProvider().Tracer("ssl").Start(ctx, "revokeCertificate")
+	defer span.End()
+	logger := s.logger.With(zap.String("trace_id", span.SpanContext().TraceID().String()))
+
 	errorReturn := func(err error) (*emptypb.Empty, error) {
-		s.logger.Error("Failed to revoke certificate", zap.Error(err))
+		logger.Error("Failed to revoke certificate", zap.Error(err))
 		return nil, status.Errorf(codes.Internal, "Failed to revoke certificate")
 	}
 
 	switch req.Identifier.(type) {
 	case *pb.RevokeSslRequest_Serial:
 		serial := req.GetSerial()
-		s.logger.Info("Revoking certificate by serial", zap.String("serial", serial))
+		logger.Info("Revoking certificate by serial", zap.String("serial", serial))
 		c, err := s.db.Certificate.Query().Where(certificate.Serial(serial)).First(ctx)
 		if err != nil {
 			return errorReturn(err)
@@ -299,7 +304,7 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 			return errorReturn(err)
 		}
 	case *pb.RevokeSslRequest_CommonName:
-		s.logger.Info("Revoking certificate by common name", zap.String("common_name", req.GetCommonName()))
+		logger.Info("Revoking certificate by common name", zap.String("common_name", req.GetCommonName()))
 		certs, err := s.db.Certificate.Query().
 			Where(certificate.And(certificate.HasDomainsWith(domain.FqdnEQ(req.GetCommonName())),
 				certificate.StatusNEQ(certificate.StatusRevoked),

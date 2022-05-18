@@ -42,6 +42,7 @@ func (h *Handler) List(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while listing certificates"}
 	}
 	span.AddEvent("fetching certificates")
+	logger.Info("fetching certificates", zap.Strings("domains", domains.Domains))
 	certs, err := h.ssl.ListCertificates(ctx, &pb.ListSslRequest{IncludePartial: false, Domains: domains.Domains})
 	if err != nil {
 		logger.Error("Error while listing certificates", zap.Error(err))
@@ -66,7 +67,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 	defer span.End()
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
-		h.logger.Error("Error getting user from request", zap.Error(err))
+		logger.Error("Error getting user from request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
 	span.SetAttributes(attribute.String("user", user))
@@ -76,7 +77,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 	span.AddEvent("validating request")
 	if err := req.Bind(c, h.validator); err != nil {
 		span.RecordError(err)
-		h.logger.Error("Error while validating request", zap.Error(err))
+		logger.Error("Error while validating request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
 	}
 
@@ -114,5 +115,42 @@ func (h *Handler) Revoke(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while revoking certificate"}
 	}
 
+	logger.Info("certificate revoked", zap.String("serial", req.Serial))
 	return c.NoContent(http.StatusNoContent)
+}
+
+// HandleCsr godoc
+// @Summary SSL CSR Endpoint
+// @Description This endpoint handles a provided CSR. The validity of the CSR is checked and passed to the sectigo server.
+// @Tags SSL
+// @Accept json
+// @Produce json
+// @Router /ssl/csr [post]
+// @Param csr body model.CsrRequest true "The CSR"
+// @Security API
+// @Success 200 {string} string "certificate"
+// @Response default {object} echo.HTTPError "Error processing the request"
+func (h *Handler) HandleCsr(c echo.Context) error {
+	logger := h.logger.With(logging.AddMetadata(c)...)
+	ctx, span := h.tracer.Start(c.Request().Context(), "revoke")
+	defer span.End()
+	user, err := auth.UserFromRequest(c)
+	if err != nil {
+		logger.Error("Error getting user from request", zap.Error(err))
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
+	}
+	span.SetAttributes(attribute.String("user", user))
+	logger = logger.With(zap.String("user", user))
+	req := &model.CsrRequest{}
+	if err := req.Bind(c, h.validator); err != nil {
+		span.RecordError(err)
+		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
+	}
+	resp, err := h.ssl.IssueCertificate(ctx, &pb.IssueSslRequest{Csr: req.CSR, Issuer: user})
+	if err != nil {
+		span.RecordError(err)
+		logger.Error("Error while processing CSR", zap.Error(err))
+		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while processing the request"}
+	}
+	return c.JSON(http.StatusOK, resp.Certificate)
 }

@@ -41,18 +41,22 @@ func newSmimeAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration) *s
 func (s *smimeAPIServer) ListCertificates(ctx context.Context, req *pb.ListSmimeRequest) (*pb.ListSmimeResponse, error) {
 	_, span := s.tracer.Start(ctx, "listCertificates")
 	defer span.End()
+	logger := s.logger.With(zap.String("user", req.Email), zap.String("trace_id", span.SpanContext().TraceID().String()))
 
-	s.logger.Debug("Requesting smime certificates", zap.String("user", req.Email))
+	logger.Info("Requesting smime certificates")
 	items, err := s.client.ClientService.ListByEmail(req.Email)
 	if err != nil {
 		if sectigoError, ok := err.(*sectigo.ErrorResponse); ok {
 			if sectigoError.Code == -105 {
+				logger.Info("No certificates found")
 				return &pb.ListSmimeResponse{Certificates: []*pb.ListSmimeResponse_CertificateDetails{}}, nil
 			}
 		}
+		logger.Info("Error while requesting smime certificates", zap.Error(err))
 		span.RecordError(err)
 		return nil, status.Error(codes.Internal, err.Error())
 	}
+	logger.Info("Successfully requested smime certificates", zap.Int("count", len(*items)))
 	return &pb.ListSmimeResponse{Certificates: helper.Map(*items, func(t client.ListItem) *pb.ListSmimeResponse_CertificateDetails {
 		return &pb.ListSmimeResponse_CertificateDetails{
 			Id:      int32(t.ID),
@@ -63,11 +67,12 @@ func (s *smimeAPIServer) ListCertificates(ctx context.Context, req *pb.ListSmime
 	})}, nil
 }
 func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmimeRequest) (*pb.IssueSmimeResponse, error) {
-
 	_, span := s.tracer.Start(ctx, "handleCsr")
 	defer span.End()
 	span.AddEvent("Validating csr")
 
+	logger := s.logger.With(zap.String("user", req.Email), zap.String("trace_id", span.SpanContext().TraceID().String()))
+	logger.Info("Issuing smime certificate")
 	block, _ := pem.Decode([]byte(req.Csr))
 
 	// Validate the passed CSR to comply the server-side requirements (e.g. key-strength, key-type, etc.)
@@ -75,24 +80,26 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 	csr, err := x509.ParseCertificateRequest(block.Bytes)
 	if err != nil {
 		span.RecordError(err)
+		logger.Error("Error while parsing CSR", zap.Error(err))
 		return nil, status.Error(codes.InvalidArgument, "Invalid CSR")
 	}
 
 	// Validate the CSR
 	if err := csr.CheckSignature(); err != nil {
 		span.RecordError(err)
+		logger.Error("Error while validating CSR", zap.Error(err))
 		return nil, status.Error(codes.InvalidArgument, "Invalid CSR")
 	}
 
 	if csr.PublicKeyAlgorithm != x509.RSA {
 		return nil, status.Error(codes.InvalidArgument, "Only RSA keys are supported")
-
 	}
 
 	// Get the public key from the CSR
 	pubKey, ok := csr.PublicKey.(*rsa.PublicKey)
 	size := pubKey.Size() * 8
 	if !ok || fmt.Sprintf("%d", size) != s.cfg.SmimeKeyLength {
+		logger.Warn("Invalid key length", zap.String("key_length", fmt.Sprintf("%d", size)))
 		return nil, status.Error(codes.InvalidArgument, "Invalid CSR")
 	}
 
@@ -113,6 +120,7 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 	})
 	if err != nil {
 		span.RecordError(err)
+		logger.Error("Error while enrolling certificate", zap.Error(err))
 		return nil, status.Error(codes.Internal, "Error enrolling certificate")
 	}
 	cert := ""
@@ -122,13 +130,14 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 			if e, ok := err.(*sectigo.ErrorResponse); ok {
 				if e.Code == 0 && e.Description == "Being processed by Sectigo" {
 					span.AddEvent("Certificate not ready yet")
-					s.logger.Info("Certificate not ready", zap.Int("id", resp.OrderNumber), zap.String("email", req.Email))
+					logger.Debug("Certificate not ready", zap.Int("id", resp.OrderNumber), zap.String("email", req.Email))
 					return false, nil
 				}
 			}
 			return false, err
 		}
 		span.AddEvent("Certificate ready")
+		logger.Info("Certificate ready", zap.Int("id", resp.OrderNumber))
 		cert = *c
 		return true, nil
 	})
