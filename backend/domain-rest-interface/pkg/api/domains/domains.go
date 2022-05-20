@@ -162,6 +162,17 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
 	}
 	logger = logger.With(zap.String("fqdn", req.FQDN))
+
+	allDomains, err := h.domainStore.ListAllDomains(ctx, false)
+	if err != nil {
+		logger.Error("Listing domains failed", zap.Error(err))
+		return &echo.HTTPError{Code: http.StatusInternalServerError, Internal: err, Message: "Failed to list domains"}
+	}
+	if helper.Contains(allDomains, req.FQDN) {
+		logger.Error("Domain already exists", zap.String("fqdn", req.FQDN))
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Domain already exists"}
+	}
+
 	domain := ent.Domain{Owner: user, Fqdn: req.FQDN}
 
 	domains, err := h.domainStore.ListDomains(ctx, user, true, true)
@@ -380,10 +391,16 @@ func (h *Handler) AddDelegation(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	exists := helper.Any(item.Delegations, (func(t *model.Delegation) bool { return t.User == req.User }))
+	if exists || item.Owner == req.User {
+		logger.Error("Delegation already exists", zap.String("fqdn", item.FQDN), zap.String("owner", req.User))
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Delegation already exists"}
+	}
 	logger.Info("Adding delegation", zap.String("fqdn", item.FQDN), zap.String("owner", req.User))
 	updated, err := h.domainStore.AddDelegation(ctx, item.ID, req.User)
 	if err != nil {
 		logger.Error("Adding delegation failed", zap.Error(err))
+
 		return &echo.HTTPError{Code: http.StatusNotFound, Message: "Adding delegation failed"}
 	}
 
