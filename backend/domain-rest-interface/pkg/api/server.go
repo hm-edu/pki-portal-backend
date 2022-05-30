@@ -85,10 +85,10 @@ func (api *Server) wireRoutesAndMiddleware() {
 	jwtMiddleware := auth.JWTWithConfig(config)
 
 	api.app.Use(middleware.RequestID())
-	api.app.Use(logging.ZapLogger(api.logger, logging.WithSkipper(func(c echo.Context) bool {
+	api.app.Use(otelecho.Middleware("domain-rest-interface", otelecho.WithSkipper(func(c echo.Context) bool {
 		return strings.Contains(c.Path(), "/docs") || strings.Contains(c.Path(), "/healthz")
 	})))
-	api.app.Use(otelecho.Middleware("domain-rest-interface", otelecho.WithSkipper(func(c echo.Context) bool {
+	api.app.Use(logging.ZapLogger(api.logger, logging.WithSkipper(func(c echo.Context) bool {
 		return strings.Contains(c.Path(), "/docs") || strings.Contains(c.Path(), "/healthz")
 	})))
 	api.app.Use(middleware.Recover())
