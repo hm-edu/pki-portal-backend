@@ -20,6 +20,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/hm-edu/portal-common/helper"
+	"github.com/hm-edu/portal-common/logging"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
@@ -59,6 +60,7 @@ func TestCreateDomainsWithoutTokenAndMiddleware(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
+	c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
 
 	h := NewHandler(store.NewDomainStore(client), &MockPkiService{})
 	assert.Error(t, h.CreateDomain(c))
@@ -111,6 +113,7 @@ func TestDeletePermissions(t *testing.T) {
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
 			ctx := e.NewContext(req, rec)
+			ctx.SetRequest(ctx.Request().WithContext(context.WithValue(ctx.Request().Context(), logging.LoggingContextKey, zap.L())))
 			ctx.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": c.User}})
 			ctx.SetPath("/:id")
 			ctx.SetParamNames("id")
@@ -146,6 +149,7 @@ func TestListHandler(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	ctx := e.NewContext(req, rec)
+	ctx.SetRequest(ctx.Request().WithContext(context.WithValue(ctx.Request().Context(), logging.LoggingContextKey, zap.L())))
 	ctx.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "test"}})
 	err := h.ListDomains(ctx)
 	assert.NoError(t, err)
@@ -170,6 +174,7 @@ func TestCreateDomainsFqdns(t *testing.T) {
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
 			c := e.NewContext(req, rec)
+			c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
 			c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "test"}})
 			h := NewHandler(store.NewDomainStore(client), &MockPkiService{})
 			resp := h.CreateDomain(c)
@@ -192,6 +197,7 @@ func TestCreateDomainsWithToken(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
+	c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
 	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "test"}})
 	h := NewHandler(store.NewDomainStore(client), &MockPkiService{})
 	resp := h.CreateDomain(c)
@@ -215,6 +221,7 @@ func TestCreateDomainsTwice(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
+	c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
 	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "test"}})
 	h := NewHandler(store.NewDomainStore(client), &MockPkiService{})
 	resp := h.CreateDomain(c)
@@ -226,6 +233,7 @@ func TestCreateDomainsTwice(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec = httptest.NewRecorder()
 	c = e.NewContext(req, rec)
+	c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
 	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "test"}})
 	resp = h.CreateDomain(c)
 	if assert.Error(t, resp) {
@@ -245,6 +253,7 @@ func TestCreateDomainsAutoApprove(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
+	c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
 	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "test"}})
 	st := store.NewDomainStore(client)
 	_, err := st.Create(c.Request().Context(), &ent.Domain{Fqdn: "example.com", Owner: "test", Approved: true})
@@ -271,6 +280,7 @@ func TestCreateDomainsNoAutoApproveOtherUser(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
+	c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
 	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "max"}})
 	st := store.NewDomainStore(client)
 	_, err := st.Create(c.Request().Context(), &ent.Domain{Fqdn: "example.com", Owner: "test", Approved: true})
@@ -302,6 +312,7 @@ func TestCreateDomainsNoAutoApproveOtherUserChild(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
+	c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
 	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "max"}})
 	h := NewHandler(st, &MockPkiService{})
 	resp := h.CreateDomain(c)
@@ -316,6 +327,7 @@ func TestCreateDomainsNoAutoApproveOtherUserChild(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec = httptest.NewRecorder()
 	c = e.NewContext(req, rec)
+	c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
 	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "test"}})
 	resp = h.CreateDomain(c)
 	if assert.NoError(t, resp) {
@@ -329,6 +341,7 @@ func TestCreateDomainsNoAutoApproveOtherUserChild(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec = httptest.NewRecorder()
 	c = e.NewContext(req, rec)
+	c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
 	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "max"}})
 	resp = h.CreateDomain(c)
 	if assert.NoError(t, resp) {
@@ -367,6 +380,7 @@ func TestApproveDomainsNotAllowed(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
+	c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
 	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "max"}})
 	assert.NoError(t, err)
 	h := NewHandler(st, &MockPkiService{})
@@ -375,11 +389,13 @@ func TestApproveDomainsNotAllowed(t *testing.T) {
 	req = httptest.NewRequest(http.MethodPost, "/", strings.NewReader(`{"fqdn":"mail.foo.example.com"}`))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c = e.NewContext(req, rec)
+	c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
 	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "test"}})
 
 	req = httptest.NewRequest(http.MethodPost, "/", strings.NewReader(`{"fqdn":"2.mail.foo.example.com"}`))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c = e.NewContext(req, rec)
+	c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
 	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "max"}})
 	_ = h.CreateDomain(c)
 
@@ -388,6 +404,7 @@ func TestApproveDomainsNotAllowed(t *testing.T) {
 			req = httptest.NewRequest(http.MethodPost, "/", strings.NewReader(""))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			c = e.NewContext(req, rec)
+			c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
 			c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "max"}})
 
 			c.SetPath("/:id")
@@ -414,6 +431,7 @@ func TestApproveMissingId(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
+	c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
 	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "test"}})
 	h := NewHandler(st, &MockPkiService{})
 	resp := h.ApproveDomain(c)
@@ -436,6 +454,7 @@ func TestApproveDomainsAllowed(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
+	c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
 	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "max"}})
 	h := NewHandler(st, &MockPkiService{})
 	_ = h.CreateDomain(c)
@@ -443,12 +462,14 @@ func TestApproveDomainsAllowed(t *testing.T) {
 	req = httptest.NewRequest(http.MethodPost, "/", strings.NewReader(`{"fqdn":"mail.foo.example.com"}`))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c = e.NewContext(req, rec)
+	c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
 	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "test"}})
 	_ = h.CreateDomain(c)
 
 	req = httptest.NewRequest(http.MethodPost, "/", strings.NewReader(`{"fqdn":"2.mail.foo.example.com"}`))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c = e.NewContext(req, rec)
+	c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
 	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "max"}})
 	_ = h.CreateDomain(c)
 
@@ -459,6 +480,7 @@ func TestApproveDomainsAllowed(t *testing.T) {
 		c.SetPath("/:id")
 		c.SetParamNames("id")
 		c.SetParamValues(fmt.Sprint(2))
+		c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
 		c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "test"}})
 		resp := h.ApproveDomain(c)
 		assert.NoError(t, resp)
@@ -471,6 +493,7 @@ func TestApproveDomainsAllowed(t *testing.T) {
 		c.SetPath("/:id")
 		c.SetParamNames("id")
 		c.SetParamValues(fmt.Sprint(4))
+		c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
 		c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "max"}})
 		resp := h.ApproveDomain(c)
 		assert.NoError(t, resp)
