@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -10,20 +11,6 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
-
-// AddMetadata places some common http request information in zap fields.
-func AddMetadata(c echo.Context) (fields []zapcore.Field) {
-	req := c.Request()
-	id := req.Header.Get(echo.HeaderXRequestID)
-	if id != "" {
-		fields = append(fields, zap.String("request_id", id))
-	}
-	trace := trace.SpanFromContext(req.Context()).SpanContext().TraceID().String()
-	if trace != "" {
-		fields = append(fields, zap.String("trace_id", trace))
-	}
-	return
-}
 
 // config is used to configure the mux middleware.
 type config struct {
@@ -61,6 +48,26 @@ func ZapLogger(log *zap.Logger, opts ...Option) echo.MiddlewareFunc {
 
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
+
+			req := c.Request()
+			fields := []zapcore.Field{
+				zap.String("remote_ip", c.RealIP()),
+				zap.String("host", req.Host),
+				zap.String("request", fmt.Sprintf("%s %s", req.Method, req.RequestURI)),
+				zap.String("user_agent", req.UserAgent()),
+			}
+
+			id := req.Header.Get(echo.HeaderXRequestID)
+			if id != "" {
+				fields = append(fields, zap.String("request_id", id))
+			}
+			trace := trace.SpanFromContext(req.Context()).SpanContext().TraceID().String()
+			if trace != "" {
+				fields = append(fields, zap.String("trace_id", trace))
+			}
+			logger := log.With(fields...)
+
+			c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), LoggingContextKey, logger)))
 			if cfg.Skipper(c) {
 				return next(c)
 			}
@@ -71,23 +78,13 @@ func ZapLogger(log *zap.Logger, opts ...Option) echo.MiddlewareFunc {
 				c.Error(err)
 			}
 
-			req := c.Request()
 			res := c.Response()
 
-			fields := []zapcore.Field{
-				zap.String("remote_ip", c.RealIP()),
+			fields = append(fields,
 				zap.String("latency", time.Since(start).String()),
-				zap.String("host", req.Host),
-				zap.String("request", fmt.Sprintf("%s %s", req.Method, req.RequestURI)),
 				zap.Int("status", res.Status),
 				zap.Int64("size", res.Size),
-				zap.String("user_agent", req.UserAgent()),
-			}
-
-			id := req.Header.Get(echo.HeaderXRequestID)
-			if id != "" {
-				fields = append(fields, zap.String("request_id", id))
-			}
+			)
 
 			n := res.Status
 			switch {

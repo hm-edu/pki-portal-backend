@@ -7,7 +7,6 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
-	"go.uber.org/zap"
 )
 
 // Handler is a wrapper around the domainstore and a validator.
@@ -15,7 +14,6 @@ type Handler struct {
 	domainStore *store.DomainStore
 	pkiService  pb.SSLServiceClient
 	validator   *model.Validator
-	logger      *zap.Logger
 	tracer      trace.Tracer
 }
 
@@ -26,7 +24,6 @@ func NewHandler(ds *store.DomainStore, pkiSerivce pb.SSLServiceClient) *Handler 
 	return &Handler{
 		domainStore: ds,
 		validator:   v,
-		logger:      zap.L(),
 		tracer:      tracer,
 		pkiService:  pkiSerivce,
 	}

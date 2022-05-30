@@ -9,6 +9,19 @@ import (
 	"github.com/lestrrat-go/jwx/jwk"
 )
 
+// SubFromRequest extracts username (or email) from the previously claimset.
+func SubFromRequest(token interface{}) (string, error) {
+	jwtToken, ok := token.(*jwt.Token)
+	if ok {
+		user, ok := jwtToken.Claims.(jwt.MapClaims)
+		if ok {
+			return user["sub"].(string), nil
+		}
+	}
+
+	return "", errors.New("unable to extract user from request")
+}
+
 // UserFromRequest extracts username (or email) from the previously claimset.
 func UserFromRequest(c echo.Context) (string, error) {
 	token, ok := c.Get("user").(*jwt.Token)

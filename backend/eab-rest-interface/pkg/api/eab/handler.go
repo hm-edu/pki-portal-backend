@@ -5,13 +5,11 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
-	"go.uber.org/zap"
 )
 
 // Handler is a wrapper around the domainstore and a validator.
 type Handler struct {
 	validator     *model.Validator
-	logger        *zap.Logger
 	tracer        trace.Tracer
 	provisionerID string
 }
@@ -22,7 +20,6 @@ func NewHandler(ProvisionerID string) *Handler {
 	tracer := otel.GetTracerProvider().Tracer("eab")
 	return &Handler{
 		validator:     v,
-		logger:        zap.L(),
 		tracer:        tracer,
 		provisionerID: ProvisionerID,
 	}

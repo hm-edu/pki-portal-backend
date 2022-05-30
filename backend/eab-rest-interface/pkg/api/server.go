@@ -11,6 +11,7 @@ import (
 	"github.com/hm-edu/eab-rest-interface/pkg/api/docs"
 	"github.com/hm-edu/eab-rest-interface/pkg/api/eab"
 	commonApi "github.com/hm-edu/portal-common/api"
+	"github.com/hm-edu/portal-common/auth"
 	commonAuth "github.com/hm-edu/portal-common/auth"
 	"github.com/hm-edu/portal-common/logging"
 	"github.com/labstack/echo/v4"
@@ -70,13 +71,13 @@ func (api *Server) wireRoutesAndMiddleware() {
 		api.logger.Fatal("fetching jwk set failed", zap.Error(err))
 	}
 
-	config := middleware.JWTConfig{
+	config := auth.JWTConfig{
 		ParseTokenFunc: func(auth string, c echo.Context) (interface{}, error) {
 			return commonAuth.GetToken(auth, ks, api.config.Audience)
 		},
 	}
 
-	jwtMiddleware := middleware.JWTWithConfig(config)
+	jwtMiddleware := auth.JWTWithConfig(config)
 
 	api.app.Use(middleware.RequestID())
 	api.app.Use(otelecho.Middleware("eab-rest-interface", otelecho.WithSkipper(func(c echo.Context) bool {

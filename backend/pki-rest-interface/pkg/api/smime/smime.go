@@ -22,7 +22,7 @@ import (
 // @Success 200 {object} []pb.ListSmimeResponse_CertificateDetails "certificates"
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) List(c echo.Context) error {
-	logger := h.logger.With(logging.AddMetadata(c)...)
+	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "list")
 	defer span.End()
 	user := commonnModel.User{}
@@ -30,7 +30,7 @@ func (h *Handler) List(c echo.Context) error {
 		span.RecordError(err)
 		return err
 	}
-	logger.Debug("Requesting smime certificates", zap.String("user", user.Email))
+	logger.Debug("Requesting smime certificates")
 	certs, err := h.smime.ListCertificates(ctx, &pb.ListSmimeRequest{Email: user.Email})
 	if err != nil {
 		logger.Error("Error requesting smime certificates", zap.Error(err))
@@ -51,7 +51,7 @@ func (h *Handler) List(c echo.Context) error {
 // @Success 204
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) Revoke(c echo.Context) error {
-	logger := h.logger.With(logging.AddMetadata(c)...)
+	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "revoke")
 	defer span.End()
 	req := &model.RevokeRequest{}
@@ -64,7 +64,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 		span.RecordError(err)
 		return err
 	}
-	logger.Debug("Requesting smime certificate revocation", zap.String("user", user.Email))
+	logger.Debug("Requesting smime certificate revocation")
 	certs, err := h.smime.ListCertificates(ctx, &pb.ListSmimeRequest{Email: user.Email})
 
 	if err != nil {
@@ -100,7 +100,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 // @Success 200 {string} string "certificate"
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) HandleCsr(c echo.Context) error {
-	logger := h.logger.With(logging.AddMetadata(c)...)
+	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "handleCsr")
 	defer span.End()
 	user := commonnModel.User{}
@@ -109,7 +109,7 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 		return err
 	}
 
-	logger.Info("Requesting smime certificate", zap.String("user", user.Email))
+	logger.Info("Requesting smime certificate")
 	req := &model.CsrRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
 		span.RecordError(err)

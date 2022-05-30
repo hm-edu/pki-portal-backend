@@ -25,16 +25,16 @@ import (
 // @Success 200 {object} []pb.SslCertificateDetails "Certificates"
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) List(c echo.Context) error {
-	logger := h.logger.With(logging.AddMetadata(c)...)
+	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "list")
 	defer span.End()
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
-		h.logger.Error("Error getting user from request", zap.Error(err))
+		logger.Error("Error getting user from request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
 	span.SetAttributes(attribute.String("user", user))
-	logger = logger.With(zap.String("user", user))
+
 	span.AddEvent("fetching domains")
 	domains, err := h.domain.ListDomains(ctx, &pb.ListDomainsRequest{User: user, Approved: true})
 	if err != nil {
@@ -62,7 +62,7 @@ func (h *Handler) List(c echo.Context) error {
 // @Success 204
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) Revoke(c echo.Context) error {
-	logger := h.logger.With(logging.AddMetadata(c)...)
+	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "revoke")
 	defer span.End()
 	user, err := auth.UserFromRequest(c)
@@ -71,7 +71,6 @@ func (h *Handler) Revoke(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
 	span.SetAttributes(attribute.String("user", user))
-	logger = logger.With(zap.String("user", user))
 
 	req := &model.RevokeRequest{}
 	span.AddEvent("validating request")
@@ -131,7 +130,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 // @Success 200 {string} string "certificate"
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) HandleCsr(c echo.Context) error {
-	logger := h.logger.With(logging.AddMetadata(c)...)
+	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "revoke")
 	defer span.End()
 	user, err := auth.UserFromRequest(c)
@@ -140,7 +139,7 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
 	span.SetAttributes(attribute.String("user", user))
-	logger = logger.With(zap.String("user", user))
+
 	req := &model.CsrRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
 		span.RecordError(err)

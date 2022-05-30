@@ -27,15 +27,14 @@ import (
 // @Success 200 {object} []models.EAB
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) GetExternalAccountKeys(c echo.Context) error {
-	logger := h.logger.With(logging.AddMetadata(c)...)
+	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "list")
 	defer span.End()
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
-		h.logger.Error("Error getting user from request", zap.Error(err))
+		logger.Error("Error getting user from request", zap.Error(err))
 		return echo.NewHTTPError(http.StatusInternalServerError, "Error getting user from request")
 	}
-	logger = logger.With(zap.String("user", user))
 	logger.Info("Requesting external account keys")
 	keys, _, err := database.DB.NoSQL.GetExternalAccountKeys(ctx, h.provisionerID, "", -1)
 	if err != nil {
@@ -65,7 +64,7 @@ func (h *Handler) GetExternalAccountKeys(c echo.Context) error {
 // @Success 201 {object} models.EAB
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) CreateNewKey(c echo.Context) error {
-	logger := h.logger.With(logging.AddMetadata(c)...)
+	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "add")
 	defer span.End()
 	user, err := auth.UserFromRequest(c)
@@ -73,7 +72,6 @@ func (h *Handler) CreateNewKey(c echo.Context) error {
 		logger.Error("Error getting user from request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
-	logger = logger.With(zap.String("user", user))
 	logger.Info("Requesting new external account key")
 	key, err := database.DB.NoSQL.CreateExternalAccountKey(ctx, h.provisionerID, "")
 
@@ -103,7 +101,7 @@ func (h *Handler) CreateNewKey(c echo.Context) error {
 // @Success 204
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) DeleteKey(c echo.Context) error {
-	logger := h.logger.With(logging.AddMetadata(c)...)
+	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "delete")
 	defer span.End()
 	user, err := auth.UserFromRequest(c)
@@ -111,7 +109,6 @@ func (h *Handler) DeleteKey(c echo.Context) error {
 		logger.Error("Failed to get user from request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
-	logger = logger.With(zap.String("user", user))
 	logger.Info("Requesting deletion of external account key")
 	key := c.Param("id")
 	mapping, err := database.DB.Db.EABKey.Query().Where(eabkey.And(eabkey.User(user), eabkey.EabKey(key))).First(ctx)

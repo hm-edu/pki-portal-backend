@@ -14,6 +14,7 @@ import (
 	"github.com/hm-edu/domain-rest-interface/pkg/store"
 	pb "github.com/hm-edu/portal-apis"
 	commonApi "github.com/hm-edu/portal-common/api"
+	"github.com/hm-edu/portal-common/auth"
 	commonAuth "github.com/hm-edu/portal-common/auth"
 	"github.com/hm-edu/portal-common/logging"
 
@@ -75,19 +76,19 @@ func (api *Server) wireRoutesAndMiddleware() {
 		api.logger.Fatal("fetching jwk set failed", zap.Error(err))
 	}
 
-	config := middleware.JWTConfig{
+	config := auth.JWTConfig{
 		ParseTokenFunc: func(auth string, c echo.Context) (interface{}, error) {
 			return commonAuth.GetToken(auth, ks, api.config.Audience)
 		},
 	}
 
-	jwtMiddleware := middleware.JWTWithConfig(config)
+	jwtMiddleware := auth.JWTWithConfig(config)
 
 	api.app.Use(middleware.RequestID())
-	api.app.Use(otelecho.Middleware("domain-rest-interface", otelecho.WithSkipper(func(c echo.Context) bool {
+	api.app.Use(logging.ZapLogger(api.logger, logging.WithSkipper(func(c echo.Context) bool {
 		return strings.Contains(c.Path(), "/docs") || strings.Contains(c.Path(), "/healthz")
 	})))
-	api.app.Use(logging.ZapLogger(api.logger, logging.WithSkipper(func(c echo.Context) bool {
+	api.app.Use(otelecho.Middleware("domain-rest-interface", otelecho.WithSkipper(func(c echo.Context) bool {
 		return strings.Contains(c.Path(), "/docs") || strings.Contains(c.Path(), "/healthz")
 	})))
 	api.app.Use(middleware.Recover())

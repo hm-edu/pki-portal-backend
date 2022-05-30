@@ -29,7 +29,7 @@ import (
 // @Success 200 {object} []model.Domain
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) ListDomains(c echo.Context) error {
-	logger := h.logger.With(logging.AddMetadata(c)...)
+	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "list")
 	defer span.End()
 
@@ -39,7 +39,6 @@ func (h *Handler) ListDomains(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
 	span.SetAttributes(attribute.String("user", user))
-	logger = logger.With(zap.String("user", user))
 
 	domains, err := h.enumerateDomains(ctx, user, logger)
 	if err != nil {
@@ -143,18 +142,17 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string, logger *zap
 // @Success 201 {object} model.Domain
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) CreateDomain(c echo.Context) error {
-	logger := h.logger.With(logging.AddMetadata(c)...)
+	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "create")
 	defer span.End()
 
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
-		h.logger.Error("Failed to get user from request", zap.Error(err))
+		logger.Error("Failed to get user from request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
 
 	span.SetAttributes(attribute.String("user", user))
-	logger = logger.With(zap.String("user", user))
 
 	req := &model.DomainRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
@@ -211,8 +209,7 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 // @Success 204
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) DeleteDomain(c echo.Context) error {
-
-	logger := h.logger.With(logging.AddMetadata(c)...)
+	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "delete")
 	defer span.End()
 
@@ -240,7 +237,7 @@ func (h *Handler) evaluatePermission(ctx context.Context, c echo.Context, logger
 		logger.Error("Failed to get user from request", zap.Error(err))
 		return nil, &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
-	logger = logger.With(zap.String("user", user), zap.Int("domain_id", id))
+	logger = logger.With(zap.Int("domain_id", id))
 	domains, err := h.enumerateDomains(ctx, user, logger)
 	if err != nil {
 		return nil, &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error listing domains"}
@@ -268,7 +265,7 @@ func (h *Handler) evaluatePermission(ctx context.Context, c echo.Context, logger
 // @Success 200 {object} model.Domain The updated domain
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) ApproveDomain(c echo.Context) error {
-	logger := h.logger.With(logging.AddMetadata(c)...)
+	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "approve")
 	defer span.End()
 
@@ -300,7 +297,7 @@ func (h *Handler) ApproveDomain(c echo.Context) error {
 // @Success 200 {object} model.Domain The updated domain
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) TransferDomain(c echo.Context) error {
-	logger := h.logger.With(logging.AddMetadata(c)...)
+	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "transfer")
 	defer span.End()
 
@@ -337,7 +334,7 @@ func (h *Handler) TransferDomain(c echo.Context) error {
 // @Success 200 {object} model.Domain The updated domain
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) DeleteDelegation(c echo.Context) error {
-	logger := h.logger.With(logging.AddMetadata(c)...)
+	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "deleteDelegation")
 	defer span.End()
 
@@ -379,7 +376,7 @@ func (h *Handler) DeleteDelegation(c echo.Context) error {
 // @Success 200 {object} model.Domain The updated domain
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) AddDelegation(c echo.Context) error {
-	logger := h.logger.With(logging.AddMetadata(c)...)
+	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "addDelegation")
 	defer span.End()
 
