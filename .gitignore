@@ -2,9 +2,12 @@ backend/pki-rest-interface/pki-rest-interface
 backend/domain-rest-interface/domain-rest-interface
 backend/pki-service/pki-service
 backend/dns-service/dns-service
+backend/eab-rest-interface/eab-rest-interface
 **/.idea
 **/.env
 **/__debug_bin
 **/*.sqlite3
 **/*.db
 backend/domain-rest-interface/coverage.txt
+deployment/portal.yaml
+backend/pki-service/acme.key

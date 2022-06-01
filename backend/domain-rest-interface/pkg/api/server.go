@@ -4,15 +4,20 @@ package api
 import (
 	"context"
 	"net/http"
+	"strings"
 	"time"
 
-	"github.com/brpaz/echozap"
 	"github.com/getkin/kin-openapi/openapi3"
+
 	"github.com/hm-edu/domain-rest-interface/pkg/api/docs"
 	"github.com/hm-edu/domain-rest-interface/pkg/api/domains"
 	"github.com/hm-edu/domain-rest-interface/pkg/store"
+	pb "github.com/hm-edu/portal-apis"
 	commonApi "github.com/hm-edu/portal-common/api"
+	"github.com/hm-edu/portal-common/auth"
 	commonAuth "github.com/hm-edu/portal-common/auth"
+	"github.com/hm-edu/portal-common/logging"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/lestrrat-go/jwx/jwk"
@@ -26,7 +31,6 @@ import (
 )
 
 var (
-	healthy     int32
 	ready       int32
 	openAPISpec *openapi3.T
 )
@@ -47,15 +51,16 @@ var (
 
 // Server is the basic structure of the users' REST-API server
 type Server struct {
-	app    *echo.Echo
-	logger *zap.Logger
-	config *commonApi.Config
-	store  *store.DomainStore
+	app        *echo.Echo
+	logger     *zap.Logger
+	config     *commonApi.Config
+	store      *store.DomainStore
+	pkiSerivce pb.SSLServiceClient
 }
 
 // NewServer creates a new server
-func NewServer(logger *zap.Logger, config *commonApi.Config, store *store.DomainStore) *Server {
-	return &Server{app: echo.New(), logger: logger, config: config, store: store}
+func NewServer(logger *zap.Logger, config *commonApi.Config, store *store.DomainStore, pkiSerivce pb.SSLServiceClient) *Server {
+	return &Server{app: echo.New(), logger: logger, config: config, store: store, pkiSerivce: pkiSerivce}
 }
 
 func (api *Server) wireRoutesAndMiddleware() {
@@ -71,18 +76,22 @@ func (api *Server) wireRoutesAndMiddleware() {
 		api.logger.Fatal("fetching jwk set failed", zap.Error(err))
 	}
 
-	config := middleware.JWTConfig{
+	config := auth.JWTConfig{
 		ParseTokenFunc: func(auth string, c echo.Context) (interface{}, error) {
 			return commonAuth.GetToken(auth, ks, api.config.Audience)
 		},
 	}
 
-	jwtMiddleware := middleware.JWTWithConfig(config)
+	jwtMiddleware := auth.JWTWithConfig(config)
 
 	api.app.Use(middleware.RequestID())
+	api.app.Use(otelecho.Middleware("domain-rest-interface", otelecho.WithSkipper(func(c echo.Context) bool {
+		return strings.Contains(c.Path(), "/docs") || strings.Contains(c.Path(), "/healthz")
+	})))
+	api.app.Use(logging.ZapLogger(api.logger, logging.WithSkipper(func(c echo.Context) bool {
+		return strings.Contains(c.Path(), "/docs") || strings.Contains(c.Path(), "/healthz")
+	})))
 	api.app.Use(middleware.Recover())
-	api.app.Use(echozap.ZapLogger(api.logger))
-	api.app.Use(otelecho.Middleware("pki-rest-interface"))
 	api.app.GET("/docs/spec.json", func(c echo.Context) error {
 		if openAPISpec == nil {
 			spec, err := commonApi.ToOpenAPI3(docs.SwaggerInfo)
@@ -103,16 +112,16 @@ func (api *Server) wireRoutesAndMiddleware() {
 
 	v1 := api.app.Group("/domains")
 	{
-		h := domains.NewHandler(api.store)
+		h := domains.NewHandler(api.store, api.pkiSerivce)
 		v1.Use(jwtMiddleware)
 		v1.GET("/", h.ListDomains)
 		v1.POST("/", h.CreateDomain)
 		{
-			v1.DELETE("/:id", h.DeleteDomains)
+			v1.DELETE("/:id", h.DeleteDomain)
 			v1.POST("/:id/approve", h.ApproveDomain)
 			v1.POST("/:id/transfer", h.TransferDomain)
 			v1.POST("/:id/delegation", h.AddDelegation)
-			v1.DELETE("/:domain/delegation/:delegation", h.DeleteDelegation)
+			v1.DELETE("/:id/delegation/:delegation", h.DeleteDelegation)
 		}
 	}
 
@@ -131,9 +140,8 @@ func (api *Server) ListenAndServe(stopCh <-chan struct{}) {
 	}()
 
 	ready = 1
-	healthy = 1
 
-	_ = <-stopCh
+	<-stopCh
 	err := api.app.Shutdown(context.Background())
 	if err != nil {
 		api.logger.Fatal("Stopping http server failed", zap.Error(err))

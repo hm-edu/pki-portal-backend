@@ -30,6 +30,10 @@ type Certificate struct {
 	NotBefore *time.Time `json:"notBefore,omitempty"`
 	// NotAfter holds the value of the "notAfter" field.
 	NotAfter time.Time `json:"notAfter,omitempty"`
+	// IssuedBy holds the value of the "issuedBy" field.
+	IssuedBy *string `json:"issuedBy,omitempty"`
+	// Created holds the value of the "created" field.
+	Created *time.Time `json:"created,omitempty"`
 	// Status holds the value of the "status" field.
 	Status certificate.Status `json:"status,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -62,9 +66,9 @@ func (*Certificate) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case certificate.FieldID, certificate.FieldSslId:
 			values[i] = new(sql.NullInt64)
-		case certificate.FieldSerial, certificate.FieldCommonName, certificate.FieldStatus:
+		case certificate.FieldSerial, certificate.FieldCommonName, certificate.FieldIssuedBy, certificate.FieldStatus:
 			values[i] = new(sql.NullString)
-		case certificate.FieldCreateTime, certificate.FieldUpdateTime, certificate.FieldNotBefore, certificate.FieldNotAfter:
+		case certificate.FieldCreateTime, certificate.FieldUpdateTime, certificate.FieldNotBefore, certificate.FieldNotAfter, certificate.FieldCreated:
 			values[i] = new(sql.NullTime)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Certificate", columns[i])
@@ -130,6 +134,20 @@ func (c *Certificate) assignValues(columns []string, values []interface{}) error
 			} else if value.Valid {
 				c.NotAfter = value.Time
 			}
+		case certificate.FieldIssuedBy:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field issuedBy", values[i])
+			} else if value.Valid {
+				c.IssuedBy = new(string)
+				*c.IssuedBy = value.String
+			}
+		case certificate.FieldCreated:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created", values[i])
+			} else if value.Valid {
+				c.Created = new(time.Time)
+				*c.Created = value.Time
+			}
 		case certificate.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
@@ -185,6 +203,14 @@ func (c *Certificate) String() string {
 	}
 	builder.WriteString(", notAfter=")
 	builder.WriteString(c.NotAfter.Format(time.ANSIC))
+	if v := c.IssuedBy; v != nil {
+		builder.WriteString(", issuedBy=")
+		builder.WriteString(*v)
+	}
+	if v := c.Created; v != nil {
+		builder.WriteString(", created=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", status=")
 	builder.WriteString(fmt.Sprintf("%v", c.Status))
 	builder.WriteByte(')')

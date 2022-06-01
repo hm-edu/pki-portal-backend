@@ -28,6 +28,10 @@ const (
 	FieldNotBefore = "not_before"
 	// FieldNotAfter holds the string denoting the notafter field in the database.
 	FieldNotAfter = "not_after"
+	// FieldIssuedBy holds the string denoting the issuedby field in the database.
+	FieldIssuedBy = "issued_by"
+	// FieldCreated holds the string denoting the created field in the database.
+	FieldCreated = "created"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// EdgeDomains holds the string denoting the domains edge name in mutations.
@@ -51,6 +55,8 @@ var Columns = []string{
 	FieldCommonName,
 	FieldNotBefore,
 	FieldNotAfter,
+	FieldIssuedBy,
+	FieldCreated,
 	FieldStatus,
 }
 

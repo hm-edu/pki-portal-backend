@@ -4,9 +4,9 @@ package api
 import (
 	"context"
 	"net/http"
+	"strings"
 	"time"
 
-	"github.com/brpaz/echozap"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -20,7 +20,9 @@ import (
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/api"
 	commonApi "github.com/hm-edu/portal-common/api"
+	"github.com/hm-edu/portal-common/auth"
 	commonAuth "github.com/hm-edu/portal-common/auth"
+	"github.com/hm-edu/portal-common/logging"
 
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
 	"go.uber.org/zap"
@@ -75,18 +77,20 @@ func (api *Server) wireRoutesAndMiddleware() {
 		api.logger.Fatal("fetching jwk set failed", zap.Error(err))
 	}
 
-	config := middleware.JWTConfig{
+	config := auth.JWTConfig{
 		ParseTokenFunc: func(auth string, c echo.Context) (interface{}, error) {
 			return commonAuth.GetToken(auth, ks, api.config.Audience)
 		},
 	}
 
-	jwtMiddleware := middleware.JWTWithConfig(config)
+	jwtMiddleware := auth.JWTWithConfig(config)
 
 	api.app.Use(middleware.RequestID())
-	api.app.Use(otelecho.Middleware("pki-rest-interface"))
+	api.app.Use(otelecho.Middleware("pki-rest-interface", otelecho.WithSkipper(func(c echo.Context) bool {
+		return strings.Contains(c.Path(), "/docs") || strings.Contains(c.Path(), "/healthz")
+	})))
+	api.app.Use(logging.ZapLogger(api.logger))
 	api.app.Use(middleware.Recover())
-	api.app.Use(echozap.ZapLogger(api.logger))
 	api.app.GET("/docs/spec.json", func(c echo.Context) error {
 		if openAPISpec == nil {
 			spec, err := commonApi.ToOpenAPI3(docs.SwaggerInfo)
@@ -114,10 +118,11 @@ func (api *Server) wireRoutesAndMiddleware() {
 		if err != nil {
 			api.logger.Fatal("failed to create ssl client", zap.Error(err))
 		}
-		ssl := ssl.NewHandler(domainClient, sslClient, api.logger)
+		ssl := ssl.NewHandler(domainClient, sslClient)
 		group.Use(jwtMiddleware)
 		group.GET("/", ssl.List)
 		group.POST("/revoke", ssl.Revoke)
+		group.POST("/csr", ssl.HandleCsr)
 	}
 
 	group = api.app.Group("/smime")
@@ -126,13 +131,14 @@ func (api *Server) wireRoutesAndMiddleware() {
 		if err != nil {
 			api.logger.Fatal("failed to create smime client", zap.Error(err))
 		}
-		handler := smime.NewHandler(smimeClient, api.logger)
+		handler := smime.NewHandler(smimeClient)
 		group.Use(jwtMiddleware)
 		group.GET("/", handler.List)
 		group.POST("/revoke", handler.Revoke)
 		group.POST("/csr", handler.HandleCsr)
 	}
-
+	ready = 1
+	healthy = 1
 }
 
 func domainClient(host string) (pb.DomainServiceClient, error) {
@@ -170,7 +176,7 @@ func (api *Server) ListenAndServe(stopCh <-chan struct{}) {
 			api.logger.Fatal("HTTP server crashed", zap.Error(err))
 		}
 	}()
-	_ = <-stopCh
+	<-stopCh
 	err := api.app.Shutdown(context.Background())
 	if err != nil {
 		api.logger.Fatal("Stopping http server failed", zap.Error(err))

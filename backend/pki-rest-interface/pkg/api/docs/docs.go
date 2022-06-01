@@ -23,64 +23,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/healthz": {
-            "get": {
-                "description": "Used by Kubernetes Liveness Probe",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Kubernetes"
-                ],
-                "summary": "Liveness check",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/api.healthResponse"
-                        }
-                    },
-                    "503": {
-                        "description": "Service Unavailable",
-                        "schema": {
-                            "$ref": "#/definitions/api.healthResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/readyz": {
-            "get": {
-                "description": "Used by Kubernetes Readiness Probe",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Kubernetes"
-                ],
-                "summary": "Readiness check",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/api.healthResponse"
-                        }
-                    },
-                    "503": {
-                        "description": "Service Unavailable",
-                        "schema": {
-                            "$ref": "#/definitions/api.healthResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/smime/": {
             "get": {
                 "security": [
@@ -239,6 +181,51 @@ const docTemplate = `{
                 }
             }
         },
+        "/ssl/csr": {
+            "post": {
+                "security": [
+                    {
+                        "API": []
+                    }
+                ],
+                "description": "This endpoint handles a provided CSR. The validity of the CSR is checked and passed to the sectigo server.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SSL"
+                ],
+                "summary": "SSL CSR Endpoint",
+                "parameters": [
+                    {
+                        "description": "The CSR",
+                        "name": "csr",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.CsrRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "certificate",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "default": {
+                        "description": "Error processing the request",
+                        "schema": {
+                            "$ref": "#/definitions/echo.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/ssl/revoke": {
             "post": {
                 "security": [
@@ -316,14 +303,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "api.healthResponse": {
-            "type": "object",
-            "properties": {
-                "status": {
-                    "type": "string"
-                }
-            }
-        },
         "echo.HTTPError": {
             "type": "object",
             "properties": {
@@ -379,13 +358,19 @@ const docTemplate = `{
                 "common_name": {
                     "type": "string"
                 },
+                "created": {
+                    "$ref": "#/definitions/timestamppb.Timestamp"
+                },
                 "expires": {
                     "$ref": "#/definitions/timestamppb.Timestamp"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "notBefore": {
+                "issued_by": {
+                    "type": "string"
+                },
+                "not_before": {
                     "$ref": "#/definitions/timestamppb.Timestamp"
                 },
                 "serial": {

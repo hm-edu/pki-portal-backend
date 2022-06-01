@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/hm-edu/pki-service/pkg/cfg"
@@ -15,6 +16,7 @@ import (
 	"github.com/hm-edu/sectigo-client/sectigo/client"
 
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -27,18 +29,34 @@ type smimeAPIServer struct {
 	client *sectigo.Client
 	cfg    *cfg.SectigoConfiguration
 	logger *zap.Logger
+
+	tracer trace.Tracer
 }
 
 func newSmimeAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration) *smimeAPIServer {
-	return &smimeAPIServer{client: client, cfg: cfg, logger: zap.L()}
+	tracer := otel.GetTracerProvider().Tracer("smime")
+	return &smimeAPIServer{client: client, cfg: cfg, logger: zap.L(), tracer: tracer}
 }
 
-func (s *smimeAPIServer) ListCertificates(_ context.Context, req *pb.ListSmimeRequest) (*pb.ListSmimeResponse, error) {
-	s.logger.Debug("Requesting smime certificates", zap.String("user", req.Email))
+func (s *smimeAPIServer) ListCertificates(ctx context.Context, req *pb.ListSmimeRequest) (*pb.ListSmimeResponse, error) {
+	_, span := s.tracer.Start(ctx, "listCertificates")
+	defer span.End()
+	logger := s.logger.With(zap.String("user", req.Email), zap.String("trace_id", span.SpanContext().TraceID().String()))
+
+	logger.Info("Requesting smime certificates")
 	items, err := s.client.ClientService.ListByEmail(req.Email)
 	if err != nil {
+		if sectigoError, ok := err.(*sectigo.ErrorResponse); ok {
+			if sectigoError.Code == -105 {
+				logger.Info("No certificates found")
+				return &pb.ListSmimeResponse{Certificates: []*pb.ListSmimeResponse_CertificateDetails{}}, nil
+			}
+		}
+		logger.Info("Error while requesting smime certificates", zap.Error(err))
+		span.RecordError(err)
 		return nil, status.Error(codes.Internal, err.Error())
 	}
+	logger.Info("Successfully requested smime certificates", zap.Int("count", len(*items)))
 	return &pb.ListSmimeResponse{Certificates: helper.Map(*items, func(t client.ListItem) *pb.ListSmimeResponse_CertificateDetails {
 		return &pb.ListSmimeResponse_CertificateDetails{
 			Id:      int32(t.ID),
@@ -49,11 +67,12 @@ func (s *smimeAPIServer) ListCertificates(_ context.Context, req *pb.ListSmimeRe
 	})}, nil
 }
 func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmimeRequest) (*pb.IssueSmimeResponse, error) {
-
-	_, span := otel.GetTracerProvider().Tracer("smime").Start(ctx, "handleCsr")
+	_, span := s.tracer.Start(ctx, "handleCsr")
 	defer span.End()
 	span.AddEvent("Validating csr")
 
+	logger := s.logger.With(zap.String("user", req.Email), zap.String("trace_id", span.SpanContext().TraceID().String()))
+	logger.Info("Issuing smime certificate")
 	block, _ := pem.Decode([]byte(req.Csr))
 
 	// Validate the passed CSR to comply the server-side requirements (e.g. key-strength, key-type, etc.)
@@ -61,24 +80,26 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 	csr, err := x509.ParseCertificateRequest(block.Bytes)
 	if err != nil {
 		span.RecordError(err)
+		logger.Error("Error while parsing CSR", zap.Error(err))
 		return nil, status.Error(codes.InvalidArgument, "Invalid CSR")
 	}
 
 	// Validate the CSR
 	if err := csr.CheckSignature(); err != nil {
 		span.RecordError(err)
+		logger.Error("Error while validating CSR", zap.Error(err))
 		return nil, status.Error(codes.InvalidArgument, "Invalid CSR")
 	}
 
 	if csr.PublicKeyAlgorithm != x509.RSA {
 		return nil, status.Error(codes.InvalidArgument, "Only RSA keys are supported")
-
 	}
 
 	// Get the public key from the CSR
 	pubKey, ok := csr.PublicKey.(*rsa.PublicKey)
 	size := pubKey.Size() * 8
 	if !ok || fmt.Sprintf("%d", size) != s.cfg.SmimeKeyLength {
+		logger.Warn("Invalid key length", zap.String("key_length", fmt.Sprintf("%d", size)))
 		return nil, status.Error(codes.InvalidArgument, "Invalid CSR")
 	}
 
@@ -99,22 +120,24 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 	})
 	if err != nil {
 		span.RecordError(err)
+		logger.Error("Error while enrolling certificate", zap.Error(err))
 		return nil, status.Error(codes.Internal, "Error enrolling certificate")
 	}
 	cert := ""
 	err = helper.WaitFor(5*time.Minute, 5*time.Second, func() (bool, error) {
-		c, err := s.client.ClientService.Collect(resp.OrderNumber, "x509")
+		c, err := s.client.ClientService.Collect(resp.OrderNumber, "pemia")
 		if err != nil {
 			if e, ok := err.(*sectigo.ErrorResponse); ok {
 				if e.Code == 0 && e.Description == "Being processed by Sectigo" {
 					span.AddEvent("Certificate not ready yet")
-					s.logger.Info("Certificate not ready", zap.Int("id", resp.OrderNumber), zap.String("email", req.Email))
+					logger.Debug("Certificate not ready", zap.Int("id", resp.OrderNumber), zap.String("email", req.Email))
 					return false, nil
 				}
 			}
 			return false, err
 		}
 		span.AddEvent("Certificate ready")
+		logger.Info("Certificate ready", zap.Int("id", resp.OrderNumber))
 		cert = *c
 		return true, nil
 	})
@@ -123,6 +146,9 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 		span.RecordError(err)
 		return nil, status.Error(codes.Internal, "Error obtaining certificate")
 	}
+
+	cert = strings.ReplaceAll(cert, "-----BEGIN PKCS7-----\n", "")
+	cert = strings.ReplaceAll(cert, "-----END PKCS7-----\n", "")
 
 	return &pb.IssueSmimeResponse{Certificate: cert}, nil
 

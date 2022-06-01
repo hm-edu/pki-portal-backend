@@ -43,7 +43,7 @@ var syncCmd = &cobra.Command{
 			Db:     database.DB.Db,
 			Client: sectigo.NewClient(http.DefaultClient, logger, sectigoCfg.User, sectigoCfg.Password, sectigoCfg.CustomerURI),
 		}
-		syncer.SyncCertificates()
+		syncer.SyncAllCertificates()
 
 	},
 }

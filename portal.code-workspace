@@ -17,6 +17,9 @@
         },
         {
             "path": "backend/dns-service"
+        },
+        {
+            "path": "backend/eab-rest-interface"
         }
     ],
     "settings": {

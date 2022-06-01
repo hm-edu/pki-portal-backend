@@ -4,7 +4,7 @@ on:
   push:
   pull_request:
     branches:
-      - 'main'
+      - "main"
 
 jobs:
   build:
@@ -16,6 +16,7 @@ jobs:
           - pki-rest-interface
           - pki-service
           - dns-service
+          - eab-rest-interface
           - domain-rest-interface
     env:
       # Use docker.io for Docker Hub if empty
@@ -42,11 +43,18 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.dir }}
+          tags: |
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=tag
+            type=ref,event=pr
+            type=raw,value={{branch}}-{{sha}}-{{date 'X'}}
+
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
           context: .
-          push: ${{ github.event_name != 'pull_request' }}
+          push: ${{ github.event_name != 'pull_request' && github.actor != 'dependabot[bot]'}}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |

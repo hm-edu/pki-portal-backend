@@ -6,7 +6,9 @@ import (
 	"github.com/hm-edu/pki-rest-interface/pkg/model"
 	"github.com/hm-edu/portal-common/auth"
 	"github.com/hm-edu/portal-common/helper"
-	"go.opentelemetry.io/otel"
+	"github.com/hm-edu/portal-common/logging"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/labstack/echo/v4"
@@ -23,15 +25,27 @@ import (
 // @Success 200 {object} []pb.SslCertificateDetails "Certificates"
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) List(c echo.Context) error {
-
-	domains, err := h.domain.ListDomains(c.Request().Context(), &pb.ListDomainsRequest{User: auth.UserFromRequest(c)})
+	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
+	ctx, span := h.tracer.Start(c.Request().Context(), "list")
+	defer span.End()
+	user, err := auth.UserFromRequest(c)
 	if err != nil {
-		h.logger.Error("Error getting domains", zap.Error(err))
+		logger.Error("Error getting user from request", zap.Error(err))
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
+	}
+	span.SetAttributes(attribute.String("user", user))
+
+	span.AddEvent("fetching domains")
+	domains, err := h.domain.ListDomains(ctx, &pb.ListDomainsRequest{User: user, Approved: true})
+	if err != nil {
+		logger.Error("Error getting domains", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while listing certificates"}
 	}
-	certs, err := h.ssl.ListCertificates(c.Request().Context(), &pb.ListSslRequest{Domains: domains.Domains})
+	span.AddEvent("fetching certificates")
+	logger.Info("fetching certificates", zap.Strings("domains", domains.Domains))
+	certs, err := h.ssl.ListCertificates(ctx, &pb.ListSslRequest{IncludePartial: false, Domains: domains.Domains})
 	if err != nil {
-		h.logger.Error("Error while listing certificates", zap.Error(err))
+		logger.Error("Error while listing certificates", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while listing certificates"}
 	}
 	return c.JSON(http.StatusOK, certs.Items)
@@ -48,37 +62,94 @@ func (h *Handler) List(c echo.Context) error {
 // @Success 204
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) Revoke(c echo.Context) error {
-	ctx, span := otel.GetTracerProvider().Tracer("ssl").Start(c.Request().Context(), "revoke")
+	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
+	ctx, span := h.tracer.Start(c.Request().Context(), "revoke")
 	defer span.End()
+	user, err := auth.UserFromRequest(c)
+	if err != nil {
+		logger.Error("Error getting user from request", zap.Error(err))
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
+	}
+	span.SetAttributes(attribute.String("user", user))
+
 	req := &model.RevokeRequest{}
+	span.AddEvent("validating request")
 	if err := req.Bind(c, h.validator); err != nil {
 		span.RecordError(err)
+		logger.Error("Error while validating request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
 	}
+
+	logger.Info("trying to revoke certificate", zap.String("serial", req.Serial), zap.String("reason", req.Reason))
+
+	span.AddEvent("obtaining certificate details")
 	details, err := h.ssl.CertificateDetails(ctx, &pb.CertificateDetailsRequest{Serial: req.Serial})
 
 	if err != nil {
-		h.logger.Error("Error while revoking certificate", zap.Error(err))
+		span.RecordError(err)
+		logger.Error("Error while revoking certificate", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while revoking certificate"}
 	}
-
-	domains, err := h.domain.ListDomains(ctx, &pb.ListDomainsRequest{User: auth.UserFromRequest(c), Approved: true})
+	span.AddEvent("fetching domains")
+	domains, err := h.domain.ListDomains(ctx, &pb.ListDomainsRequest{User: user, Approved: true})
 	if err != nil {
-		h.logger.Error("Error while revoking certificate", zap.Error(err))
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "error listing domains")
+		logger.Error("Error listing domains for certificate revocation", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while revoking certificate"}
 	}
 
 	for _, certDomain := range details.SubjectAlternativeNames {
 		if !helper.Contains(domains.Domains, certDomain) {
+			logger.Warn("Domain not found. Revocation not allowed.", zap.String("domain", certDomain))
 			return &echo.HTTPError{Code: http.StatusUnauthorized, Message: "You are not authorized to revoke this certificate"}
 		}
 	}
-
+	span.AddEvent("revoking certificate")
 	_, err = h.ssl.RevokeCertificate(ctx, &pb.RevokeSslRequest{Identifier: &pb.RevokeSslRequest_Serial{Serial: req.Serial}, Reason: req.Reason})
 	if err != nil {
-		h.logger.Error("Error while revoking certificate", zap.Error(err))
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "error revoking certificate")
+		logger.Error("Error while revoking certificate", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while revoking certificate"}
 	}
 
+	logger.Info("certificate revoked", zap.String("serial", req.Serial))
 	return c.NoContent(http.StatusNoContent)
+}
+
+// HandleCsr godoc
+// @Summary SSL CSR Endpoint
+// @Description This endpoint handles a provided CSR. The validity of the CSR is checked and passed to the sectigo server.
+// @Tags SSL
+// @Accept json
+// @Produce json
+// @Router /ssl/csr [post]
+// @Param csr body model.CsrRequest true "The CSR"
+// @Security API
+// @Success 200 {string} string "certificate"
+// @Response default {object} echo.HTTPError "Error processing the request"
+func (h *Handler) HandleCsr(c echo.Context) error {
+	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
+	ctx, span := h.tracer.Start(c.Request().Context(), "revoke")
+	defer span.End()
+	user, err := auth.UserFromRequest(c)
+	if err != nil {
+		logger.Error("Error getting user from request", zap.Error(err))
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
+	}
+	span.SetAttributes(attribute.String("user", user))
+
+	req := &model.CsrRequest{}
+	if err := req.Bind(c, h.validator); err != nil {
+		span.RecordError(err)
+		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
+	}
+	resp, err := h.ssl.IssueCertificate(ctx, &pb.IssueSslRequest{Csr: req.CSR, Issuer: user})
+	if err != nil {
+		span.RecordError(err)
+		logger.Error("Error while processing CSR", zap.Error(err))
+		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while processing the request"}
+	}
+	return c.JSON(http.StatusOK, resp.Certificate)
 }

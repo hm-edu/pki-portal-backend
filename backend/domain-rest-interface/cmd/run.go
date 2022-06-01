@@ -7,6 +7,7 @@ import (
 	"github.com/hm-edu/domain-rest-interface/pkg/database"
 	"github.com/hm-edu/domain-rest-interface/pkg/grpc"
 	"github.com/hm-edu/domain-rest-interface/pkg/store"
+	pb "github.com/hm-edu/portal-apis"
 	commonApi "github.com/hm-edu/portal-common/api"
 	"github.com/hm-edu/portal-common/signals"
 	"github.com/hm-edu/portal-common/tracing"
@@ -46,7 +47,7 @@ var runCmd = &cobra.Command{
 		database.ConnectDb(logger, viper.GetString("db"))
 
 		store := store.NewDomainStore(database.DB.Db)
-
+		store.Preseed(logger)
 		stopCh := signals.SetupSignalHandler()
 
 		// start gRPC server
@@ -55,12 +56,24 @@ var runCmd = &cobra.Command{
 			go grpcSrv.ListenAndServe(stopCh)
 		}
 
+		client, err := sslClient(viper.GetString("ssl_service"))
+		if err != nil {
+			logger.Fatal("Error connecting to ssl service", zap.Error(err))
+		}
+
 		// start HTTP server
-		srv := api.NewServer(logger, &srvCfg, store)
+		srv := api.NewServer(logger, &srvCfg, store, client)
 		srv.ListenAndServe(stopCh)
 	},
 }
 
+func sslClient(host string) (pb.SSLServiceClient, error) {
+	conn, err := commonApi.ConnectGRPC(host)
+	if err != nil {
+		return nil, err
+	}
+	return pb.NewSSLServiceClient(conn), nil
+}
 func init() {
 	rootCmd.AddCommand(runCmd)
 
@@ -70,5 +83,7 @@ func init() {
 	runCmd.Flags().String("jwks_uri", "", "The location of the jwk set")
 	runCmd.Flags().String("audience", "", "The expected audience")
 	runCmd.Flags().String("db", "", "connection string for the database")
+	runCmd.Flags().String("ssl_service", "", "pki backend")
+	runCmd.Flags().String("preseed", "", "path to the preseed file")
 	runCmd.Flags().String("level", "info", "log level debug, info, warn, error, flat or panic")
 }

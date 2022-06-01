@@ -5,6 +5,14 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+// ContextKey is the type for context keys.
+type ContextKey string
+
+var (
+	// LoggingContextKey is the key used to store the logger in the context.
+	LoggingContextKey = ContextKey("logging")
+)
+
 // InitZap performs the initialization of the ZAP logger.
 func InitZap(logLevel string) (*zap.Logger, error) {
 	level := zap.NewAtomicLevelAt(zapcore.InfoLevel)

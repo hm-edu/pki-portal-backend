@@ -8,11 +8,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dir: 
+        dir:
           - backend/pki-rest-interface
           - backend/pki-service
           - backend/dns-service
           - backend/domain-rest-interface
+          - backend/eab-rest-interface
           - backend/common
     steps:
       - uses: actions/checkout@v3

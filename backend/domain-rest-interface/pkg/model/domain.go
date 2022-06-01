@@ -28,9 +28,18 @@ func DomainToOutput(d *ent.Domain) Domain {
 
 // Domain represents a domain.
 type Domain struct {
-	ID          int          `json:"id"`
-	FQDN        string       `json:"fqdn"`
-	Owner       string       `json:"owner"`
-	Delegations []Delegation `json:"delegations"`
-	Approved    bool         `json:"approved"`
+	ID          int           `json:"id"`
+	FQDN        string        `json:"fqdn"`
+	Owner       string        `json:"owner"`
+	Delegations []*Delegation `json:"delegations"`
+	Approved    bool          `json:"approved"`
+	Permissions Permissions   `json:"permissions,omitempty"`
+}
+
+// Permissions holds the informations about the permissions on the domain
+type Permissions struct {
+	CanDelete   bool `json:"can_delete"`
+	CanApprove  bool `json:"can_approve"`
+	CanTransfer bool `json:"can_transfer"`
+	CanDelegate bool `json:"can_delegate"`
 }

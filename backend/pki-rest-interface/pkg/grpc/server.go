@@ -58,7 +58,7 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 			s.logger.Error("failed to serve", zap.Error(err))
 		}
 	}()
-	_ = <-stopCh
+	<-stopCh
 	s.logger.Info("Stopping GRPC server")
 	srv.GracefulStop()
 }
