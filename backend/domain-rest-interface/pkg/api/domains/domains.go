@@ -350,7 +350,7 @@ func (h *Handler) DeleteDelegation(c echo.Context) error {
 	logger.Info("Deleting delegation", zap.Int("domain", item.ID), zap.Int("delegation", delegationID), zap.Any("domain", item))
 
 	delegation := helper.First(item.Delegations, func(t *model.Delegation) bool { return delegationID == t.ID })
-	if delegation != nil {
+	if delegation == nil {
 		logger.Error("Delegation not found", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusNotFound, Message: "Delegation not found"}
 	}
