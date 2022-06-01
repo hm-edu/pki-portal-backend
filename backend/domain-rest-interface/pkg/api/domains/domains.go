@@ -347,6 +347,7 @@ func (h *Handler) DeleteDelegation(c echo.Context) error {
 	if err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest}
 	}
+	logger.Info("Deleting delegation", zap.Int("domain", item.ID), zap.Int("delegation", delegationID), zap.Any("domain", item))
 
 	delegation := helper.First(item.Delegations, func(t *model.Delegation) bool { return delegationID == t.ID })
 	if delegation != nil {
