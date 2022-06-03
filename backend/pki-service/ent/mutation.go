@@ -44,6 +44,7 @@ type CertificateMutation struct {
 	notBefore      *time.Time
 	notAfter       *time.Time
 	issuedBy       *string
+	source         *string
 	created        *time.Time
 	status         *certificate.Status
 	clearedFields  map[string]struct{}
@@ -527,6 +528,55 @@ func (m *CertificateMutation) ResetIssuedBy() {
 	delete(m.clearedFields, certificate.FieldIssuedBy)
 }
 
+// SetSource sets the "source" field.
+func (m *CertificateMutation) SetSource(s string) {
+	m.source = &s
+}
+
+// Source returns the value of the "source" field in the mutation.
+func (m *CertificateMutation) Source() (r string, exists bool) {
+	v := m.source
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSource returns the old "source" field's value of the Certificate entity.
+// If the Certificate object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CertificateMutation) OldSource(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSource is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSource requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSource: %w", err)
+	}
+	return oldValue.Source, nil
+}
+
+// ClearSource clears the value of the "source" field.
+func (m *CertificateMutation) ClearSource() {
+	m.source = nil
+	m.clearedFields[certificate.FieldSource] = struct{}{}
+}
+
+// SourceCleared returns if the "source" field was cleared in this mutation.
+func (m *CertificateMutation) SourceCleared() bool {
+	_, ok := m.clearedFields[certificate.FieldSource]
+	return ok
+}
+
+// ResetSource resets all changes to the "source" field.
+func (m *CertificateMutation) ResetSource() {
+	m.source = nil
+	delete(m.clearedFields, certificate.FieldSource)
+}
+
 // SetCreated sets the "created" field.
 func (m *CertificateMutation) SetCreated(t time.Time) {
 	m.created = &t
@@ -685,7 +735,7 @@ func (m *CertificateMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CertificateMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.create_time != nil {
 		fields = append(fields, certificate.FieldCreateTime)
 	}
@@ -709,6 +759,9 @@ func (m *CertificateMutation) Fields() []string {
 	}
 	if m.issuedBy != nil {
 		fields = append(fields, certificate.FieldIssuedBy)
+	}
+	if m.source != nil {
+		fields = append(fields, certificate.FieldSource)
 	}
 	if m.created != nil {
 		fields = append(fields, certificate.FieldCreated)
@@ -740,6 +793,8 @@ func (m *CertificateMutation) Field(name string) (ent.Value, bool) {
 		return m.NotAfter()
 	case certificate.FieldIssuedBy:
 		return m.IssuedBy()
+	case certificate.FieldSource:
+		return m.Source()
 	case certificate.FieldCreated:
 		return m.Created()
 	case certificate.FieldStatus:
@@ -769,6 +824,8 @@ func (m *CertificateMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldNotAfter(ctx)
 	case certificate.FieldIssuedBy:
 		return m.OldIssuedBy(ctx)
+	case certificate.FieldSource:
+		return m.OldSource(ctx)
 	case certificate.FieldCreated:
 		return m.OldCreated(ctx)
 	case certificate.FieldStatus:
@@ -837,6 +894,13 @@ func (m *CertificateMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetIssuedBy(v)
+		return nil
+	case certificate.FieldSource:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSource(v)
 		return nil
 	case certificate.FieldCreated:
 		v, ok := value.(time.Time)
@@ -912,6 +976,9 @@ func (m *CertificateMutation) ClearedFields() []string {
 	if m.FieldCleared(certificate.FieldIssuedBy) {
 		fields = append(fields, certificate.FieldIssuedBy)
 	}
+	if m.FieldCleared(certificate.FieldSource) {
+		fields = append(fields, certificate.FieldSource)
+	}
 	if m.FieldCleared(certificate.FieldCreated) {
 		fields = append(fields, certificate.FieldCreated)
 	}
@@ -943,6 +1010,9 @@ func (m *CertificateMutation) ClearField(name string) error {
 		return nil
 	case certificate.FieldIssuedBy:
 		m.ClearIssuedBy()
+		return nil
+	case certificate.FieldSource:
+		m.ClearSource()
 		return nil
 	case certificate.FieldCreated:
 		m.ClearCreated()
@@ -978,6 +1048,9 @@ func (m *CertificateMutation) ResetField(name string) error {
 		return nil
 	case certificate.FieldIssuedBy:
 		m.ResetIssuedBy()
+		return nil
+	case certificate.FieldSource:
+		m.ResetSource()
 		return nil
 	case certificate.FieldCreated:
 		m.ResetCreated()

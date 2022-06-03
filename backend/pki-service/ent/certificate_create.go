@@ -127,6 +127,20 @@ func (cc *CertificateCreate) SetNillableIssuedBy(s *string) *CertificateCreate {
 	return cc
 }
 
+// SetSource sets the "source" field.
+func (cc *CertificateCreate) SetSource(s string) *CertificateCreate {
+	cc.mutation.SetSource(s)
+	return cc
+}
+
+// SetNillableSource sets the "source" field if the given value is not nil.
+func (cc *CertificateCreate) SetNillableSource(s *string) *CertificateCreate {
+	if s != nil {
+		cc.SetSource(*s)
+	}
+	return cc
+}
+
 // SetCreated sets the "created" field.
 func (cc *CertificateCreate) SetCreated(t time.Time) *CertificateCreate {
 	cc.mutation.SetCreated(t)
@@ -380,6 +394,14 @@ func (cc *CertificateCreate) createSpec() (*Certificate, *sqlgraph.CreateSpec) {
 		})
 		_node.IssuedBy = &value
 	}
+	if value, ok := cc.mutation.Source(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: certificate.FieldSource,
+		})
+		_node.Source = &value
+	}
 	if value, ok := cc.mutation.Created(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -598,6 +620,24 @@ func (u *CertificateUpsert) UpdateIssuedBy() *CertificateUpsert {
 // ClearIssuedBy clears the value of the "issuedBy" field.
 func (u *CertificateUpsert) ClearIssuedBy() *CertificateUpsert {
 	u.SetNull(certificate.FieldIssuedBy)
+	return u
+}
+
+// SetSource sets the "source" field.
+func (u *CertificateUpsert) SetSource(v string) *CertificateUpsert {
+	u.Set(certificate.FieldSource, v)
+	return u
+}
+
+// UpdateSource sets the "source" field to the value that was provided on create.
+func (u *CertificateUpsert) UpdateSource() *CertificateUpsert {
+	u.SetExcluded(certificate.FieldSource)
+	return u
+}
+
+// ClearSource clears the value of the "source" field.
+func (u *CertificateUpsert) ClearSource() *CertificateUpsert {
+	u.SetNull(certificate.FieldSource)
 	return u
 }
 
@@ -829,6 +869,27 @@ func (u *CertificateUpsertOne) UpdateIssuedBy() *CertificateUpsertOne {
 func (u *CertificateUpsertOne) ClearIssuedBy() *CertificateUpsertOne {
 	return u.Update(func(s *CertificateUpsert) {
 		s.ClearIssuedBy()
+	})
+}
+
+// SetSource sets the "source" field.
+func (u *CertificateUpsertOne) SetSource(v string) *CertificateUpsertOne {
+	return u.Update(func(s *CertificateUpsert) {
+		s.SetSource(v)
+	})
+}
+
+// UpdateSource sets the "source" field to the value that was provided on create.
+func (u *CertificateUpsertOne) UpdateSource() *CertificateUpsertOne {
+	return u.Update(func(s *CertificateUpsert) {
+		s.UpdateSource()
+	})
+}
+
+// ClearSource clears the value of the "source" field.
+func (u *CertificateUpsertOne) ClearSource() *CertificateUpsertOne {
+	return u.Update(func(s *CertificateUpsert) {
+		s.ClearSource()
 	})
 }
 
@@ -1229,6 +1290,27 @@ func (u *CertificateUpsertBulk) UpdateIssuedBy() *CertificateUpsertBulk {
 func (u *CertificateUpsertBulk) ClearIssuedBy() *CertificateUpsertBulk {
 	return u.Update(func(s *CertificateUpsert) {
 		s.ClearIssuedBy()
+	})
+}
+
+// SetSource sets the "source" field.
+func (u *CertificateUpsertBulk) SetSource(v string) *CertificateUpsertBulk {
+	return u.Update(func(s *CertificateUpsert) {
+		s.SetSource(v)
+	})
+}
+
+// UpdateSource sets the "source" field to the value that was provided on create.
+func (u *CertificateUpsertBulk) UpdateSource() *CertificateUpsertBulk {
+	return u.Update(func(s *CertificateUpsert) {
+		s.UpdateSource()
+	})
+}
+
+// ClearSource clears the value of the "source" field.
+func (u *CertificateUpsertBulk) ClearSource() *CertificateUpsertBulk {
+	return u.Update(func(s *CertificateUpsert) {
+		s.ClearSource()
 	})
 }
 

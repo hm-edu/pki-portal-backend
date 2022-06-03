@@ -5,7 +5,6 @@ package ent
 import (
 	"context"
 	"database/sql/driver"
-	"errors"
 	"fmt"
 	"math"
 
@@ -302,15 +301,17 @@ func (dq *DomainQuery) WithCertificates(opts ...func(*CertificateQuery)) *Domain
 //		Scan(ctx, &v)
 //
 func (dq *DomainQuery) GroupBy(field string, fields ...string) *DomainGroupBy {
-	group := &DomainGroupBy{config: dq.config}
-	group.fields = append([]string{field}, fields...)
-	group.path = func(ctx context.Context) (prev *sql.Selector, err error) {
+	grbuild := &DomainGroupBy{config: dq.config}
+	grbuild.fields = append([]string{field}, fields...)
+	grbuild.path = func(ctx context.Context) (prev *sql.Selector, err error) {
 		if err := dq.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
 		return dq.sqlQuery(ctx), nil
 	}
-	return group
+	grbuild.label = domain.Label
+	grbuild.flds, grbuild.scan = &grbuild.fields, grbuild.Scan
+	return grbuild
 }
 
 // Select allows the selection one or more fields/columns for the given query,
@@ -328,7 +329,10 @@ func (dq *DomainQuery) GroupBy(field string, fields ...string) *DomainGroupBy {
 //
 func (dq *DomainQuery) Select(fields ...string) *DomainSelect {
 	dq.fields = append(dq.fields, fields...)
-	return &DomainSelect{DomainQuery: dq}
+	selbuild := &DomainSelect{DomainQuery: dq}
+	selbuild.label = domain.Label
+	selbuild.flds, selbuild.scan = &dq.fields, selbuild.Scan
+	return selbuild
 }
 
 func (dq *DomainQuery) prepareQuery(ctx context.Context) error {
@@ -347,7 +351,7 @@ func (dq *DomainQuery) prepareQuery(ctx context.Context) error {
 	return nil
 }
 
-func (dq *DomainQuery) sqlAll(ctx context.Context) ([]*Domain, error) {
+func (dq *DomainQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Domain, error) {
 	var (
 		nodes       = []*Domain{}
 		_spec       = dq.querySpec()
@@ -356,17 +360,16 @@ func (dq *DomainQuery) sqlAll(ctx context.Context) ([]*Domain, error) {
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
-		node := &Domain{config: dq.config}
-		nodes = append(nodes, node)
-		return node.scanValues(columns)
+		return (*Domain).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []interface{}) error {
-		if len(nodes) == 0 {
-			return fmt.Errorf("ent: Assign called without calling ScanValues")
-		}
-		node := nodes[len(nodes)-1]
+		node := &Domain{config: dq.config}
+		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
+	}
+	for i := range hooks {
+		hooks[i](ctx, _spec)
 	}
 	if err := sqlgraph.QueryNodes(ctx, dq.driver, _spec); err != nil {
 		return nil, err
@@ -376,66 +379,54 @@ func (dq *DomainQuery) sqlAll(ctx context.Context) ([]*Domain, error) {
 	}
 
 	if query := dq.withCertificates; query != nil {
-		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[int]*Domain, len(nodes))
-		for _, node := range nodes {
-			ids[node.ID] = node
-			fks = append(fks, node.ID)
+		edgeids := make([]driver.Value, len(nodes))
+		byid := make(map[int]*Domain)
+		nids := make(map[int]map[*Domain]struct{})
+		for i, node := range nodes {
+			edgeids[i] = node.ID
+			byid[node.ID] = node
 			node.Edges.Certificates = []*Certificate{}
 		}
-		var (
-			edgeids []int
-			edges   = make(map[int][]*Domain)
-		)
-		_spec := &sqlgraph.EdgeQuerySpec{
-			Edge: &sqlgraph.EdgeSpec{
-				Inverse: true,
-				Table:   domain.CertificatesTable,
-				Columns: domain.CertificatesPrimaryKey,
-			},
-			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(domain.CertificatesPrimaryKey[1], fks...))
-			},
-			ScanValues: func() [2]interface{} {
-				return [2]interface{}{new(sql.NullInt64), new(sql.NullInt64)}
-			},
-			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullInt64)
-				if !ok || eout == nil {
-					return fmt.Errorf("unexpected id value for edge-out")
+		query.Where(func(s *sql.Selector) {
+			joinT := sql.Table(domain.CertificatesTable)
+			s.Join(joinT).On(s.C(certificate.FieldID), joinT.C(domain.CertificatesPrimaryKey[0]))
+			s.Where(sql.InValues(joinT.C(domain.CertificatesPrimaryKey[1]), edgeids...))
+			columns := s.SelectedColumns()
+			s.Select(joinT.C(domain.CertificatesPrimaryKey[1]))
+			s.AppendSelect(columns...)
+			s.SetDistinct(false)
+		})
+		neighbors, err := query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]interface{}, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
 				}
-				ein, ok := in.(*sql.NullInt64)
-				if !ok || ein == nil {
-					return fmt.Errorf("unexpected id value for edge-in")
+				return append([]interface{}{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []interface{}) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Domain]struct{}{byid[outValue]: struct{}{}}
+					return assign(columns[1:], values[1:])
 				}
-				outValue := int(eout.Int64)
-				inValue := int(ein.Int64)
-				node, ok := ids[outValue]
-				if !ok {
-					return fmt.Errorf("unexpected node id in edges: %v", outValue)
-				}
-				if _, ok := edges[inValue]; !ok {
-					edgeids = append(edgeids, inValue)
-				}
-				edges[inValue] = append(edges[inValue], node)
+				nids[inValue][byid[outValue]] = struct{}{}
 				return nil
-			},
-		}
-		if err := sqlgraph.QueryEdges(ctx, dq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "certificates": %w`, err)
-		}
-		query.Where(certificate.IDIn(edgeids...))
-		neighbors, err := query.All(ctx)
+			}
+		})
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			nodes, ok := edges[n.ID]
+			nodes, ok := nids[n.ID]
 			if !ok {
 				return nil, fmt.Errorf(`unexpected "certificates" node returned %v`, n.ID)
 			}
-			for i := range nodes {
-				nodes[i].Edges.Certificates = append(nodes[i].Edges.Certificates, n)
+			for kn := range nodes {
+				kn.Edges.Certificates = append(kn.Edges.Certificates, n)
 			}
 		}
 	}
@@ -543,6 +534,7 @@ func (dq *DomainQuery) sqlQuery(ctx context.Context) *sql.Selector {
 // DomainGroupBy is the group-by builder for Domain entities.
 type DomainGroupBy struct {
 	config
+	selector
 	fields []string
 	fns    []AggregateFunc
 	// intermediate query (i.e. traversal path).
@@ -564,209 +556,6 @@ func (dgb *DomainGroupBy) Scan(ctx context.Context, v interface{}) error {
 	}
 	dgb.sql = query
 	return dgb.sqlScan(ctx, v)
-}
-
-// ScanX is like Scan, but panics if an error occurs.
-func (dgb *DomainGroupBy) ScanX(ctx context.Context, v interface{}) {
-	if err := dgb.Scan(ctx, v); err != nil {
-		panic(err)
-	}
-}
-
-// Strings returns list of strings from group-by.
-// It is only allowed when executing a group-by query with one field.
-func (dgb *DomainGroupBy) Strings(ctx context.Context) ([]string, error) {
-	if len(dgb.fields) > 1 {
-		return nil, errors.New("ent: DomainGroupBy.Strings is not achievable when grouping more than 1 field")
-	}
-	var v []string
-	if err := dgb.Scan(ctx, &v); err != nil {
-		return nil, err
-	}
-	return v, nil
-}
-
-// StringsX is like Strings, but panics if an error occurs.
-func (dgb *DomainGroupBy) StringsX(ctx context.Context) []string {
-	v, err := dgb.Strings(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// String returns a single string from a group-by query.
-// It is only allowed when executing a group-by query with one field.
-func (dgb *DomainGroupBy) String(ctx context.Context) (_ string, err error) {
-	var v []string
-	if v, err = dgb.Strings(ctx); err != nil {
-		return
-	}
-	switch len(v) {
-	case 1:
-		return v[0], nil
-	case 0:
-		err = &NotFoundError{domain.Label}
-	default:
-		err = fmt.Errorf("ent: DomainGroupBy.Strings returned %d results when one was expected", len(v))
-	}
-	return
-}
-
-// StringX is like String, but panics if an error occurs.
-func (dgb *DomainGroupBy) StringX(ctx context.Context) string {
-	v, err := dgb.String(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Ints returns list of ints from group-by.
-// It is only allowed when executing a group-by query with one field.
-func (dgb *DomainGroupBy) Ints(ctx context.Context) ([]int, error) {
-	if len(dgb.fields) > 1 {
-		return nil, errors.New("ent: DomainGroupBy.Ints is not achievable when grouping more than 1 field")
-	}
-	var v []int
-	if err := dgb.Scan(ctx, &v); err != nil {
-		return nil, err
-	}
-	return v, nil
-}
-
-// IntsX is like Ints, but panics if an error occurs.
-func (dgb *DomainGroupBy) IntsX(ctx context.Context) []int {
-	v, err := dgb.Ints(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Int returns a single int from a group-by query.
-// It is only allowed when executing a group-by query with one field.
-func (dgb *DomainGroupBy) Int(ctx context.Context) (_ int, err error) {
-	var v []int
-	if v, err = dgb.Ints(ctx); err != nil {
-		return
-	}
-	switch len(v) {
-	case 1:
-		return v[0], nil
-	case 0:
-		err = &NotFoundError{domain.Label}
-	default:
-		err = fmt.Errorf("ent: DomainGroupBy.Ints returned %d results when one was expected", len(v))
-	}
-	return
-}
-
-// IntX is like Int, but panics if an error occurs.
-func (dgb *DomainGroupBy) IntX(ctx context.Context) int {
-	v, err := dgb.Int(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Float64s returns list of float64s from group-by.
-// It is only allowed when executing a group-by query with one field.
-func (dgb *DomainGroupBy) Float64s(ctx context.Context) ([]float64, error) {
-	if len(dgb.fields) > 1 {
-		return nil, errors.New("ent: DomainGroupBy.Float64s is not achievable when grouping more than 1 field")
-	}
-	var v []float64
-	if err := dgb.Scan(ctx, &v); err != nil {
-		return nil, err
-	}
-	return v, nil
-}
-
-// Float64sX is like Float64s, but panics if an error occurs.
-func (dgb *DomainGroupBy) Float64sX(ctx context.Context) []float64 {
-	v, err := dgb.Float64s(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Float64 returns a single float64 from a group-by query.
-// It is only allowed when executing a group-by query with one field.
-func (dgb *DomainGroupBy) Float64(ctx context.Context) (_ float64, err error) {
-	var v []float64
-	if v, err = dgb.Float64s(ctx); err != nil {
-		return
-	}
-	switch len(v) {
-	case 1:
-		return v[0], nil
-	case 0:
-		err = &NotFoundError{domain.Label}
-	default:
-		err = fmt.Errorf("ent: DomainGroupBy.Float64s returned %d results when one was expected", len(v))
-	}
-	return
-}
-
-// Float64X is like Float64, but panics if an error occurs.
-func (dgb *DomainGroupBy) Float64X(ctx context.Context) float64 {
-	v, err := dgb.Float64(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Bools returns list of bools from group-by.
-// It is only allowed when executing a group-by query with one field.
-func (dgb *DomainGroupBy) Bools(ctx context.Context) ([]bool, error) {
-	if len(dgb.fields) > 1 {
-		return nil, errors.New("ent: DomainGroupBy.Bools is not achievable when grouping more than 1 field")
-	}
-	var v []bool
-	if err := dgb.Scan(ctx, &v); err != nil {
-		return nil, err
-	}
-	return v, nil
-}
-
-// BoolsX is like Bools, but panics if an error occurs.
-func (dgb *DomainGroupBy) BoolsX(ctx context.Context) []bool {
-	v, err := dgb.Bools(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Bool returns a single bool from a group-by query.
-// It is only allowed when executing a group-by query with one field.
-func (dgb *DomainGroupBy) Bool(ctx context.Context) (_ bool, err error) {
-	var v []bool
-	if v, err = dgb.Bools(ctx); err != nil {
-		return
-	}
-	switch len(v) {
-	case 1:
-		return v[0], nil
-	case 0:
-		err = &NotFoundError{domain.Label}
-	default:
-		err = fmt.Errorf("ent: DomainGroupBy.Bools returned %d results when one was expected", len(v))
-	}
-	return
-}
-
-// BoolX is like Bool, but panics if an error occurs.
-func (dgb *DomainGroupBy) BoolX(ctx context.Context) bool {
-	v, err := dgb.Bool(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
 }
 
 func (dgb *DomainGroupBy) sqlScan(ctx context.Context, v interface{}) error {
@@ -810,6 +599,7 @@ func (dgb *DomainGroupBy) sqlQuery() *sql.Selector {
 // DomainSelect is the builder for selecting fields of Domain entities.
 type DomainSelect struct {
 	*DomainQuery
+	selector
 	// intermediate query (i.e. traversal path).
 	sql *sql.Selector
 }
@@ -821,201 +611,6 @@ func (ds *DomainSelect) Scan(ctx context.Context, v interface{}) error {
 	}
 	ds.sql = ds.DomainQuery.sqlQuery(ctx)
 	return ds.sqlScan(ctx, v)
-}
-
-// ScanX is like Scan, but panics if an error occurs.
-func (ds *DomainSelect) ScanX(ctx context.Context, v interface{}) {
-	if err := ds.Scan(ctx, v); err != nil {
-		panic(err)
-	}
-}
-
-// Strings returns list of strings from a selector. It is only allowed when selecting one field.
-func (ds *DomainSelect) Strings(ctx context.Context) ([]string, error) {
-	if len(ds.fields) > 1 {
-		return nil, errors.New("ent: DomainSelect.Strings is not achievable when selecting more than 1 field")
-	}
-	var v []string
-	if err := ds.Scan(ctx, &v); err != nil {
-		return nil, err
-	}
-	return v, nil
-}
-
-// StringsX is like Strings, but panics if an error occurs.
-func (ds *DomainSelect) StringsX(ctx context.Context) []string {
-	v, err := ds.Strings(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// String returns a single string from a selector. It is only allowed when selecting one field.
-func (ds *DomainSelect) String(ctx context.Context) (_ string, err error) {
-	var v []string
-	if v, err = ds.Strings(ctx); err != nil {
-		return
-	}
-	switch len(v) {
-	case 1:
-		return v[0], nil
-	case 0:
-		err = &NotFoundError{domain.Label}
-	default:
-		err = fmt.Errorf("ent: DomainSelect.Strings returned %d results when one was expected", len(v))
-	}
-	return
-}
-
-// StringX is like String, but panics if an error occurs.
-func (ds *DomainSelect) StringX(ctx context.Context) string {
-	v, err := ds.String(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Ints returns list of ints from a selector. It is only allowed when selecting one field.
-func (ds *DomainSelect) Ints(ctx context.Context) ([]int, error) {
-	if len(ds.fields) > 1 {
-		return nil, errors.New("ent: DomainSelect.Ints is not achievable when selecting more than 1 field")
-	}
-	var v []int
-	if err := ds.Scan(ctx, &v); err != nil {
-		return nil, err
-	}
-	return v, nil
-}
-
-// IntsX is like Ints, but panics if an error occurs.
-func (ds *DomainSelect) IntsX(ctx context.Context) []int {
-	v, err := ds.Ints(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Int returns a single int from a selector. It is only allowed when selecting one field.
-func (ds *DomainSelect) Int(ctx context.Context) (_ int, err error) {
-	var v []int
-	if v, err = ds.Ints(ctx); err != nil {
-		return
-	}
-	switch len(v) {
-	case 1:
-		return v[0], nil
-	case 0:
-		err = &NotFoundError{domain.Label}
-	default:
-		err = fmt.Errorf("ent: DomainSelect.Ints returned %d results when one was expected", len(v))
-	}
-	return
-}
-
-// IntX is like Int, but panics if an error occurs.
-func (ds *DomainSelect) IntX(ctx context.Context) int {
-	v, err := ds.Int(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Float64s returns list of float64s from a selector. It is only allowed when selecting one field.
-func (ds *DomainSelect) Float64s(ctx context.Context) ([]float64, error) {
-	if len(ds.fields) > 1 {
-		return nil, errors.New("ent: DomainSelect.Float64s is not achievable when selecting more than 1 field")
-	}
-	var v []float64
-	if err := ds.Scan(ctx, &v); err != nil {
-		return nil, err
-	}
-	return v, nil
-}
-
-// Float64sX is like Float64s, but panics if an error occurs.
-func (ds *DomainSelect) Float64sX(ctx context.Context) []float64 {
-	v, err := ds.Float64s(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Float64 returns a single float64 from a selector. It is only allowed when selecting one field.
-func (ds *DomainSelect) Float64(ctx context.Context) (_ float64, err error) {
-	var v []float64
-	if v, err = ds.Float64s(ctx); err != nil {
-		return
-	}
-	switch len(v) {
-	case 1:
-		return v[0], nil
-	case 0:
-		err = &NotFoundError{domain.Label}
-	default:
-		err = fmt.Errorf("ent: DomainSelect.Float64s returned %d results when one was expected", len(v))
-	}
-	return
-}
-
-// Float64X is like Float64, but panics if an error occurs.
-func (ds *DomainSelect) Float64X(ctx context.Context) float64 {
-	v, err := ds.Float64(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Bools returns list of bools from a selector. It is only allowed when selecting one field.
-func (ds *DomainSelect) Bools(ctx context.Context) ([]bool, error) {
-	if len(ds.fields) > 1 {
-		return nil, errors.New("ent: DomainSelect.Bools is not achievable when selecting more than 1 field")
-	}
-	var v []bool
-	if err := ds.Scan(ctx, &v); err != nil {
-		return nil, err
-	}
-	return v, nil
-}
-
-// BoolsX is like Bools, but panics if an error occurs.
-func (ds *DomainSelect) BoolsX(ctx context.Context) []bool {
-	v, err := ds.Bools(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// Bool returns a single bool from a selector. It is only allowed when selecting one field.
-func (ds *DomainSelect) Bool(ctx context.Context) (_ bool, err error) {
-	var v []bool
-	if v, err = ds.Bools(ctx); err != nil {
-		return
-	}
-	switch len(v) {
-	case 1:
-		return v[0], nil
-	case 0:
-		err = &NotFoundError{domain.Label}
-	default:
-		err = fmt.Errorf("ent: DomainSelect.Bools returned %d results when one was expected", len(v))
-	}
-	return
-}
-
-// BoolX is like Bool, but panics if an error occurs.
-func (ds *DomainSelect) BoolX(ctx context.Context) bool {
-	v, err := ds.Bool(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return v
 }
 
 func (ds *DomainSelect) sqlScan(ctx context.Context, v interface{}) error {

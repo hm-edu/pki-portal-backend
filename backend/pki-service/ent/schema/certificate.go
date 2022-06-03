@@ -23,6 +23,7 @@ func (Certificate) Fields() []ent.Field {
 		field.Time("notBefore").Nillable().Optional(),
 		field.Time("notAfter").Optional(),
 		field.String("issuedBy").Nillable().Optional(),
+		field.String("source").Nillable().Optional(),
 		field.Time("created").Nillable().Optional(),
 		field.Enum("status").Values("Invalid", "Requested", "Approved", "Declined", "Applied", "Issued", "Revoked", "Expired", "Replaced", "Rejected", "Unmanaged", "SAApproved", "Init").Default("Invalid"),
 	}

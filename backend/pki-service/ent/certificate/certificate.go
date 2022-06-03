@@ -30,6 +30,8 @@ const (
 	FieldNotAfter = "not_after"
 	// FieldIssuedBy holds the string denoting the issuedby field in the database.
 	FieldIssuedBy = "issued_by"
+	// FieldSource holds the string denoting the source field in the database.
+	FieldSource = "source"
 	// FieldCreated holds the string denoting the created field in the database.
 	FieldCreated = "created"
 	// FieldStatus holds the string denoting the status field in the database.
@@ -56,6 +58,7 @@ var Columns = []string{
 	FieldNotBefore,
 	FieldNotAfter,
 	FieldIssuedBy,
+	FieldSource,
 	FieldCreated,
 	FieldStatus,
 }

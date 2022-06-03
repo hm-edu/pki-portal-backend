@@ -228,6 +228,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	entry, err := s.db.Certificate.Create().
 		SetCommonName(sans[0]).
 		SetIssuedBy(req.Issuer).
+		SetSource(req.Source).
 		AddDomainIDs(ids...).
 		Save(ctx)
 

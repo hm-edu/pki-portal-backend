@@ -1,6 +1,8 @@
 package ssl
 
 import (
+	"crypto/x509"
+	"encoding/pem"
 	"net/http"
 
 	"github.com/hm-edu/pki-rest-interface/pkg/model"
@@ -102,7 +104,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 	for _, certDomain := range details.SubjectAlternativeNames {
 		if !helper.Contains(domains.Domains, certDomain) {
 			logger.Warn("Domain not found. Revocation not allowed.", zap.String("domain", certDomain))
-			return &echo.HTTPError{Code: http.StatusUnauthorized, Message: "You are not authorized to revoke this certificate"}
+			return &echo.HTTPError{Code: http.StatusForbidden, Message: "You are not authorized to revoke this certificate"}
 		}
 	}
 	span.AddEvent("revoking certificate")
@@ -145,7 +147,46 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 		span.RecordError(err)
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
 	}
-	resp, err := h.ssl.IssueCertificate(ctx, &pb.IssueSslRequest{Csr: req.CSR, Issuer: user})
+	block, _ := pem.Decode([]byte(req.CSR))
+
+	if block == nil {
+		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
+	}
+
+	csr, err := x509.ParseCertificateRequest(block.Bytes)
+	if err != nil {
+		span.RecordError(err)
+		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
+	}
+
+	// Validate the CSR
+	if err := csr.CheckSignature(); err != nil {
+		span.RecordError(err)
+		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
+	}
+	sans := make([]string, 0, len(csr.DNSNames)+len(csr.IPAddresses)+len(csr.URIs))
+	sans = append(sans, csr.DNSNames...)
+	for _, ip := range csr.IPAddresses {
+		sans = append(sans, ip.String())
+	}
+	for _, u := range csr.URIs {
+		sans = append(sans, u.String())
+	}
+
+	permissions, err := h.domain.CheckPermission(ctx, &pb.CheckPermissionRequest{User: user, Domains: sans})
+	if err != nil {
+		span.RecordError(err)
+		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while checking permissions"}
+	}
+
+	missing := helper.Map(helper.Where(permissions.Permissions, func(t *pb.Permission) bool { return !t.Granted }), func(t *pb.Permission) string { return t.Domain })
+	span.SetAttributes(attribute.StringSlice("domains", sans), attribute.String("user", user), attribute.StringSlice("missing", missing))
+	logger.Info("Permissions checked", zap.Strings("missing", missing), zap.Strings("domains", sans))
+	if len(missing) > 0 {
+		return &echo.HTTPError{Code: http.StatusForbidden, Message: "You are not authorized to issue this certificate"}
+	}
+
+	resp, err := h.ssl.IssueCertificate(ctx, &pb.IssueSslRequest{Csr: req.CSR, SubjectAlternativeNames: sans, Issuer: user, Source: "API"})
 	if err != nil {
 		span.RecordError(err)
 		logger.Error("Error while processing CSR", zap.Error(err))

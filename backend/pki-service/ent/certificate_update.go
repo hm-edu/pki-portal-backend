@@ -148,6 +148,26 @@ func (cu *CertificateUpdate) ClearIssuedBy() *CertificateUpdate {
 	return cu
 }
 
+// SetSource sets the "source" field.
+func (cu *CertificateUpdate) SetSource(s string) *CertificateUpdate {
+	cu.mutation.SetSource(s)
+	return cu
+}
+
+// SetNillableSource sets the "source" field if the given value is not nil.
+func (cu *CertificateUpdate) SetNillableSource(s *string) *CertificateUpdate {
+	if s != nil {
+		cu.SetSource(*s)
+	}
+	return cu
+}
+
+// ClearSource clears the value of the "source" field.
+func (cu *CertificateUpdate) ClearSource() *CertificateUpdate {
+	cu.mutation.ClearSource()
+	return cu
+}
+
 // SetCreated sets the "created" field.
 func (cu *CertificateUpdate) SetCreated(t time.Time) *CertificateUpdate {
 	cu.mutation.SetCreated(t)
@@ -417,6 +437,19 @@ func (cu *CertificateUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: certificate.FieldIssuedBy,
 		})
 	}
+	if value, ok := cu.mutation.Source(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: certificate.FieldSource,
+		})
+	}
+	if cu.mutation.SourceCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: certificate.FieldSource,
+		})
+	}
 	if value, ok := cu.mutation.Created(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -626,6 +659,26 @@ func (cuo *CertificateUpdateOne) SetNillableIssuedBy(s *string) *CertificateUpda
 // ClearIssuedBy clears the value of the "issuedBy" field.
 func (cuo *CertificateUpdateOne) ClearIssuedBy() *CertificateUpdateOne {
 	cuo.mutation.ClearIssuedBy()
+	return cuo
+}
+
+// SetSource sets the "source" field.
+func (cuo *CertificateUpdateOne) SetSource(s string) *CertificateUpdateOne {
+	cuo.mutation.SetSource(s)
+	return cuo
+}
+
+// SetNillableSource sets the "source" field if the given value is not nil.
+func (cuo *CertificateUpdateOne) SetNillableSource(s *string) *CertificateUpdateOne {
+	if s != nil {
+		cuo.SetSource(*s)
+	}
+	return cuo
+}
+
+// ClearSource clears the value of the "source" field.
+func (cuo *CertificateUpdateOne) ClearSource() *CertificateUpdateOne {
+	cuo.mutation.ClearSource()
 	return cuo
 }
 
@@ -920,6 +973,19 @@ func (cuo *CertificateUpdateOne) sqlSave(ctx context.Context) (_node *Certificat
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Column: certificate.FieldIssuedBy,
+		})
+	}
+	if value, ok := cuo.mutation.Source(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: certificate.FieldSource,
+		})
+	}
+	if cuo.mutation.SourceCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: certificate.FieldSource,
 		})
 	}
 	if value, ok := cuo.mutation.Created(); ok {

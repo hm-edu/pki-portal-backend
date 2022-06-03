@@ -149,6 +149,13 @@ func IssuedBy(v string) predicate.Certificate {
 	})
 }
 
+// Source applies equality check predicate on the "source" field. It's identical to SourceEQ.
+func Source(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldSource), v))
+	})
+}
+
 // Created applies equality check predicate on the "created" field. It's identical to CreatedEQ.
 func Created(v time.Time) predicate.Certificate {
 	return predicate.Certificate(func(s *sql.Selector) {
@@ -936,6 +943,131 @@ func IssuedByEqualFold(v string) predicate.Certificate {
 func IssuedByContainsFold(v string) predicate.Certificate {
 	return predicate.Certificate(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldIssuedBy), v))
+	})
+}
+
+// SourceEQ applies the EQ predicate on the "source" field.
+func SourceEQ(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldSource), v))
+	})
+}
+
+// SourceNEQ applies the NEQ predicate on the "source" field.
+func SourceNEQ(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldSource), v))
+	})
+}
+
+// SourceIn applies the In predicate on the "source" field.
+func SourceIn(vs ...string) predicate.Certificate {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Certificate(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldSource), v...))
+	})
+}
+
+// SourceNotIn applies the NotIn predicate on the "source" field.
+func SourceNotIn(vs ...string) predicate.Certificate {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Certificate(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldSource), v...))
+	})
+}
+
+// SourceGT applies the GT predicate on the "source" field.
+func SourceGT(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldSource), v))
+	})
+}
+
+// SourceGTE applies the GTE predicate on the "source" field.
+func SourceGTE(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldSource), v))
+	})
+}
+
+// SourceLT applies the LT predicate on the "source" field.
+func SourceLT(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldSource), v))
+	})
+}
+
+// SourceLTE applies the LTE predicate on the "source" field.
+func SourceLTE(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldSource), v))
+	})
+}
+
+// SourceContains applies the Contains predicate on the "source" field.
+func SourceContains(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldSource), v))
+	})
+}
+
+// SourceHasPrefix applies the HasPrefix predicate on the "source" field.
+func SourceHasPrefix(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldSource), v))
+	})
+}
+
+// SourceHasSuffix applies the HasSuffix predicate on the "source" field.
+func SourceHasSuffix(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldSource), v))
+	})
+}
+
+// SourceIsNil applies the IsNil predicate on the "source" field.
+func SourceIsNil() predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldSource)))
+	})
+}
+
+// SourceNotNil applies the NotNil predicate on the "source" field.
+func SourceNotNil() predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldSource)))
+	})
+}
+
+// SourceEqualFold applies the EqualFold predicate on the "source" field.
+func SourceEqualFold(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldSource), v))
+	})
+}
+
+// SourceContainsFold applies the ContainsFold predicate on the "source" field.
+func SourceContainsFold(v string) predicate.Certificate {
+	return predicate.Certificate(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldSource), v))
 	})
 }
 

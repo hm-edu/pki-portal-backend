@@ -19,6 +19,7 @@ var (
 		{Name: "not_before", Type: field.TypeTime, Nullable: true},
 		{Name: "not_after", Type: field.TypeTime, Nullable: true},
 		{Name: "issued_by", Type: field.TypeString, Nullable: true},
+		{Name: "source", Type: field.TypeString, Nullable: true},
 		{Name: "created", Type: field.TypeTime, Nullable: true},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"Invalid", "Requested", "Approved", "Declined", "Applied", "Issued", "Revoked", "Expired", "Replaced", "Rejected", "Unmanaged", "SAApproved", "Init"}, Default: "Invalid"},
 	}
