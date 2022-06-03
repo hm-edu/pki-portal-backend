@@ -207,9 +207,8 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	if _, ok := s.pendingValidations[req.Csr]; ok {
 		return nil, status.Errorf(codes.AlreadyExists, "Outstanding validation for this CSR")
 	}
-	logger.Info("Issuing certificate",
-		zap.String("common_name", csr.Subject.CommonName),
-		zap.Strings("subject_alternative_names", sans))
+	logger = logger.With(zap.Strings("subject_alternative_names", sans))
+	logger.Info("Issuing certificate")
 
 	span.SetAttributes(attribute.StringSlice("subject_alternative_names", sans))
 	for _, fqdn := range sans {
@@ -237,7 +236,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	}
 
 	start := time.Now()
-	certificates, err := pkiHelper.RequestCertificate(ctx, span, s.acmeClient, csr, sans)
+	certificates, err := pkiHelper.RequestCertificate(ctx, span, s.acmeClient, csr, sans, logger)
 	if err != nil {
 		return s.handleError("Error while collecting certificate", span, err, logger)
 	}
@@ -247,20 +246,15 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	s.duration = &duration
 	s.last = &stop
 
-	if err != nil {
-		logger.Error("Error while registering callback", zap.Error(err))
-	}
-	logger.Info("Certificate issued", zap.Strings("sans", sans))
 	certs, err := pkiHelper.LoadDER(certificates)
 	if err != nil {
-		return s.handleError("Error while collecting certificate", span, err, logger)
+		return s.handleError("Error parsing certificate", span, err, logger)
 	}
 	pem := certs[0]
 	serial := fmt.Sprintf("%032x", pem.SerialNumber)
 	logger.Info("Certificate issued",
-		zap.Strings("subject_alternative_names", req.SubjectAlternativeNames),
 		zap.Duration("duration", stop.Sub(start)),
-		zap.String("certificate", serial))
+		zap.String("serial", serial))
 
 	_, err = s.db.Certificate.UpdateOneID(entry.ID).
 		SetSerial(pkiHelper.NormalizeSerial(serial)).
@@ -283,7 +277,7 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 	defer span.End()
 	logger := s.logger.With(zap.String("trace_id", span.SpanContext().TraceID().String()))
 
-	errorReturn := func(err error) (*emptypb.Empty, error) {
+	errorReturn := func(err error, logger *zap.Logger) (*emptypb.Empty, error) {
 		logger.Error("Failed to revoke certificate", zap.Error(err))
 		return nil, status.Errorf(codes.Internal, "Failed to revoke certificate")
 	}
@@ -291,21 +285,23 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 	switch req.Identifier.(type) {
 	case *pb.RevokeSslRequest_Serial:
 		serial := req.GetSerial()
-		logger.Info("Revoking certificate by serial", zap.String("serial", serial))
+		logger := logger.With(zap.String("serial", serial))
+		logger.Info("Revoking certificate by serial")
 		c, err := s.db.Certificate.Query().Where(certificate.Serial(serial)).First(ctx)
 		if err != nil {
-			return errorReturn(err)
+			return errorReturn(err, logger)
 		}
 		err = s.client.SslService.Revoke(serial, req.Reason)
 		if err != nil {
-			return errorReturn(err)
+			return errorReturn(err, logger)
 		}
 		_, err = s.db.Certificate.UpdateOneID(c.ID).SetStatus(certificate.StatusRevoked).Save(ctx)
 		if err != nil {
-			return errorReturn(err)
+			return errorReturn(err, logger)
 		}
 	case *pb.RevokeSslRequest_CommonName:
-		logger.Info("Revoking certificate by common name", zap.String("common_name", req.GetCommonName()))
+		logger := logger.With(zap.String("common_name", req.GetCommonName()))
+		logger.Info("Revoking certificate by common name")
 		certs, err := s.db.Certificate.Query().
 			Where(certificate.And(certificate.HasDomainsWith(domain.FqdnEQ(req.GetCommonName())),
 				certificate.StatusNEQ(certificate.StatusRevoked),
@@ -318,11 +314,11 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 		for _, c := range certs {
 			err := s.client.SslService.Revoke(c.Serial, req.Reason)
 			if err != nil {
-				return errorReturn(err)
+				return errorReturn(err, logger)
 			}
 			_, err = s.db.Certificate.UpdateOneID(c.ID).SetStatus(certificate.StatusRevoked).Save(ctx)
 			if err != nil {
-				return errorReturn(err)
+				return errorReturn(err, logger)
 			}
 		}
 	}

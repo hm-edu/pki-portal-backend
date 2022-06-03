@@ -54,17 +54,17 @@ type issueResult struct {
 }
 
 // RequestCertificate runs the acme flow to request a certificate with the desired contents
-func RequestCertificate(ctx context.Context, span trace.Span, client *acme.Client, csr *x509.CertificateRequest, domains []string) ([][]byte, error) {
+func RequestCertificate(ctx context.Context, span trace.Span, client *acme.Client, csr *x509.CertificateRequest, domains []string, logger *zap.Logger) ([][]byte, error) {
 
 	span.AddEvent("Sending AuthorizeOrder Request")
-	zap.L().Info("Sending AuthorizeOrder Request", zap.Strings("domains", domains))
+	logger.Info("Sending AuthorizeOrder Request")
 	order, err := client.AuthorizeOrder(ctx, acme.DomainIDs(domains...))
 	if err != nil {
 		return nil, err
 	}
 
 	span.AddEvent("Received AuthorizeOrder Response. Requesting Certificate")
-	zap.L().Info("Requesting certificate", zap.Strings("domains", domains))
+	logger.Info("Requesting certificate")
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Minute)
 	defer cancel()
 	// Create a channel to received a signal that work is done.
@@ -80,10 +80,10 @@ func RequestCertificate(ctx context.Context, span trace.Span, client *acme.Clien
 			return nil, d.err
 		}
 		span.AddEvent("Certificate received")
-		zap.L().Info("Certificate received", zap.Strings("domains", domains))
+		logger.Info("Certificate received")
 		return d.certs, nil
 	case <-ctx.Done():
-		zap.L().Warn("Timeout waiting for certificate")
+		logger.Warn("Timeout waiting for certificate")
 		span.AddEvent("Timeout waiting for certificate")
 		span.SetStatus(codes.Error, "Timeout waiting for certificate")
 		return nil, ctx.Err()
