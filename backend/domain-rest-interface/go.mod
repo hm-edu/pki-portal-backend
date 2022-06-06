@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/getkin/kin-openapi v0.96.0
-	github.com/hm-edu/portal-common v0.0.0-20220517040357-b761454b30fb
+	github.com/hm-edu/portal-common v0.0.0-20220603065958-01c27b645108
 	go.opentelemetry.io/otel v1.7.0
 	go.uber.org/zap v1.21.0
 	google.golang.org/grpc v1.47.0
@@ -22,7 +22,7 @@ require (
 	github.com/spf13/afero v1.8.2 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
-	github.com/subosito/gotenv v1.3.0 // indirect
+	github.com/subosito/gotenv v1.4.0 // indirect
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.32.0 // indirect
@@ -48,7 +48,7 @@ require (
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.10 // indirect
-	google.golang.org/genproto v0.0.0-20220531173845-685668d2de03 // indirect
+	google.golang.org/genproto v0.0.0-20220602131408-e326c6e8e9c8 // indirect
 	google.golang.org/protobuf v1.28.0
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
@@ -57,7 +57,7 @@ require (
 	entgo.io/ent v0.10.2-0.20220502113020-4ac82f5bb3f0
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
-	github.com/hm-edu/portal-apis v0.0.0-20220517182537-e93c840ce8e9
+	github.com/hm-edu/portal-apis v0.0.0-20220603062428-bf1306b32398
 	github.com/jackc/pgx/v4 v4.16.1
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/lestrrat-go/jwx v1.2.25
