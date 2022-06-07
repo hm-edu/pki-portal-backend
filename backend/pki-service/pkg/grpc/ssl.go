@@ -51,6 +51,10 @@ func mapCertificate(x *ent.Certificate) *pb.SslCertificateDetails {
 	if x.IssuedBy != nil {
 		issuedBy = *x.IssuedBy
 	}
+	source := ""
+	if x.Source != nil {
+		source = *x.Source
+	}
 	return &pb.SslCertificateDetails{
 		Id:                      int32(x.SslId),
 		CommonName:              x.CommonName,
@@ -59,6 +63,7 @@ func mapCertificate(x *ent.Certificate) *pb.SslCertificateDetails {
 		Expires:                 timestamppb.New(x.NotAfter),
 		NotBefore:               nbf,
 		Status:                  string(x.Status),
+		Source:                  source,
 		IssuedBy:                issuedBy,
 		Created:                 created,
 	}
