@@ -55,13 +55,13 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string, logger *zap
 	ctx, span := h.tracer.Start(ctx, "enumerating")
 	defer span.End()
 
-	domains, err := h.domainStore.ListDomains(ctx, user, false, true)
+	domains, err := h.domainStore.ListDomains(ctx, user, false)
 	if err != nil {
 		logger.Error("Listing domains failed", zap.Error(err))
 		return nil, err
 	}
 
-	approvedDomains, err := h.domainStore.ListDomains(ctx, user, true, true)
+	approvedDomains, err := h.domainStore.ListDomains(ctx, user, true)
 	if err != nil {
 		logger.Error("Listing domains failed", zap.Error(err))
 		return nil, err
@@ -173,7 +173,7 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 
 	domain := ent.Domain{Owner: user, Fqdn: req.FQDN}
 
-	domains, err := h.domainStore.ListDomains(ctx, user, true, true)
+	domains, err := h.domainStore.ListDomains(ctx, user, true)
 	if err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
 	}

@@ -351,13 +351,13 @@ func TestCreateDomainsNoAutoApproveOtherUserChild(t *testing.T) {
 `, rec.Body.String())
 	}
 
-	list, err := st.ListDomains(c.Request().Context(), "test", false, true)
+	list, err := st.ListDomains(c.Request().Context(), "test", false)
 	assert.NoError(t, err)
 	assert.Len(t, list, 4)
 	assert.False(t, helper.First(list, func(d *ent.Domain) bool { return d.Fqdn == "foo.example.com" }).Approved)
 	assert.False(t, helper.First(list, func(d *ent.Domain) bool { return d.Fqdn == "2.mail.foo.example.com" }).Approved)
 
-	list, err = st.ListDomains(c.Request().Context(), "max", false, true)
+	list, err = st.ListDomains(c.Request().Context(), "max", false)
 	assert.NoError(t, err)
 	assert.Len(t, list, 2)
 	assert.False(t, helper.First(list, func(d *ent.Domain) bool { return d.Fqdn == "foo.example.com" }).Approved)
