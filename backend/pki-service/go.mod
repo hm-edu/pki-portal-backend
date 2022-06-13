@@ -3,13 +3,11 @@ module github.com/hm-edu/pki-service
 go 1.18
 
 require (
-	github.com/go-co-op/gocron v1.13.0
 	github.com/hm-edu/sectigo-client v0.0.0-20220507111459-6a7620d7f447
 	github.com/mattn/go-sqlite3 v1.14.10
 	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.7.1
 	go.uber.org/zap v1.21.0
-	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
 )
 
 require (
@@ -57,7 +55,6 @@ require (
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.34.0 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
-	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/stretchr/objx v0.3.0 // indirect
 	github.com/swaggo/swag v1.8.2 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
@@ -67,8 +64,8 @@ require (
 	go.opentelemetry.io/otel/exporters/jaeger v1.7.0 // indirect
 	go.opentelemetry.io/otel/exporters/prometheus v0.30.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v0.30.0 // indirect
+	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
-	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
 	golang.org/x/time v0.0.0-20220411224347-583f2d630306 // indirect
 	golang.org/x/tools v0.1.10 // indirect
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect

@@ -40,18 +40,15 @@ data:
         "provisioners": [
           {
             "type": "ACME",
-            "name": "acme"
-          },
-          {
-            "type": "ACME",
-            "name": "eab",
+            "name": "acme",
             "requireEAB": true
           }
         ],
         "template": {},
         "backdate": "1m0s",
         "config":{
-          "pkiBackend": "pki-service:8081"
+          "pkiBackend": "pki-service:8081",
+          "eabBackend": "eab-rest-interface:8081"
         }
       },
       "tls": {
@@ -64,7 +61,7 @@ data:
         "renegotiation": false
       },
       "storage": "/opt/step",
-      "managementHost": "domain-rest-interface:8081"
+      "managementHost": "eab-rest-interface:8081"
     }
 ---
 apiVersion: apps/v1

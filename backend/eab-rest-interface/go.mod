@@ -134,6 +134,7 @@ require (
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.1 // indirect
+	github.com/go-chi/chi v4.0.2+incompatible // indirect
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
@@ -171,4 +172,4 @@ replace github.com/hm-edu/portal-common => ../common
 
 replace github.com/smallstep/nosql => github.com/hm-edu/nosql v0.4.1-0.20220510094234-1fbe0ffbb194
 
-replace github.com/smallstep/certificates => github.com/hm-edu/certificates v0.0.0-20220517045123-d0ead780acbf
+replace github.com/smallstep/certificates => github.com/hm-edu/certificates v0.0.0-20220603063538-8bb63d8dc423
