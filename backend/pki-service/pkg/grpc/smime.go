@@ -16,6 +16,7 @@ import (
 	"github.com/hm-edu/sectigo-client/sectigo/client"
 
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
@@ -153,14 +154,24 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 	return &pb.IssueSmimeResponse{Certificate: cert}, nil
 
 }
-func (s *smimeAPIServer) RevokeCertificate(_ context.Context, req *pb.RevokeSmimeRequest) (*emptypb.Empty, error) {
+func (s *smimeAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSmimeRequest) (*emptypb.Empty, error) {
+	_, span := s.tracer.Start(ctx, "listCertificates")
+	defer span.End()
+
+	logger := s.logger.With(zap.String("trace_id", span.SpanContext().TraceID().String()), zap.String("reason", req.Reason))
 
 	switch req.Identifier.(type) {
 	case *pb.RevokeSmimeRequest_Email:
+		logger = logger.With(zap.String("email", req.GetEmail()))
+		logger.Info("Revoking smime certificate")
+		span.SetAttributes(attribute.String("email", req.GetEmail()))
 		err := s.client.ClientService.RevokeByEmail(client.RevokeByEmailRequest{Email: req.GetEmail(), Reason: req.GetReason()})
 		if err != nil {
+			span.RecordError(err)
+			logger.Error("Error while revoking certificate", zap.Error(err))
 			return nil, status.Error(codes.Internal, err.Error())
 		}
+		logger.Info("Successfully revoked smime certificate")
 		return &emptypb.Empty{}, nil
 	case *pb.RevokeSmimeRequest_Serial:
 		err := s.client.ClientService.RevokeBySerial(client.RevokeBySerialRequest{Serial: req.GetSerial(), Reason: req.GetReason()})

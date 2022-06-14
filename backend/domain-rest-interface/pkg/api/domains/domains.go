@@ -218,6 +218,14 @@ func (h *Handler) DeleteDomain(c echo.Context) error {
 		return err
 	}
 
+	if item.Approved {
+		_, err := h.pkiService.RevokeCertificate(ctx, &pb.RevokeSslRequest{Identifier: &pb.RevokeSslRequest_CommonName{CommonName: item.FQDN}, Reason: "Domain deleted"})
+		if err != nil {
+			logger.Error("Failed to revoke certificate", zap.Error(err))
+			return &echo.HTTPError{Code: http.StatusInternalServerError, Internal: err, Message: "Failed to revoke certificate"}
+		}
+	}
+
 	logger.Info("Deleting domain", zap.String("fqdn", item.FQDN))
 	if err := h.domainStore.Delete(ctx, item.ID); err != nil {
 		logger.Error("Deleting domain failed", zap.Error(err))
