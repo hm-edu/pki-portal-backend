@@ -303,7 +303,7 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 		if err != nil {
 			return errorReturn(err, logger)
 		}
-		err = s.client.SslService.Revoke(serial, req.Reason)
+		err = s.client.SslService.RevokeBySslID(fmt.Sprint(c.SslId), req.Reason)
 		if sectigoError, ok := err.(*sectigo.ErrorResponse); ok && sectigoError.Code == -102 {
 			logger.Info("Certificate already revoked")
 		} else {
@@ -326,8 +326,7 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 			return nil, status.Error(codes.Internal, "Error querying certificates")
 		}
 		for _, c := range certs {
-			err := s.client.SslService.Revoke(c.Serial, req.Reason)
-
+			err := s.client.SslService.RevokeBySslID(fmt.Sprint(c.SslId), req.Reason)
 			if err != nil {
 				if sectigoError, ok := err.(*sectigo.ErrorResponse); ok && sectigoError.Code == -102 {
 					logger.Info("Certificate already revoked")
