@@ -59,7 +59,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          push: ${{ github.event_name != 'pull_request' && github.actor != 'dependabot[bot]' && steps.changes.outputs.src == 'true'}}
+          push: ${{ github.event_name != 'pull_request' && github.actor != 'dependabot[bot]' && steps.filter.outputs.src == 'true'}}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
