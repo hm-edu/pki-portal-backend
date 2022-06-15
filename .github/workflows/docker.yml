@@ -49,12 +49,17 @@ jobs:
             type=ref,event=tag
             type=ref,event=pr
             type=raw,value={{branch}}-{{sha}}-{{date 'X'}}
-
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            src:
+              - 'backend/${{ matrix.dir }}/**'
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
           context: .
-          push: ${{ github.event_name != 'pull_request' && github.actor != 'dependabot[bot]'}}
+          push: ${{ github.event_name != 'pull_request' && github.actor != 'dependabot[bot]' && steps.changes.outputs.src == 'true'}}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
