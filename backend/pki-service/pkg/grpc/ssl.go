@@ -287,7 +287,7 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 
 	_, span := otel.GetTracerProvider().Tracer("ssl").Start(ctx, "revokeCertificate")
 	defer span.End()
-	logger := s.logger.With(zap.String("trace_id", span.SpanContext().TraceID().String()))
+	logger := s.logger.With(zap.String("trace_id", span.SpanContext().TraceID().String()), zap.String("reason", req.Reason))
 
 	errorReturn := func(err error, logger *zap.Logger) (*emptypb.Empty, error) {
 		logger.Error("Failed to revoke certificate", zap.Error(err))
