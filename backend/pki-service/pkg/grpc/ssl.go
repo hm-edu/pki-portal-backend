@@ -304,7 +304,9 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 			return errorReturn(err, logger)
 		}
 		err = s.client.SslService.Revoke(serial, req.Reason)
-		if err != nil {
+		if sectigoError, ok := err.(*sectigo.ErrorResponse); ok && sectigoError.Code == -102 {
+			logger.Info("Certificate already revoked")
+		} else {
 			return errorReturn(err, logger)
 		}
 		_, err = s.db.Certificate.UpdateOneID(c.ID).SetStatus(certificate.StatusRevoked).Save(ctx)
@@ -325,8 +327,13 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 		}
 		for _, c := range certs {
 			err := s.client.SslService.Revoke(c.Serial, req.Reason)
+
 			if err != nil {
-				return errorReturn(err, logger)
+				if sectigoError, ok := err.(*sectigo.ErrorResponse); ok && sectigoError.Code == -102 {
+					logger.Info("Certificate already revoked")
+				} else {
+					return errorReturn(err, logger)
+				}
 			}
 			_, err = s.db.Certificate.UpdateOneID(c.ID).SetStatus(certificate.StatusRevoked).Save(ctx)
 			if err != nil {
