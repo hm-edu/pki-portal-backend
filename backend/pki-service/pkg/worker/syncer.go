@@ -31,6 +31,7 @@ func (s *Syncer) SyncAllCertificates() {
 		logger.Fatal("Error while listing certificates", zap.Error(err))
 		return
 	}
+	offset := 0
 	for {
 		var wg sync.WaitGroup
 		details := []*ssl.Details{}
@@ -106,7 +107,8 @@ func (s *Syncer) SyncAllCertificates() {
 		if certificates <= 0 {
 			break
 		}
-		certs, _, err = s.Client.SslService.List(&ssl.ListSSLRequest{Size: 200, Position: 200})
+		offset += len(*certs)
+		certs, _, err = s.Client.SslService.List(&ssl.ListSSLRequest{Size: 200, Position: offset})
 
 		if err != nil {
 			logger.Fatal("Error while listing certificates", zap.Error(err))
