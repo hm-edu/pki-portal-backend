@@ -214,6 +214,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	if err != nil {
 		return s.handleError("Error while creating certificate", span, err, logger)
 	}
+	start := time.Now()
 	enrollment, err := s.client.SslService.Enroll(ssl.EnrollmentRequest{
 		OrgID:        s.cfg.SslOrgID,
 		Csr:          req.Csr,
@@ -231,7 +232,6 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	if err != nil {
 		return s.handleError("Error while storing certificate", span, err, logger)
 	}
-	start := time.Now()
 	cert := ""
 	err = helper.WaitFor(5*time.Minute, 1*time.Second, func() (bool, error) {
 		c, err := s.client.SslService.Collect(enrollment.SslID, "pemia")
