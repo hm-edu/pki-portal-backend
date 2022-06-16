@@ -67,7 +67,8 @@ func init() {
 	runCmd.Flags().Int("smime_key_length", 0, "The (expected) key length")
 	runCmd.Flags().String("smime_key_type", "", "The (expected) key type")
 	runCmd.Flags().String("db", "", "connection string for the database")
-	runCmd.Flags().String("eab_kid", "", "EAB KID for the internal acme client")
-	runCmd.Flags().String("eab_hmac", "", "EAB HMAC for the internal acme client")
+	runCmd.Flags().Int("ssl_profile", 0, "The (default) ssl profile id")
+	runCmd.Flags().Int("ssl_org_id", 0, "The (default) ssl org id")
+	runCmd.Flags().Int("ssl_term", 0, "The (default) ssl lifetime")
 	runCmd.Flags().String("level", "info", "log level debug, info, warn, error, flat or panic")
 }

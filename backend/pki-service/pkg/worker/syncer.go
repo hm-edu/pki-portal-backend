@@ -7,7 +7,6 @@ import (
 	"github.com/hm-edu/pki-service/ent"
 	"github.com/hm-edu/pki-service/ent/certificate"
 	"github.com/hm-edu/pki-service/ent/domain"
-	"github.com/hm-edu/portal-common/helper"
 
 	pkiHelper "github.com/hm-edu/pki-service/pkg/helper"
 	"github.com/hm-edu/sectigo-client/sectigo"
@@ -116,42 +115,5 @@ func (s *Syncer) SyncAllCertificates() {
 			return
 		}
 	}
-
-}
-
-// SyncPendingCertificates downloads all available information from the Sectigo API and stores it in the database.
-func (s *Syncer) SyncPendingCertificates() {
-	logger := zap.L()
-	logger.Info("Syncing pending certificates")
-	certs, err := s.Db.Certificate.Query().Where(certificate.SslIdIsNil()).All(context.Background())
-
-	if err != nil {
-		logger.Fatal("Error while listing certificates", zap.Error(err))
-		return
-	}
-	var wg sync.WaitGroup
-	logger.Info("Got pending certificates", zap.Int("count", len(certs)), zap.Strings("certificates", helper.Map(certs, func(cert *ent.Certificate) string { return cert.Serial })))
-	for _, cert := range certs {
-		wg.Add(1)
-		go func(cert *ent.Certificate) {
-			defer wg.Done()
-			data, _, err := s.Client.SslService.List(&ssl.ListSSLRequest{SerialNumber: cert.Serial})
-			if err != nil {
-				logger.Error("Error while listing certificates", zap.Error(err), zap.String("serial", cert.Serial))
-				return
-			}
-			if len(*data) == 0 {
-				logger.Debug("No certificates found", zap.String("serial", cert.Serial))
-				return
-			}
-			item := (*data)[0]
-			_, err = s.Db.Certificate.UpdateOneID(cert.ID).SetSslId(item.SslID).Save(context.Background())
-			logger.Info("Updated certificate", zap.String("serial", cert.Serial), zap.Int("id", item.SslID))
-			if err != nil {
-				logger.Error("Error while updating certificate", zap.Error(err), zap.String("serial", cert.Serial))
-			}
-		}(cert)
-	}
-	wg.Wait()
 
 }
