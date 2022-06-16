@@ -325,19 +325,38 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 		if err != nil {
 			return nil, status.Error(codes.Internal, "Error querying certificates")
 		}
+
+		ret := make(chan struct{ err error }, len(certs))
+
 		for _, c := range certs {
-			err := s.client.SslService.RevokeBySslID(fmt.Sprint(c.SslId), req.Reason)
-			if err != nil {
-				if sectigoError, ok := err.(*sectigo.ErrorResponse); ok && sectigoError.Code == -102 {
-					logger.Info("Certificate already revoked")
-				} else {
-					return errorReturn(err, logger)
+			go func(c *ent.Certificate, ret chan struct{ err error }) {
+				err := s.client.SslService.RevokeBySslID(fmt.Sprint(c.SslId), req.Reason)
+				if err != nil {
+					if sectigoError, ok := err.(*sectigo.ErrorResponse); ok && sectigoError.Code == -102 {
+						logger.Info("Certificate already revoked")
+					} else {
+						ret <- struct{ err error }{err}
+					}
 				}
+				_, err = s.db.Certificate.UpdateOneID(c.ID).SetStatus(certificate.StatusRevoked).Save(ctx)
+				if err != nil {
+					ret <- struct{ err error }{err}
+				}
+			}(c, ret)
+		}
+		errors := make([]error, 0)
+		for i := 0; i < len(certs); i++ {
+			select {
+			case err := <-ret:
+				if err.err != nil {
+					errors = append(errors, err.err)
+				}
+			case <-ctx.Done():
+				return nil, status.Error(codes.Canceled, "Canceled")
 			}
-			_, err = s.db.Certificate.UpdateOneID(c.ID).SetStatus(certificate.StatusRevoked).Save(ctx)
-			if err != nil {
-				return errorReturn(err, logger)
-			}
+		}
+		if len(errors) > 0 {
+			return errorReturn(fmt.Errorf("%v", errors), logger)
 		}
 	}
 	return &emptypb.Empty{}, nil
