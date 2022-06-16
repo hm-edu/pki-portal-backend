@@ -106,12 +106,5 @@ func (v *DomainValidator) ValidateDomains() {
 				logger.Debug("Deleted validation record", zap.String("domain", validation.Domain))
 			}
 		}
-		_, err = v.Client.DomainValidationService.Clear(validation.Domain)
-		if err != nil {
-			logger.Error("Failed to clear validation", zap.Error(err), zap.String("domain", validation.Domain))
-			continue
-		}
-		logger.Info("Cleared validation", zap.String("domain", validation.Domain))
-
 	}
 }
