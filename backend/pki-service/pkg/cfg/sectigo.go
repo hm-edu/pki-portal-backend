@@ -17,9 +17,8 @@ type SectigoConfiguration struct {
 	SmimeProfile   int    `mapstructure:"smime_profile"`
 	SmimeOrgID     int    `mapstructure:"smime_org_id"`
 	SmimeTerm      int    `mapstructure:"smime_term"`
-	SslProfile     int    `mapstructure:"ssl_profile"`
-	SslOrgID       int    `mapstructure:"ssl_org_id"`
-	SslTerm        int    `mapstructure:"ssl_term"`
+	EabKid         string `mapstructure:"eab_kid"`
+	EabHmac        string `mapstructure:"eab_hmac"`
 	SmimeKeyLength string `mapstructure:"smime_key_length"`
 	SmimeKeyType   string `mapstructure:"smime_key_type"`
 }

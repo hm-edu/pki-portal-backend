@@ -3,10 +3,13 @@ package grpc
 import (
 	"context"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/pem"
 	"fmt"
-	"strings"
+	"net/http"
 	"time"
+
+	"golang.org/x/crypto/acme"
 
 	"github.com/hm-edu/pki-service/ent"
 	"github.com/hm-edu/pki-service/ent/certificate"
@@ -17,7 +20,6 @@ import (
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/helper"
 	"github.com/hm-edu/sectigo-client/sectigo"
-	"github.com/hm-edu/sectigo-client/sectigo/ssl"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -34,6 +36,10 @@ import (
 )
 
 var meter = global.MeterProvider().Meter("pki-service")
+
+func backoff(n int, r *http.Request, res *http.Response) time.Duration {
+	return 1 * time.Second
+}
 
 func mapCertificate(x *ent.Certificate) *pb.SslCertificateDetails {
 
@@ -90,6 +96,8 @@ type sslAPIServer struct {
 	cfg    *cfg.SectigoConfiguration
 	logger *zap.Logger
 
+	acmeClient *acme.Client
+
 	pendingValidations map[string]interface{}
 
 	last     *time.Time
@@ -97,8 +105,24 @@ type sslAPIServer struct {
 }
 
 func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *ent.Client) *sslAPIServer {
+	var acmeClient *acme.Client
 	var err error
+	ctx := context.Background()
 
+	sectigoDiectory := "https://acme.sectigo.com/v2/OV"
+
+	hmac, err := base64.RawURLEncoding.DecodeString(cfg.EabHmac)
+	if err != nil {
+		zap.L().Fatal("Failed to decode hmac", zap.Error(err))
+	}
+
+	acmeClient, err = pkiHelper.RegisterAccount(ctx, sectigoDiectory, acme.ExternalAccountBinding{KID: cfg.EabKid, Key: hmac})
+	if err != nil {
+		zap.L().Fatal("Error registering ACME account", zap.Error(err))
+	}
+	zap.L().Info("Registered ACME account", zap.String("kid", cfg.EabKid))
+
+	acmeClient.RetryBackoff = backoff
 	gauge, _ := meter.AsyncInt64().Gauge(
 		"ssl.issue.last.duration",
 		instrument.WithUnit("seconds"),
@@ -110,7 +134,7 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 		instrument.WithUnit("unixMilli"),
 		instrument.WithDescription("Issue timestamp for last SSL Certificates"),
 	)
-	instance := &sslAPIServer{client: client, cfg: cfg, logger: zap.L(), db: db, pendingValidations: make(map[string]interface{})}
+	instance := &sslAPIServer{client: client, acmeClient: acmeClient, cfg: cfg, logger: zap.L(), db: db, pendingValidations: make(map[string]interface{})}
 	err = meter.RegisterCallback([]instrument.Asynchronous{gauge, gaugeLast}, func(ctx context.Context) {
 		if instance.last != nil {
 			gauge.Observe(ctx, int64(instance.duration.Seconds()))
@@ -214,43 +238,11 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	if err != nil {
 		return s.handleError("Error while creating certificate", span, err, logger)
 	}
+
 	start := time.Now()
-	enrollment, err := s.client.SslService.Enroll(ssl.EnrollmentRequest{
-		OrgID:        s.cfg.SslOrgID,
-		Csr:          req.Csr,
-		Term:         s.cfg.SslTerm,
-		CertType:     s.cfg.SslProfile,
-		SubjAltNames: strings.Join(req.SubjectAlternativeNames, ","),
-	})
-
-	span.AddEvent("Enrollment request sent")
+	certificates, err := pkiHelper.RequestCertificate(ctx, span, s.acmeClient, csr, sans, logger)
 	if err != nil {
-		return s.handleError("Error while requesting certificate", span, err, logger)
-	}
-
-	entry, err = s.db.Certificate.UpdateOneID(entry.ID).SetStatus(certificate.StatusRequested).SetSslId(enrollment.SslID).Save(ctx)
-	if err != nil {
-		return s.handleError("Error while storing certificate", span, err, logger)
-	}
-	cert := ""
-	err = helper.WaitFor(5*time.Minute, 1*time.Second, func() (bool, error) {
-		c, err := s.client.SslService.Collect(enrollment.SslID, "pemia")
-		if err != nil {
-			if e, ok := err.(*sectigo.ErrorResponse); ok {
-				if e.Code == 0 && e.Description == "Being processed by Sectigo" {
-					span.AddEvent("Certificate not ready yet")
-					s.logger.Info("Certificate not ready", zap.Int("id", enrollment.SslID), zap.Strings("subject_alternative_names", req.SubjectAlternativeNames))
-					return false, nil
-				}
-			}
-			return false, err
-		}
-		span.AddEvent("Certificate ready")
-		cert = *c
-		return true, nil
-	})
-	if err != nil {
-		return s.handleError("Error collecting certificate", span, err, logger)
+		return s.handleError("Error while collecting certificate", span, err, logger)
 	}
 
 	stop := time.Now()
@@ -258,7 +250,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	s.duration = &duration
 	s.last = &stop
 
-	certs, err := pkiHelper.ParseCertificates([]byte(cert))
+	certs, err := pkiHelper.LoadDER(certificates)
 	if err != nil {
 		return s.handleError("Error parsing certificate", span, err, logger)
 	}

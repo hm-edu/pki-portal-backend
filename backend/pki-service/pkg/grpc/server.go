@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"time"
 
 	pb "github.com/hm-edu/portal-apis"
 
@@ -13,8 +14,11 @@ import (
 
 	"github.com/hm-edu/pki-service/ent"
 	"github.com/hm-edu/pki-service/pkg/cfg"
+	"github.com/hm-edu/pki-service/pkg/worker"
 	"github.com/hm-edu/portal-common/tracing"
 	"github.com/hm-edu/sectigo-client/sectigo"
+
+	"github.com/go-co-op/gocron"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -83,6 +87,13 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	// => one http client is fine ;)
 
 	c := sectigo.NewClient(http.DefaultClient, s.logger, s.sectigoCfg.User, s.sectigoCfg.Password, s.sectigoCfg.CustomerURI)
+	syncer := worker.Syncer{Client: c, Db: s.db}
+	cron := gocron.NewScheduler(time.UTC)
+	_, err = cron.Every("5m").Do(syncer.SyncPendingCertificates)
+	if err != nil {
+		s.logger.Warn("failed to schedule syncer", zap.Error(err))
+	}
+	cron.StartAsync()
 
 	ssl := newSslAPIServer(c, s.sectigoCfg, s.db)
 	pb.RegisterSSLServiceServer(srv, ssl)
