@@ -109,6 +109,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 	{
 		h := eab.NewHandler(api.provisionerID)
 		v1.Use(jwtMiddleware)
+		v1.Use(auth.HasScope("EAB"))
 		v1.GET("/", h.GetExternalAccountKeys)
 		v1.POST("/", h.CreateNewKey)
 		v1.DELETE("/:id", h.DeleteKey)

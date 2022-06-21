@@ -120,6 +120,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 		}
 		ssl := ssl.NewHandler(domainClient, sslClient)
 		group.Use(jwtMiddleware)
+		group.Use(auth.HasScope("Certificates"))
 		group.GET("/", ssl.List)
 		group.POST("/revoke", ssl.Revoke)
 		group.POST("/csr", ssl.HandleCsr)
@@ -133,6 +134,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 		}
 		handler := smime.NewHandler(smimeClient)
 		group.Use(jwtMiddleware)
+		group.Use(auth.HasScope("Certificates"))
 		group.GET("/", handler.List)
 		group.POST("/revoke", handler.Revoke)
 		group.POST("/csr", handler.HandleCsr)

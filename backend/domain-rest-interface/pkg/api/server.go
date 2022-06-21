@@ -114,6 +114,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 	{
 		h := domains.NewHandler(api.store, api.pkiSerivce)
 		v1.Use(jwtMiddleware)
+		v1.Use(auth.HasScope("Domains"))
 		v1.GET("/", h.ListDomains)
 		v1.POST("/", h.CreateDomain)
 		{

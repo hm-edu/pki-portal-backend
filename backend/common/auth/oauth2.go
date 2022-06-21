@@ -3,18 +3,19 @@ package auth
 import (
 	"errors"
 	"fmt"
+	"net/http"
+	"strings"
 
 	jwt "github.com/golang-jwt/jwt/v4"
+	"github.com/hm-edu/portal-common/helper"
 	"github.com/labstack/echo/v4"
 	"github.com/lestrrat-go/jwx/jwk"
 )
 
 // SubFromRequest extracts username (or email) from the previously claimset.
 func SubFromRequest(token interface{}) (string, error) {
-	jwtToken, ok := token.(*jwt.Token)
-	if ok {
-		user, ok := jwtToken.Claims.(jwt.MapClaims)
-		if ok {
+	if token, ok := token.(*jwt.Token); ok {
+		if user, ok := token.Claims.(jwt.MapClaims); ok {
 			return user["sub"].(string), nil
 		}
 	}
@@ -24,10 +25,8 @@ func SubFromRequest(token interface{}) (string, error) {
 
 // UserFromRequest extracts username (or email) from the previously claimset.
 func UserFromRequest(c echo.Context) (string, error) {
-	token, ok := c.Get("user").(*jwt.Token)
-	if ok {
-		user, ok := token.Claims.(jwt.MapClaims)
-		if ok {
+	if token, ok := c.Get("user").(*jwt.Token); ok {
+		if user, ok := token.Claims.(jwt.MapClaims); ok {
 			return user["email"].(string), nil
 		}
 	}
@@ -74,4 +73,24 @@ func GetKey(token *jwt.Token, ks jwk.Set) (interface{}, error) {
 	}
 
 	return pubkey, nil
+}
+
+// HasScope tries to extract the scope from the provided token.
+func HasScope(scope string) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+
+			if token, ok := c.Get("user").(*jwt.Token); ok {
+				if user, ok := token.Claims.(jwt.MapClaims); ok {
+					if scp, ok := user["scp"].(string); ok {
+						if !helper.Contains(strings.Split(scp, " "), scope) {
+							return echo.NewHTTPError(http.StatusForbidden, fmt.Sprintf("scope %s missing", scope))
+						}
+						return next(c)
+					}
+				}
+			}
+			return echo.NewHTTPError(http.StatusInternalServerError, "extracting scope failed")
+		}
+	}
 }
