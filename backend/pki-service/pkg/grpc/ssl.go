@@ -341,10 +341,12 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 				_, err = s.db.Certificate.UpdateOneID(c.ID).SetStatus(certificate.StatusRevoked).Save(ctx)
 				if err != nil {
 					ret <- struct{ err error }{err}
+					return
 				}
+				ret <- struct{ err error }{}
 			}(c, ret)
 		}
-		errors := make([]error, 0)
+		var errors []error
 		for i := 0; i < len(certs); i++ {
 			select {
 			case err := <-ret:
