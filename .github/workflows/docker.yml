@@ -1,9 +1,5 @@
 name: Docker Images
 
-concurrency:
-  group: docker-${{ github.ref }}
-  cancel-in-progress: true
-
 on:
   push:
   pull_request:
