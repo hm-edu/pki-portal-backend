@@ -48,7 +48,7 @@ jobs:
             type=ref,event=branch
             type=ref,event=tag
             type=ref,event=pr
-            type=raw,value={{branch}}-{{sha}}-{{date 'X'}}
+            type=raw,value={{branch}}-{{sha}}-{{date 'X'}},enable=${{ github.event_name != 'pull_request' }}
       - uses: dorny/paths-filter@v2
         id: filter
         with:
@@ -65,3 +65,4 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             SERVICE=${{ matrix.dir }}
+  
