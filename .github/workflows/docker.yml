@@ -54,6 +54,7 @@ jobs:
         with:
           filters: |
             src:
+              - 'backend/common/**'
               - 'backend/${{ matrix.dir }}/**'
       - name: Build and push
         uses: docker/build-push-action@v3
