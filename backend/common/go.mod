@@ -3,7 +3,7 @@ module github.com/hm-edu/portal-common
 go 1.18
 
 require (
-	github.com/getkin/kin-openapi v0.96.0
+	github.com/getkin/kin-openapi v0.97.0
 	github.com/golang-jwt/jwt/v4 v4.4.1
 	github.com/joho/godotenv v1.4.0
 	github.com/labstack/echo/v4 v4.7.2
