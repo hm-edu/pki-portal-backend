@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/labstack/gommon v0.3.1
-	github.com/miekg/dns v1.1.49
+	github.com/miekg/dns v1.1.50
 	go.uber.org/zap v1.21.0
 	google.golang.org/grpc v1.47.0
 )
