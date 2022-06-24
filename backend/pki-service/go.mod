@@ -6,7 +6,7 @@ require (
 	github.com/hm-edu/sectigo-client v0.0.0-20220617052413-56f0074339c4
 	github.com/mattn/go-sqlite3 v1.14.10
 	github.com/spf13/cobra v1.5.0
-	github.com/stretchr/testify v1.7.4
+	github.com/stretchr/testify v1.7.5
 	go.uber.org/zap v1.21.0
 )
 
