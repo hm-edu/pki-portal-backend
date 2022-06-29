@@ -17,7 +17,7 @@ jobs:
           - pki-service
           - dns-service
           - eab-rest-interface
-          - validation-interface
+          - validation-service
           - domain-rest-interface
     env:
       # Use docker.io for Docker Hub if empty

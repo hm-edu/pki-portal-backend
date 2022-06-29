@@ -30,7 +30,7 @@ func (v *DomainValidator) ValidateDomains() {
 	}
 
 	if len(v.Domains) == 0 {
-		logger.Info("No filter given. Validating all domains")
+		logger.Warn("No filter given. Validating all domains")
 	}
 
 	for _, validation := range *validations {
