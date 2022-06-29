@@ -19,6 +19,7 @@ jobs:
           - backend/dns-service
           - backend/domain-rest-interface
           - backend/eab-rest-interface
+          - backend/validation-service
           - backend/common
     steps:
       - uses: actions/checkout@v3

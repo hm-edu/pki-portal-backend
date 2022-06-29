@@ -57,9 +57,11 @@ func (v *DomainValidator) ValidateDomains() {
 			continue
 		}
 		logger.Info("Started validation", zap.String("domain", validation.Domain))
-		_, err = v.DNSService.Add(context.Background(), &pb.AddRequest{Zone: fmt.Sprintf("%s.", validation.Domain), Records: []*pb.DNSRecord{
-			{Ttl: 3600, Type: "CNAME", Name: data.Host, Content: data.Point},
-		}})
+		_, err = v.DNSService.Add(context.Background(), &pb.AddRequest{
+			Zone: fmt.Sprintf("%s.", validation.Domain),
+			Records: []*pb.DNSRecord{
+				{Ttl: 3600, Type: "CNAME", Name: data.Host, Content: data.Point},
+			}})
 		if err != nil {
 			logger.Error("Failed to add validation record", zap.Error(err), zap.String("domain", validation.Domain))
 			continue
@@ -98,7 +100,9 @@ func (v *DomainValidator) ValidateDomains() {
 			if record.Type == "CNAME" && record.Name == data.Host && record.Content == data.Point {
 				logger.Info("Deleting validation record", zap.String("domain", validation.Domain))
 
-				_, err = v.DNSService.Delete(context.Background(), &pb.DeleteRequest{Zone: fmt.Sprintf("%s.", validation.Domain), Records: []*pb.DNSRecord{record}})
+				_, err = v.DNSService.Delete(context.Background(), &pb.DeleteRequest{
+					Zone:    fmt.Sprintf("%s.", validation.Domain),
+					Records: []*pb.DNSRecord{record}})
 				if err != nil {
 					logger.Error("Failed to delete validation record", zap.Error(err), zap.String("domain", validation.Domain))
 					continue

@@ -4,12 +4,12 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/hm-edu/pki-service/pkg/cfg"
-	"github.com/hm-edu/pki-service/pkg/worker"
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/api"
 	"github.com/hm-edu/portal-common/tracing"
 	"github.com/hm-edu/sectigo-client/sectigo"
+	"github.com/hm-edu/validation-service/pkg/cfg"
+	"github.com/hm-edu/validation-service/pkg/worker"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -30,7 +30,7 @@ var validateCmd = &cobra.Command{
 			logger.Panic("config unmarshal failed", zap.Error(err))
 		}
 
-		tp := tracing.InitTracer(logger, "pki-service")
+		tp := tracing.InitTracer(logger, "validation-service")
 
 		defer func() {
 			if err := tp.Shutdown(context.Background()); err != nil {

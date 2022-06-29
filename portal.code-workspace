@@ -20,6 +20,9 @@
         },
         {
             "path": "backend/eab-rest-interface"
+        },
+        {
+            "path": "backend/validation-service"
         }
     ],
     "settings": {

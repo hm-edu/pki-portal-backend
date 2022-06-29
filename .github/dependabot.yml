@@ -44,3 +44,9 @@ updates:
     directory: "/backend/pki-service" # Location of package manifests
     schedule:
       interval: "daily"
+      
+  - package-ecosystem: "gomod"
+    directory: "/backend/validation-service" # Location of package manifests
+    schedule:
+      interval: "daily"
+

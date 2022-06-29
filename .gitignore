@@ -3,6 +3,7 @@ backend/domain-rest-interface/domain-rest-interface
 backend/pki-service/pki-service
 backend/dns-service/dns-service
 backend/eab-rest-interface/eab-rest-interface
+backend/validation-service/validation-service
 **/.idea
 **/.env
 **/__debug_bin
