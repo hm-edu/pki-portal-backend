@@ -77,12 +77,8 @@ func (v *DomainValidator) ValidateDomains() {
 		} else {
 			duration = validation.ExpirationDate.Time.Sub(x)
 		}
+		pending[duration] = append(pending[duration], validation.Domain)
 
-		if _, ok := pending[duration]; ok {
-			pending[duration] = append(pending[duration], validation.Domain)
-		} else {
-			pending[duration] = []string{validation.Domain}
-		}
 	}
 
 	(*v.observerLock).Lock()
