@@ -6,6 +6,7 @@ import (
 
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/api"
+	"github.com/hm-edu/portal-common/signals"
 	"github.com/hm-edu/portal-common/tracing"
 	"github.com/hm-edu/sectigo-client/sectigo"
 	"github.com/hm-edu/validation-service/pkg/cfg"
@@ -49,7 +50,10 @@ var validateCmd = &cobra.Command{
 			DNSService: pb.NewDNSServiceClient(conn),
 			Domains:    viper.GetStringSlice("domains"),
 		}
+
+		stopCh := signals.SetupSignalHandler()
 		validator.ValidateDomains()
+		<-stopCh
 	},
 }
 
