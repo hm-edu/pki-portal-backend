@@ -15,6 +15,7 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric/global"
 	"go.opentelemetry.io/otel/metric/instrument"
+	"go.opentelemetry.io/otel/metric/unit"
 	"go.uber.org/zap"
 )
 
@@ -22,7 +23,6 @@ import (
 type DomainValidator struct {
 	Client     *sectigo.Client
 	DNSService pb.DNSServiceClient
-	Force      bool
 	Domains    []string
 
 	observerLock          *sync.RWMutex
@@ -37,7 +37,7 @@ func (v *DomainValidator) ValidateDomains() {
 	logger := zap.L()
 	v.observerLock = new(sync.RWMutex)
 	v.observerValueToReport = make(map[string]time.Duration)
-	gaugeObserver, err := meter.AsyncInt64().Gauge("remaining_dates")
+	gaugeObserver, err := meter.AsyncInt64().Gauge("remaining_days", instrument.WithDescription("The remaining validation days per domain"), instrument.WithUnit(unit.Unit("days")))
 	if err != nil {
 		logger.Panic("failed to initialize instrument: %v", zap.Error(err))
 	}
@@ -78,17 +78,14 @@ func (v *DomainValidator) ValidateDomains() {
 			duration = validation.ExpirationDate.Time.Sub(x)
 		}
 		pending[duration] = append(pending[duration], validation.Domain)
-
+		(*v.observerLock).Lock()
+		v.observerValueToReport[validation.Domain] = time.Until(validation.ExpirationDate.Time)
+		(*v.observerLock).Unlock()
 	}
 
-	(*v.observerLock).Lock()
 	for duration, domains := range pending {
 		go v.validateDomains(duration, domains)
-		for _, domain := range domains {
-			v.observerValueToReport[domain] = duration
-		}
 	}
-	(*v.observerLock).Unlock()
 
 }
 

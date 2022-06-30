@@ -46,7 +46,6 @@ var validateCmd = &cobra.Command{
 
 		validator := worker.DomainValidator{
 			Client:     sectigo.NewClient(http.DefaultClient, logger, sectigoCfg.User, sectigoCfg.Password, sectigoCfg.CustomerURI),
-			Force:      viper.GetBool("force"),
 			DNSService: pb.NewDNSServiceClient(conn),
 			Domains:    viper.GetStringSlice("domains"),
 		}
@@ -63,7 +62,6 @@ func init() {
 	validateCmd.Flags().String("sectigo_user", "", "The sectigo user")
 	validateCmd.Flags().String("sectigo_password", "", "The password for the sectigo user")
 	validateCmd.Flags().String("sectigo_customeruri", "", "The sectigo customerUri")
-	validateCmd.Flags().Bool("force", false, "Force the DCV validation")
 	validateCmd.Flags().String("dns_service", "", "The dns service to use")
 	validateCmd.Flags().StringSlice("domains", nil, "The domains to validate")
 	validateCmd.Flags().String("level", "info", "log level debug, info, warn, error, flat or panic")

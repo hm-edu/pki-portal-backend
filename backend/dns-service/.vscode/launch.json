@@ -7,8 +7,7 @@
             "mode": "auto",
             "args": [
                 "run",
-                "mwn",
-                "--no-xds",
+                "mwn"
             ],
             "program": "${workspaceFolder}"
         }
