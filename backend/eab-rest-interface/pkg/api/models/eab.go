@@ -1,6 +1,7 @@
 package models
 
 import (
+	b64 "encoding/base64"
 	"time"
 
 	"github.com/smallstep/certificates/acme"
@@ -9,7 +10,7 @@ import (
 // EAB is an external account binding.
 type EAB struct {
 	ID       string     `json:"id"`
-	KeyBytes []byte     `json:"key_bytes"`
+	KeyBytes string     `json:"key_bytes"`
 	Bound    *time.Time `json:"bound_at"`
 }
 
@@ -21,7 +22,7 @@ func NewEAB(key *acme.ExternalAccountKey) *EAB {
 	}
 	return &EAB{
 		ID:       key.ID,
-		KeyBytes: key.HmacKey,
+		KeyBytes: b64.URLEncoding.EncodeToString(key.HmacKey),
 		Bound:    bound,
 	}
 }
