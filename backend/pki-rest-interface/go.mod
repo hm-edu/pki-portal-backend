@@ -11,7 +11,7 @@ require (
 	github.com/spf13/cobra v1.5.0
 	github.com/swaggo/echo-swagger v1.3.3
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.32.0
-	go.opentelemetry.io/otel v1.7.0
+	go.opentelemetry.io/otel v1.8.0
 	go.uber.org/zap v1.21.0
 	google.golang.org/grpc v1.47.0
 )
@@ -89,7 +89,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/swaggo/swag v1.8.3
 	go.opentelemetry.io/otel/sdk v1.7.0 // indirect
-	go.opentelemetry.io/otel/trace v1.7.0
+	go.opentelemetry.io/otel/trace v1.8.0
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/net v0.0.0-20220621193019-9d032be2e588 // indirect
