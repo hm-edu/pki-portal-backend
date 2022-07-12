@@ -7,8 +7,10 @@ import (
 	"github.com/hm-edu/domain-rest-interface/pkg/store"
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/helper"
+	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 )
@@ -29,15 +31,19 @@ func (api *domainAPIServer) CheckPermission(ctx context.Context, req *pb.CheckPe
 
 	ctx, span := api.tracer.Start(ctx, "CheckPermission")
 	defer span.End()
+	span.SetAttributes(attribute.String("user", req.User), attribute.StringSlice("domains", req.Domains))
 	domains, err := api.store.ListDomains(ctx, req.User, true)
+	log := otelzap.New(api.logger.With(zap.String("user", req.User), zap.Strings("domains", req.Domains)))
 	if err != nil {
 		return nil, err
 	}
 
 	permissions := helper.Map(req.Domains, func(t string) *pb.Permission {
 		if helper.Any(domains, func(d *ent.Domain) bool { return d.Fqdn == t }) {
+			log.Ctx(ctx).Info("Permission granted", zap.String("user", req.User), zap.String("domain", t))
 			return &pb.Permission{Domain: t, Granted: true}
 		}
+		log.Ctx(ctx).Info("Permission denied", zap.String("user", req.User), zap.String("domain", t))
 		return &pb.Permission{Domain: t, Granted: false}
 	})
 

@@ -8,6 +8,7 @@ import (
 	"github.com/hm-edu/eab-rest-interface/pkg/database"
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/helper"
+	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -34,26 +35,27 @@ func newEabAPIServer(domainService pb.DomainServiceClient, logger *zap.Logger, p
 func (api *eabAPIServer) ResolveAccountId(ctx context.Context, req *pb.ResolveAccountIdRequest) (*pb.ResolveAccountIdResponse, error) { // nolint
 	ctx, span := api.tracer.Start(ctx, "CheckEABPermissions")
 	defer span.End()
+
+	log := otelzap.New(api.logger.With(zap.String("user", req.AccountId)))
 	eak, err := database.DB.NoSQL.GetExternalAccountKeyByAccountID(ctx, api.provisionerID, req.AccountId)
 	if err != nil {
 		span.RecordError(err)
-		span.AddEvent("Error looking up user")
-		api.logger.Error("Error looking up user", zap.String("acc", req.AccountId), zap.Error(err))
+		log.Error("Error looking up user", zap.String("acc", req.AccountId), zap.Error(err))
 		return nil, status.Error(codes.Internal, "Error looking up user")
 	}
 	key, err := database.DB.Db.EABKey.Query().Where(eabkey.EabKey(eak.ID)).First(ctx)
 
 	if err != nil {
 		if _, ok := err.(*ent.NotFoundError); ok {
-			span.AddEvent("Key not found")
-			api.logger.Warn("Key not found", zap.String("key", eak.ID), zap.Error(err))
+			log.Warn("Key not found", zap.String("key", eak.ID), zap.Error(err))
 			return nil, status.Error(codes.Unauthenticated, "Key not found")
 		}
 		span.RecordError(err)
-		span.AddEvent("Error looking up user")
-		api.logger.Error("Error looking up user", zap.String("key", eak.ID), zap.Error(err))
+		log.Error("Error looking up user", zap.String("key", eak.ID), zap.Error(err))
 		return nil, status.Error(codes.Internal, "Error looking up user")
 	}
+	span.SetAttributes(attribute.String("key", eak.ID), attribute.String("user", key.User))
+	log.Info("User found", zap.String("key", eak.ID), zap.String("user", key.User))
 	return &pb.ResolveAccountIdResponse{User: key.User, EabKey: eak.ID}, nil
 }
 
@@ -62,33 +64,31 @@ func (api *eabAPIServer) CheckEABPermissions(ctx context.Context, req *pb.CheckE
 
 	ctx, span := api.tracer.Start(ctx, "CheckEABPermissions")
 	defer span.End()
+	log := otelzap.New(api.logger.With(zap.String("user", req.EabKey), zap.Strings("domains", req.Domains)))
 	span.SetAttributes(attribute.String("key", req.EabKey), attribute.StringSlice("domains", req.Domains))
 	key, err := database.DB.Db.EABKey.Query().Where(eabkey.EabKey(req.EabKey)).First(ctx)
 
 	if err != nil {
 		if _, ok := err.(*ent.NotFoundError); ok {
-			span.AddEvent("Key not found")
-			api.logger.Warn("Key not found", zap.String("key", req.EabKey), zap.Error(err))
+			log.Warn("Key not found", zap.String("key", req.EabKey), zap.Error(err))
 			return nil, status.Error(codes.Unauthenticated, "Key not found")
 		}
 		span.RecordError(err)
-		span.AddEvent("Error looking up user")
-		api.logger.Error("Error looking up user", zap.String("key", req.EabKey), zap.Error(err))
+		log.Error("Error looking up user", zap.String("key", req.EabKey), zap.Error(err))
 		return nil, status.Error(codes.Internal, "Error looking up user")
 	}
 
 	span.SetAttributes(attribute.String("key", req.EabKey), attribute.StringSlice("domains", req.Domains), attribute.String("user", key.User))
-	api.logger.Info("Checking registrations for user", zap.String("key", key.EabKey), zap.String("user", key.User), zap.Strings("domains", req.Domains))
+	log.Info("Checking registrations for user", zap.String("key", key.EabKey), zap.String("user", key.User), zap.Strings("domains", req.Domains))
 	permissions, err := api.domainService.CheckPermission(ctx, &pb.CheckPermissionRequest{User: key.User, Domains: req.Domains})
 	if err != nil {
 		span.RecordError(err)
-		span.AddEvent("Error checking permissions")
-		api.logger.Error("Error checking permissions", zap.Error(err))
+		log.Error("Error checking permissions", zap.Error(err))
 		return nil, status.Error(codes.Internal, "Error checking permissions")
 	}
 
 	missing := helper.Map(helper.Where(permissions.Permissions, func(t *pb.Permission) bool { return !t.Granted }), func(t *pb.Permission) string { return t.Domain })
 	span.SetAttributes(attribute.String("key", req.EabKey), attribute.StringSlice("domains", req.Domains), attribute.String("user", key.User), attribute.StringSlice("missing", missing))
-	api.logger.Info("Permissions checked", zap.Strings("missing", missing), zap.String("key", key.EabKey), zap.String("user", key.User))
+	log.Info("Permissions checked", zap.Strings("missing", missing), zap.String("key", key.EabKey), zap.String("user", key.User))
 	return &pb.CheckEABPermissionResponse{Missing: missing}, nil
 }
