@@ -8,7 +8,7 @@ require (
 	github.com/smallstep/certificates v0.21.0
 	go.opentelemetry.io/otel v1.8.0
 	go.uber.org/zap v1.21.0
-	google.golang.org/grpc v1.47.0
+	google.golang.org/grpc v1.48.0
 )
 
 require (
@@ -63,6 +63,7 @@ require (
 	github.com/smallstep/nosql v0.4.0
 	github.com/spf13/cobra v1.5.0
 	github.com/swaggo/echo-swagger v1.3.3
+	github.com/uptrace/opentelemetry-go-extra/otelzap v0.1.14
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.33.0
 )
 
@@ -161,7 +162,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rogpeppe/go-internal v1.8.1 // indirect
 	github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.14 // indirect
-	github.com/uptrace/opentelemetry-go-extra/otelzap v0.1.14 // indirect
 	github.com/valyala/fasttemplate v1.2.1 // indirect
 	github.com/zclconf/go-cty v1.10.0 // indirect
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d // indirect
