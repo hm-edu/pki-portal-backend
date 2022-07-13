@@ -13,7 +13,7 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.33.0
 	go.opentelemetry.io/otel v1.8.0
 	go.uber.org/zap v1.21.0
-	google.golang.org/grpc v1.47.0
+	google.golang.org/grpc v1.48.0
 )
 
 require (
