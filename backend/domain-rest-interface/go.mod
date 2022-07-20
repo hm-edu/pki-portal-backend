@@ -39,7 +39,7 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/swaggo/swag v1.8.3
+	github.com/swaggo/swag v1.8.4
 	go.opentelemetry.io/otel/sdk v1.8.0 // indirect
 	go.opentelemetry.io/otel/trace v1.8.0
 	go.uber.org/atomic v1.9.0 // indirect
@@ -66,6 +66,7 @@ require (
 	github.com/spf13/cobra v1.5.0
 	github.com/stretchr/testify v1.8.0
 	github.com/swaggo/echo-swagger v1.3.3
+	github.com/uptrace/opentelemetry-go-extra/otelzap v0.1.14
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.33.0
 )
 
@@ -93,7 +94,6 @@ require (
 	github.com/prometheus/common v0.35.0 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.14 // indirect
-	github.com/uptrace/opentelemetry-go-extra/otelzap v0.1.14 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.8.0 // indirect
 	go.opentelemetry.io/otel/exporters/jaeger v1.8.0 // indirect
 	go.opentelemetry.io/otel/exporters/prometheus v0.31.0 // indirect
