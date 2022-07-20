@@ -617,8 +617,8 @@ github.com/swaggo/echo-swagger v1.3.3/go.mod h1:vbKcEBeJgOexLuPcsdZhrRAV508fsE79
 github.com/swaggo/files v0.0.0-20220610200504-28940afbdbfe h1:K8pHPVoTgxFJt1lXuIzzOX7zZhZFldJQK/CgKx9BFIc=
 github.com/swaggo/files v0.0.0-20220610200504-28940afbdbfe/go.mod h1:lKJPbtWzJ9JhsTN1k1gZgleJWY/cqq0psdoMmaThG3w=
 github.com/swaggo/swag v1.8.1/go.mod h1:ugemnJsPZm/kRwFUnzBlbHRd0JY9zE1M4F+uy2pAaPQ=
-github.com/swaggo/swag v1.8.3 h1:3pZSSCQ//gAH88lfmxM3Cd1+JCsxV8Md6f36b9hrZ5s=
-github.com/swaggo/swag v1.8.3/go.mod h1:jMLeXOOmYyjk8PvHTsXBdrubsNd9gUJTTCzL5iBnseg=
+github.com/swaggo/swag v1.8.4 h1:oGB351qH1JqUqK1tsMYEE5qTBbPk394BhsZxmUfebcI=
+github.com/swaggo/swag v1.8.4/go.mod h1:jMLeXOOmYyjk8PvHTsXBdrubsNd9gUJTTCzL5iBnseg=
 github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8/go.mod h1:VFNgLljTbGfSG7qAOspJ7OScBnGdDN/yBr0sguwnwf0=
 github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.14 h1:vuYn+33yx7KrzmnUH2TYmapR8B8DwO0nRIluc0gRdfE=
 github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.14/go.mod h1:vNmY7gwoy9t4RQxhmYHV1Myt4qf2bSMpSgmzFKuoZDg=
