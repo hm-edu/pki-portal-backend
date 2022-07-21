@@ -14,7 +14,6 @@ import (
 	_ "github.com/hm-edu/pki-service/ent/runtime"
 
 	entsql "entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/schema"
 	"go.uber.org/zap"
 )
 
@@ -44,7 +43,7 @@ func ConnectDb(log *zap.Logger, connectionString string) {
 	client, db := Open(log, connectionString)
 
 	// Run the auto migration tool.
-	if err := client.Schema.Create(context.Background(), schema.WithAtlas(true)); err != nil {
+	if err := client.Schema.Create(context.Background()); err != nil {
 		log.Fatal("failed creating schema resources", zap.Error(err))
 	}
 
