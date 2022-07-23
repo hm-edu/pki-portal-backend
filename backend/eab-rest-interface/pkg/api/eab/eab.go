@@ -28,7 +28,7 @@ import (
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) GetExternalAccountKeys(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
-	ctx, span := h.tracer.Start(c.Request().Context(), "list")
+	ctx, span := h.tracer.Start(c.Request().Context(), "listing eab keys")
 	defer span.End()
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
@@ -65,7 +65,7 @@ func (h *Handler) GetExternalAccountKeys(c echo.Context) error {
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) CreateNewKey(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
-	ctx, span := h.tracer.Start(c.Request().Context(), "add")
+	ctx, span := h.tracer.Start(c.Request().Context(), "add eab key")
 	defer span.End()
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
@@ -86,6 +86,7 @@ func (h *Handler) CreateNewKey(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to get external account keys")
 	}
 
+	logger.Info("Created new external account key", zap.String("keyid", key.ID))
 	return c.JSON(http.StatusCreated, models.NewEAB(key))
 }
 
@@ -103,14 +104,16 @@ func (h *Handler) CreateNewKey(c echo.Context) error {
 func (h *Handler) DeleteKey(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "delete")
+
 	defer span.End()
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		logger.Error("Failed to get user from request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
-	logger.Info("Requesting deletion of external account key")
 	key := c.Param("id")
+	logger = logger.With(zap.String("keyid", key))
+	logger.Info("Requesting deletion of external account key")
 	mapping, err := database.DB.Db.EABKey.Query().Where(eabkey.And(eabkey.User(user), eabkey.EabKey(key))).First(ctx)
 	if err != nil {
 		logger.Error("Failed to get external account keys", zap.Error(err))

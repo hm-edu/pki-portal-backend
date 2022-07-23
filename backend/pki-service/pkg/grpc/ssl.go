@@ -21,6 +21,7 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
+	tracingCodes "go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/metric/global"
 	"go.opentelemetry.io/otel/metric/instrument"
 	"go.opentelemetry.io/otel/trace"
@@ -133,6 +134,11 @@ func (s *sslAPIServer) CertificateDetails(ctx context.Context, req *pb.Certifica
 
 func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequest) (*pb.ListSslResponse, error) {
 
+	_, span := otel.GetTracerProvider().Tracer("ssl").Start(ctx, "listing ssl certificates")
+	defer span.End()
+	logger := s.logger.With(zap.Strings("domains", req.Domains), zap.Bool("partial", req.IncludePartial))
+	logger.Info("listing certificates for domains")
+
 	var cond predicate.Certificate
 	if req.IncludePartial {
 		cond = certificate.HasDomainsWith(domain.FqdnIn(req.Domains...))
@@ -144,6 +150,8 @@ func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequ
 	}
 	certificates, err := s.db.Certificate.Query().WithDomains().Where(cond).All(ctx)
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(tracingCodes.Error, "listing certificates failed")
 		return nil, status.Error(codes.Internal, "Error querying certificates")
 	}
 	return &pb.ListSslResponse{Items: helper.Map(certificates, mapCertificate)}, nil
@@ -151,9 +159,9 @@ func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequ
 
 func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslRequest) (*pb.IssueSslResponse, error) {
 
-	_, span := otel.GetTracerProvider().Tracer("ssl").Start(ctx, "handleCsr")
+	_, span := otel.GetTracerProvider().Tracer("ssl").Start(ctx, "issuing ssl certificate")
 	defer span.End()
-	logger := s.logger.With(zap.String("trace_id", span.SpanContext().TraceID().String()))
+	logger := s.logger.With(zap.String("trace_id", span.SpanContext().TraceID().String()), zap.String("issuer", req.Issuer))
 
 	block, _ := pem.Decode([]byte(req.Csr))
 
@@ -239,7 +247,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 			if e, ok := err.(*sectigo.ErrorResponse); ok {
 				if e.Code == 0 && e.Description == "Being processed by Sectigo" {
 					span.AddEvent("Certificate not ready yet")
-					s.logger.Info("Certificate not ready", zap.Int("id", enrollment.SslID), zap.Strings("subject_alternative_names", req.SubjectAlternativeNames))
+					s.logger.Debug("Certificate not ready", zap.Int("id", enrollment.SslID), zap.Strings("subject_alternative_names", req.SubjectAlternativeNames))
 					return false, nil
 				}
 			}
@@ -285,7 +293,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 
 func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslRequest) (*emptypb.Empty, error) {
 
-	_, span := otel.GetTracerProvider().Tracer("ssl").Start(ctx, "revokeCertificate")
+	_, span := otel.GetTracerProvider().Tracer("ssl").Start(ctx, "revoke ssl certificate")
 	defer span.End()
 	logger := s.logger.With(zap.String("trace_id", span.SpanContext().TraceID().String()), zap.String("reason", req.Reason))
 
