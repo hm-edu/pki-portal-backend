@@ -137,25 +137,21 @@ func (v *DomainValidator) validateDomains(duration time.Duration, domains []stri
 			continue
 		}
 
-		records, err := v.DNSService.List(context.Background(), &pb.ListRequest{Zone: fmt.Sprintf("%s.", d)})
 		if err != nil {
 			logger.Error("Failed to list dns records", zap.Error(err))
 			continue
 		}
-		for _, record := range records.Records {
-			if record.Type == "CNAME" && record.Name == data.Host && record.Content == data.Point {
-				logger.Info("Deleting validation record")
+		logger.Info("Deleting validation record")
 
-				_, err = v.DNSService.Delete(context.Background(), &pb.DeleteRequest{
-					Zone:    fmt.Sprintf("%s.", d),
-					Records: []*pb.DNSRecord{record}})
-				if err != nil {
-					logger.Error("Failed to delete validation record", zap.Error(err))
-					continue
-				}
-				logger.Debug("Deleted validation record")
-			}
+		_, err = v.DNSService.Delete(context.Background(), &pb.DeleteRequest{
+			Zone:    fmt.Sprintf("%s.", d),
+			Records: []*pb.DNSRecord{{Ttl: 0, Type: "CNAME", Name: data.Host, Content: ""}}})
+		if err != nil {
+			logger.Error("Failed to delete validation record", zap.Error(err))
+			continue
 		}
+		logger.Debug("Deleted validation record")
+
 		pending[status.ExpirationDate.Time.Sub(x)] = append(pending[status.ExpirationDate.Time.Sub(x)], d)
 	}
 
