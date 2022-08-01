@@ -3,7 +3,7 @@ module github.com/hm-edu/domain-rest-interface
 go 1.18
 
 require (
-	github.com/getkin/kin-openapi v0.97.0
+	github.com/getkin/kin-openapi v0.98.0
 	github.com/hm-edu/portal-common v0.0.0-20220721062043-e158f582ae19
 	go.opentelemetry.io/otel v1.8.0
 	go.uber.org/zap v1.21.0
