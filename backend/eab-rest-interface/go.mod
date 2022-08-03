@@ -6,7 +6,7 @@ require (
 	github.com/getkin/kin-openapi v0.97.0
 	github.com/hm-edu/portal-common v0.0.0-20220721062043-e158f582ae19
 	github.com/smallstep/certificates v0.21.0
-	go.opentelemetry.io/otel v1.8.0
+	go.opentelemetry.io/otel v1.9.0
 	go.uber.org/zap v1.21.0
 	google.golang.org/grpc v1.48.0
 )
@@ -42,7 +42,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/swaggo/swag v1.8.4
 	go.opentelemetry.io/otel/sdk v1.8.0 // indirect
-	go.opentelemetry.io/otel/trace v1.8.0
+	go.opentelemetry.io/otel/trace v1.9.0
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/net v0.0.0-20220708220712-1185a9018129 // indirect
@@ -64,7 +64,7 @@ require (
 	github.com/spf13/cobra v1.5.0
 	github.com/swaggo/echo-swagger v1.3.3
 	github.com/uptrace/opentelemetry-go-extra/otelzap v0.1.15
-	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.33.0
+	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.34.0
 )
 
 require (
@@ -119,7 +119,7 @@ require (
 	github.com/urfave/cli v1.22.9 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	go.mozilla.org/pkcs7 v0.0.0-20210826202110-33d05740a352 // indirect
-	go.opentelemetry.io/contrib/propagators/b3 v1.8.0 // indirect
+	go.opentelemetry.io/contrib/propagators/b3 v1.9.0 // indirect
 	go.opentelemetry.io/otel/exporters/jaeger v1.8.0 // indirect
 	go.opentelemetry.io/otel/exporters/prometheus v0.31.0 // indirect
 	go.opentelemetry.io/otel/metric v0.31.0 // indirect
