@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/getkin/kin-openapi v0.97.0
 	github.com/hm-edu/portal-common v0.0.0-20220721062043-e158f582ae19
-	go.opentelemetry.io/otel v1.8.0
+	go.opentelemetry.io/otel v1.9.0
 	go.uber.org/zap v1.21.0
 	google.golang.org/grpc v1.48.0
 )
@@ -41,7 +41,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/swaggo/swag v1.8.4
 	go.opentelemetry.io/otel/sdk v1.8.0 // indirect
-	go.opentelemetry.io/otel/trace v1.8.0
+	go.opentelemetry.io/otel/trace v1.9.0
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/net v0.0.0-20220708220712-1185a9018129 // indirect
