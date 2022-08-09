@@ -12,7 +12,7 @@ require (
 	github.com/swaggo/echo-swagger v1.3.3
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.34.0
 	go.opentelemetry.io/otel v1.9.0
-	go.uber.org/zap v1.21.0
+	go.uber.org/zap v1.22.0
 	google.golang.org/grpc v1.48.0
 )
 
