@@ -90,7 +90,7 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.34.0
 	go.opentelemetry.io/otel v1.9.0
 	go.opentelemetry.io/otel/sdk v1.9.0
-	go.uber.org/zap v1.21.0
+	go.uber.org/zap v1.22.0
 	golang.org/x/sys v0.0.0-20220803195053-6e608f9ce704 // indirect
 	google.golang.org/grpc v1.48.0
 )
