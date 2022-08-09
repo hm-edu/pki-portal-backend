@@ -6,7 +6,7 @@ require (
 	github.com/hm-edu/sectigo-client v0.0.0-20220731065241-e31d902c4924
 	github.com/spf13/cobra v1.5.0
 	go.opentelemetry.io/otel/metric v0.31.0
-	go.uber.org/zap v1.21.0
+	go.uber.org/zap v1.22.0
 )
 
 require (
