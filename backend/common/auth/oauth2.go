@@ -82,7 +82,7 @@ func HasScope(scope string) echo.MiddlewareFunc {
 
 			if token, ok := c.Get("user").(*jwt.Token); ok {
 				if user, ok := token.Claims.(jwt.MapClaims); ok {
-					if scp, ok := user["scp"].(string); ok {
+					if scp, ok := user["scope"].(string); ok {
 						if !helper.Contains(strings.Split(scp, " "), scope) {
 							return echo.NewHTTPError(http.StatusForbidden, fmt.Sprintf("scope %s missing", scope))
 						}
