@@ -28,7 +28,7 @@ func (o optionFunc) apply(c *config) {
 	o(c)
 }
 
-//WithSkipper specifies a skipper for allowing requests to skip generating spans.
+// WithSkipper specifies a skipper for allowing requests to skip generating spans.
 func WithSkipper(skipper middleware.Skipper) Option {
 	return optionFunc(func(cfg *config) {
 		cfg.Skipper = skipper
