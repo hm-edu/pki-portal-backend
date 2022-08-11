@@ -6,7 +6,7 @@ require (
 	github.com/getkin/kin-openapi v0.98.0
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/joho/godotenv v1.4.0
-	github.com/labstack/echo/v4 v4.7.2
+	github.com/labstack/echo/v4 v4.8.0
 	github.com/lestrrat-go/jwx v1.2.25
 	github.com/ory/viper v1.7.5
 	github.com/spf13/cobra v1.5.0
