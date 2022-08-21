@@ -61,7 +61,7 @@ require (
 	github.com/jackc/pgx/v4 v4.17.0
 	github.com/labstack/echo/v4 v4.8.0
 	github.com/lestrrat-go/jwx v1.2.25
-	github.com/mattn/go-sqlite3 v1.14.14
+	github.com/mattn/go-sqlite3 v1.14.15
 	github.com/ory/viper v1.7.5
 	github.com/spf13/cobra v1.5.0
 	github.com/stretchr/testify v1.8.0
