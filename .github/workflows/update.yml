@@ -1,0 +1,28 @@
+name: update-packages
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 * * * *"
+
+jobs:
+  components:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '1.19'
+      - name: Execute update script
+        run: ./helper/update.sh
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+            token: ${{ secrets.GITHUB_TOKEN }}
+            branch: update-packages
+            commit-message: "chore: Update packages"
+            title: "chore: Update packages"
+            body: |
+              Update packages
