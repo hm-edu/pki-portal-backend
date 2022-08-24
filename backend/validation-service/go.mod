@@ -6,7 +6,7 @@ require (
 	github.com/hm-edu/sectigo-client v0.0.0-20220731065241-e31d902c4924
 	github.com/spf13/cobra v1.5.0
 	go.opentelemetry.io/otel/metric v0.31.0
-	go.uber.org/zap v1.22.0
+	go.uber.org/zap v1.23.0
 )
 
 require (
@@ -68,19 +68,19 @@ require (
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/hm-edu/portal-common v0.0.0-20220810084148-cc7581bb01d1
+	github.com/hm-edu/portal-common v0.0.0-20220823053517-d9e4f3f19da7
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/spf13/afero v1.9.2 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
-	github.com/subosito/gotenv v1.4.0 // indirect
-	golang.org/x/net v0.0.0-20220812174116-3211cb980234 // indirect
-	golang.org/x/sys v0.0.0-20220818161305-2296e01440c6 // indirect
+	github.com/subosito/gotenv v1.4.1 // indirect
+	golang.org/x/net v0.0.0-20220822230855-b0a4917ee28c // indirect
+	golang.org/x/sys v0.0.0-20220823224334-20c2bfdbfe24 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	google.golang.org/genproto v0.0.0-20220819174105-e9f053255caa // indirect
-	google.golang.org/grpc v1.48.0 // indirect
+	google.golang.org/genproto v0.0.0-20220822174746-9e6da59bd2fc // indirect
+	google.golang.org/grpc v1.49.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

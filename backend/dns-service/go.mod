@@ -6,8 +6,8 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/labstack/gommon v0.3.1
 	github.com/miekg/dns v1.1.50
-	go.uber.org/zap v1.22.0
-	google.golang.org/grpc v1.48.0
+	go.uber.org/zap v1.23.0
+	google.golang.org/grpc v1.49.0
 )
 
 require (
@@ -60,7 +60,7 @@ require (
 	github.com/spf13/afero v1.9.2 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
-	github.com/subosito/gotenv v1.4.0 // indirect
+	github.com/subosito/gotenv v1.4.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.34.0 // indirect
@@ -72,14 +72,14 @@ require (
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	google.golang.org/genproto v0.0.0-20220819174105-e9f053255caa // indirect
+	google.golang.org/genproto v0.0.0-20220822174746-9e6da59bd2fc // indirect
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
 require (
-	github.com/hm-edu/portal-common v0.0.0-20220810084148-cc7581bb01d1
+	github.com/hm-edu/portal-common v0.0.0-20220823053517-d9e4f3f19da7
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 )
@@ -87,8 +87,8 @@ require (
 require (
 	github.com/spf13/cobra v1.5.0
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
-	golang.org/x/net v0.0.0-20220812174116-3211cb980234 // indirect
-	golang.org/x/sys v0.0.0-20220818161305-2296e01440c6 // indirect
+	golang.org/x/net v0.0.0-20220822230855-b0a4917ee28c // indirect
+	golang.org/x/sys v0.0.0-20220823224334-20c2bfdbfe24 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 )
 

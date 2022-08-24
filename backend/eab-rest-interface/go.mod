@@ -4,11 +4,11 @@ go 1.18
 
 require (
 	github.com/getkin/kin-openapi v0.98.0
-	github.com/hm-edu/portal-common v0.0.0-20220810084148-cc7581bb01d1
+	github.com/hm-edu/portal-common v0.0.0-20220823053517-d9e4f3f19da7
 	github.com/smallstep/certificates v0.21.0
 	go.opentelemetry.io/otel v1.9.0
-	go.uber.org/zap v1.22.0
-	google.golang.org/grpc v1.48.0
+	go.uber.org/zap v1.23.0
+	google.golang.org/grpc v1.49.0
 )
 
 require (
@@ -23,7 +23,7 @@ require (
 	github.com/spf13/afero v1.9.2 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
-	github.com/subosito/gotenv v1.4.0 // indirect
+	github.com/subosito/gotenv v1.4.1 // indirect
 	github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.34.0 // indirect
@@ -45,11 +45,11 @@ require (
 	go.opentelemetry.io/otel/trace v1.9.0
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
-	golang.org/x/net v0.0.0-20220812174116-3211cb980234 // indirect
-	golang.org/x/sys v0.0.0-20220818161305-2296e01440c6 // indirect
+	golang.org/x/net v0.0.0-20220822230855-b0a4917ee28c // indirect
+	golang.org/x/sys v0.0.0-20220823224334-20c2bfdbfe24 // indirect
 	golang.org/x/text v0.3.8-0.20211004125949-5bd84dd9b33b // indirect
 	golang.org/x/tools v0.1.13-0.20220804200503-81c7dc4e4efa // indirect
-	google.golang.org/genproto v0.0.0-20220819174105-e9f053255caa // indirect
+	google.golang.org/genproto v0.0.0-20220822174746-9e6da59bd2fc // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
@@ -125,13 +125,13 @@ require (
 	go.opentelemetry.io/otel/metric v0.31.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v0.31.0 // indirect
 	go.step.sm/cli-utils v0.7.3 // indirect
-	go.step.sm/crypto v0.17.2 // indirect
+	go.step.sm/crypto v0.17.3 // indirect
 	go.step.sm/linkedca v0.18.0 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 )
 
 require (
-	ariga.io/atlas v0.6.1 // indirect
+	ariga.io/atlas v0.6.3 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0 // indirect
@@ -163,7 +163,7 @@ require (
 	github.com/rogpeppe/go-internal v1.8.1 // indirect
 	github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.15 // indirect
 	github.com/valyala/fasttemplate v1.2.1 // indirect
-	github.com/zclconf/go-cty v1.10.0 // indirect
+	github.com/zclconf/go-cty v1.11.0 // indirect
 	golang.org/x/crypto v0.0.0-20220817201139-bc19a97f63c8 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/time v0.0.0-20220722155302-e5dcc9cfc0b9 // indirect
