@@ -86,7 +86,7 @@ func InitTracer(logger *zap.Logger, name string) *sdktrace.TracerProvider {
 	otel.SetTextMapPropagator(b3)
 	http.HandleFunc("/", prom.ServeHTTP)
 	go func() {
-		_ = http.ListenAndServe(":2222", nil)
+		_ = http.ListenAndServe(":2222", nil) // nolint:gosec // we expect don't expose this interface to the internet
 	}()
 
 	logger.Info("Prometheus server running on :2222")
