@@ -3,7 +3,7 @@ module github.com/hm-edu/eab-rest-interface
 go 1.18
 
 require (
-	github.com/getkin/kin-openapi v0.98.0
+	github.com/getkin/kin-openapi v0.99.0
 	github.com/hm-edu/portal-common v0.0.0-20220823053517-d9e4f3f19da7
 	github.com/smallstep/certificates v0.22.0
 	go.opentelemetry.io/otel v1.9.0
@@ -46,10 +46,10 @@ require (
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b // indirect
-	golang.org/x/sys v0.0.0-20220825204002-c680a09ffe64 // indirect
+	golang.org/x/sys v0.0.0-20220829200755-d48e67d00261 // indirect
 	golang.org/x/text v0.3.8-0.20211004125949-5bd84dd9b33b // indirect
 	golang.org/x/tools v0.1.13-0.20220804200503-81c7dc4e4efa // indirect
-	google.golang.org/genproto v0.0.0-20220822174746-9e6da59bd2fc // indirect
+	google.golang.org/genproto v0.0.0-20220829175752-36a9c930ecbf // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
@@ -164,7 +164,7 @@ require (
 	github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.15 // indirect
 	github.com/valyala/fasttemplate v1.2.1 // indirect
 	github.com/zclconf/go-cty v1.11.0 // indirect
-	golang.org/x/crypto v0.0.0-20220826181053-bd7e27e6170d // indirect
+	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/time v0.0.0-20220722155302-e5dcc9cfc0b9 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
