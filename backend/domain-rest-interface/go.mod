@@ -3,7 +3,7 @@ module github.com/hm-edu/domain-rest-interface
 go 1.18
 
 require (
-	github.com/getkin/kin-openapi v0.99.0
+	github.com/getkin/kin-openapi v0.100.0
 	github.com/hm-edu/portal-common v0.0.0-20220823053517-d9e4f3f19da7
 	go.opentelemetry.io/otel v1.9.0
 	go.uber.org/zap v1.23.0
@@ -48,7 +48,7 @@ require (
 	golang.org/x/sys v0.0.0-20220829200755-d48e67d00261 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.13-0.20220804200503-81c7dc4e4efa // indirect
-	google.golang.org/genproto v0.0.0-20220829175752-36a9c930ecbf // indirect
+	google.golang.org/genproto v0.0.0-20220902135211-223410557253 // indirect
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
@@ -58,7 +58,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/hm-edu/portal-apis v0.0.0-20220603062428-bf1306b32398
-	github.com/jackc/pgx/v4 v4.17.1
+	github.com/jackc/pgx/v4 v4.17.2
 	github.com/labstack/echo/v4 v4.8.0
 	github.com/lestrrat-go/jwx v1.2.25
 	github.com/mattn/go-sqlite3 v1.14.15
@@ -103,7 +103,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.6.3 // indirect
+	ariga.io/atlas v0.6.4 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0 // indirect
@@ -115,7 +115,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/hashicorp/hcl/v2 v2.13.0 // indirect
+	github.com/hashicorp/hcl/v2 v2.14.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/labstack/gommon v0.3.1 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
