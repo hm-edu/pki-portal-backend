@@ -66,7 +66,7 @@ require (
 	github.com/spf13/cobra v1.5.0
 	github.com/stretchr/testify v1.8.0
 	github.com/swaggo/echo-swagger v1.3.4
-	github.com/uptrace/opentelemetry-go-extra/otelzap v0.1.15
+	github.com/uptrace/opentelemetry-go-extra/otelzap v0.1.16
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.34.0
 )
 
@@ -93,7 +93,7 @@ require (
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.37.0 // indirect
 	github.com/prometheus/procfs v0.8.0 // indirect
-	github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.15 // indirect
+	github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.16 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.9.0 // indirect
 	go.opentelemetry.io/otel/exporters/jaeger v1.9.0 // indirect
 	go.opentelemetry.io/otel/exporters/prometheus v0.31.0 // indirect

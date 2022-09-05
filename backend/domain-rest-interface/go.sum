@@ -529,10 +529,10 @@ github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a/go.mod h1:lKJPbtWzJ9J
 github.com/swaggo/swag v1.8.1/go.mod h1:ugemnJsPZm/kRwFUnzBlbHRd0JY9zE1M4F+uy2pAaPQ=
 github.com/swaggo/swag v1.8.5 h1:7NgtfXsXE+jrcOwRyiftGKW7Ppydj7tZiVenuRf1fE4=
 github.com/swaggo/swag v1.8.5/go.mod h1:jMLeXOOmYyjk8PvHTsXBdrubsNd9gUJTTCzL5iBnseg=
-github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.15 h1:5eYO+onNB1mbdc3+uw6r+yNFFEzqR6sm8sj7zcrjrAs=
-github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.15/go.mod h1:6fGFPZDTcvHLxgWTFvf8hHWQrRO1tMXAFlxlqE+c650=
-github.com/uptrace/opentelemetry-go-extra/otelzap v0.1.15 h1:iLKZ61+M4mqJx2EOwr1NpC7yqsRPo1lAyOa7tZpJkIk=
-github.com/uptrace/opentelemetry-go-extra/otelzap v0.1.15/go.mod h1:xOB2Oq29mzf4Id68h8mczj4H5U6KagDdcH64tgd4yMo=
+github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.16 h1:bJld2pB1BJjbsh4SDOazz3Gies8gJhjTh/oapV54Vtw=
+github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.16/go.mod h1:Z26JCmg3BtsTgXO/MuvyuCPXfzQVsw4TjFgjGpjTM9A=
+github.com/uptrace/opentelemetry-go-extra/otelzap v0.1.16 h1:8sOhtcYDlqLT9ruKfSjODlfh7NAEGh/+dthTPvjKILk=
+github.com/uptrace/opentelemetry-go-extra/otelzap v0.1.16/go.mod h1:Tuve+DFmFgVMW+JajAKy2OuBy4ccVB/KNUrlvIjR9Do=
 github.com/urfave/cli/v2 v2.3.0/go.mod h1:LJmUH05zAU44vOAcrfzZQKsZbVcdbOG8rtL3/XcUArI=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=
 github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
