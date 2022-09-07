@@ -13,6 +13,9 @@
                 "validate",
                 "--level",
                 "debug",
+                "--dns_service",
+                "localhost:8081",
+                "--force"
             ],
             "program": "${workspaceFolder}"
         }

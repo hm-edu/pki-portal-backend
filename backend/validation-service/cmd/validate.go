@@ -48,6 +48,7 @@ var validateCmd = &cobra.Command{
 			Client:     sectigo.NewClient(http.DefaultClient, logger, sectigoCfg.User, sectigoCfg.Password, sectigoCfg.CustomerURI),
 			DNSService: pb.NewDNSServiceClient(conn),
 			Domains:    viper.GetStringSlice("domains"),
+			Force:      viper.GetBool("force"),
 		}
 
 		stopCh := signals.SetupSignalHandler()
@@ -63,6 +64,7 @@ func init() {
 	validateCmd.Flags().String("sectigo_password", "", "The password for the sectigo user")
 	validateCmd.Flags().String("sectigo_customeruri", "", "The sectigo customerUri")
 	validateCmd.Flags().String("dns_service", "", "The dns service to use")
+	validateCmd.Flags().Bool("force", false, "Force the validation of all domains")
 	validateCmd.Flags().StringSlice("domains", nil, "The domains to validate")
 	validateCmd.Flags().String("level", "info", "log level debug, info, warn, error, flat or panic")
 }

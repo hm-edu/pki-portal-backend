@@ -3,7 +3,7 @@ module github.com/hm-edu/validation-service
 go 1.18
 
 require (
-	github.com/hm-edu/sectigo-client v0.0.0-20220731065241-e31d902c4924
+	github.com/hm-edu/sectigo-client v0.0.0-20220906180858-c570c6804dcd
 	github.com/spf13/cobra v1.5.0
 	go.opentelemetry.io/otel/metric v0.31.0
 	go.uber.org/zap v1.23.0
@@ -45,6 +45,7 @@ require (
 	go.opentelemetry.io/otel/exporters/prometheus v0.31.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v0.31.0 // indirect
 	golang.org/x/crypto v0.0.0-20220817201139-bc19a97f63c8 // indirect
+	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/time v0.0.0-20220722155302-e5dcc9cfc0b9 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
@@ -88,6 +89,7 @@ require (
 require (
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/joho/godotenv v1.4.0 // indirect
+	github.com/miekg/dns v1.1.50
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/objx v0.4.0 // indirect
 )
