@@ -31,9 +31,11 @@ func NewDNSServer(logger *zap.Logger, provider core.DNSProvider) *DNSServer {
 
 // List returns all the records for the given zone.
 func (s *DNSServer) List(_ context.Context, req *pb.ListRequest) (*pb.ListResponse, error) {
+	logger := s.logger.With(zap.String("zone", req.Zone))
+	logger.Info("listing zone")
 	rrs, err := s.provider.List(req.Zone)
 	if err != nil {
-		s.logger.Error("failed to list RR", zap.Error(err))
+		logger.Error("failed to list RR", zap.Error(err))
 		return nil, status.Error(codes.Internal, fmt.Sprintf("failed to list RR: %v", err))
 	}
 	entries := []*pb.DNSRecord{}
@@ -93,14 +95,14 @@ func (s *DNSServer) parseRR(rr dns.RR) *pb.DNSRecord {
 
 }
 
-func (s *DNSServer) buildRRs(rrs []*pb.DNSRecord) ([]dns.RR, error) {
+func (s *DNSServer) buildRRs(rrs []*pb.DNSRecord, logger *zap.Logger) ([]dns.RR, error) {
 	rr := []dns.RR{}
 
 	for _, r := range rrs {
 		newRR := fmt.Sprintf("%s %d %s %s", r.Name, r.Ttl, r.Type, r.Content)
 		item, err := dns.NewRR(newRR)
 		if err != nil {
-			s.logger.Error("failed to build RR", zap.Error(err))
+			logger.Error("failed to build RR", zap.Error(err))
 			return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("failed to build new RR: %v", err))
 		}
 		rr = append(rr, item)
@@ -110,15 +112,16 @@ func (s *DNSServer) buildRRs(rrs []*pb.DNSRecord) ([]dns.RR, error) {
 
 // Add adds the given records to the given zone.
 func (s *DNSServer) Add(_ context.Context, req *pb.AddRequest) (*emptypb.Empty, error) {
-
-	rrs, err := s.buildRRs(req.Records)
+	logger := s.logger.With(zap.String("zone", req.Zone), zap.Any("records", req.Records))
+	logger.Info("adding records to zone")
+	rrs, err := s.buildRRs(req.Records, logger)
 	if err != nil {
 		return nil, err
 	}
 
 	err = s.provider.Add(req.Zone, rrs)
 	if err != nil {
-		s.logger.Error("failed to add new RR", zap.Error(err))
+		logger.Error("failed to add new RR", zap.Error(err))
 		return nil, status.Error(codes.Internal, fmt.Sprintf("failed to add new RR: %v", err))
 	}
 	return &emptypb.Empty{}, nil
@@ -126,13 +129,15 @@ func (s *DNSServer) Add(_ context.Context, req *pb.AddRequest) (*emptypb.Empty, 
 
 // Delete deletes the given records from the given zone.
 func (s *DNSServer) Delete(_ context.Context, req *pb.DeleteRequest) (*emptypb.Empty, error) {
-	rrs, err := s.buildRRs(req.Records)
+	logger := s.logger.With(zap.String("zone", req.Zone), zap.Any("records", req.Records))
+	logger.Info("deleting records from zone")
+	rrs, err := s.buildRRs(req.Records, logger)
 	if err != nil {
 		return nil, err
 	}
 	err = s.provider.Delete(req.Zone, rrs)
 	if err != nil {
-		s.logger.Error("failed to delete RR", zap.Error(err))
+		logger.Error("failed to delete RR", zap.Error(err))
 		return nil, status.Error(codes.Internal, fmt.Sprintf("failed to delete RR: %v", err))
 	}
 	return &emptypb.Empty{}, nil
@@ -141,17 +146,19 @@ func (s *DNSServer) Delete(_ context.Context, req *pb.DeleteRequest) (*emptypb.E
 // Update updates the given records in the given zone.
 func (s *DNSServer) Update(_ context.Context, req *pb.UpdateRequest) (*emptypb.Empty, error) {
 	for _, updateSet := range req.Updates {
-		oldRRs, err := s.buildRRs([]*pb.DNSRecord{updateSet.Old})
+		logger := s.logger.With(zap.String("zone", req.Zone), zap.Any("add", updateSet.New), zap.Any("delete", updateSet.Old))
+		logger.Info("updating records in zone")
+		oldRRs, err := s.buildRRs([]*pb.DNSRecord{updateSet.Old}, logger)
 		if err != nil {
 			return nil, err
 		}
-		newRRs, err := s.buildRRs([]*pb.DNSRecord{updateSet.New})
+		newRRs, err := s.buildRRs([]*pb.DNSRecord{updateSet.New}, logger)
 		if err != nil {
 			return nil, err
 		}
 		err = s.provider.Update(req.Zone, []core.UpdateSet{{Old: oldRRs, New: newRRs}})
 		if err != nil {
-			s.logger.Error("failed to update RR", zap.Error(err))
+			logger.Error("failed to update RR", zap.Error(err))
 			return nil, status.Error(codes.Internal, fmt.Sprintf("failed to update RR: %v", err))
 		}
 	}
