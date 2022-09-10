@@ -24,5 +24,6 @@ jobs:
             branch: update-packages
             commit-message: "chore: Update packages"
             title: "chore: Update packages"
+            assignees:  fritterhoff
             body: |
               Update packages
