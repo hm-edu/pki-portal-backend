@@ -10,8 +10,8 @@ require (
 	github.com/lestrrat-go/jwx v1.2.25
 	github.com/spf13/cobra v1.5.0
 	github.com/swaggo/echo-swagger v1.3.4
-	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.34.0
-	go.opentelemetry.io/otel v1.9.0
+	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.35.0
+	go.opentelemetry.io/otel v1.10.0
 	go.uber.org/zap v1.23.0
 	google.golang.org/grpc v1.49.0
 )
@@ -65,7 +65,7 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.34.0 // indirect
-	go.opentelemetry.io/contrib/propagators/b3 v1.9.0 // indirect
+	go.opentelemetry.io/contrib/propagators/b3 v1.10.0 // indirect
 	go.opentelemetry.io/otel/exporters/jaeger v1.9.0 // indirect
 	go.opentelemetry.io/otel/exporters/prometheus v0.31.0 // indirect
 	go.opentelemetry.io/otel/metric v0.31.0 // indirect
@@ -89,7 +89,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/swaggo/swag v1.8.5
 	go.opentelemetry.io/otel/sdk v1.9.0 // indirect
-	go.opentelemetry.io/otel/trace v1.9.0
+	go.opentelemetry.io/otel/trace v1.10.0
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/net v0.0.0-20220909164309-bea034e7d591 // indirect
