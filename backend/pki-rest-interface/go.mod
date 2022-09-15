@@ -3,7 +3,7 @@ module github.com/hm-edu/pki-rest-interface
 go 1.18
 
 require (
-	github.com/getkin/kin-openapi v0.100.0
+	github.com/getkin/kin-openapi v0.101.0
 	github.com/hm-edu/portal-apis v0.0.0-20220603062428-bf1306b32398
 	github.com/hm-edu/portal-common v0.0.0-20220823053517-d9e4f3f19da7
 	github.com/labstack/echo/v4 v4.9.0
