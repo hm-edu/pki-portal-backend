@@ -10,7 +10,7 @@ require (
 	github.com/lestrrat-go/jwx v1.2.25
 	github.com/ory/viper v1.7.5
 	github.com/spf13/cobra v1.5.0
-	github.com/swaggo/swag v1.8.5
+	github.com/swaggo/swag v1.8.6
 	go.opentelemetry.io/contrib/propagators/b3 v1.10.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.10.0
 	go.opentelemetry.io/otel/exporters/prometheus v0.31.0
