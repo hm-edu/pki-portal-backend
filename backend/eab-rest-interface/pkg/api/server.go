@@ -65,7 +65,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 	api.app.HidePort = true
 
 	ar.Configure(api.config.JwksURI, jwk.WithMinRefreshInterval(15*time.Minute))
-	ks, err := ar.Refresh(context.Background(), api.config.JwksURI)
+	_, err := ar.Refresh(context.Background(), api.config.JwksURI)
 
 	if err != nil {
 		api.logger.Fatal("fetching jwk set failed", zap.Error(err))
@@ -73,6 +73,10 @@ func (api *Server) wireRoutesAndMiddleware() {
 
 	config := auth.JWTConfig{
 		ParseTokenFunc: func(auth string, c echo.Context) (interface{}, error) {
+			ks, err := ar.Fetch(c.Request().Context(), api.config.JwksURI)
+			if err != nil {
+				return nil, err
+			}
 			return commonAuth.GetToken(auth, ks, api.config.Audience)
 		},
 	}
