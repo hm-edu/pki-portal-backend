@@ -14,39 +14,3 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "daily"
-
-  - package-ecosystem: "gomod"
-    directory: "/backend/common" # Location of package manifests
-    schedule:
-      interval: "daily"
-
-  - package-ecosystem: "gomod"
-    directory: "/backend/domain-rest-interface" # Location of package manifests
-    schedule:
-      interval: "daily"
-
-  - package-ecosystem: "gomod"
-    directory: "/backend/pki-rest-interface" # Location of package manifests
-    schedule:
-      interval: "daily"
-
-  - package-ecosystem: "gomod"
-    directory: "/backend/eab-rest-interface" # Location of package manifests
-    schedule:
-      interval: "daily"
-
-  - package-ecosystem: "gomod"
-    directory: "/backend/dns-service" # Location of package manifests
-    schedule:
-      interval: "daily"
-
-  - package-ecosystem: "gomod"
-    directory: "/backend/pki-service" # Location of package manifests
-    schedule:
-      interval: "daily"
-      
-  - package-ecosystem: "gomod"
-    directory: "/backend/validation-service" # Location of package manifests
-    schedule:
-      interval: "daily"
-
