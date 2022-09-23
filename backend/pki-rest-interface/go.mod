@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/getkin/kin-openapi v0.103.0
 	github.com/hm-edu/portal-apis v0.0.0-20220603062428-bf1306b32398
-	github.com/hm-edu/portal-common v0.0.0-20220823053517-d9e4f3f19da7
+	github.com/hm-edu/portal-common 1400ddd55305
 	github.com/labstack/echo/v4 v4.9.0
 	github.com/lestrrat-go/jwx v1.2.25
 	github.com/spf13/cobra v1.5.0
