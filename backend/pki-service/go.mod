@@ -112,7 +112,7 @@ require (
 	github.com/jackc/pgx/v4 v4.17.2
 	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	go.opentelemetry.io/otel/metric v0.32.0
+	go.opentelemetry.io/otel/metric v0.32.1
 )
 
 replace github.com/hm-edu/portal-common => ../common

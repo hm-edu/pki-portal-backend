@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/hm-edu/sectigo-client v0.0.0-20220906180858-c570c6804dcd
 	github.com/spf13/cobra v1.5.0
-	go.opentelemetry.io/otel/metric v0.32.0
+	go.opentelemetry.io/otel/metric v0.32.1
 	go.uber.org/zap v1.23.0
 )
 
