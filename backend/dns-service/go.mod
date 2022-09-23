@@ -79,7 +79,7 @@ require (
 )
 
 require (
-	github.com/hm-edu/portal-common v0.0.0-20220823053517-d9e4f3f19da7
+	github.com/hm-edu/portal-common 1400ddd55305
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 )

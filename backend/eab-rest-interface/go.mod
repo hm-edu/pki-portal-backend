@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/getkin/kin-openapi v0.103.0
-	github.com/hm-edu/portal-common v0.0.0-20220823053517-d9e4f3f19da7
+	github.com/hm-edu/portal-common 1400ddd55305
 	github.com/smallstep/certificates v0.22.1
 	go.opentelemetry.io/otel v1.10.0
 	go.uber.org/zap v1.23.0
