@@ -3,7 +3,7 @@ module github.com/hm-edu/domain-rest-interface
 go 1.18
 
 require (
-	github.com/getkin/kin-openapi v0.103.0
+	github.com/getkin/kin-openapi v0.104.0
 	github.com/hm-edu/portal-common v0.0.0-20220823053517-d9e4f3f19da7
 	go.opentelemetry.io/otel v1.10.0
 	go.uber.org/zap v1.23.0
@@ -66,7 +66,7 @@ require (
 	github.com/spf13/cobra v1.5.0
 	github.com/stretchr/testify v1.8.0
 	github.com/swaggo/echo-swagger v1.3.5
-	github.com/uptrace/opentelemetry-go-extra/otelzap v0.1.16
+	github.com/uptrace/opentelemetry-go-extra/otelzap v0.1.17
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.36.1
 )
 
@@ -88,12 +88,13 @@ require (
 	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
 	github.com/jackc/pgtype v1.12.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2 // indirect
+	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.13.0 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.37.0 // indirect
 	github.com/prometheus/procfs v0.8.0 // indirect
-	github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.16 // indirect
+	github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.17 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.10.0 // indirect
 	go.opentelemetry.io/otel/exporters/jaeger v1.10.0 // indirect
 	go.opentelemetry.io/otel/exporters/prometheus v0.32.1 // indirect
