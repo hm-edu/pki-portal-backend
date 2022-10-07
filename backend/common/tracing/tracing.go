@@ -3,16 +3,15 @@ package tracing
 import (
 	"net/http"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/contrib/propagators/b3"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/jaeger"
-	"go.opentelemetry.io/otel/exporters/prometheus"
+	otelprom "go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/metric/global"
-	controller "go.opentelemetry.io/otel/sdk/metric/controller/basic"
-	"go.opentelemetry.io/otel/sdk/metric/export/aggregation"
-	processor "go.opentelemetry.io/otel/sdk/metric/processor/basic"
-	selector "go.opentelemetry.io/otel/sdk/metric/selector/simple"
+	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
@@ -59,32 +58,20 @@ func InitTracer(logger *zap.Logger, name string) *sdktrace.TracerProvider {
 				semconv.ServiceNameKey.String(name),
 			)),
 	)
-	config := prometheus.Config{}
-	c := controller.New(
-		processor.NewFactory(
-			selector.NewWithHistogramDistribution(),
-			aggregation.CumulativeTemporalitySelector(),
-			processor.WithMemory(false),
-		),
-		controller.WithResource(
-			resource.NewWithAttributes(
-				semconv.SchemaURL,
-				semconv.ServiceNameKey.String(name),
-			),
-		),
-	)
-	prom, err := prometheus.New(config, c)
 
+	otelProm := otelprom.New()
+	provider := metric.NewMeterProvider(metric.WithReader(otelProm))
+	registry := prometheus.NewRegistry()
+	err = registry.Register(otelProm.Collector)
 	if err != nil {
 		logger.Panic("failed to initialize prometheus exporter", zap.Error(err))
 	}
 
-	global.SetMeterProvider(prom.MeterProvider())
-
+	global.SetMeterProvider(provider)
 	otel.SetTracerProvider(tp)
 	b3 := b3.New()
 	otel.SetTextMapPropagator(b3)
-	http.HandleFunc("/", prom.ServeHTTP)
+	http.Handle("/", promhttp.HandlerFor(registry, promhttp.HandlerOpts{}))
 	go func() {
 		_ = http.ListenAndServe(":2222", nil) // nolint:gosec // we expect don't expose this interface to the internet
 	}()
