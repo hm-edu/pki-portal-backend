@@ -3,7 +3,6 @@ package tracing
 import (
 	"net/http"
 
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/contrib/propagators/b3"
@@ -59,19 +58,17 @@ func InitTracer(logger *zap.Logger, name string) *sdktrace.TracerProvider {
 			)),
 	)
 
-	otelProm := otelprom.New()
-	provider := metric.NewMeterProvider(metric.WithReader(otelProm))
-	registry := prometheus.NewRegistry()
-	err = registry.Register(otelProm.Collector)
+	otelProm, err := otelprom.New()
 	if err != nil {
 		logger.Panic("failed to initialize prometheus exporter", zap.Error(err))
 	}
+	provider := metric.NewMeterProvider(metric.WithReader(otelProm))
 
 	global.SetMeterProvider(provider)
 	otel.SetTracerProvider(tp)
 	b3 := b3.New()
 	otel.SetTextMapPropagator(b3)
-	http.Handle("/", promhttp.HandlerFor(registry, promhttp.HandlerOpts{}))
+	http.Handle("/", promhttp.Handler())
 	go func() {
 		_ = http.ListenAndServe(":2222", nil) // nolint:gosec // we expect don't expose this interface to the internet
 	}()
