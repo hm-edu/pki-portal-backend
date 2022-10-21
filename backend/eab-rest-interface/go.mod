@@ -126,7 +126,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v0.33.0 // indirect
 	go.step.sm/cli-utils v0.7.5 // indirect
 	go.step.sm/crypto v0.21.0 // indirect
-	go.step.sm/linkedca v0.18.0 // indirect
+	go.step.sm/linkedca v0.19.0-rc.3 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 )
 
@@ -135,6 +135,7 @@ require (
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0 // indirect
+	github.com/fxamacker/cbor/v2 v2.4.0 // indirect
 	github.com/go-chi/chi v4.1.2+incompatible // indirect
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
@@ -164,6 +165,7 @@ require (
 	github.com/rogpeppe/go-internal v1.8.1 // indirect
 	github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.17 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
+	github.com/x448/float16 v0.8.4 // indirect
 	github.com/zclconf/go-cty v1.11.1 // indirect
 	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/mod v0.6.0 // indirect
@@ -173,6 +175,6 @@ require (
 
 replace github.com/hm-edu/portal-common => ../common
 
-replace github.com/smallstep/nosql => github.com/hm-edu/nosql v0.4.1-0.20220510094234-1fbe0ffbb194
+replace github.com/smallstep/nosql => github.com/hm-edu/nosql v0.4.1-0.20221021074654-ff0ebfc36cd6
 
-replace github.com/smallstep/certificates => github.com/hm-edu/certificates v0.0.0-20220603063538-8bb63d8dc423
+replace github.com/smallstep/certificates => github.com/hm-edu/certificates v0.0.0-20221021075019-2ad80be2c25d
