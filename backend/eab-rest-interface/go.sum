@@ -307,6 +307,8 @@ github.com/hm-edu/certificates v0.0.0-20221021145340-6375d7e832ca h1:1pjQOzKzSi+
 github.com/hm-edu/certificates v0.0.0-20221021145340-6375d7e832ca/go.mod h1:e8rey86A6Zggn3xf+RhnwLfusADAbuWwZ/QyqgfeOqc=
 github.com/hm-edu/certificates v0.0.0-20221021164300-0b5387bea661 h1:e4yO4rF5QjTehP4BHwq1ZUTlE1tt/WYxYC+1xxiY3FA=
 github.com/hm-edu/certificates v0.0.0-20221021164300-0b5387bea661/go.mod h1:e8rey86A6Zggn3xf+RhnwLfusADAbuWwZ/QyqgfeOqc=
+github.com/hm-edu/certificates v0.0.0-20221021170629-68318a6e7c9d h1:/10Q8aNYVfHG76EAsgFH/2K+ZW3DZWnlZc9M4HGjCUk=
+github.com/hm-edu/certificates v0.0.0-20221021170629-68318a6e7c9d/go.mod h1:e8rey86A6Zggn3xf+RhnwLfusADAbuWwZ/QyqgfeOqc=
 github.com/hm-edu/nosql v0.4.1-0.20221021074654-ff0ebfc36cd6 h1:y2/TSGSQOdd1kK4NvTGeUmamcVbbWG/sLCTAKfpLeDM=
 github.com/hm-edu/nosql v0.4.1-0.20221021074654-ff0ebfc36cd6/go.mod h1:6XhRTHHp0/maggMch4SF3vokbFzSnvp2VxBWNSyGN8A=
 github.com/hm-edu/portal-apis v0.0.0-20220603062428-bf1306b32398 h1:wOv4/G5BzbTihGn0nHiE/7n+e3uve9YlDvIwBkxO2Fc=
