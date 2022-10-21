@@ -177,4 +177,4 @@ replace github.com/hm-edu/portal-common => ../common
 
 replace github.com/smallstep/nosql => github.com/hm-edu/nosql v0.4.1-0.20221021074654-ff0ebfc36cd6
 
-replace github.com/smallstep/certificates => github.com/hm-edu/certificates v0.0.0-20221021171921-8757021db137
+replace github.com/smallstep/certificates => github.com/hm-edu/certificates v0.0.0-20221021173402-5c910a1909d0
