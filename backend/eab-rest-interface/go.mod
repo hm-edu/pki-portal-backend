@@ -26,7 +26,7 @@ require (
 	github.com/subosito/gotenv v1.4.1 // indirect
 	github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.36.3 // indirect
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.36.4 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 )
 
@@ -48,7 +48,7 @@ require (
 	golang.org/x/net v0.1.0 // indirect
 	golang.org/x/sys v0.1.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
-	golang.org/x/tools v0.1.13-0.20220804200503-81c7dc4e4efa // indirect
+	golang.org/x/tools v0.2.0 // indirect
 	google.golang.org/genproto v0.0.0-20221018160656-63c7b68cfc55 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
@@ -64,7 +64,7 @@ require (
 	github.com/spf13/cobra v1.6.0
 	github.com/swaggo/echo-swagger v1.3.5
 	github.com/uptrace/opentelemetry-go-extra/otelzap v0.1.17
-	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.36.3
+	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.36.4
 )
 
 require (
@@ -119,7 +119,7 @@ require (
 	github.com/urfave/cli v1.22.10 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	go.mozilla.org/pkcs7 v0.0.0-20210826202110-33d05740a352 // indirect
-	go.opentelemetry.io/contrib/propagators/b3 v1.11.0 // indirect
+	go.opentelemetry.io/contrib/propagators/b3 v1.11.1 // indirect
 	go.opentelemetry.io/otel/exporters/jaeger v1.11.1 // indirect
 	go.opentelemetry.io/otel/exporters/prometheus v0.33.0 // indirect
 	go.opentelemetry.io/otel/metric v0.33.0 // indirect
@@ -131,7 +131,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.7.2 // indirect
+	ariga.io/atlas v0.8.1 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0 // indirect

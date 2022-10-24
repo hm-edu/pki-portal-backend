@@ -10,7 +10,7 @@ require (
 	github.com/lestrrat-go/jwx v1.2.25
 	github.com/spf13/cobra v1.6.0
 	github.com/swaggo/echo-swagger v1.3.5
-	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.36.3
+	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.36.4
 	go.opentelemetry.io/otel v1.11.1
 	go.uber.org/zap v1.23.0
 	google.golang.org/grpc v1.50.1
@@ -65,8 +65,8 @@ require (
 	github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.36.3 // indirect
-	go.opentelemetry.io/contrib/propagators/b3 v1.11.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.36.4 // indirect
+	go.opentelemetry.io/contrib/propagators/b3 v1.11.1 // indirect
 	go.opentelemetry.io/otel/exporters/jaeger v1.11.1 // indirect
 	go.opentelemetry.io/otel/exporters/prometheus v0.33.0 // indirect
 	go.opentelemetry.io/otel/metric v0.33.0 // indirect
@@ -96,7 +96,7 @@ require (
 	golang.org/x/net v0.1.0 // indirect
 	golang.org/x/sys v0.1.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
-	golang.org/x/tools v0.1.12 // indirect
+	golang.org/x/tools v0.2.0 // indirect
 	google.golang.org/genproto v0.0.0-20221018160656-63c7b68cfc55 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
