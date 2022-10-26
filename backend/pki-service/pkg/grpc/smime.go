@@ -43,7 +43,7 @@ func (s *smimeAPIServer) ListCertificates(ctx context.Context, req *pb.ListSmime
 	defer span.End()
 	logger := s.logger.With(zap.String("user", req.Email), zap.String("trace_id", span.SpanContext().TraceID().String()))
 
-	logger.Info("Requesting smime certificates")
+	logger.Info("Requesting issued smime certificates")
 	items, err := s.client.ClientService.ListByEmail(req.Email)
 	if err != nil {
 		if sectigoError, ok := err.(*sectigo.ErrorResponse); ok {
@@ -72,7 +72,7 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 	span.AddEvent("Validating csr")
 
 	logger := s.logger.With(zap.String("user", req.Email), zap.String("trace_id", span.SpanContext().TraceID().String()))
-	logger.Info("Issuing smime certificate")
+	logger.Info("Issuing new smime certificate")
 	block, _ := pem.Decode([]byte(req.Csr))
 
 	// Validate the passed CSR to comply the server-side requirements (e.g. key-strength, key-type, etc.)
