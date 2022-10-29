@@ -38,6 +38,14 @@ func NewGRPCStreamServerInterceptor() grpc.StreamServerInterceptor {
 	return otelgrpc.StreamServerInterceptor()
 }
 
+type LoggingHandler struct {
+	log *zap.Logger
+}
+
+func (l *LoggingHandler) Handle(err error) {
+	l.log.Error("OpenTelemetry error", zap.Error(err))
+}
+
 // InitTracer performs the initialization of the traceprovider.
 // By default this tries to init a jeager tracer.
 func InitTracer(logger *zap.Logger, name string) *sdktrace.TracerProvider {
@@ -68,6 +76,8 @@ func InitTracer(logger *zap.Logger, name string) *sdktrace.TracerProvider {
 	otel.SetTracerProvider(tp)
 	b3 := b3.New()
 	otel.SetTextMapPropagator(b3)
+	otel.SetErrorHandler(&LoggingHandler{log: logger})
+
 	http.Handle("/", promhttp.Handler())
 	go func() {
 		_ = http.ListenAndServe(":2222", nil) // nolint:gosec // we expect don't expose this interface to the internet
