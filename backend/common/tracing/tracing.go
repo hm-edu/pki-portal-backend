@@ -38,10 +38,12 @@ func NewGRPCStreamServerInterceptor() grpc.StreamServerInterceptor {
 	return otelgrpc.StreamServerInterceptor()
 }
 
+// LoggingHandler is a simple error handler that logs the error.
 type LoggingHandler struct {
 	log *zap.Logger
 }
 
+// Handle captures the logs to the zap logger.
 func (l *LoggingHandler) Handle(err error) {
 	l.log.Error("OpenTelemetry error", zap.Error(err))
 }
