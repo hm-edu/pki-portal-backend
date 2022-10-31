@@ -16,6 +16,7 @@ func (EABKey) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("user"),
 		field.String("eabKey").Unique(),
+		field.String("comment"),
 	}
 }
 

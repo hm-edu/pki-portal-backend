@@ -76,6 +76,17 @@ const docTemplate = `{
                     "EAB"
                 ],
                 "summary": "Create a new key.",
+                "parameters": [
+                    {
+                        "description": "The optional comment of the token to create",
+                        "name": "comment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.EabRequest"
+                        }
+                    }
+                ],
                 "responses": {
                     "201": {
                         "description": "Created",
@@ -121,7 +132,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "No Content"
                     },
                     "default": {
                         "description": "Error processing the request",
@@ -180,10 +191,21 @@ const docTemplate = `{
                 "bound_at": {
                     "type": "string"
                 },
+                "comment": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
                 "key_bytes": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.EabRequest": {
+            "type": "object",
+            "properties": {
+                "comment": {
                     "type": "string"
                 }
             }

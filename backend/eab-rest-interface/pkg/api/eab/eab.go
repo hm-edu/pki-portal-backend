@@ -50,7 +50,16 @@ func (h *Handler) GetExternalAccountKeys(c echo.Context) error {
 	keys = helper.Where(keys, func(key *acme.ExternalAccountKey) bool {
 		return helper.Any(mappedKeys, func(x *ent.EABKey) bool { return key.ID == x.EabKey })
 	})
-	return c.JSON(http.StatusOK, helper.Map(keys, models.NewEAB))
+	response := helper.Map(keys, models.NewEAB)
+	for i, key := range response {
+		for _, mappedKey := range mappedKeys {
+			if key.ID == mappedKey.EabKey {
+				response[i].Comment = mappedKey.Comment
+				break
+			}
+		}
+	}
+	return c.JSON(http.StatusOK, response)
 }
 
 // CreateNewKey godoc
@@ -60,6 +69,7 @@ func (h *Handler) GetExternalAccountKeys(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Router /eab/ [post]
+// @Param comment body models.EabRequest true "The optional comment of the token to create"
 // @Security API
 // @Success 201 {object} models.EAB
 // @Response default {object} echo.HTTPError "Error processing the request"
@@ -72,6 +82,12 @@ func (h *Handler) CreateNewKey(c echo.Context) error {
 		logger.Error("Error getting user from request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
+	req := &models.EabRequest{}
+	if err := req.Bind(c, h.validator); err != nil {
+		logger.Error("Binding request failed", zap.Error(err))
+		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
+	}
+
 	logger.Info("Requesting new external account key")
 	key, err := database.DB.NoSQL.CreateExternalAccountKey(ctx, h.provisionerID, "")
 
@@ -80,7 +96,7 @@ func (h *Handler) CreateNewKey(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to get external account keys")
 	}
 
-	_, err = database.DB.Db.EABKey.Create().SetEabKey(key.ID).SetUser(user).Save(ctx)
+	_, err = database.DB.Db.EABKey.Create().SetEabKey(key.ID).SetUser(user).SetComment(req.Comment).Save(ctx)
 	if err != nil {
 		logger.Error("Failed to create new external account key", zap.Error(err))
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to get external account keys")
