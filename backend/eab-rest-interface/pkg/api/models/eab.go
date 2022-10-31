@@ -21,7 +21,7 @@ func (r *EabRequest) Bind(c echo.Context, _ *model.Validator) error {
 	if err := c.Bind(r); err != nil {
 		return err
 	}
-	match := regexp.MustCompile(`^[a-zA-Z0-9-_.:]*$`).MatchString(r.Comment)
+	match := regexp.MustCompile(`^[a-zA-Z0-9-_.: üäöÄÖÜß]*$`).MatchString(r.Comment)
 	if !match {
 		return errors.New("comment must match regex ^[a-zA-Z0-9-_.:]*$")
 	}
