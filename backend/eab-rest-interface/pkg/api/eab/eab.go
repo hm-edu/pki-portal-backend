@@ -103,7 +103,9 @@ func (h *Handler) CreateNewKey(c echo.Context) error {
 	}
 
 	logger.Info("Created new external account key", zap.String("keyid", key.ID))
-	return c.JSON(http.StatusCreated, models.NewEAB(key))
+	response := models.NewEAB(key)
+	response.Comment = req.Comment
+	return c.JSON(http.StatusCreated, response)
 }
 
 // DeleteKey godoc

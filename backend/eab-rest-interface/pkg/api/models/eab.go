@@ -17,7 +17,7 @@ type EabRequest struct {
 }
 
 // Bind binds an incoming echo request to the internal model and perfoms a validation
-func (r *EabRequest) Bind(c echo.Context, v *model.Validator) error {
+func (r *EabRequest) Bind(c echo.Context, _ *model.Validator) error {
 	if err := c.Bind(r); err != nil {
 		return err
 	}
