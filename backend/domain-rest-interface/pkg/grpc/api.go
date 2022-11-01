@@ -37,7 +37,7 @@ func (api *domainAPIServer) CheckPermission(ctx context.Context, req *pb.CheckPe
 	if err != nil {
 		return nil, err
 	}
-
+	log.Ctx(ctx).Info("Checking permissions", zap.String("user", req.User), zap.Strings("domains", req.Domains))
 	permissions := helper.Map(req.Domains, func(t string) *pb.Permission {
 		if helper.Any(domains, func(d *ent.Domain) bool { return d.Fqdn == t }) {
 			log.Ctx(ctx).Info("Permission granted", zap.String("user", req.User), zap.String("domain", t))
@@ -46,7 +46,7 @@ func (api *domainAPIServer) CheckPermission(ctx context.Context, req *pb.CheckPe
 		log.Ctx(ctx).Info("Permission denied", zap.String("user", req.User), zap.String("domain", t))
 		return &pb.Permission{Domain: t, Granted: false}
 	})
-
+	log.Ctx(ctx).Info("Checked permissions", zap.String("user", req.User), zap.Any("permissions", permissions))
 	resp := pb.CheckPermissionResponse{Permissions: permissions}
 
 	return &resp, nil
@@ -57,6 +57,7 @@ func (api *domainAPIServer) CheckRegistration(ctx context.Context, req *pb.Check
 	ctx, span := api.tracer.Start(ctx, "CheckRegistration")
 	defer span.End()
 
+	api.logger.Info("Checking registrations domains", zap.Strings("domains", req.Domains))
 	domains, err := api.store.ListAllDomains(ctx, true)
 	if err != nil {
 		span.RecordError(err)
@@ -69,21 +70,21 @@ func (api *domainAPIServer) CheckRegistration(ctx context.Context, req *pb.Check
 			return d == t
 		})
 	})
-	api.logger.Info("Checking registration", zap.Strings("domains", req.Domains), zap.Strings("missing", missing))
+	api.logger.Info("Checked registrations", zap.Strings("domains", req.Domains), zap.Strings("missing", missing))
 	return &pb.CheckRegistrationResponse{Missing: missing}, nil
 }
 
 func (api *domainAPIServer) ListDomains(ctx context.Context, req *pb.ListDomainsRequest) (*pb.ListDomainsResponse, error) {
 	ctx, span := api.tracer.Start(ctx, "ListDomains")
 	defer span.End()
-
+	api.logger.Info("Listing domains", zap.String("user", req.User))
 	domains, err := api.store.ListDomains(ctx, req.User, req.Approved)
 	if err != nil {
 		span.RecordError(err)
 		api.logger.Error("Listing domains failed", zap.String("user", req.User), zap.Error(err))
 		return nil, err
 	}
-
+	api.logger.Info("Listed domains", zap.String("user", req.User), zap.Any("domains", domains))
 	resp := pb.ListDomainsResponse{Domains: helper.Map(domains, func(t *ent.Domain) string { return t.Fqdn })}
 	return &resp, nil
 }
