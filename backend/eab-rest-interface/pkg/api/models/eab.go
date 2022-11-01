@@ -44,7 +44,7 @@ func NewEAB(key *acme.ExternalAccountKey) *EAB {
 	}
 	return &EAB{
 		ID:       key.ID,
-		KeyBytes: b64.URLEncoding.EncodeToString(key.HmacKey),
+		KeyBytes: b64.RawURLEncoding.EncodeToString(key.HmacKey),
 		Bound:    bound,
 	}
 }
