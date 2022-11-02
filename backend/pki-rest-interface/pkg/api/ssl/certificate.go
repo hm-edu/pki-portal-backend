@@ -145,6 +145,7 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 	req := &model.CsrRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
 		span.RecordError(err)
+		logger.Error("error while parsing csr", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
 	}
 	block, _ := pem.Decode([]byte(req.CSR))
@@ -156,12 +157,14 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 	csr, err := x509.ParseCertificateRequest(block.Bytes)
 	if err != nil {
 		span.RecordError(err)
+		logger.Error("error while parsing csr", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
 	}
 
 	// Validate the CSR
 	if err := csr.CheckSignature(); err != nil {
 		span.RecordError(err)
+		logger.Error("error while parsing csr", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
 	}
 	sans := make([]string, 0, len(csr.DNSNames)+len(csr.IPAddresses)+len(csr.URIs))
@@ -172,10 +175,15 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 	for _, u := range csr.URIs {
 		sans = append(sans, u.String())
 	}
+	if len(sans) == 0 {
+		logger.Info("no SANs found in CSR")
+		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request. No SANs found in CSR"}
+	}
 
 	permissions, err := h.domain.CheckPermission(ctx, &pb.CheckPermissionRequest{User: user, Domains: sans})
 	if err != nil {
 		span.RecordError(err)
+		logger.Error("error while checking permissions", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while checking permissions"}
 	}
 	logger.Info("checking permission for certificate issuance", zap.Strings("domains", sans))
