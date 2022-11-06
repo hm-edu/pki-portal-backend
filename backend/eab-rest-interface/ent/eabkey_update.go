@@ -45,6 +45,20 @@ func (eku *EABKeyUpdate) SetComment(s string) *EABKeyUpdate {
 	return eku
 }
 
+// SetNillableComment sets the "comment" field if the given value is not nil.
+func (eku *EABKeyUpdate) SetNillableComment(s *string) *EABKeyUpdate {
+	if s != nil {
+		eku.SetComment(*s)
+	}
+	return eku
+}
+
+// ClearComment clears the value of the "comment" field.
+func (eku *EABKeyUpdate) ClearComment() *EABKeyUpdate {
+	eku.mutation.ClearComment()
+	return eku
+}
+
 // Mutation returns the EABKeyMutation object of the builder.
 func (eku *EABKeyUpdate) Mutation() *EABKeyMutation {
 	return eku.mutation
@@ -131,6 +145,9 @@ func (eku *EABKeyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := eku.mutation.Comment(); ok {
 		_spec.SetField(eabkey.FieldComment, field.TypeString, value)
 	}
+	if eku.mutation.CommentCleared() {
+		_spec.ClearField(eabkey.FieldComment, field.TypeString)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, eku.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{eabkey.Label}
@@ -165,6 +182,20 @@ func (ekuo *EABKeyUpdateOne) SetEabKey(s string) *EABKeyUpdateOne {
 // SetComment sets the "comment" field.
 func (ekuo *EABKeyUpdateOne) SetComment(s string) *EABKeyUpdateOne {
 	ekuo.mutation.SetComment(s)
+	return ekuo
+}
+
+// SetNillableComment sets the "comment" field if the given value is not nil.
+func (ekuo *EABKeyUpdateOne) SetNillableComment(s *string) *EABKeyUpdateOne {
+	if s != nil {
+		ekuo.SetComment(*s)
+	}
+	return ekuo
+}
+
+// ClearComment clears the value of the "comment" field.
+func (ekuo *EABKeyUpdateOne) ClearComment() *EABKeyUpdateOne {
+	ekuo.mutation.ClearComment()
 	return ekuo
 }
 
@@ -283,6 +314,9 @@ func (ekuo *EABKeyUpdateOne) sqlSave(ctx context.Context) (_node *EABKey, err er
 	}
 	if value, ok := ekuo.mutation.Comment(); ok {
 		_spec.SetField(eabkey.FieldComment, field.TypeString, value)
+	}
+	if ekuo.mutation.CommentCleared() {
+		_spec.ClearField(eabkey.FieldComment, field.TypeString)
 	}
 	_node = &EABKey{config: ekuo.config}
 	_spec.Assign = _node.assignValues

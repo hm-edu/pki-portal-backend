@@ -13,7 +13,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "user", Type: field.TypeString},
 		{Name: "eab_key", Type: field.TypeString, Unique: true},
-		{Name: "comment", Type: field.TypeString},
+		{Name: "comment", Type: field.TypeString, Nullable: true},
 	}
 	// EabKeysTable holds the schema information for the "eab_keys" table.
 	EabKeysTable = &schema.Table{

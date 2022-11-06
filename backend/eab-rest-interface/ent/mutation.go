@@ -242,9 +242,22 @@ func (m *EABKeyMutation) OldComment(ctx context.Context) (v string, err error) {
 	return oldValue.Comment, nil
 }
 
+// ClearComment clears the value of the "comment" field.
+func (m *EABKeyMutation) ClearComment() {
+	m.comment = nil
+	m.clearedFields[eabkey.FieldComment] = struct{}{}
+}
+
+// CommentCleared returns if the "comment" field was cleared in this mutation.
+func (m *EABKeyMutation) CommentCleared() bool {
+	_, ok := m.clearedFields[eabkey.FieldComment]
+	return ok
+}
+
 // ResetComment resets all changes to the "comment" field.
 func (m *EABKeyMutation) ResetComment() {
 	m.comment = nil
+	delete(m.clearedFields, eabkey.FieldComment)
 }
 
 // Where appends a list predicates to the EABKeyMutation builder.
@@ -364,7 +377,11 @@ func (m *EABKeyMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *EABKeyMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(eabkey.FieldComment) {
+		fields = append(fields, eabkey.FieldComment)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -377,6 +394,11 @@ func (m *EABKeyMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *EABKeyMutation) ClearField(name string) error {
+	switch name {
+	case eabkey.FieldComment:
+		m.ClearComment()
+		return nil
+	}
 	return fmt.Errorf("unknown EABKey nullable field %s", name)
 }
 

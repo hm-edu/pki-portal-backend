@@ -261,7 +261,6 @@ func (ekq *EABKeyQuery) Clone() *EABKeyQuery {
 //		GroupBy(eabkey.FieldUser).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-//
 func (ekq *EABKeyQuery) GroupBy(field string, fields ...string) *EABKeyGroupBy {
 	grbuild := &EABKeyGroupBy{config: ekq.config}
 	grbuild.fields = append([]string{field}, fields...)
@@ -288,7 +287,6 @@ func (ekq *EABKeyQuery) GroupBy(field string, fields ...string) *EABKeyGroupBy {
 //	client.EABKey.Query().
 //		Select(eabkey.FieldUser).
 //		Scan(ctx, &v)
-//
 func (ekq *EABKeyQuery) Select(fields ...string) *EABKeySelect {
 	ekq.fields = append(ekq.fields, fields...)
 	selbuild := &EABKeySelect{EABKeyQuery: ekq}

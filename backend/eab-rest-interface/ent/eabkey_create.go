@@ -37,6 +37,14 @@ func (ekc *EABKeyCreate) SetComment(s string) *EABKeyCreate {
 	return ekc
 }
 
+// SetNillableComment sets the "comment" field if the given value is not nil.
+func (ekc *EABKeyCreate) SetNillableComment(s *string) *EABKeyCreate {
+	if s != nil {
+		ekc.SetComment(*s)
+	}
+	return ekc
+}
+
 // Mutation returns the EABKeyMutation object of the builder.
 func (ekc *EABKeyCreate) Mutation() *EABKeyMutation {
 	return ekc.mutation
@@ -118,9 +126,6 @@ func (ekc *EABKeyCreate) check() error {
 	}
 	if _, ok := ekc.mutation.EabKey(); !ok {
 		return &ValidationError{Name: "eabKey", err: errors.New(`ent: missing required field "EABKey.eabKey"`)}
-	}
-	if _, ok := ekc.mutation.Comment(); !ok {
-		return &ValidationError{Name: "comment", err: errors.New(`ent: missing required field "EABKey.comment"`)}
 	}
 	return nil
 }

@@ -382,6 +382,20 @@ func CommentHasSuffix(v string) predicate.EABKey {
 	})
 }
 
+// CommentIsNil applies the IsNil predicate on the "comment" field.
+func CommentIsNil() predicate.EABKey {
+	return predicate.EABKey(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldComment)))
+	})
+}
+
+// CommentNotNil applies the NotNil predicate on the "comment" field.
+func CommentNotNil() predicate.EABKey {
+	return predicate.EABKey(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldComment)))
+	})
+}
+
 // CommentEqualFold applies the EqualFold predicate on the "comment" field.
 func CommentEqualFold(v string) predicate.EABKey {
 	return predicate.EABKey(func(s *sql.Selector) {

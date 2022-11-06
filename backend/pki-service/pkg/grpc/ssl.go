@@ -159,14 +159,14 @@ func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequ
 
 func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslRequest) (*pb.IssueSslResponse, error) {
 
-	_, span := otel.GetTracerProvider().Tracer("ssl").Start(ctx, "issuing ssl certificate")
+	_, span := otel.GetTracerProvider().Tracer("ssl").Start(ctx, "issuing server certificate")
 	defer span.End()
 	logger := s.logger.With(zap.String("trace_id", span.SpanContext().TraceID().String()), zap.String("issuer", req.Issuer))
 
 	block, _ := pem.Decode([]byte(req.Csr))
 
 	if block == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid CSR")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid pem block")
 	}
 
 	csr, err := x509.ParseCertificateRequest(block.Bytes)
@@ -178,7 +178,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	// Validate the CSR
 	if err := csr.CheckSignature(); err != nil {
 		span.RecordError(err)
-		return nil, status.Errorf(codes.InvalidArgument, "invalid CSR")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid CSR signature")
 	}
 	var sans []string
 	if csr.Subject.CommonName != "" {
@@ -196,7 +196,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		return nil, status.Errorf(codes.AlreadyExists, "Outstanding validation for this CSR")
 	}
 	logger = logger.With(zap.Strings("subject_alternative_names", sans))
-	logger.Info("Issuing certificate")
+	logger.Info("Issuing new server certificate")
 
 	span.SetAttributes(attribute.StringSlice("subject_alternative_names", sans))
 	for _, fqdn := range sans {
@@ -328,6 +328,7 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 		certs, err := s.db.Certificate.Query().
 			Where(certificate.And(certificate.HasDomainsWith(domain.FqdnEQ(req.GetCommonName())),
 				certificate.StatusNEQ(certificate.StatusRevoked),
+				certificate.StatusNEQ(certificate.StatusInvalid),
 				certificate.NotAfterGT(time.Now()))).
 			All(ctx)
 
