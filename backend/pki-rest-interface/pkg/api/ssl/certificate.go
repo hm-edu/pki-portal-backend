@@ -167,7 +167,10 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 		logger.Error("error while parsing csr", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
 	}
-	sans := make([]string, 0, len(csr.DNSNames)+len(csr.IPAddresses)+len(csr.URIs))
+	sans := make([]string, 0, len(csr.DNSNames)+len(csr.IPAddresses)+len(csr.URIs)+1)
+	if csr.Subject.CommonName != "" {
+		sans = append(sans, csr.Subject.CommonName)
+	}
 	sans = append(sans, csr.DNSNames...)
 	for _, ip := range csr.IPAddresses {
 		sans = append(sans, ip.String())
