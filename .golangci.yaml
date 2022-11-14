@@ -4,7 +4,6 @@ linters:
   enable:
     - revive
     - bodyclose
-    - deadcode
     - errcheck
     - gofmt
     - goimports
@@ -15,11 +14,9 @@ linters:
     - misspell
     - prealloc
     - staticcheck
-    - structcheck
     - typecheck
     - unconvert
     - unused
-    - varcheck
 issues:
   exclude-use-default: false
 linters-settings:

@@ -12,3 +12,4 @@ backend/validation-service/validation-service
 backend/domain-rest-interface/coverage.txt
 deployment/portal.yaml
 backend/pki-service/acme.key
+**/.DS_Store
