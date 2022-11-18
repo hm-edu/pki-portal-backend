@@ -75,7 +75,7 @@ require (
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
-	github.com/hm-edu/portal-apis v0.0.0-20220603062428-bf1306b32398
+	github.com/hm-edu/portal-apis v0.0.0-20221118051102-2167a6f6c4fe
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.36.4 // indirect
 	go.opentelemetry.io/otel v1.11.1
 	go.opentelemetry.io/otel/sdk v1.11.1 // indirect
@@ -100,7 +100,7 @@ require (
 	golang.org/x/net v0.2.0 // indirect
 	golang.org/x/sys v0.2.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
-	google.golang.org/genproto v0.0.0-20221116193143-41c2ba794472 // indirect
+	google.golang.org/genproto v0.0.0-20221117204609-8f9c96812029 // indirect
 	google.golang.org/grpc v1.50.1
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

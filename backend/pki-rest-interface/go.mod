@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/getkin/kin-openapi v0.108.0
-	github.com/hm-edu/portal-apis v0.0.0-20220603062428-bf1306b32398
+	github.com/hm-edu/portal-apis v0.0.0-20221118051102-2167a6f6c4fe
 	github.com/hm-edu/portal-common v0.0.0-20220823053517-d9e4f3f19da7
 	github.com/labstack/echo/v4 v4.9.1
 	github.com/lestrrat-go/jwx v1.2.25
@@ -98,7 +98,7 @@ require (
 	golang.org/x/sys v0.2.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
 	golang.org/x/tools v0.3.0 // indirect
-	google.golang.org/genproto v0.0.0-20221116193143-41c2ba794472 // indirect
+	google.golang.org/genproto v0.0.0-20221117204609-8f9c96812029 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

@@ -1,6 +1,8 @@
 package model
 
 import (
+	"strings"
+
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 )
@@ -12,6 +14,7 @@ type User struct {
 	MiddleName string
 	Email      string `validate:"required"`
 	CommonName string `validate:"required"`
+	Student    bool
 }
 
 // Bind binds an incoming echo request to the the User and perfoms a validation
@@ -23,7 +26,7 @@ func (r *User) Bind(c echo.Context, v *Validator) error {
 	r.LastName = claims["family_name"].(string)
 	r.CommonName = claims["name"].(string)
 	r.Email = claims["email"].(string)
-
+	r.Student = strings.Contains((claims["eduPersonScopedAffiliation"].(string)), "student@")
 	err := v.Validate(r)
 	return err
 }

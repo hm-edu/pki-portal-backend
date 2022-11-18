@@ -11,17 +11,18 @@ import (
 
 // SectigoConfiguration handles different configuration properties for the sectigo client
 type SectigoConfiguration struct {
-	User           string `mapstructure:"sectigo_user"`
-	Password       string `mapstructure:"sectigo_password"`
-	CustomerURI    string `mapstructure:"sectigo_customeruri"`
-	SmimeProfile   int    `mapstructure:"smime_profile"`
-	SmimeOrgID     int    `mapstructure:"smime_org_id"`
-	SmimeTerm      int    `mapstructure:"smime_term"`
-	SslProfile     int    `mapstructure:"ssl_profile"`
-	SslOrgID       int    `mapstructure:"ssl_org_id"`
-	SslTerm        int    `mapstructure:"ssl_term"`
-	SmimeKeyLength string `mapstructure:"smime_key_length"`
-	SmimeKeyType   string `mapstructure:"smime_key_type"`
+	User             string `mapstructure:"sectigo_user"`
+	Password         string `mapstructure:"sectigo_password"`
+	CustomerURI      string `mapstructure:"sectigo_customeruri"`
+	SmimeProfile     int    `mapstructure:"smime_profile"`
+	SmimeOrgID       int    `mapstructure:"smime_org_id"`
+	SmimeTerm        int    `mapstructure:"smime_term"`
+	SmimeStudentTerm int    `mapstructure:"smime_student_term"`
+	SslProfile       int    `mapstructure:"ssl_profile"`
+	SslOrgID         int    `mapstructure:"ssl_org_id"`
+	SslTerm          int    `mapstructure:"ssl_term"`
+	SmimeKeyLength   string `mapstructure:"smime_key_length"`
+	SmimeKeyType     string `mapstructure:"smime_key_type"`
 }
 
 // CheckSectigoConfiguration checks the sectigo configuration for the syntactical correctness.

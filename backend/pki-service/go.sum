@@ -262,6 +262,8 @@ github.com/hashicorp/hcl/v2 v2.15.0 h1:CPDXO6+uORPjKflkWCCwoWc9uRp+zSIPcCQ+BrxV7
 github.com/hashicorp/hcl/v2 v2.15.0/go.mod h1:JRmR89jycNkrrqnMmvPDMd56n1rQJ2Q6KocSLCMCXng=
 github.com/hm-edu/portal-apis v0.0.0-20220603062428-bf1306b32398 h1:wOv4/G5BzbTihGn0nHiE/7n+e3uve9YlDvIwBkxO2Fc=
 github.com/hm-edu/portal-apis v0.0.0-20220603062428-bf1306b32398/go.mod h1:o2FYTwt6w4uXfIoPAFRQpxbOOhGjde0PiGZlErVVyZk=
+github.com/hm-edu/portal-apis v0.0.0-20221118051102-2167a6f6c4fe h1:cmfQh2N+iEnVg/V+GN6z66Rq9eC7xvd5pFas1JXMsHw=
+github.com/hm-edu/portal-apis v0.0.0-20221118051102-2167a6f6c4fe/go.mod h1:o2FYTwt6w4uXfIoPAFRQpxbOOhGjde0PiGZlErVVyZk=
 github.com/hm-edu/sectigo-client v0.0.0-20221112052116-02942adbbb9e h1:k99s1lleFGAhB62fw/exVrcHBHtwpZgQ1m13mIhsrZs=
 github.com/hm-edu/sectigo-client v0.0.0-20221112052116-02942adbbb9e/go.mod h1:W6AP/RZufc8GpZeLHz/uy5NvkUVbQWgSSkSY6YhHpMU=
 github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
@@ -949,6 +951,8 @@ google.golang.org/genproto v0.0.0-20220218161850-94dd64e39d7c/go.mod h1:kGP+zUP2
 google.golang.org/genproto v0.0.0-20220222213610-43724f9ea8cf/go.mod h1:kGP+zUP2Ddo0ayMi4YuN7C3WZyJvGLZRh8Z5wnAqvEI=
 google.golang.org/genproto v0.0.0-20221116193143-41c2ba794472 h1:kIfItBRE5gkUKpH4H5lNGciZbka1JrmRli3ArqrKFkA=
 google.golang.org/genproto v0.0.0-20221116193143-41c2ba794472/go.mod h1:rZS5c/ZVYMaOGBfO68GWtjOw/eLaZM1X6iVtgjZ+EWg=
+google.golang.org/genproto v0.0.0-20221117204609-8f9c96812029 h1:zS8DNtiDX68/osEpazR86KM1vnDELdnRgpK6/fwlQTs=
+google.golang.org/genproto v0.0.0-20221117204609-8f9c96812029/go.mod h1:rZS5c/ZVYMaOGBfO68GWtjOw/eLaZM1X6iVtgjZ+EWg=
 google.golang.org/grpc v1.19.0/go.mod h1:mqu4LbDTu4XGKhr4mRzUsmM4RtVoemTSY81AxZiDr8c=
 google.golang.org/grpc v1.20.1/go.mod h1:10oTOabMzJvdu6/UiuZezV6QK5dSlG84ov/aaiqXj38=
 google.golang.org/grpc v1.21.1/go.mod h1:oYelfM1adQP15Ek0mdvEgi9Df8B9CZIaU1084ijfRaM=

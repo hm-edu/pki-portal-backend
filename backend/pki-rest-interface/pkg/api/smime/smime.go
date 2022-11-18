@@ -122,6 +122,7 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 		LastName:   user.LastName,
 		MiddleName: user.MiddleName,
 		CommonName: user.CommonName,
+		Student:    user.Student,
 	})
 	if err != nil {
 		logger.Error("error requesting smime certificate", zap.Error(err))

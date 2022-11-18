@@ -103,6 +103,10 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 		return nil, status.Error(codes.InvalidArgument, "Invalid CSR")
 	}
 
+	term := s.cfg.SmimeTerm
+	if req.Student {
+		term = s.cfg.SmimeStudentTerm
+	}
 	span.AddEvent("Enrolling certificate")
 	resp, err := s.client.ClientService.Enroll(client.EnrollmentRequest{
 		OrgID:           s.cfg.SmimeOrgID,
@@ -115,7 +119,7 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 		SecondaryEmails: []string{},
 		CSR:             req.Csr,
 		CertType:        s.cfg.SmimeProfile,
-		Term:            s.cfg.SmimeTerm,
+		Term:            term,
 		Eppn:            "",
 	})
 	if err != nil {
