@@ -127,7 +127,7 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 	if err != nil {
 		logger.Error("error requesting smime certificate", zap.Error(err))
 		span.RecordError(err)
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
+		return &echo.HTTPError{Code: http.StatusInternalServerError, Internal: err, Message: "Handling CSR failed"}
 	}
 
 	return c.JSON(http.StatusOK, cert.Certificate)
