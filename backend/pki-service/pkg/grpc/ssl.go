@@ -166,19 +166,19 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	block, _ := pem.Decode([]byte(req.Csr))
 
 	if block == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid pem block")
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid pem block")
 	}
 
 	csr, err := x509.ParseCertificateRequest(block.Bytes)
 	if err != nil {
 		span.RecordError(err)
-		return nil, status.Errorf(codes.InvalidArgument, "invalid CSR")
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid CSR")
 	}
 
 	// Validate the CSR
 	if err := csr.CheckSignature(); err != nil {
 		span.RecordError(err)
-		return nil, status.Errorf(codes.InvalidArgument, "invalid CSR signature")
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid CSR signature")
 	}
 	var sans []string
 	if csr.Subject.CommonName != "" {

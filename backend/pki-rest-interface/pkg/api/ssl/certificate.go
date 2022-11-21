@@ -1,9 +1,12 @@
 package ssl
 
 import (
+	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/hm-edu/pki-rest-interface/pkg/model"
 	"github.com/hm-edu/portal-common/auth"
@@ -151,22 +154,31 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 	block, _ := pem.Decode([]byte(req.CSR))
 
 	if block == nil {
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
+		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request. CSR has invalid format."}
 	}
 
 	csr, err := x509.ParseCertificateRequest(block.Bytes)
 	if err != nil {
 		span.RecordError(err)
 		logger.Error("error while parsing csr", zap.Error(err))
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
+		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request. CSR has invalid format."}
 	}
 
 	// Validate the CSR
 	if err := csr.CheckSignature(); err != nil {
 		span.RecordError(err)
 		logger.Error("error while parsing csr", zap.Error(err))
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
+		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request. CSR has invalid signature."}
 	}
+
+	// Get the public key from the CSR
+	pubKey, ok := csr.PublicKey.(*rsa.PublicKey)
+	size := pubKey.Size() * 8
+	if ok && size < 2048 {
+		logger.Warn("Invalid key length", zap.String("key_length", fmt.Sprintf("%d", size)))
+		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request. RSA key length must be greater than 2048."}
+	}
+
 	sans := make([]string, 0, len(csr.DNSNames)+len(csr.IPAddresses)+len(csr.URIs)+1)
 	if csr.Subject.CommonName != "" {
 		sans = append(sans, csr.Subject.CommonName)
@@ -194,14 +206,14 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 	span.SetAttributes(attribute.StringSlice("domains", sans), attribute.String("user", user), attribute.StringSlice("missing", missing))
 	logger.Info("permissions checked", zap.Strings("missing", missing), zap.Strings("domains", sans))
 	if len(missing) > 0 {
-		return &echo.HTTPError{Code: http.StatusForbidden, Message: "You are not authorized to issue this certificate"}
+		return &echo.HTTPError{Code: http.StatusForbidden, Message: "You are not authorized to issue this certificate. Missing permissions for domains: " + strings.Join(missing, ", ")}
 	}
 
 	resp, err := h.ssl.IssueCertificate(ctx, &pb.IssueSslRequest{Csr: req.CSR, SubjectAlternativeNames: sans, Issuer: user, Source: "API"})
 	if err != nil {
 		span.RecordError(err)
 		logger.Error("error while processing CSR", zap.Error(err))
-		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while processing the request"}
+		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Internal Error while processing the request."}
 	}
 	return c.JSON(http.StatusOK, resp.Certificate)
 }
