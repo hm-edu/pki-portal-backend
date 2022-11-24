@@ -173,12 +173,13 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 
 	// Get the public key from the CSR
 	pubKey, ok := csr.PublicKey.(*rsa.PublicKey)
-	size := pubKey.Size() * 8
-	if ok && size < 2048 {
-		logger.Warn("Invalid key length", zap.String("key_length", fmt.Sprintf("%d", size)))
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request. RSA key length must be greater than 2048."}
+	if ok {
+		size := pubKey.Size() * 8
+		if ok && size < 2048 {
+			logger.Warn("Invalid key length", zap.String("key_length", fmt.Sprintf("%d", size)))
+			return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request. RSA key length must be greater than 2048."}
+		}
 	}
-
 	sans := make([]string, 0, len(csr.DNSNames)+len(csr.IPAddresses)+len(csr.URIs)+1)
 	if csr.Subject.CommonName != "" {
 		sans = append(sans, csr.Subject.CommonName)
