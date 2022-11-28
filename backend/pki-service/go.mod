@@ -11,7 +11,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.8.2 // indirect
+	ariga.io/atlas v0.8.3 // indirect
 	cloud.google.com/go/compute v1.5.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
@@ -21,7 +21,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
-	github.com/getkin/kin-openapi v0.108.0 // indirect
+	github.com/getkin/kin-openapi v0.109.0 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.20.0 // indirect
@@ -56,7 +56,7 @@ require (
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.37.0 // indirect
 	github.com/prometheus/procfs v0.8.0 // indirect
-	github.com/swaggo/swag v1.8.7 // indirect
+	github.com/swaggo/swag v1.8.8 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/zclconf/go-cty v1.12.1 // indirect
@@ -100,8 +100,8 @@ require (
 	golang.org/x/net v0.2.0 // indirect
 	golang.org/x/sys v0.2.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
-	google.golang.org/genproto v0.0.0-20221117204609-8f9c96812029 // indirect
-	google.golang.org/grpc v1.50.1
+	google.golang.org/genproto v0.0.0-20221118155620-16455021b5e6 // indirect
+	google.golang.org/grpc v1.51.0
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
