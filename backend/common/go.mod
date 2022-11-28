@@ -3,7 +3,7 @@ module github.com/hm-edu/portal-common
 go 1.19
 
 require (
-	github.com/getkin/kin-openapi v0.108.0
+	github.com/getkin/kin-openapi v0.109.0
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/joho/godotenv v1.4.0
 	github.com/labstack/echo/v4 v4.9.1
@@ -11,7 +11,7 @@ require (
 	github.com/ory/viper v1.7.5
 	github.com/prometheus/client_golang v1.14.0
 	github.com/spf13/cobra v1.6.1
-	github.com/swaggo/swag v1.8.7
+	github.com/swaggo/swag v1.8.8
 	go.opentelemetry.io/contrib/propagators/b3 v1.11.1
 	go.opentelemetry.io/otel/exporters/jaeger v1.11.1
 	go.opentelemetry.io/otel/exporters/prometheus v0.33.0
@@ -79,7 +79,7 @@ require (
 	golang.org/x/text v0.4.0 // indirect
 	golang.org/x/time v0.2.0 // indirect
 	golang.org/x/tools v0.3.0 // indirect
-	google.golang.org/genproto v0.0.0-20221116193143-41c2ba794472 // indirect
+	google.golang.org/genproto v0.0.0-20221118155620-16455021b5e6 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
@@ -94,5 +94,5 @@ require (
 	go.opentelemetry.io/otel/sdk v1.11.1
 	go.uber.org/zap v1.23.0
 	golang.org/x/sys v0.2.0 // indirect
-	google.golang.org/grpc v1.50.1
+	google.golang.org/grpc v1.51.0
 )

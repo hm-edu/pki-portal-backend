@@ -3,11 +3,11 @@ module github.com/hm-edu/domain-rest-interface
 go 1.19
 
 require (
-	github.com/getkin/kin-openapi v0.108.0
+	github.com/getkin/kin-openapi v0.109.0
 	github.com/hm-edu/portal-common v0.0.0-20220823053517-d9e4f3f19da7
 	go.opentelemetry.io/otel v1.11.1
 	go.uber.org/zap v1.23.0
-	google.golang.org/grpc v1.50.1
+	google.golang.org/grpc v1.51.0
 )
 
 require (
@@ -39,7 +39,7 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/swaggo/swag v1.8.7
+	github.com/swaggo/swag v1.8.8
 	go.opentelemetry.io/otel/sdk v1.11.1 // indirect
 	go.opentelemetry.io/otel/trace v1.11.1
 	go.uber.org/atomic v1.10.0 // indirect
@@ -48,7 +48,7 @@ require (
 	golang.org/x/sys v0.2.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
 	golang.org/x/tools v0.3.0 // indirect
-	google.golang.org/genproto v0.0.0-20221116193143-41c2ba794472 // indirect
+	google.golang.org/genproto v0.0.0-20221118155620-16455021b5e6 // indirect
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
@@ -57,7 +57,7 @@ require (
 	entgo.io/ent v0.11.4
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
-	github.com/hm-edu/portal-apis v0.0.0-20220603062428-bf1306b32398
+	github.com/hm-edu/portal-apis v0.0.0-20221118051102-2167a6f6c4fe
 	github.com/jackc/pgx/v4 v4.17.2
 	github.com/labstack/echo/v4 v4.9.1
 	github.com/lestrrat-go/jwx v1.2.25
@@ -105,7 +105,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.8.2 // indirect
+	ariga.io/atlas v0.8.3 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0 // indirect
