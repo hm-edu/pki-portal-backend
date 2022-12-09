@@ -1,4 +1,4 @@
-FROM gitpod/workspace-full:2022-04-01-12-31-37
+FROM gitpod/workspace-full:2022-12-09-04-00-52
 
 RUN PB_REL="https://github.com/protocolbuffers/protobuf/releases" && \
     VERSION="protoc-3.19.4-linux-x86_64.zip" && \
