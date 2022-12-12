@@ -270,7 +270,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	if err != nil {
 		return s.handleError("Error parsing certificate", span, err, logger)
 	}
-	pem := certs[0]
+	pem := certs[3]
 	serial := fmt.Sprintf("%032x", pem.SerialNumber)
 	logger.Info("Certificate issued",
 		zap.Duration("duration", stop.Sub(start)),
