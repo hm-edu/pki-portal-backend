@@ -242,7 +242,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	}
 	cert := ""
 	err = helper.WaitFor(5*time.Minute, 1*time.Second, func() (bool, error) {
-		c, err := s.client.SslService.Collect(enrollment.SslID, "pemia")
+		c, err := s.client.SslService.Collect(enrollment.SslID, "pem")
 		if err != nil {
 			if e, ok := err.(*sectigo.ErrorResponse); ok {
 				if e.Code == 0 && e.Description == "Being processed by Sectigo" {
