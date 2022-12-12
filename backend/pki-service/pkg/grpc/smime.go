@@ -129,7 +129,7 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 	}
 	cert := ""
 	err = helper.WaitFor(5*time.Minute, 1*time.Second, func() (bool, error) {
-		c, err := s.client.ClientService.Collect(resp.OrderNumber, "pem")
+		c, err := s.client.ClientService.Collect(resp.OrderNumber, "x509R")
 		if err != nil {
 			if e, ok := err.(*sectigo.ErrorResponse); ok {
 				if e.Code == 0 && e.Description == "Being processed by Sectigo" {

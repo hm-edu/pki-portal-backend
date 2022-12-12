@@ -242,7 +242,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	}
 	cert := ""
 	err = helper.WaitFor(5*time.Minute, 1*time.Second, func() (bool, error) {
-		c, err := s.client.SslService.Collect(enrollment.SslID, "pem")
+		c, err := s.client.SslService.Collect(enrollment.SslID, "x509R")
 		if err != nil {
 			if e, ok := err.(*sectigo.ErrorResponse); ok {
 				if e.Code == 0 && e.Description == "Being processed by Sectigo" {
@@ -270,7 +270,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	if err != nil {
 		return s.handleError("Error parsing certificate", span, err, logger)
 	}
-	pem := certs[3]
+	pem := certs[0]
 	serial := fmt.Sprintf("%032x", pem.SerialNumber)
 	logger.Info("Certificate issued",
 		zap.Duration("duration", stop.Sub(start)),
