@@ -3,7 +3,7 @@ module github.com/hm-edu/portal-common
 go 1.19
 
 require (
-	github.com/getkin/kin-openapi v0.110.0
+	github.com/getkin/kin-openapi v0.111.0
 	github.com/golang-jwt/jwt/v4 v4.4.3
 	github.com/joho/godotenv v1.4.0
 	github.com/labstack/echo/v4 v4.9.1
@@ -11,7 +11,7 @@ require (
 	github.com/ory/viper v1.7.5
 	github.com/prometheus/client_golang v1.14.0
 	github.com/spf13/cobra v1.6.1
-	github.com/swaggo/swag v1.8.8
+	github.com/swaggo/swag v1.8.9
 	go.opentelemetry.io/contrib/propagators/b3 v1.12.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.11.2
 	go.opentelemetry.io/otel/exporters/prometheus v0.34.0
@@ -51,7 +51,7 @@ require (
 	github.com/lestrrat-go/blackmagic v1.0.1 // indirect
 	github.com/lestrrat-go/httpcc v1.0.1 // indirect
 	github.com/lestrrat-go/iter v1.0.2 // indirect
-	github.com/lestrrat-go/option v1.0.0 // indirect
+	github.com/lestrrat-go/option v1.0.1 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
@@ -62,7 +62,7 @@ require (
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_model v0.3.0 // indirect
-	github.com/prometheus/common v0.38.0 // indirect
+	github.com/prometheus/common v0.39.0 // indirect
 	github.com/prometheus/procfs v0.8.0 // indirect
 	github.com/spf13/afero v1.9.3 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
