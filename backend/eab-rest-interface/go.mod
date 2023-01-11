@@ -5,10 +5,10 @@ go 1.19
 require (
 	github.com/getkin/kin-openapi v0.112.0
 	github.com/hm-edu/portal-common v0.0.0-20220823053517-d9e4f3f19da7
-	github.com/smallstep/certificates v0.23.0
+	github.com/smallstep/certificates v0.23.1
 	go.opentelemetry.io/otel v1.11.2
 	go.uber.org/zap v1.24.0
-	google.golang.org/grpc v1.51.0
+	google.golang.org/grpc v1.52.0
 )
 
 require (
@@ -23,7 +23,7 @@ require (
 	github.com/spf13/afero v1.9.3 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
-	github.com/subosito/gotenv v1.4.1 // indirect
+	github.com/subosito/gotenv v1.4.2 // indirect
 	github.com/swaggo/files v1.0.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.37.0 // indirect
@@ -49,13 +49,13 @@ require (
 	golang.org/x/sys v0.4.0 // indirect
 	golang.org/x/text v0.6.0 // indirect
 	golang.org/x/tools v0.5.0 // indirect
-	google.golang.org/genproto v0.0.0-20230104163317-caabf589fcbf // indirect
+	google.golang.org/genproto v0.0.0-20230110181048-76db0878b65f // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
 require (
-	entgo.io/ent v0.11.4
+	entgo.io/ent v0.11.5
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/hm-edu/portal-apis v0.0.0-20221118051102-2167a6f6c4fe
 	github.com/labstack/echo/v4 v4.10.0
@@ -63,7 +63,7 @@ require (
 	github.com/smallstep/nosql v0.5.0
 	github.com/spf13/cobra v1.6.1
 	github.com/swaggo/echo-swagger v1.3.5
-	github.com/uptrace/opentelemetry-go-extra/otelzap v0.1.17
+	github.com/uptrace/opentelemetry-go-extra/otelzap v0.1.18
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.37.0
 )
 
@@ -131,7 +131,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.8.3 // indirect
+	ariga.io/atlas v0.9.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0 // indirect
@@ -139,7 +139,7 @@ require (
 	github.com/go-chi/chi v4.1.2+incompatible // indirect
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
-	github.com/go-playground/locales v0.14.0 // indirect
+	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-playground/validator/v10 v10.11.1 // indirect
 	github.com/goccy/go-json v0.10.0 // indirect
@@ -163,7 +163,7 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rogpeppe/go-internal v1.8.1 // indirect
-	github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.17 // indirect
+	github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.18 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/zclconf/go-cty v1.12.1 // indirect
