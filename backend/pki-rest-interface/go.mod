@@ -3,7 +3,7 @@ module github.com/hm-edu/pki-rest-interface
 go 1.19
 
 require (
-	github.com/getkin/kin-openapi v0.112.0
+	github.com/getkin/kin-openapi v0.113.0
 	github.com/hm-edu/portal-apis v0.0.0-20221118051102-2167a6f6c4fe
 	github.com/hm-edu/portal-common v0.0.0-20220823053517-d9e4f3f19da7
 	github.com/labstack/echo/v4 v4.10.0
@@ -13,7 +13,7 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.37.0
 	go.opentelemetry.io/otel v1.11.2
 	go.uber.org/zap v1.24.0
-	google.golang.org/grpc v1.52.0
+	google.golang.org/grpc v1.52.1
 )
 
 require (
@@ -51,6 +51,7 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/ory/viper v1.7.5 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
+	github.com/perimeterx/marshmallow v1.1.4 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_golang v1.14.0 // indirect
 	github.com/prometheus/client_model v0.3.0 // indirect
@@ -96,7 +97,7 @@ require (
 	golang.org/x/sys v0.4.0 // indirect
 	golang.org/x/text v0.6.0 // indirect
 	golang.org/x/tools v0.5.0 // indirect
-	google.golang.org/genproto v0.0.0-20230113154510-dbe35b8444a5 // indirect
+	google.golang.org/genproto v0.0.0-20230125152338-dcaf20b6aeaa // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
