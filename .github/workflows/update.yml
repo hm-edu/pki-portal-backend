@@ -25,7 +25,6 @@ jobs:
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           signoff: false
-          delete-branch: true
           commit-message: "chore: Update packages"
           title: "chore: Update packages"
           assignees: fritterhoff
