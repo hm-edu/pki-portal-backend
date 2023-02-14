@@ -15,6 +15,7 @@ import (
 
 	"github.com/miekg/dns"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/global"
 	"go.opentelemetry.io/otel/metric/instrument"
 	"go.opentelemetry.io/otel/metric/unit"
@@ -40,18 +41,24 @@ func (v *DomainValidator) ValidateDomains() {
 	logger := zap.L()
 	v.observerLock = new(sync.RWMutex)
 	v.observerValueToReport = make(map[string]time.Duration)
-	gaugeObserver, err := meter.AsyncInt64().Gauge("remaining_days", instrument.WithDescription("The remaining validation days per domain"), instrument.WithUnit(unit.Unit("days")))
+	gaugeObserver, err := meter.Int64ObservableGauge("remaining_days", instrument.WithDescription("The remaining validation days per domain"), instrument.WithUnit(unit.Unit("days")))
 	if err != nil {
 		logger.Panic("failed to initialize instrument: %v", zap.Error(err))
 	}
-	_ = meter.RegisterCallback([]instrument.Asynchronous{gaugeObserver}, func(ctx context.Context) {
+
+	_, err = meter.RegisterCallback(func(ctx context.Context, observer metric.Observer) error {
 		(*v.observerLock).RLock()
 		data := v.observerValueToReport
 		(*v.observerLock).RUnlock()
 		for domain, duration := range data {
-			gaugeObserver.Observe(ctx, int64(duration.Hours()/24), attribute.String("domain", domain))
+			observer.ObserveInt64(gaugeObserver, int64(duration.Hours()/24), attribute.String("domain", domain))
 		}
-	})
+		return nil
+	}, gaugeObserver)
+
+	if err != nil {
+		logger.Panic("failed to register callback: %v", zap.Error(err))
+	}
 
 	pending := make(map[time.Duration][]string)
 	x := time.Now().Add(7 * 24 * time.Hour)
