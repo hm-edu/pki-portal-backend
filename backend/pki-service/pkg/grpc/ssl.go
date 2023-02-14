@@ -22,6 +22,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	tracingCodes "go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/global"
 	"go.opentelemetry.io/otel/metric/instrument"
 	"go.opentelemetry.io/otel/trace"
@@ -100,24 +101,25 @@ type sslAPIServer struct {
 func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *ent.Client) *sslAPIServer {
 	var err error
 
-	gauge, _ := meter.AsyncInt64().Gauge(
+	gauge, _ := meter.Int64ObservableGauge(
 		"ssl.issue.last.duration",
 		instrument.WithUnit("seconds"),
 		instrument.WithDescription("Required time for last SSL Certificates"),
 	)
 
-	gaugeLast, _ := meter.AsyncInt64().Gauge(
+	gaugeLast, _ := meter.Int64ObservableGauge(
 		"ssl.issue.last.unix",
 		instrument.WithUnit("unixMilli"),
 		instrument.WithDescription("Issue timestamp for last SSL Certificates"),
 	)
 	instance := &sslAPIServer{client: client, cfg: cfg, logger: zap.L(), db: db, pendingValidations: make(map[string]interface{})}
-	err = meter.RegisterCallback([]instrument.Asynchronous{gauge, gaugeLast}, func(ctx context.Context) {
+	_, err = meter.RegisterCallback(func(ctx context.Context, observer metric.Observer) error {
 		if instance.last != nil {
-			gauge.Observe(ctx, int64(instance.duration.Seconds()))
-			gaugeLast.Observe(ctx, instance.last.UnixMilli())
+			observer.ObserveInt64(gauge, int64(instance.duration.Seconds()))
+			observer.ObserveInt64(gaugeLast, instance.last.UnixMilli())
 		}
-	})
+		return nil
+	}, gauge, gaugeLast)
 	if err != nil {
 		zap.L().Error("Failed to register callback", zap.Error(err))
 	}
