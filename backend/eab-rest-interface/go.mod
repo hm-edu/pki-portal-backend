@@ -110,7 +110,6 @@ require (
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.41.0 // indirect
 	github.com/prometheus/procfs v0.9.0 // indirect
-	github.com/rs/xid v1.4.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
@@ -176,6 +175,6 @@ require (
 
 replace github.com/hm-edu/portal-common => ../common
 
-replace github.com/smallstep/nosql => github.com/hm-edu/nosql v0.4.1-0.20221021074654-ff0ebfc36cd6
+replace github.com/smallstep/nosql => github.com/hm-edu/nosql v0.4.1-0.20230305071512-139857866201
 
-replace github.com/smallstep/certificates => github.com/hm-edu/certificates v0.0.0-20221021173402-5c910a1909d0
+replace github.com/smallstep/certificates => github.com/hm-edu/certificates v0.0.0-20230305071756-ee2883a451aa
