@@ -9,7 +9,7 @@ require (
 	github.com/labstack/echo/v4 v4.10.2
 	github.com/lestrrat-go/jwx v1.2.25
 	github.com/ory/viper v1.7.5
-	github.com/prometheus/client_golang v1.14.0
+	github.com/prometheus/client_golang v1.15.0
 	github.com/spf13/cobra v1.7.0
 	github.com/swaggo/swag v1.8.12
 	go.opentelemetry.io/contrib/propagators/b3 v1.15.0
@@ -24,7 +24,7 @@ require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
-	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0 // indirect
+	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.0 // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect

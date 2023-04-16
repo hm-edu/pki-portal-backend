@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/getkin/kin-openapi v0.115.0
 	github.com/hm-edu/portal-common v0.0.0-20220823053517-d9e4f3f19da7
-	github.com/smallstep/certificates v0.24.0
+	github.com/smallstep/certificates v0.24.1
 	go.opentelemetry.io/otel v1.14.0
 	go.uber.org/zap v1.24.0
 	google.golang.org/grpc v1.54.0
@@ -54,7 +54,7 @@ require (
 )
 
 require (
-	entgo.io/ent v0.12.0
+	entgo.io/ent v0.12.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/hm-edu/portal-apis v0.0.0-20221118051102-2167a6f6c4fe
 	github.com/labstack/echo/v4 v4.10.2
@@ -105,7 +105,7 @@ require (
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/ory/viper v1.7.5 // indirect
-	github.com/prometheus/client_golang v1.14.0 // indirect
+	github.com/prometheus/client_golang v1.15.0 // indirect
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.42.0 // indirect
 	github.com/prometheus/procfs v0.9.0 // indirect
@@ -122,8 +122,8 @@ require (
 	go.opentelemetry.io/otel/exporters/prometheus v0.37.0 // indirect
 	go.opentelemetry.io/otel/metric v0.37.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v0.37.0 // indirect
-	go.step.sm/cli-utils v0.7.5 // indirect
-	go.step.sm/crypto v0.29.2 // indirect
+	go.step.sm/cli-utils v0.7.6 // indirect
+	go.step.sm/crypto v0.29.3 // indirect
 	go.step.sm/linkedca v0.19.0 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 )
@@ -132,7 +132,7 @@ require (
 	ariga.io/atlas v0.10.1 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
-	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0 // indirect
+	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.4.0 // indirect
 	github.com/go-chi/chi v4.1.2+incompatible // indirect
 	github.com/go-kit/log v0.2.1 // indirect
@@ -161,7 +161,6 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/perimeterx/marshmallow v1.1.4 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/rogpeppe/go-internal v1.8.1 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
 	github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.21 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
