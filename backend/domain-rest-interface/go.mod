@@ -53,7 +53,7 @@ require (
 )
 
 require (
-	entgo.io/ent v0.12.1
+	entgo.io/ent v0.12.2
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/hm-edu/portal-apis v0.0.0-20221118051102-2167a6f6c4fe

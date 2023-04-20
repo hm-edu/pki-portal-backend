@@ -107,7 +107,7 @@ require (
 )
 
 require (
-	entgo.io/ent v0.12.1
+	entgo.io/ent v0.12.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jackc/pgx/v4 v4.18.1
