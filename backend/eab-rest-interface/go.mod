@@ -54,7 +54,7 @@ require (
 )
 
 require (
-	entgo.io/ent v0.12.1
+	entgo.io/ent v0.12.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/hm-edu/portal-apis v0.0.0-20221118051102-2167a6f6c4fe
 	github.com/labstack/echo/v4 v4.10.2
