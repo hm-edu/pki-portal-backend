@@ -84,7 +84,7 @@ func (api *domainAPIServer) ListDomains(ctx context.Context, req *pb.ListDomains
 		api.logger.Error("Listing domains failed", zap.String("user", req.User), zap.Error(err))
 		return nil, err
 	}
-	api.logger.Info("Listed domains", zap.String("user", req.User), zap.Any("domains", domains))
+	api.logger.Debug("Listed domains", zap.String("user", req.User), zap.Any("domains", domains))
 	resp := pb.ListDomainsResponse{Domains: helper.Map(domains, func(t *ent.Domain) string { return t.Fqdn })}
 	return &resp, nil
 }
