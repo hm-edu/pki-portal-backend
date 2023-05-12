@@ -112,7 +112,6 @@ func (r MwnProvider) Update(zoneName string, entries []UpdateSet) error {
 func (r MwnProvider) sendMessage(msg *dns.Msg) error {
 
 	c := new(dns.Client)
-	c.SingleInflight = true
 
 	c.TsigSecret = map[string]string{r.cfg.TsigKeyName: r.cfg.TsigSecret}
 	msg.SetTsig(r.cfg.TsigKeyName, r.cfg.TsigSecretAlg, clockSkew, time.Now().Unix())
