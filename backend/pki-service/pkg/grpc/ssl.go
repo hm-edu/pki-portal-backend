@@ -24,7 +24,6 @@ import (
 	tracingCodes "go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/global"
-	"go.opentelemetry.io/otel/metric/instrument"
 	"go.opentelemetry.io/otel/trace"
 
 	"go.uber.org/zap"
@@ -103,14 +102,14 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 
 	gauge, _ := meter.Int64ObservableGauge(
 		"ssl.issue.last.duration",
-		instrument.WithUnit("seconds"),
-		instrument.WithDescription("Required time for last SSL Certificates"),
+		metric.WithUnit("seconds"),
+		metric.WithDescription("Required time for last SSL Certificates"),
 	)
 
 	gaugeLast, _ := meter.Int64ObservableGauge(
 		"ssl.issue.last.unix",
-		instrument.WithUnit("unixMilli"),
-		instrument.WithDescription("Issue timestamp for last SSL Certificates"),
+		metric.WithUnit("unixMilli"),
+		metric.WithDescription("Issue timestamp for last SSL Certificates"),
 	)
 	instance := &sslAPIServer{client: client, cfg: cfg, logger: zap.L(), db: db, pendingValidations: make(map[string]interface{})}
 	_, err = meter.RegisterCallback(func(ctx context.Context, observer metric.Observer) error {

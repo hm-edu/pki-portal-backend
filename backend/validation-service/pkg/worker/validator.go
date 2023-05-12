@@ -17,7 +17,6 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/metric/global"
-	"go.opentelemetry.io/otel/metric/instrument"
 	"go.uber.org/zap"
 )
 
@@ -40,7 +39,7 @@ func (v *DomainValidator) ValidateDomains() {
 	logger := zap.L()
 	v.observerLock = new(sync.RWMutex)
 	v.observerValueToReport = make(map[string]time.Duration)
-	gaugeObserver, err := meter.Int64ObservableGauge("remaining_days", instrument.WithDescription("The remaining validation days per domain"), instrument.WithUnit("days"))
+	gaugeObserver, err := meter.Int64ObservableGauge("remaining_days", metric.WithDescription("The remaining validation days per domain"), metric.WithUnit("days"))
 	if err != nil {
 		logger.Panic("failed to initialize instrument: %v", zap.Error(err))
 	}
@@ -50,7 +49,7 @@ func (v *DomainValidator) ValidateDomains() {
 		data := v.observerValueToReport
 		(*v.observerLock).RUnlock()
 		for domain, duration := range data {
-			observer.ObserveInt64(gaugeObserver, int64(duration.Hours()/24), attribute.String("domain", domain))
+			observer.ObserveInt64(gaugeObserver, int64(duration.Hours()/24), metric.WithAttributes(attribute.String("domain", domain)))
 		}
 		return nil
 	}, gaugeObserver)
