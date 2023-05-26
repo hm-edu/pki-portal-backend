@@ -26,7 +26,11 @@ func (r *User) Bind(c echo.Context, v *Validator) error {
 	r.LastName = claims["family_name"].(string)
 	r.CommonName = claims["name"].(string)
 	r.Email = claims["email"].(string)
-	r.Student = strings.Contains((claims["eduPersonScopedAffiliation"].(string)), "student@")
+	if claim, ok := claims["eduPersonScopedAffiliation"]; ok {
+		r.Student = strings.Contains((claim.(string)), "student@")
+	} else {
+		r.Student = false
+	}
 	err := v.Validate(r)
 	return err
 }
