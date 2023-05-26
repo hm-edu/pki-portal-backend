@@ -83,6 +83,8 @@ services:
       - "1095"
       - --smime_key_length
       - "3072"
+      - --smime_student_term
+      - "365"
       - --smime_key_type
       - "RSA"
       - --db
