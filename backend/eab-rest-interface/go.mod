@@ -1,6 +1,6 @@
 module github.com/hm-edu/eab-rest-interface
 
-go 1.19
+go 1.20
 
 require (
 	github.com/getkin/kin-openapi v0.117.0
