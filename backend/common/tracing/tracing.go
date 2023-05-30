@@ -9,7 +9,6 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	otelprom "go.opentelemetry.io/otel/exporters/prometheus"
-	"go.opentelemetry.io/otel/metric/global"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -74,7 +73,7 @@ func InitTracer(logger *zap.Logger, name string) *sdktrace.TracerProvider {
 	}
 	provider := metric.NewMeterProvider(metric.WithReader(otelProm))
 
-	global.SetMeterProvider(provider)
+	otel.SetMeterProvider(provider)
 	otel.SetTracerProvider(tp)
 	b3 := b3.New()
 	otel.SetTextMapPropagator(b3)

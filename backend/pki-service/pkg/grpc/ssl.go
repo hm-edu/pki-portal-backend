@@ -23,7 +23,6 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	tracingCodes "go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/metric/global"
 	"go.opentelemetry.io/otel/trace"
 
 	"go.uber.org/zap"
@@ -34,7 +33,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-var meter = global.MeterProvider().Meter("pki-service")
+var meter = otel.GetMeterProvider().Meter("pki-service")
 
 func mapCertificate(x *ent.Certificate) *pb.SslCertificateDetails {
 

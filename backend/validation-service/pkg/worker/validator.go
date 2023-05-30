@@ -14,9 +14,9 @@ import (
 	"github.com/hm-edu/sectigo-client/sectigo/domain"
 
 	"github.com/miekg/dns"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/metric/global"
 	"go.uber.org/zap"
 )
 
@@ -31,7 +31,7 @@ type DomainValidator struct {
 	observerValueToReport map[string]time.Duration
 }
 
-var meter = global.MeterProvider().Meter("validation-service")
+var meter = otel.GetMeterProvider().Meter("validation-service")
 
 // ValidateDomains validates the domains returned from sectigo.
 func (v *DomainValidator) ValidateDomains() {
