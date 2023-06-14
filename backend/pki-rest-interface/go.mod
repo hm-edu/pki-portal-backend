@@ -7,7 +7,7 @@ require (
 	github.com/hm-edu/portal-apis v0.0.0-20221118051102-2167a6f6c4fe
 	github.com/hm-edu/portal-common v0.0.0-20230526063228-e05d19370449
 	github.com/labstack/echo/v4 v4.10.2
-	github.com/lestrrat-go/jwx v1.2.25
+	github.com/lestrrat-go/jwx v1.2.26
 	github.com/spf13/cobra v1.7.0
 	github.com/swaggo/echo-swagger v1.4.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.42.0
