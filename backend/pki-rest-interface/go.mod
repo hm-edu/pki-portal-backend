@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/getkin/kin-openapi v0.118.0
 	github.com/hm-edu/portal-apis v0.0.0-20221118051102-2167a6f6c4fe
-	github.com/hm-edu/portal-common v0.0.0-20230530092916-6e2b8052e9fe
+	github.com/hm-edu/portal-common v0.0.0-20230619060401-18b1d7313040
 	github.com/labstack/echo/v4 v4.10.2
 	github.com/lestrrat-go/jwx v1.2.26
 	github.com/spf13/cobra v1.7.0
@@ -13,7 +13,7 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.42.0
 	go.opentelemetry.io/otel v1.16.0
 	go.uber.org/zap v1.24.0
-	google.golang.org/grpc v1.56.0
+	google.golang.org/grpc v1.56.1
 )
 
 require (

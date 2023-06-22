@@ -5,9 +5,9 @@ go 1.20
 require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/labstack/gommon v0.4.0
-	github.com/miekg/dns v1.1.54
+	github.com/miekg/dns v1.1.55
 	go.uber.org/zap v1.24.0
-	google.golang.org/grpc v1.56.0
+	google.golang.org/grpc v1.56.1
 )
 
 require (
@@ -80,7 +80,7 @@ require (
 )
 
 require (
-	github.com/hm-edu/portal-common v0.0.0-20230530092916-6e2b8052e9fe
+	github.com/hm-edu/portal-common v0.0.0-20230619060401-18b1d7313040
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 )

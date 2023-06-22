@@ -4,11 +4,11 @@ go 1.20
 
 require (
 	github.com/getkin/kin-openapi v0.118.0
-	github.com/hm-edu/portal-common v0.0.0-20230530092916-6e2b8052e9fe
+	github.com/hm-edu/portal-common v0.0.0-20230619060401-18b1d7313040
 	github.com/smallstep/certificates v0.24.2
 	go.opentelemetry.io/otel v1.16.0
 	go.uber.org/zap v1.24.0
-	google.golang.org/grpc v1.56.0
+	google.golang.org/grpc v1.56.1
 )
 
 require (
@@ -122,7 +122,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.16.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v0.39.0 // indirect
 	go.step.sm/cli-utils v0.7.6 // indirect
-	go.step.sm/crypto v0.32.0 // indirect
+	go.step.sm/crypto v0.32.1 // indirect
 	go.step.sm/linkedca v0.19.1 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 )

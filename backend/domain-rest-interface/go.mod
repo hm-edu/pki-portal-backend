@@ -4,10 +4,10 @@ go 1.20
 
 require (
 	github.com/getkin/kin-openapi v0.118.0
-	github.com/hm-edu/portal-common v0.0.0-20230530092916-6e2b8052e9fe
+	github.com/hm-edu/portal-common v0.0.0-20230619060401-18b1d7313040
 	go.opentelemetry.io/otel v1.16.0
 	go.uber.org/zap v1.24.0
-	google.golang.org/grpc v1.56.0
+	google.golang.org/grpc v1.56.1
 )
 
 require (
