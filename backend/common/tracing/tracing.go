@@ -42,7 +42,7 @@ type LoggingHandler struct {
 }
 
 // Handle captures the logs to the zap logger.
-func (l *LoggingHandler) Handle(err error) {
+func (l *LoggingHandler) Handle(_ error) {
 
 }
 
