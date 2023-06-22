@@ -39,12 +39,11 @@ func NewGRPCStreamServerInterceptor() grpc.StreamServerInterceptor {
 
 // LoggingHandler is a simple error handler that logs the error.
 type LoggingHandler struct {
-	log *zap.Logger
 }
 
 // Handle captures the logs to the zap logger.
 func (l *LoggingHandler) Handle(err error) {
-	l.log.Error("OpenTelemetry error", zap.Error(err))
+
 }
 
 // InitTracer performs the initialization of the traceprovider.
@@ -77,7 +76,7 @@ func InitTracer(logger *zap.Logger, name string) *sdktrace.TracerProvider {
 	otel.SetTracerProvider(tp)
 	b3 := b3.New()
 	otel.SetTextMapPropagator(b3)
-	otel.SetErrorHandler(&LoggingHandler{log: logger})
+	otel.SetErrorHandler(&LoggingHandler{})
 
 	http.Handle("/", promhttp.Handler())
 	go func() {
