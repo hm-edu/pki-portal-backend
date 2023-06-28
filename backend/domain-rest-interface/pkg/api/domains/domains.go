@@ -149,7 +149,7 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		logger.Error("Failed to get user from request", zap.Error(err))
-		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
+		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
 	}
 
 	span.SetAttributes(attribute.String("user", user))
@@ -185,7 +185,7 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 	logger.Info("Creating domain", zap.Bool("approved", domain.Approved), zap.String("owner", domain.Owner))
 	created, err := h.domainStore.Create(ctx, &domain)
 	if err != nil {
-		return &echo.HTTPError{Code: http.StatusBadRequest}
+		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
 	}
 	item := model.DomainToOutput(created)
 	item.Permissions.CanDelete = true

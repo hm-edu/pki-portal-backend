@@ -238,6 +238,7 @@ func TestCreateDomainsTwice(t *testing.T) {
 	resp = h.CreateDomain(c)
 	if assert.Error(t, resp) {
 		assert.Equal(t, http.StatusBadRequest, resp.(*echo.HTTPError).Code)
+		assert.Equal(t, "Domain already exists", resp.(*echo.HTTPError).Message)
 	}
 }
 

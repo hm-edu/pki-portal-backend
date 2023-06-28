@@ -31,9 +31,17 @@ func (s *DomainStore) ListAllDomains(ctx context.Context, approved bool) ([]stri
 		return nil, fmt.Errorf("pinging the database: %w", err)
 	}
 	var domains []string
-	err := s.db.Domain.Query().Where(domain.Approved(approved)).Select(domain.FieldFqdn).Scan(ctx, &domains)
-	if err != nil {
-		return nil, err
+	q := s.db.Domain.Query()
+	if approved {
+		err := q.Where(domain.Approved(approved)).Select(domain.FieldFqdn).Scan(ctx, &domains)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		err := q.Select(domain.FieldFqdn).Scan(ctx, &domains)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return domains, nil
 }
