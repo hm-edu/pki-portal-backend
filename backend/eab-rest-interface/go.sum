@@ -565,10 +565,10 @@ github.com/ugorji/go v1.2.7/go.mod h1:nF9osbDWLy6bDVv/Rtoh6QgnvNDpmCalQV5urGCCS6
 github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8/go.mod h1:VFNgLljTbGfSG7qAOspJ7OScBnGdDN/yBr0sguwnwf0=
 github.com/ugorji/go/codec v1.2.7 h1:YPXUKf7fYbp/y8xloBqZOw2qaVggbfwMlI8WM3wZUJ0=
 github.com/ugorji/go/codec v1.2.7/go.mod h1:WGN1fab3R1fzQlVQTkfxVtIBhWDRqOviHU95kRgeqEY=
-github.com/uptrace/opentelemetry-go-extra/otelutil v0.2.1 h1:qjljyY//UH064+gQDHh5U7M1Jh6b+iQpJUWVAuRJ04A=
-github.com/uptrace/opentelemetry-go-extra/otelutil v0.2.1/go.mod h1:7YSrHCmYPHIXjTWnKSU7EGT0TFEcm3WwSeQquwCGg38=
-github.com/uptrace/opentelemetry-go-extra/otelzap v0.2.1 h1:HhKd/kmL1JuBK3zPr3gT/Ku7lvvBsnsy8NtQ+uG5rRM=
-github.com/uptrace/opentelemetry-go-extra/otelzap v0.2.1/go.mod h1:GiIWZ+UVlFnAik/QCTc7TjsLA+YV1m94ls3G1Q7fKRY=
+github.com/uptrace/opentelemetry-go-extra/otelutil v0.2.2 h1:CNznWHkrbA6o1q2H/BsH4tIHf4zbKNtndeoV+AH8z0U=
+github.com/uptrace/opentelemetry-go-extra/otelutil v0.2.2/go.mod h1:7YSrHCmYPHIXjTWnKSU7EGT0TFEcm3WwSeQquwCGg38=
+github.com/uptrace/opentelemetry-go-extra/otelzap v0.2.2 h1:uyrW06oJi4iWvhjPLVfk4qrSP2Zm0AMozKKDmp6i4pE=
+github.com/uptrace/opentelemetry-go-extra/otelzap v0.2.2/go.mod h1:PMAs2dNxP55lgt6xu0if+Jasm6s+Xpmqn6ev1NyDfnI=
 github.com/urfave/cli v1.22.14 h1:ebbhrRiGK2i4naQJr+1Xj92HXZCrK7MsyTS/ob3HnAk=
 github.com/urfave/cli v1.22.14/go.mod h1:X0eDS6pD6Exaclxm99NJ3FiCDRED7vIHpx2mDOHLvkA=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=
@@ -621,8 +621,8 @@ go.opentelemetry.io/otel/trace v1.16.0 h1:8JRpaObFoW0pxuVPapkgH8UhHQj+bJW8jJsCZE
 go.opentelemetry.io/otel/trace v1.16.0/go.mod h1:Yt9vYq1SdNz3xdjZZK7wcXv1qv2pwLkqr2QVwea0ef0=
 go.step.sm/cli-utils v0.7.6 h1:YkpLVrepmy2c5+eaz/wduiGxlgrRx3YdAStE37if25g=
 go.step.sm/cli-utils v0.7.6/go.mod h1:j+FxFZ2gbWkAJl0eded/rksuxmNqWpmyxbkXcukGJaY=
-go.step.sm/crypto v0.32.1 h1:kAiL21zTqAgYu1geOYxH+ApUCUX+oclB25TccnNEYTU=
-go.step.sm/crypto v0.32.1/go.mod h1:JwarCq+Sn6N8IbRSKfSJfjUNKfO8c4N1mcNxYXuxXzc=
+go.step.sm/crypto v0.32.2 h1:EhJpFRNgU3RaNEO3WZ62Kn2gF9NWNglNG4DvSPeuiTs=
+go.step.sm/crypto v0.32.2/go.mod h1:JwarCq+Sn6N8IbRSKfSJfjUNKfO8c4N1mcNxYXuxXzc=
 go.step.sm/linkedca v0.19.1 h1:uY0ByT/uB3FCQ8zIo9mU7MWG7HKf5sDXNEBeN94MuP8=
 go.step.sm/linkedca v0.19.1/go.mod h1:vPV2ad3LFQJmV7XWt87VlnJSs6UOqgsbVGVWe3veEmI=
 go.uber.org/atomic v1.3.2/go.mod h1:gD2HeocX3+yG+ygLZcrzQJaqmWj9AIm7n08wl/qW/PE=
@@ -989,8 +989,8 @@ google.golang.org/genproto v0.0.0-20210108203827-ffc7fda8c3d7/go.mod h1:FWY/as6D
 google.golang.org/genproto v0.0.0-20210226172003-ab064af71705/go.mod h1:FWY/as6DDZQgahTzZj3fqbO1CbirC29ZNUFHwi0/+no=
 google.golang.org/genproto v0.0.0-20230530153820-e85fd2cbaebc h1:8DyZCyvI8mE1IdLy/60bS+52xfymkE72wv1asokgtao=
 google.golang.org/genproto/googleapis/api v0.0.0-20230530153820-e85fd2cbaebc h1:kVKPf/IiYSBWEWtkIn6wZXwWGCnLKcC8oWfZvXjsGnM=
-google.golang.org/genproto/googleapis/rpc v0.0.0-20230628200519-e449d1ea0e82 h1:6b+zGQBiXFlAMpQr+cCarAdrZD4QgXSG7uUZadYysgg=
-google.golang.org/genproto/googleapis/rpc v0.0.0-20230628200519-e449d1ea0e82/go.mod h1:66JfowdXAEgad5O9NnYcsNPLCPZJD++2L9X0PCMODrA=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20230629202037-9506855d4529 h1:DEH99RbiLZhMxrpEJCZ0A+wdTe0EOgou/poSLx9vWf4=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20230629202037-9506855d4529/go.mod h1:66JfowdXAEgad5O9NnYcsNPLCPZJD++2L9X0PCMODrA=
 google.golang.org/grpc v1.19.0/go.mod h1:mqu4LbDTu4XGKhr4mRzUsmM4RtVoemTSY81AxZiDr8c=
 google.golang.org/grpc v1.20.1/go.mod h1:10oTOabMzJvdu6/UiuZezV6QK5dSlG84ov/aaiqXj38=
 google.golang.org/grpc v1.21.1/go.mod h1:oYelfM1adQP15Ek0mdvEgi9Df8B9CZIaU1084ijfRaM=
