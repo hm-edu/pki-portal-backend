@@ -56,7 +56,7 @@ require (
 	entgo.io/ent v0.12.3
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/hm-edu/portal-apis v0.0.0-20221118051102-2167a6f6c4fe
-	github.com/labstack/echo/v4 v4.11.0
+	github.com/labstack/echo/v4 v4.11.1
 	github.com/lestrrat-go/jwx v1.2.26
 	github.com/smallstep/nosql v0.6.0
 	github.com/spf13/cobra v1.7.0
