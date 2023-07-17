@@ -122,7 +122,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.16.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v0.39.0 // indirect
 	go.step.sm/cli-utils v0.7.6 // indirect
-	go.step.sm/crypto v0.32.3 // indirect
+	go.step.sm/crypto v0.32.4 // indirect
 	go.step.sm/linkedca v0.19.1 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 )
@@ -169,7 +169,7 @@ require (
 	golang.org/x/crypto v0.11.0 // indirect
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20230711160842-782d3b101e98 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230717213848-3f92550aa753 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
