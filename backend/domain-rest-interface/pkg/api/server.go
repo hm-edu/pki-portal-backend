@@ -96,6 +96,14 @@ func (api *Server) wireRoutesAndMiddleware() {
 		return strings.Contains(c.Path(), "/docs") || strings.Contains(c.Path(), "/healthz")
 	})))
 	api.app.Use(middleware.Recover())
+	if len(api.config.CorsAllowedOrigins) != 0 {
+		api.app.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins:     api.config.CorsAllowedOrigins,
+			AllowHeaders:     []string{echo.HeaderContentType, echo.HeaderAuthorization},
+			AllowCredentials: false,
+			AllowMethods:     []string{http.MethodGet, http.MethodOptions, http.MethodPost, http.MethodDelete},
+		}))
+	}
 	api.app.GET("/docs/spec.json", func(c echo.Context) error {
 		if openAPISpec == nil {
 			spec, err := commonApi.ToOpenAPI3(docs.SwaggerInfo)
