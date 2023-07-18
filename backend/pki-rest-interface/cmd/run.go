@@ -71,6 +71,7 @@ func init() {
 	runCmd.Flags().Int("grpc-port", 8081, "GRPC port to bind service to")
 	runCmd.Flags().String("jwks_uri", "", "The location of the jwk set")
 	runCmd.Flags().String("audience", "", "The expected audience")
+	runCmd.Flags().StringSlice("cors_allowed_origins", []string{}, "The allowed origin for CORS")
 	runCmd.Flags().String("smime_service", "", "The smime service to use")
 	runCmd.Flags().String("ssl_service", "", "The ssl service to use")
 	runCmd.Flags().String("domain_service", "", "The domain service to use")
