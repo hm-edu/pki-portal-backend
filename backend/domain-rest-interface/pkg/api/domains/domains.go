@@ -108,7 +108,10 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string, logger *zap
 			})
 			if len(matchingCerts) > 0 {
 				for _, cert := range matchingCerts {
-					if cert.Id == 0 && cert.Status != "Invalid" {
+					if cert.Status == "Invalid" {
+						continue
+					}
+					if cert.Id == 0 {
 						logger.Debug("Certificate has no ID; Denying deletion of domain.", zap.String("serial", cert.Serial), zap.String("domain", domain.Fqdn), zap.String("user", user))
 						item.Permissions.CanDelete = false
 						continue
