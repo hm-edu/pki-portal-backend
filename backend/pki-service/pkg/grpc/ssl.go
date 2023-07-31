@@ -55,6 +55,7 @@ func mapCertificate(x *ent.Certificate) *pb.SslCertificateDetails {
 	}
 	return &pb.SslCertificateDetails{
 		Id:                      int32(x.SslId),
+		DbId:                    int32(x.ID),
 		CommonName:              x.CommonName,
 		SubjectAlternativeNames: helper.Map(x.Edges.Domains, func(t *ent.Domain) string { return t.Fqdn }),
 		Serial:                  x.Serial,
