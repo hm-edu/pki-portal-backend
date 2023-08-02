@@ -7,7 +7,7 @@ require (
 	github.com/hm-edu/portal-common v0.0.0-20230729065407-ef3de9ebca2d
 	github.com/smallstep/certificates v0.24.2
 	go.opentelemetry.io/otel v1.16.0
-	go.uber.org/zap v1.24.0
+	go.uber.org/zap v1.25.0
 	google.golang.org/grpc v1.57.0
 )
 
@@ -42,7 +42,6 @@ require (
 	github.com/swaggo/swag v1.16.1
 	go.opentelemetry.io/otel/sdk v1.16.0 // indirect
 	go.opentelemetry.io/otel/trace v1.16.0
-	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/net v0.13.0 // indirect
 	golang.org/x/sys v0.10.0 // indirect
