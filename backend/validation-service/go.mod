@@ -3,7 +3,7 @@ module github.com/hm-edu/validation-service
 go 1.19
 
 require (
-	github.com/hm-edu/sectigo-client v0.0.0-20230717081508-943716b5a01c
+	github.com/hm-edu/sectigo-client v0.0.0-20230809171244-68cca7ac1439
 	github.com/spf13/cobra v1.7.0
 	go.opentelemetry.io/otel/metric v1.16.0
 	go.uber.org/zap v1.25.0
