@@ -3,7 +3,7 @@ module github.com/hm-edu/pki-service
 go 1.20
 
 require (
-	github.com/hm-edu/sectigo-client v0.0.0-20230817050430-937650115cb7
+	github.com/hm-edu/sectigo-client v0.0.0-20230822063728-36aac077ca9a
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
@@ -29,7 +29,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/glog v1.1.2 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
-	github.com/google/uuid v1.3.0 // indirect
+	github.com/google/uuid v1.3.1 // indirect
 	github.com/hashicorp/hcl/v2 v2.17.0 // indirect
 	github.com/invopop/yaml v0.2.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
@@ -68,7 +68,7 @@ require (
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.12.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20230815205213-6bfd019c3878 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230821184602-ccc8af3d0e93 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
