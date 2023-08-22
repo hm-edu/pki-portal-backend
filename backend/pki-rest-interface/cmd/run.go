@@ -75,5 +75,6 @@ func init() {
 	runCmd.Flags().String("smime_service", "", "The smime service to use")
 	runCmd.Flags().String("ssl_service", "", "The ssl service to use")
 	runCmd.Flags().String("domain_service", "", "The domain service to use")
+	runCmd.Flags().Bool("reject_students", false, "Reject students")
 	runCmd.Flags().String("level", "info", "log level debug, info, warn, error, flat or panic")
 }
