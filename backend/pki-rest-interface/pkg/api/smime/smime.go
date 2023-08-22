@@ -108,6 +108,10 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 		span.RecordError(err)
 		return err
 	}
+	if user.Student && h.rejectStudents {
+		logger.Warn("rejecting student", zap.String("email", user.Email))
+		return &echo.HTTPError{Code: http.StatusForbidden, Message: "Students are not allowed to request smime certificates"}
+	}
 
 	logger.Info("Issuing new smime certificate")
 	req := &model.CsrRequest{}

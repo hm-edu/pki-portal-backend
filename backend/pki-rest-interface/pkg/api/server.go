@@ -144,7 +144,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 		if err != nil {
 			api.logger.Fatal("failed to create smime client", zap.Error(err))
 		}
-		handler := smime.NewHandler(smimeClient)
+		handler := smime.NewHandler(smimeClient, api.handlerCfg.RejectStudents)
 		group.Use(jwtMiddleware)
 		group.Use(auth.HasScope("Certificates"))
 		group.GET("/", handler.List)

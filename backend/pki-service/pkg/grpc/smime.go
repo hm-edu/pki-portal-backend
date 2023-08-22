@@ -13,6 +13,7 @@ import (
 	"github.com/hm-edu/portal-common/helper"
 	"github.com/hm-edu/sectigo-client/sectigo"
 	"github.com/hm-edu/sectigo-client/sectigo/client"
+	"github.com/hm-edu/sectigo-client/sectigo/person"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -107,6 +108,48 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 	if req.Student {
 		term = s.cfg.SmimeStudentTerm
 	}
+
+	persons, err := s.client.PersonService.List(&person.ListParams{Email: req.Email})
+	if err != nil {
+		span.RecordError(err)
+		logger.Error("Error while requesting person", zap.Error(err))
+		return nil, status.Error(codes.Internal, "Error requesting person")
+	}
+	if len(*persons) == 0 {
+		logger.Info("No person found. Creating new")
+		span.AddEvent("Creating new person")
+		err = s.client.PersonService.CreatePerson(person.CreateRequest{
+			FirstName:      req.FirstName,
+			LastName:       req.LastName,
+			Email:          req.Email,
+			OrganizationID: s.cfg.SmimeOrgID,
+			ValidationType: "HIGH",
+			CommonName:     req.CommonName,
+			Phone:          "",
+		})
+		if err != nil {
+			span.RecordError(err)
+			logger.Error("Error while creating person", zap.Error(err))
+			return nil, status.Error(codes.Internal, "Error creating person")
+		}
+	} else {
+		personItem := (*persons)[0]
+		if personItem.ValidationType != "HIGH" {
+			err := s.client.PersonService.UpdatePerson(personItem.ID, person.UpdateRequest{
+				FirstName:      req.FirstName,
+				LastName:       req.LastName,
+				OrganizationID: s.cfg.SmimeOrgID,
+				ValidationType: "HIGH",
+				CommonName:     req.CommonName,
+			})
+			if err != nil {
+				span.RecordError(err)
+				logger.Error("Error while updating person", zap.Error(err))
+				return nil, status.Error(codes.Internal, "Error updating person")
+			}
+		}
+	}
+
 	span.AddEvent("Enrolling certificate")
 	resp, err := s.client.ClientService.Enroll(client.EnrollmentRequest{
 		OrgID:           s.cfg.SmimeOrgID,
