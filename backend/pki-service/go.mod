@@ -11,7 +11,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.13.1 // indirect
+	ariga.io/atlas v0.13.2 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
@@ -59,7 +59,7 @@ require (
 	github.com/swaggo/swag v1.16.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	github.com/zclconf/go-cty v1.13.2 // indirect
+	github.com/zclconf/go-cty v1.13.3 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.17.0 // indirect
 	go.opentelemetry.io/otel/exporters/jaeger v1.16.0 // indirect
 	go.opentelemetry.io/otel/exporters/prometheus v0.39.0 // indirect

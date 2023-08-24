@@ -127,7 +127,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.13.1 // indirect
+	ariga.io/atlas v0.13.2 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.0 // indirect
@@ -164,7 +164,7 @@ require (
 	github.com/uptrace/opentelemetry-go-extra/otelutil v0.2.2 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
-	github.com/zclconf/go-cty v1.13.2 // indirect
+	github.com/zclconf/go-cty v1.13.3 // indirect
 	golang.org/x/crypto v0.12.0 // indirect
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
