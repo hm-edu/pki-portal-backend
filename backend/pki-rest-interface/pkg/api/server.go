@@ -114,7 +114,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 		return c.JSON(http.StatusOK, openAPISpec)
 	})
 	api.app.GET("/docs/*", echoSwagger.EchoWrapHandler(func(c *echoSwagger.Config) {
-		c.URL = "/docs/spec.json"
+		c.URLs = []string{"/docs/spec.json"}
 	})) // default
 	api.app.GET("/healthz", api.healthzHandler)
 	api.app.GET("/readyz", api.readyzHandler)
