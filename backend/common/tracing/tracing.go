@@ -1,14 +1,19 @@
 package tracing
 
 import (
+	"context"
+	"io"
 	"net/http"
+	"os"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/contrib/propagators/b3"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	otelprom "go.opentelemetry.io/otel/exporters/prometheus"
+	stdout "go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -51,7 +56,15 @@ func (l *LoggingHandler) Handle(_ error) {
 func InitTracer(logger *zap.Logger, name string) *sdktrace.TracerProvider {
 	//exporter, err := stdout.New(stdout.WithPrettyPrint())
 	logger.Debug("Setting up tracing provider")
-	exporter, err := jaeger.New(jaeger.WithCollectorEndpoint())
+	var exporter sdktrace.SpanExporter
+	var err error
+	if os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT") == "" {
+		exporter, err = stdout.New(stdout.WithWriter(io.Discard))
+	} else {
+		opts := []otlptracegrpc.Option{otlptracegrpc.WithInsecure(), otlptracegrpc.WithEndpoint(os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT"))}
+		client := otlptracegrpc.NewClient(opts...)
+		exporter, err = otlptrace.New(context.Background(), client)
+	}
 
 	if err != nil {
 		logger.Fatal("Error creating collector.", zap.Error(err))
