@@ -36,7 +36,8 @@ func (cfg *SectigoConfiguration) CheckSectigoConfiguration() {
 		logger.Fatal("fetching profiles failed", zap.Error(err))
 	}
 	if len(*profiles) == 0 {
-		logger.Fatal("no profiles found")
+		logger.Warn("no profiles found")
+		return
 	}
 	found := helper.Any(*profiles, func(t client.ListProfileItem) bool {
 		if t.ID == cfg.SmimeProfile {
