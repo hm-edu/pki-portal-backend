@@ -171,7 +171,7 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 		return nil, status.Error(codes.Internal, "Error enrolling certificate")
 	}
 	cert := ""
-	err = helper.WaitFor(5*time.Minute, 1*time.Second, func() (bool, error) {
+	err = helper.WaitFor(10*time.Minute, 15*time.Second, func() (bool, error) {
 		c, err := s.client.ClientService.Collect(resp.OrderNumber, "x509R")
 		if err != nil {
 			if e, ok := err.(*sectigo.ErrorResponse); ok {
