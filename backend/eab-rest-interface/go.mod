@@ -3,7 +3,7 @@ module github.com/hm-edu/eab-rest-interface
 go 1.20
 
 require (
-	github.com/getkin/kin-openapi v0.119.0
+	github.com/getkin/kin-openapi v0.120.0
 	github.com/hm-edu/portal-common v0.0.0-20230824190016-178fb44809a8
 	github.com/smallstep/certificates v0.24.2
 	go.opentelemetry.io/otel v1.17.0
