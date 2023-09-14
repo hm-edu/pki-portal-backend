@@ -6,8 +6,8 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/labstack/gommon v0.4.0
 	github.com/miekg/dns v1.1.56
-	go.uber.org/zap v1.25.0
-	google.golang.org/grpc v1.58.0
+	go.uber.org/zap v1.26.0
+	google.golang.org/grpc v1.58.1
 )
 
 require (
@@ -44,8 +44,8 @@ require (
 	go.opentelemetry.io/proto/otlp v1.0.0 // indirect
 	golang.org/x/crypto v0.13.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20230911183012-2d3300fd4832 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20230911183012-2d3300fd4832 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20230913181813-007df8e322eb // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230913181813-007df8e322eb // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
