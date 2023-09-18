@@ -530,8 +530,8 @@ github.com/hashicorp/hcl/v2 v2.18.0 h1:wYnG7Lt31t2zYkcquwgKo6MWXzRUDIeIVU5naZwHL
 github.com/hashicorp/hcl/v2 v2.18.0/go.mod h1:ThLC89FV4p9MPW804KVbe/cEXoQ8NZEh+JtMeeGErHE=
 github.com/hm-edu/portal-apis v0.0.0-20230731060801-90ca7bb8cec2 h1:nI075ZaJ3t8FLybtkgvJf9QbcyRcJejVQFGvxzgRe+Y=
 github.com/hm-edu/portal-apis v0.0.0-20230731060801-90ca7bb8cec2/go.mod h1:o2FYTwt6w4uXfIoPAFRQpxbOOhGjde0PiGZlErVVyZk=
-github.com/hm-edu/sectigo-client v0.0.0-20230905103831-0f580b4f78a4 h1:gHyb+9okzsdtaY2fEKpNy6SqejteuxVrff2yc3Zvmuo=
-github.com/hm-edu/sectigo-client v0.0.0-20230905103831-0f580b4f78a4/go.mod h1:zCFmBSFAgksaqwlIqJiDNCt0XIIvNPhj95hOcwufZw0=
+github.com/hm-edu/sectigo-client v0.0.0-20230915044137-7df86146f82c h1:uQBcRdc5iztQ/VYYVzHX3hNYU97B2D96l7BmUuOYt3I=
+github.com/hm-edu/sectigo-client v0.0.0-20230915044137-7df86146f82c/go.mod h1:kyTu5xF6hbYk7mie39/SqQbUa75yGYKOwnC12dSVI+o=
 github.com/iancoleman/strcase v0.2.0/go.mod h1:iwCmte+B7n89clKwxIoIXy/HfoL7AsD47ZCWhYzw7ho=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
