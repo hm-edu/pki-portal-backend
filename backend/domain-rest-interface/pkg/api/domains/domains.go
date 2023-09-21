@@ -12,6 +12,7 @@ import (
 	"github.com/hm-edu/portal-common/auth"
 	"github.com/hm-edu/portal-common/helper"
 	"github.com/hm-edu/portal-common/logging"
+	"golang.org/x/net/publicsuffix"
 
 	"github.com/labstack/echo/v4"
 	"go.opentelemetry.io/otel/attribute"
@@ -99,7 +100,9 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string, logger *zap
 		} else {
 			// There is no upper domain for this user -> Prevent deletion
 			if item.Permissions.CanDelete && item.Approved {
-				item.Permissions.CanDelete = false
+				if domain, err := publicsuffix.EffectiveTLDPlusOne(item.FQDN); err == nil && domain != item.FQDN {
+					item.Permissions.CanDelete = false
+				}
 			}
 		}
 		if item.Permissions.CanDelete {
