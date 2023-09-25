@@ -24,6 +24,7 @@ type Server struct {
 	logger *zap.Logger
 	config *Config
 	store  *store.DomainStore
+	admins []string
 }
 
 // Config is the basic structure of the GRPC configuration
@@ -33,11 +34,12 @@ type Config struct {
 }
 
 // NewServer creates a new GRPC server
-func NewServer(config *Config, logger *zap.Logger, store *store.DomainStore) (*Server, error) {
+func NewServer(config *Config, logger *zap.Logger, store *store.DomainStore, admins []string) (*Server, error) {
 	srv := &Server{
 		logger: logger,
 		config: config,
 		store:  store,
+		admins: admins,
 	}
 
 	return srv, nil

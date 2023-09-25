@@ -50,9 +50,10 @@ var runCmd = &cobra.Command{
 		store.Preseed(logger)
 		stopCh := signals.SetupSignalHandler()
 
+		admins := viper.GetStringSlice("admins")
 		// start gRPC server
 		if grpcCfg.Port > 0 {
-			grpcSrv, _ := grpc.NewServer(&grpcCfg, logger, store)
+			grpcSrv, _ := grpc.NewServer(&grpcCfg, logger, store, admins)
 			go grpcSrv.ListenAndServe(stopCh)
 		}
 
@@ -62,7 +63,7 @@ var runCmd = &cobra.Command{
 		}
 
 		// start HTTP server
-		srv := api.NewServer(logger, &srvCfg, store, client)
+		srv := api.NewServer(logger, &srvCfg, store, client, admins)
 		srv.ListenAndServe(stopCh)
 	},
 }
