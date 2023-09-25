@@ -56,13 +56,18 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string, logger *zap
 	ctx, span := h.tracer.Start(ctx, "enumerating")
 	defer span.End()
 
-	domains, err := h.domainStore.ListDomains(ctx, user, false)
+	admin := false
+	if helper.Contains(h.admins, user) {
+		admin = true
+	}
+
+	domains, err := h.domainStore.ListDomains(ctx, user, false, admin)
 	if err != nil {
 		logger.Error("Listing domains failed", zap.Error(err))
 		return nil, err
 	}
 
-	approvedDomains, err := h.domainStore.ListDomains(ctx, user, true)
+	approvedDomains, err := h.domainStore.ListDomains(ctx, user, true, admin)
 	if err != nil {
 		logger.Error("Listing domains failed", zap.Error(err))
 		return nil, err
@@ -80,9 +85,9 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string, logger *zap
 	for _, domain := range domains {
 		item := model.DomainToOutput(domain)
 		// Users may always delete their own domains and transfer it.
-		if item.Owner == user {
+		if item.Owner == user || admin {
 			item.Permissions.CanDelete = true
-			if item.Approved {
+			if item.Approved || admin {
 				item.Permissions.CanTransfer = true
 				item.Permissions.CanDelegate = true
 			}
@@ -98,8 +103,8 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string, logger *zap
 			item.Permissions.CanTransfer = true
 			item.Permissions.CanDelegate = true
 		} else {
-			// There is no upper domain for this user -> Prevent deletion
-			if item.Permissions.CanDelete && item.Approved {
+			// There is no upper domain for this user -> Prevent deletion (only permit deletion incase of)
+			if item.Permissions.CanDelete && item.Approved || !admin {
 				if domain, err := publicsuffix.EffectiveTLDPlusOne(item.FQDN); err == nil && domain != item.FQDN {
 					item.Permissions.CanDelete = false
 				}
@@ -180,12 +185,12 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 
 	domain := ent.Domain{Owner: user, Fqdn: req.FQDN}
 
-	domains, err := h.domainStore.ListDomains(ctx, user, true)
+	domains, err := h.domainStore.ListDomains(ctx, user, true, false)
 	if err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
 	}
 
-	if helper.Any(domains, func(i *ent.Domain) bool { return i.Approved && strings.HasSuffix(domain.Fqdn, "."+i.Fqdn) }) {
+	if helper.Any(domains, func(i *ent.Domain) bool { return i.Approved && strings.HasSuffix(domain.Fqdn, "."+i.Fqdn) }) || helper.Contains(h.admins, user) {
 		logger.Info("Auto approving domain request")
 		domain.Approved = true
 	}

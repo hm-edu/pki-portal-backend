@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/ory/viper"
 
 	"github.com/hm-edu/domain-rest-interface/pkg/api/docs"
 	"github.com/hm-edu/domain-rest-interface/pkg/api/domains"
@@ -56,11 +57,14 @@ type Server struct {
 	config     *commonApi.Config
 	store      *store.DomainStore
 	pkiSerivce pb.SSLServiceClient
+	admins     []string
 }
 
 // NewServer creates a new server
 func NewServer(logger *zap.Logger, config *commonApi.Config, store *store.DomainStore, pkiSerivce pb.SSLServiceClient) *Server {
-	return &Server{app: echo.New(), logger: logger, config: config, store: store, pkiSerivce: pkiSerivce}
+	admins := viper.GetStringSlice("admins")
+
+	return &Server{app: echo.New(), logger: logger, config: config, store: store, pkiSerivce: pkiSerivce, admins: admins}
 }
 
 func (api *Server) wireRoutesAndMiddleware() {
@@ -124,7 +128,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 
 	v1 := api.app.Group("/domains")
 	{
-		h := domains.NewHandler(api.store, api.pkiSerivce)
+		h := domains.NewHandler(api.store, api.pkiSerivce, api.admins)
 		v1.Use(jwtMiddleware)
 		v1.Use(auth.HasScope("Domains"))
 		v1.GET("/", h.ListDomains)

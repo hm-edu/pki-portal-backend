@@ -74,6 +74,7 @@ func sslClient(host string) (pb.SSLServiceClient, error) {
 	}
 	return pb.NewSSLServiceClient(conn), nil
 }
+
 func init() {
 	rootCmd.AddCommand(runCmd)
 
@@ -87,4 +88,5 @@ func init() {
 	runCmd.Flags().String("ssl_service", "", "pki backend")
 	runCmd.Flags().String("preseed", "", "path to the preseed file")
 	runCmd.Flags().String("level", "info", "log level debug, info, warn, error, flat or panic")
+	runCmd.Flags().StringSlice("admins", []string{}, "list of admin emails")
 }

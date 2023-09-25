@@ -47,20 +47,31 @@ func (s *DomainStore) ListAllDomains(ctx context.Context, approved bool) ([]stri
 }
 
 // ListDomains returns all domains that are owned or delegated to one user
-func (s *DomainStore) ListDomains(ctx context.Context, user string, requireApproval bool) ([]*ent.Domain, error) {
+func (s *DomainStore) ListDomains(ctx context.Context, user string, requireApproval bool, admin bool) ([]*ent.Domain, error) {
 	if err := database.DB.Internal.Ping(); err != nil {
 		return nil, fmt.Errorf("pinging the database: %w", err)
 	}
 
-	predicates := domain.Or(domain.HasDelegationsWith(delegation.User(user)), domain.Owner(user))
-	if requireApproval {
-		predicates = domain.And(predicates, domain.Approved(true))
-	}
-	domains, err := s.db.Domain.Query().WithDelegations().Where(predicates).All(ctx)
-	if err != nil {
-		return nil, err
-	}
+	var (
+		domains []*ent.Domain
+		err     error
+	)
 
+	if admin {
+		domains, err = s.db.Domain.Query().WithDelegations().All(ctx)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		predicates := domain.Or(domain.HasDelegationsWith(delegation.User(user)), domain.Owner(user))
+		if requireApproval {
+			predicates = domain.And(predicates, domain.Approved(true))
+		}
+		domains, err = s.db.Domain.Query().WithDelegations().Where(predicates).All(ctx)
+		if err != nil {
+			return nil, err
+		}
+	}
 	if len(domains) != 0 {
 		fqdns := helper.Map(domains, func(d *ent.Domain) predicate.Domain {
 			if d.Approved {
