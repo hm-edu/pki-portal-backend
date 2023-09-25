@@ -103,7 +103,7 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string, logger *zap
 			item.Permissions.CanTransfer = true
 			item.Permissions.CanDelegate = true
 		} else {
-			// There is no upper domain for this user -> Prevent deletion (only permit deletion incase of)
+			// There is no upper domain for this user -> Prevent deletion (if not admin and not tld+1)
 			if item.Permissions.CanDelete && item.Approved || !admin {
 				if domain, err := publicsuffix.EffectiveTLDPlusOne(item.FQDN); err == nil && domain != item.FQDN {
 					item.Permissions.CanDelete = false
