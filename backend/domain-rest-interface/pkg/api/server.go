@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/getkin/kin-openapi/openapi3"
-	"github.com/ory/viper"
 
 	"github.com/hm-edu/domain-rest-interface/pkg/api/docs"
 	"github.com/hm-edu/domain-rest-interface/pkg/api/domains"
@@ -61,8 +60,7 @@ type Server struct {
 }
 
 // NewServer creates a new server
-func NewServer(logger *zap.Logger, config *commonApi.Config, store *store.DomainStore, pkiSerivce pb.SSLServiceClient) *Server {
-	admins := viper.GetStringSlice("admins")
+func NewServer(logger *zap.Logger, config *commonApi.Config, store *store.DomainStore, pkiSerivce pb.SSLServiceClient, admins []string) *Server {
 
 	return &Server{app: echo.New(), logger: logger, config: config, store: store, pkiSerivce: pkiSerivce, admins: admins}
 }

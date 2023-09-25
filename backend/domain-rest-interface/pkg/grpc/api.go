@@ -20,11 +20,12 @@ type domainAPIServer struct {
 	store  *store.DomainStore
 	logger *zap.Logger
 	tracer trace.Tracer
+	admins []string
 }
 
-func newDomainAPIServer(store *store.DomainStore, logger *zap.Logger) *domainAPIServer {
+func newDomainAPIServer(store *store.DomainStore, logger *zap.Logger, admins []string) *domainAPIServer {
 	tracer := otel.GetTracerProvider().Tracer("domains")
-	return &domainAPIServer{store: store, logger: logger, tracer: tracer}
+	return &domainAPIServer{store: store, logger: logger, tracer: tracer, admins: admins}
 }
 
 func (api *domainAPIServer) CheckPermission(ctx context.Context, req *pb.CheckPermissionRequest) (*pb.CheckPermissionResponse, error) {
@@ -78,7 +79,7 @@ func (api *domainAPIServer) ListDomains(ctx context.Context, req *pb.ListDomains
 	ctx, span := api.tracer.Start(ctx, "ListDomains")
 	defer span.End()
 	api.logger.Info("Listing domains", zap.String("user", req.User))
-	domains, err := api.store.ListDomains(ctx, req.User, req.Approved, false)
+	domains, err := api.store.ListDomains(ctx, req.User, req.Approved, helper.Contains(api.admins, req.User))
 	if err != nil {
 		span.RecordError(err)
 		api.logger.Error("Listing domains failed", zap.String("user", req.User), zap.Error(err))
