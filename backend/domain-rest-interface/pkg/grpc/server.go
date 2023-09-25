@@ -59,7 +59,7 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 
 	server := health.NewServer()
 	reflection.Register(srv)
-	api := newDomainAPIServer(s.store, s.logger)
+	api := newDomainAPIServer(s.store, s.logger, s.admins)
 	pb.RegisterDomainServiceServer(srv, api)
 	grpc_health_v1.RegisterHealthServer(srv, server)
 	server.SetServingStatus(s.config.ServiceName, grpc_health_v1.HealthCheckResponse_SERVING)
