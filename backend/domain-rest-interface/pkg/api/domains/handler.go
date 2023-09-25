@@ -15,10 +15,11 @@ type Handler struct {
 	pkiService  pb.SSLServiceClient
 	validator   *model.Validator
 	tracer      trace.Tracer
+	admins      []string
 }
 
 // NewHandler generates a new handler for acting on the domain storage.
-func NewHandler(ds *store.DomainStore, pkiSerivce pb.SSLServiceClient) *Handler {
+func NewHandler(ds *store.DomainStore, pkiSerivce pb.SSLServiceClient, admins []string) *Handler {
 	v := model.NewValidator()
 	tracer := otel.GetTracerProvider().Tracer("domains")
 	return &Handler{
@@ -26,5 +27,6 @@ func NewHandler(ds *store.DomainStore, pkiSerivce pb.SSLServiceClient) *Handler 
 		validator:   v,
 		tracer:      tracer,
 		pkiService:  pkiSerivce,
+		admins:      admins,
 	}
 }

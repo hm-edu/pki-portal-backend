@@ -32,7 +32,7 @@ func (api *domainAPIServer) CheckPermission(ctx context.Context, req *pb.CheckPe
 	ctx, span := api.tracer.Start(ctx, "CheckPermission")
 	defer span.End()
 	span.SetAttributes(attribute.String("user", req.User), attribute.StringSlice("domains", req.Domains))
-	domains, err := api.store.ListDomains(ctx, req.User, true)
+	domains, err := api.store.ListDomains(ctx, req.User, true, false)
 	log := otelzap.New(api.logger.With(zap.String("user", req.User), zap.Strings("domains", req.Domains)))
 	if err != nil {
 		return nil, err
@@ -78,7 +78,7 @@ func (api *domainAPIServer) ListDomains(ctx context.Context, req *pb.ListDomains
 	ctx, span := api.tracer.Start(ctx, "ListDomains")
 	defer span.End()
 	api.logger.Info("Listing domains", zap.String("user", req.User))
-	domains, err := api.store.ListDomains(ctx, req.User, req.Approved)
+	domains, err := api.store.ListDomains(ctx, req.User, req.Approved, false)
 	if err != nil {
 		span.RecordError(err)
 		api.logger.Error("Listing domains failed", zap.String("user", req.User), zap.Error(err))
