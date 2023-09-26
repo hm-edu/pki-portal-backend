@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 
 	jwt "github.com/golang-jwt/jwt/v4"
 	"github.com/hm-edu/portal-common/helper"
@@ -82,8 +81,8 @@ func HasScope(scope string) echo.MiddlewareFunc {
 
 			if token, ok := c.Get("user").(*jwt.Token); ok {
 				if user, ok := token.Claims.(jwt.MapClaims); ok {
-					if scp, ok := user["scope"].(string); ok {
-						if !helper.Contains(strings.Split(scp, " "), scope) {
+					if scopes, ok := ExtractScopes(user); ok {
+						if !helper.Contains(scopes, scope) {
 							return echo.NewHTTPError(http.StatusForbidden, fmt.Sprintf("scope %s missing", scope))
 						}
 						return next(c)
