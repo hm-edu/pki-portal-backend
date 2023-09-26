@@ -6,7 +6,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-// extractScope extracts the scope from a given claim set
+// ExtractScopes extracts the scope from a given claim set
 // and returns them in normalized form
 func ExtractScopes(claims jwt.MapClaims) ([]string, bool) {
 	claim, ok := extractClaim(claims, []string{"scope", "scopes", "scp"})
