@@ -30,6 +30,7 @@ var notifyCmd = &cobra.Command{
 			MailFrom:  viper.GetString("mail_from"),
 			MailTo:    viper.GetString("mail_to"),
 			MailToBcc: viper.GetString("mail_bcc"),
+			Force:     viper.GetBool("force"),
 		}
 
 		if err := w.Notify(logger); err != nil {
@@ -47,5 +48,5 @@ func init() {
 	notifyCmd.Flags().String("mail_from", "", "The mail from")
 	notifyCmd.Flags().String("mail_to", "", "Optional param to send notifications to a specific mail address instead of the orignal issuer.")
 	notifyCmd.Flags().String("mail_bcc", "", "Optional param to send notifications as blind copy to a specific mail address instead of the orignal issuer.")
-
+	notifyCmd.Flags().Bool("force", false, "Optional param to force sending notifications.")
 }
