@@ -21,6 +21,7 @@ type Notifier struct {
 	MailTo    string
 	MailToBcc string
 	Db        *ent.Client
+	Force     bool
 }
 
 type certificateItem struct {
@@ -48,7 +49,7 @@ func (w *Notifier) loadCertificates() (map[int]certificateItem, error) {
 		if certificate[0].NotAfter.Before(time.Now().AddDate(0, 0, 30)) && certificate[0].NotAfter.After(time.Now()) {
 
 			days := time.Until(certificate[0].NotAfter).Hours() / 24
-			if _, ok := doneCertificates[certificate[0].ID]; !ok && int(days)%7 == 0 {
+			if _, ok := doneCertificates[certificate[0].ID]; !ok && (int(days)%7 == 0 || w.Force) {
 				doneCertificates[certificate[0].ID] = certificateItem{cert: certificate[0], domain: d.Fqdn}
 			}
 		}
