@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/getkin/kin-openapi v0.120.0
 	github.com/hm-edu/portal-common v0.0.0-20230824190016-178fb44809a8
-	github.com/smallstep/certificates v0.24.2
+	github.com/smallstep/certificates v0.25.0
 	go.opentelemetry.io/otel v1.18.0
 	go.uber.org/zap v1.26.0
 	google.golang.org/grpc v1.58.2
@@ -60,7 +60,7 @@ require (
 	github.com/smallstep/nosql v0.6.0
 	github.com/spf13/cobra v1.7.0
 	github.com/swaggo/echo-swagger v1.4.1
-	github.com/uptrace/opentelemetry-go-extra/otelzap v0.2.2
+	github.com/uptrace/opentelemetry-go-extra/otelzap v0.2.3
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.44.0
 )
 
@@ -103,8 +103,8 @@ require (
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/ory/viper v1.7.5 // indirect
-	github.com/prometheus/client_golang v1.16.0 // indirect
-	github.com/prometheus/client_model v0.4.0 // indirect
+	github.com/prometheus/client_golang v1.17.0 // indirect
+	github.com/prometheus/client_model v0.4.1-0.20230718164431-9a2bf3000d16 // indirect
 	github.com/prometheus/common v0.44.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
@@ -121,7 +121,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v0.41.0 // indirect
 	go.step.sm/cli-utils v0.8.0 // indirect
 	go.step.sm/crypto v0.35.1 // indirect
-	go.step.sm/linkedca v0.20.0 // indirect
+	go.step.sm/linkedca v0.20.1 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 )
 
@@ -163,7 +163,7 @@ require (
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
-	github.com/uptrace/opentelemetry-go-extra/otelutil v0.2.2 // indirect
+	github.com/uptrace/opentelemetry-go-extra/otelutil v0.2.3 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/zclconf/go-cty v1.14.0 // indirect
