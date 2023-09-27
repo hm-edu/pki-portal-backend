@@ -29,7 +29,7 @@ func TestLoadCertificates(t *testing.T) {
 	d3 := client.Domain.Create().SetFqdn("test2.example.com").SaveX(context.Background())
 	d4 := client.Domain.Create().SetFqdn("test3.example.com").SaveX(context.Background())
 
-	client.Certificate.Create().SetCommonName("test.example.com").SetNotAfter(time.Now().Add(29*24*time.Hour)).SetStatus(certificate.StatusIssued).AddDomains(d1, d2).SaveX(context.Background())
+	client.Certificate.Create().SetCommonName("test.example.com").SetNotAfter(time.Now().Add(29*24*time.Hour)).SetStatus(certificate.StatusIssued).AddDomains(d1, d2, d4).SaveX(context.Background())
 	client.Certificate.Create().SetCommonName("test2.example.com").SetNotAfter(time.Now().Add(22*24*time.Hour)).SetStatus(certificate.StatusIssued).AddDomains(d2, d3).SaveX(context.Background())
 	client.Certificate.Create().SetCommonName("test3.example.com").SetNotAfter(time.Now().Add(31 * 24 * time.Hour)).SetStatus(certificate.StatusIssued).AddDomains(d4).SaveX(context.Background())
 
@@ -39,5 +39,8 @@ func TestLoadCertificates(t *testing.T) {
 	}
 	if len(certs) != 2 {
 		t.Errorf("Expected 2 certificates, got %d", len(certs))
+	}
+	if len(certs[1].domains) != 2 {
+		t.Errorf("Expected 2 domains, got %d", len(certs[1].domains))
 	}
 }
