@@ -23,7 +23,14 @@ var notifyCmd = &cobra.Command{
 		}
 
 		database.ConnectDb(logger, viper.GetString("db"))
-		w := worker.Notifier{Db: database.DB.Db, MailHost: viper.GetString("mail_host"), MailPort: viper.GetInt("mail_port"), MailFrom: viper.GetString("mail_from")}
+		w := worker.Notifier{
+			Db:        database.DB.Db,
+			MailHost:  viper.GetString("mail_host"),
+			MailPort:  viper.GetInt("mail_port"),
+			MailFrom:  viper.GetString("mail_from"),
+			MailTo:    viper.GetString("mail_to"),
+			MailToBcc: viper.GetString("mail_bcc")
+		}
 
 		if err := w.Notify(logger); err != nil {
 			logger.Error("Error while sending notifications", zap.Error(err))
@@ -38,4 +45,7 @@ func init() {
 	notifyCmd.Flags().String("mail_host", "", "The mail host")
 	notifyCmd.Flags().Int("mail_port", 25, "The mail port")
 	notifyCmd.Flags().String("mail_from", "", "The mail from")
+	notifyCmd.Flags().String("mail_to", "", "Optional param to send notifications to a specific mail address instead of the orignal issuer.")
+	notifyCmd.Flags().String("mail_bcc", "", "Optional param to send notifications as blind copy to a specific mail address instead of the orignal issuer.")
+
 }
