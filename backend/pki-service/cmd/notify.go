@@ -25,7 +25,10 @@ var notifyCmd = &cobra.Command{
 		database.ConnectDb(logger, viper.GetString("db"))
 		w := worker.Notifier{Db: database.DB.Db, MailHost: viper.GetString("mail_host"), MailPort: viper.GetInt("mail_port"), MailFrom: viper.GetString("mail_from")}
 
-		w.Notify(logger)
+		if err := w.Notify(logger); err != nil {
+			logger.Error("Error while sending notifications", zap.Error(err))
+		}
+
 	},
 }
 
