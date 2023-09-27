@@ -30,6 +30,7 @@ func (w *Notifier) Notify(logger *zap.Logger) error {
 	if err != nil {
 		return err
 	}
+	doneCertificates := make(map[int]struct{})
 	for _, d := range domains {
 		certificate, err := w.Db.Certificate.Query().WithDomains().Where(certificate.HasDomainsWith(domain.FqdnEQ(d.Fqdn)),
 			certificate.StatusNEQ(certificate.StatusRevoked),
@@ -42,7 +43,7 @@ func (w *Notifier) Notify(logger *zap.Logger) error {
 		}
 		if certificate[0].NotAfter.Before(time.Now().AddDate(0, 0, 30)) && certificate[0].NotAfter.After(time.Now()) {
 			days := time.Until(certificate[0].NotAfter).Hours() / 24
-			if int(days)%7 == 0 {
+			if _, ok := doneCertificates[certificate[0].ID]; !ok && int(days)%7 == 0 {
 				// TODO: send notification
 				logger.Info(fmt.Sprintf("Certificate for %s expires in %d days, sending notification.", d.Fqdn, int(days)))
 				certDomains := certificate[0].Edges.Domains[0].Fqdn
@@ -59,7 +60,7 @@ func (w *Notifier) Notify(logger *zap.Logger) error {
 				err = smtp.SendMail(fmt.Sprintf("%s:%d", w.MailHost, w.MailPort), nil, w.MailFrom, to, []byte(fmt.Sprintf(`
 				From: PKI <%s>
 				To: %s
-				Subject: Zertifikatsablauf %s
+				Subject: Infomationen zu Zertifikatsablauf %s
 
 				Sehr geehrte(r) Nutzer(in) des PKI-Portals,
 
@@ -77,6 +78,7 @@ func (w *Notifier) Notify(logger *zap.Logger) error {
 				if err != nil {
 					logger.Error("Error sending mail", zap.Error(err))
 				}
+				doneCertificates[certificate[0].ID] = struct{}{}
 			}
 		}
 	}
