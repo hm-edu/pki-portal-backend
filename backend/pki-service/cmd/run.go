@@ -48,24 +48,28 @@ var runCmd = &cobra.Command{
 		sectigoCfg.CheckSectigoConfiguration()
 
 		database.ConnectDb(logger, viper.GetString("db"))
-		w := worker.Notifier{Db: database.DB.Db,
-			MailHost:  viper.GetString("mail_host"),
-			MailPort:  viper.GetInt("mail_port"),
-			MailFrom:  viper.GetString("mail_from"),
-			MailTo:    viper.GetString("mail_to"),
-			MailToBcc: viper.GetString("mail_bcc"),
-		}
 
-		s := gocron.NewScheduler(time.UTC)
-		_, err := s.Every(1).Day().At("09:00").Do(func() {
-			if err := w.Notify(logger); err != nil {
-				logger.Error("Error while sending notifications", zap.Error(err))
+		if viper.GetBool("enable_notifications") {
+
+			w := worker.Notifier{Db: database.DB.Db,
+				MailHost:  viper.GetString("mail_host"),
+				MailPort:  viper.GetInt("mail_port"),
+				MailFrom:  viper.GetString("mail_from"),
+				MailTo:    viper.GetString("mail_to"),
+				MailToBcc: viper.GetString("mail_bcc"),
 			}
-		})
-		if err != nil {
-			logger.Error("Error while scheduling notifications", zap.Error(err))
+
+			s := gocron.NewScheduler(time.UTC)
+			_, err := s.Every(1).Day().At("09:00").Do(func() {
+				if err := w.Notify(logger); err != nil {
+					logger.Error("Error while sending notifications", zap.Error(err))
+				}
+			})
+			if err != nil {
+				logger.Error("Error while scheduling notifications", zap.Error(err))
+			}
+			s.StartAsync()
 		}
-		s.StartAsync()
 
 		// start gRPC server
 		if grpcCfg.Port > 0 {

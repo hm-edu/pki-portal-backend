@@ -54,7 +54,7 @@ func (w *Notifier) Notify(logger *zap.Logger) error {
 				if w.MailTo != "" {
 					to = []string{w.MailTo}
 				}
-				if w.MailToBcc != "" {
+				if w.MailToBcc != "" && w.MailToBcc != to[0] {
 					to = append(to, w.MailToBcc)
 				}
 				err = smtp.SendMail(fmt.Sprintf("%s:%d", w.MailHost, w.MailPort), nil, w.MailFrom, to, []byte(fmt.Sprintf(`
