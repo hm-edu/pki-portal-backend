@@ -77,23 +77,22 @@ func (w *Notifier) Notify(logger *zap.Logger) error {
 		if w.MailToBcc != "" && w.MailToBcc != to[0] {
 			to = append(to, w.MailToBcc)
 		}
-		err = smtp.SendMail(fmt.Sprintf("%s:%d", w.MailHost, w.MailPort), nil, w.MailFrom, to, []byte(fmt.Sprintf(`
-				From: PKI <%s>
-				To: %s
-				Subject: Infomationen zu Zertifikatsablauf %s
+		err = smtp.SendMail(fmt.Sprintf("%s:%d", w.MailHost, w.MailPort), nil, w.MailFrom, to, []byte(fmt.Sprintf(`From: PKI <%s>
+To: %s
+Subject: Infomationen zu Zertifikatsablauf %s
 
-				Sehr geehrte(r) Nutzer(in) des PKI-Portals,
+Sehr geehrte(r) Nutzer(in) des PKI-Portals,
 
-				Das letzte Zertifikat für die Domain %s wird am %s ablaufen.
-				Bitte erneuern Sie dieses Zertifikat zeitnah.
-				Das betreffende Zertifikat ist für folgende (weitere) Domains ausgestellt:
+Das letzte Zertifikat für die Domain %s wird am %s ablaufen.
+Bitte erneuern Sie dieses Zertifikat zeitnah.
+Das betreffende Zertifikat ist für folgende (weitere) Domains ausgestellt:
 
-				%s.
+%s.
 
-				Sollten Sie Fragen haben, wenden Sie sich bitte an den Support.
+Sollten Sie Fragen haben, wenden Sie sich bitte an den Support.
 
-				Mit freundlichen Grüßen,
-				Ihre Zentrale IT
+Mit freundlichen Grüßen,
+Ihre Zentrale IT
 				`, w.MailFrom, strings.Split(*certificate.cert.IssuedBy, " ")[0], certificate.domain, certificate.domain, certificate.cert.NotAfter.Format("02.01.2006"), certDomains)))
 		if err != nil {
 			logger.Error("Error sending mail", zap.Error(err))
