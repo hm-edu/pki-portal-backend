@@ -57,9 +57,14 @@ var runCmd = &cobra.Command{
 		}
 
 		s := gocron.NewScheduler(time.UTC)
-		s.Every(1).Day().At("09:00").Do(func() {
-			w.Notify(logger)
+		_, err := s.Every(1).Day().At("09:00").Do(func() {
+			if err := w.Notify(logger); err != nil {
+				logger.Error("Error while sending notifications", zap.Error(err))
+			}
 		})
+		if err != nil {
+			logger.Error("Error while scheduling notifications", zap.Error(err))
+		}
 		s.StartAsync()
 
 		// start gRPC server
