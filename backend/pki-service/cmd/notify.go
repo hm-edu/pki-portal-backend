@@ -29,7 +29,7 @@ var notifyCmd = &cobra.Command{
 			MailPort:  viper.GetInt("mail_port"),
 			MailFrom:  viper.GetString("mail_from"),
 			MailTo:    viper.GetString("mail_to"),
-			MailToBcc: viper.GetString("mail_bcc")
+			MailToBcc: viper.GetString("mail_bcc"),
 		}
 
 		if err := w.Notify(logger); err != nil {
