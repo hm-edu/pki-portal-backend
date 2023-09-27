@@ -87,7 +87,7 @@ Subject: Infomationen zu Zertifikatsablauf %s
 
 Sehr geehrte(r) Nutzer(in) des PKI-Portals,
 
-Das letzte Zertifikat für die Domain(s) %s wird am %s ablaufen.
+Das letzte ausgetellte Zertifikat für die Domain(s) %s wird am %s ablaufen.
 Bitte erneuern Sie dieses Zertifikat zeitnah.
 Das betreffende Zertifikat ist für folgende (weitere) Domains ausgestellt:
 
