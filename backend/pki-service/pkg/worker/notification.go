@@ -25,8 +25,8 @@ type Notifier struct {
 }
 
 type certificateItem struct {
-	cert   *ent.Certificate
-	domain string
+	cert    *ent.Certificate
+	domains []string
 }
 
 func (w *Notifier) loadCertificates() (map[int]certificateItem, error) {
@@ -49,8 +49,12 @@ func (w *Notifier) loadCertificates() (map[int]certificateItem, error) {
 		if certificate[0].NotAfter.Before(time.Now().AddDate(0, 0, 30)) && certificate[0].NotAfter.After(time.Now()) {
 
 			days := time.Until(certificate[0].NotAfter).Hours() / 24
-			if _, ok := doneCertificates[certificate[0].ID]; !ok && (int(days)%7 == 0 || w.Force) {
-				doneCertificates[certificate[0].ID] = certificateItem{cert: certificate[0], domain: d.Fqdn}
+			if int(days)%7 == 0 || w.Force {
+				if _, ok := doneCertificates[certificate[0].ID]; !ok {
+					doneCertificates[certificate[0].ID] = certificateItem{cert: certificate[0], domains: []string{d.Fqdn}}
+				} else {
+					doneCertificates[certificate[0].ID] = certificateItem{cert: certificate[0], domains: append(doneCertificates[certificate[0].ID].domains, d.Fqdn)}
+				}
 			}
 		}
 	}
@@ -65,7 +69,7 @@ func (w *Notifier) Notify(logger *zap.Logger) error {
 	}
 	for _, certificate := range doneCertificates {
 		days := time.Until(certificate.cert.NotAfter).Hours() / 24
-		logger.Info(fmt.Sprintf("Certificate for %s expires in %d days, sending notification.", certificate.domain, int(days)))
+		logger.Info(fmt.Sprintf("Certificate for %v expires in %d days, sending notification.", certificate.domains, int(days)))
 		certDomains := certificate.cert.Edges.Domains[0].Fqdn
 		for _, x := range certificate.cert.Edges.Domains[1:] {
 			certDomains = fmt.Sprintf("%s, %s", certDomains, x.Fqdn)
@@ -83,7 +87,7 @@ Subject: Infomationen zu Zertifikatsablauf %s
 
 Sehr geehrte(r) Nutzer(in) des PKI-Portals,
 
-Das letzte Zertifikat für die Domain %s wird am %s ablaufen.
+Das letzte Zertifikat für die Domain(s) %s wird am %s ablaufen.
 Bitte erneuern Sie dieses Zertifikat zeitnah.
 Das betreffende Zertifikat ist für folgende (weitere) Domains ausgestellt:
 
@@ -93,7 +97,7 @@ Sollten Sie Fragen haben, wenden Sie sich bitte an den Support.
 
 Mit freundlichen Grüßen,
 Ihre Zentrale IT
-				`, w.MailFrom, strings.Split(*certificate.cert.IssuedBy, " ")[0], certificate.domain, certificate.domain, certificate.cert.NotAfter.Format("02.01.2006"), certDomains)))
+				`, w.MailFrom, strings.Split(*certificate.cert.IssuedBy, " ")[0], strings.Join(certificate.domains, ", "), strings.Join(certificate.domains, ", "), certificate.cert.NotAfter.Format("02.01.2006"), certDomains)))
 		if err != nil {
 			logger.Error("Error sending mail", zap.Error(err))
 		}
