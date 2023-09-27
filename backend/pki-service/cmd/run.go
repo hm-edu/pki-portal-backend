@@ -2,10 +2,13 @@ package cmd
 
 import (
 	"context"
+	"time"
 
+	"github.com/go-co-op/gocron"
 	"github.com/hm-edu/pki-service/pkg/cfg"
 	"github.com/hm-edu/pki-service/pkg/database"
 	"github.com/hm-edu/pki-service/pkg/grpc"
+	"github.com/hm-edu/pki-service/pkg/worker"
 	"github.com/hm-edu/portal-common/api"
 	"github.com/hm-edu/portal-common/signals"
 	"github.com/hm-edu/portal-common/tracing"
@@ -45,6 +48,20 @@ var runCmd = &cobra.Command{
 		sectigoCfg.CheckSectigoConfiguration()
 
 		database.ConnectDb(logger, viper.GetString("db"))
+		w := worker.Notifier{Db: database.DB.Db,
+			MailHost:  viper.GetString("mail_host"),
+			MailPort:  viper.GetInt("mail_port"),
+			MailFrom:  viper.GetString("mail_from"),
+			MailTo:    viper.GetString("mail_to"),
+			MailToBcc: viper.GetString("mail_bcc"),
+		}
+
+		s := gocron.NewScheduler(time.UTC)
+		s.Every(1).Day().At("09:00").Do(func() {
+			w.Notify(logger)
+		})
+		s.StartAsync()
+
 		// start gRPC server
 		if grpcCfg.Port > 0 {
 			grpcSrv, _ := grpc.NewServer(&grpcCfg, logger, &sectigoCfg, database.DB.Db)
@@ -72,4 +89,10 @@ func init() {
 	runCmd.Flags().Int("ssl_org_id", 0, "The (default) ssl org id")
 	runCmd.Flags().Int("ssl_term", 0, "The (default) ssl lifetime")
 	runCmd.Flags().String("level", "info", "log level debug, info, warn, error, flat or panic")
+	runCmd.Flags().Bool("enable_notifications", false, "Enable notifications")
+	runCmd.Flags().String("mail_host", "", "The mail host")
+	runCmd.Flags().Int("mail_port", 25, "The mail port")
+	runCmd.Flags().String("mail_to", "", "Optional param to send notifications to a specific mail address instead of the orignal issuer.")
+	runCmd.Flags().String("mail_bcc", "", "Optional param to send notifications as blind copy to a specific mail address instead of the orignal issuer.")
+	runCmd.Flags().String("mail_from", "", "The mail from")
 }
