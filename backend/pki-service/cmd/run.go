@@ -49,6 +49,7 @@ var runCmd = &cobra.Command{
 
 		database.ConnectDb(logger, viper.GetString("db"))
 
+		s := gocron.NewScheduler(time.UTC)
 		if viper.GetBool("enable_notifications") {
 
 			w := worker.Notifier{Db: database.DB.Db,
@@ -59,7 +60,6 @@ var runCmd = &cobra.Command{
 				MailToBcc: viper.GetString("mail_bcc"),
 			}
 
-			s := gocron.NewScheduler(time.UTC)
 			_, err := s.Every(1).Day().At("09:00").Do(func() {
 				if err := w.Notify(logger); err != nil {
 					logger.Error("Error while sending notifications", zap.Error(err))
@@ -68,9 +68,16 @@ var runCmd = &cobra.Command{
 			if err != nil {
 				logger.Error("Error while scheduling notifications", zap.Error(err))
 			}
-			s.StartAsync()
 		}
-
+		_, err := s.Every(1).Day().At("01:00").Do(func() {
+			if err := worker.Cleanup(logger, database.DB.Db); err != nil {
+				logger.Error("Error while cleaning up", zap.Error(err))
+			}
+		})
+		if err != nil {
+			logger.Error("Error while scheduling cleanup", zap.Error(err))
+		}
+		s.StartAsync()
 		// start gRPC server
 		if grpcCfg.Port > 0 {
 			grpcSrv, _ := grpc.NewServer(&grpcCfg, logger, &sectigoCfg, database.DB.Db)
