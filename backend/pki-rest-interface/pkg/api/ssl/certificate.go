@@ -20,6 +20,65 @@ import (
 	"go.uber.org/zap"
 )
 
+// Active godoc
+// @Summary SSL List active certificates Endpoint
+// @Tags SSL
+// @Accept json
+// @Produce json
+// @Router /ssl/active [get]
+// @Param        domain    query     string  true  "domain search by domain"
+// @Security API
+// @Success 200 {object} []pb.SslCertificateDetails "Certificates"
+// @Response default {object} echo.HTTPError "Error processing the request"
+func (h *Handler) Active(c echo.Context) error {
+
+	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
+	ctx, span := h.tracer.Start(c.Request().Context(), "list active ssl certificates for given domain")
+	defer span.End()
+
+	user, err := auth.UserFromRequest(c)
+	if err != nil {
+		logger.Error("error getting user from request", zap.Error(err))
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
+	}
+	span.SetAttributes(attribute.String("user", user))
+
+	domain := c.QueryParam("domain")
+
+	if domain == "" {
+		logger.Warn("no domain provided")
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "No domain provided"}
+	}
+
+	span.AddEvent("fetching domains")
+	domains, err := h.domain.ListDomains(ctx, &pb.ListDomainsRequest{User: user, Approved: true})
+	if err != nil {
+		logger.Error("error getting domains", zap.Error(err))
+		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while listing certificates"}
+	}
+
+	if !helper.Contains(domains.Domains, domain) {
+		logger.Warn("domain not found. Usage not allowed.", zap.String("domain", domain))
+		return &echo.HTTPError{Code: http.StatusForbidden, Message: "You are not authorized to use this domain"}
+	}
+
+	span.AddEvent("fetching certificates")
+	logger.Info("fetching certificates", zap.Strings("domains", domains.Domains))
+	certs, err := h.ssl.ListCertificates(ctx, &pb.ListSslRequest{IncludePartial: false, Domains: []string{domain}})
+	if err != nil {
+		logger.Error("error while listing certificates", zap.Error(err))
+		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while listing certificates"}
+	}
+
+	active := make([]*pb.SslCertificateDetails, 0)
+	for _, cert := range certs.Items {
+		if cert.Status == "Issued" {
+			active = append(active, cert)
+		}
+	}
+	return c.JSON(http.StatusOK, active)
+}
+
 // List godoc
 // @Summary SSL List Endpoint
 // @Tags SSL
