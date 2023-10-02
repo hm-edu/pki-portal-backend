@@ -134,6 +134,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 		group.Use(jwtMiddleware)
 		group.Use(auth.HasScope("Certificates"))
 		group.GET("/", ssl.List)
+		group.GET("/active", ssl.Active)
 		group.POST("/revoke", ssl.Revoke)
 		group.POST("/csr", ssl.HandleCsr)
 	}
