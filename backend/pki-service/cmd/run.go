@@ -102,6 +102,7 @@ func init() {
 	runCmd.Flags().String("smime_key_type", "", "The (expected) key type")
 	runCmd.Flags().String("db", "", "connection string for the database")
 	runCmd.Flags().Int("ssl_profile", 0, "The (default) ssl profile id")
+	runCmd.Flags().Int("ssl_profile_standard", 0, "The (default) ssl profile id for validation level standard")
 	runCmd.Flags().Int("ssl_org_id", 0, "The (default) ssl org id")
 	runCmd.Flags().Int("ssl_term", 0, "The (default) ssl lifetime")
 	runCmd.Flags().String("level", "info", "log level debug, info, warn, error, flat or panic")

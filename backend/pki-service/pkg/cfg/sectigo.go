@@ -11,18 +11,19 @@ import (
 
 // SectigoConfiguration handles different configuration properties for the sectigo client
 type SectigoConfiguration struct {
-	User             string `mapstructure:"sectigo_user"`
-	Password         string `mapstructure:"sectigo_password"`
-	CustomerURI      string `mapstructure:"sectigo_customeruri"`
-	SmimeProfile     int    `mapstructure:"smime_profile"`
-	SmimeOrgID       int    `mapstructure:"smime_org_id"`
-	SmimeTerm        int    `mapstructure:"smime_term"`
-	SmimeStudentTerm int    `mapstructure:"smime_student_term"`
-	SslProfile       int    `mapstructure:"ssl_profile"`
-	SslOrgID         int    `mapstructure:"ssl_org_id"`
-	SslTerm          int    `mapstructure:"ssl_term"`
-	SmimeKeyLength   string `mapstructure:"smime_key_length"`
-	SmimeKeyType     string `mapstructure:"smime_key_type"`
+	User                 string `mapstructure:"sectigo_user"`
+	Password             string `mapstructure:"sectigo_password"`
+	CustomerURI          string `mapstructure:"sectigo_customeruri"`
+	SmimeProfile         int    `mapstructure:"smime_profile"`
+	SmimeProfileStandard int    `mapstructure:"smime_profile_standard"`
+	SmimeOrgID           int    `mapstructure:"smime_org_id"`
+	SmimeTerm            int    `mapstructure:"smime_term"`
+	SmimeStudentTerm     int    `mapstructure:"smime_student_term"`
+	SslProfile           int    `mapstructure:"ssl_profile"`
+	SslOrgID             int    `mapstructure:"ssl_org_id"`
+	SslTerm              int    `mapstructure:"ssl_term"`
+	SmimeKeyLength       string `mapstructure:"smime_key_length"`
+	SmimeKeyType         string `mapstructure:"smime_key_type"`
 }
 
 // CheckSectigoConfiguration checks the sectigo configuration for the syntactical correctness.
@@ -40,7 +41,7 @@ func (cfg *SectigoConfiguration) CheckSectigoConfiguration() {
 		return
 	}
 	found := helper.Any(*profiles, func(t client.ListProfileItem) bool {
-		if t.ID == cfg.SmimeProfile {
+		if t.ID == cfg.SmimeProfile || (t.ID == cfg.SmimeProfileStandard && cfg.SmimeProfileStandard > 0) {
 			if helper.Any(t.Terms, func(i int) bool { return i == cfg.SmimeTerm }) &&
 				helper.Any(t.KeyTypes[cfg.SmimeKeyType], func(i string) bool {
 					return i == cfg.SmimeKeyLength

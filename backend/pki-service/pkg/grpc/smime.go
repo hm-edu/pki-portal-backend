@@ -115,6 +115,19 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 		logger.Error("Error while requesting person", zap.Error(err))
 		return nil, status.Error(codes.Internal, "Error requesting person")
 	}
+
+	validationLevel := "HIGH"
+	profile := s.cfg.SmimeProfile
+
+	if req.ValidationStandard {
+		validationLevel = "STANDARD"
+		profile = s.cfg.SmimeProfileStandard
+		if profile == 0 {
+			logger.Warn("No profile for validation level standard configured")
+			return nil, status.Error(codes.InvalidArgument, "Validation level standard not supported")
+		}
+	}
+
 	if len(*persons) == 0 {
 		logger.Info("No person found. Creating new")
 		span.AddEvent("Creating new person")
@@ -123,7 +136,7 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 			LastName:       req.LastName,
 			Email:          req.Email,
 			OrganizationID: s.cfg.SmimeOrgID,
-			ValidationType: "HIGH",
+			ValidationType: validationLevel,
 			CommonName:     req.CommonName,
 			Phone:          "",
 		})
@@ -134,12 +147,12 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 		}
 	} else {
 		personItem := (*persons)[0]
-		if personItem.ValidationType != "HIGH" {
+		if personItem.ValidationType != "HIGH" && !req.ValidationStandard {
 			err := s.client.PersonService.UpdatePerson(personItem.ID, person.UpdateRequest{
 				FirstName:      req.FirstName,
 				LastName:       req.LastName,
 				OrganizationID: s.cfg.SmimeOrgID,
-				ValidationType: "HIGH",
+				ValidationType: validationLevel,
 				CommonName:     req.CommonName,
 			})
 			if err != nil {
@@ -161,7 +174,7 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 		Phone:           "",
 		SecondaryEmails: []string{},
 		CSR:             req.Csr,
-		CertType:        s.cfg.SmimeProfile,
+		CertType:        profile,
 		Term:            term,
 		Eppn:            "",
 	})
