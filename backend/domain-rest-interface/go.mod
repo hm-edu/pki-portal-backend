@@ -7,7 +7,7 @@ require (
 	github.com/hm-edu/portal-common v0.0.0-20230824190016-178fb44809a8
 	go.opentelemetry.io/otel v1.19.0
 	go.uber.org/zap v1.26.0
-	google.golang.org/grpc v1.58.3
+	google.golang.org/grpc v1.59.0
 )
 
 require (
@@ -88,13 +88,13 @@ require (
 	github.com/jackc/pgproto3/v2 v2.3.2 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgtype v1.14.0 // indirect
-	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
+	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.17.0 // indirect
 	github.com/prometheus/client_model v0.5.0 // indirect
-	github.com/prometheus/common v0.44.0 // indirect
+	github.com/prometheus/common v0.45.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
 	github.com/uptrace/opentelemetry-go-extra/otelutil v0.2.3 // indirect
@@ -123,7 +123,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/uuid v1.3.1 // indirect
-	github.com/hashicorp/hcl/v2 v2.19.0 // indirect
+	github.com/hashicorp/hcl/v2 v2.19.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
