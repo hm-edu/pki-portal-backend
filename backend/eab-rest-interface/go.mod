@@ -8,7 +8,7 @@ require (
 	github.com/smallstep/certificates v0.25.0
 	go.opentelemetry.io/otel v1.19.0
 	go.uber.org/zap v1.26.0
-	google.golang.org/grpc v1.58.3
+	google.golang.org/grpc v1.59.0
 )
 
 require (
@@ -97,7 +97,6 @@ require (
 	github.com/jackc/pgx/v4 v4.18.1
 	github.com/klauspost/compress v1.17.1 // indirect
 	github.com/manifoldco/promptui v0.9.0 // indirect
-	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
 	github.com/micromdm/scep/v2 v2.1.0 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
@@ -105,7 +104,7 @@ require (
 	github.com/ory/viper v1.7.5 // indirect
 	github.com/prometheus/client_golang v1.17.0 // indirect
 	github.com/prometheus/client_model v0.5.0 // indirect
-	github.com/prometheus/common v0.44.0 // indirect
+	github.com/prometheus/common v0.45.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
@@ -120,7 +119,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.19.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.19.0 // indirect
 	go.step.sm/cli-utils v0.8.0 // indirect
-	go.step.sm/crypto v0.36.0 // indirect
+	go.step.sm/crypto v0.36.1 // indirect
 	go.step.sm/linkedca v0.20.1 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 )
@@ -146,7 +145,7 @@ require (
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/uuid v1.3.1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.0 // indirect
-	github.com/hashicorp/hcl/v2 v2.19.0 // indirect
+	github.com/hashicorp/hcl/v2 v2.19.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/invopop/yaml v0.2.0 // indirect
 	github.com/labstack/gommon v0.4.0 // indirect
@@ -158,6 +157,7 @@ require (
 	github.com/lestrrat-go/option v1.0.1 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
