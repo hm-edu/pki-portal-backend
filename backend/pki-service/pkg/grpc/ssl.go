@@ -138,7 +138,7 @@ func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequ
 	_, span := otel.GetTracerProvider().Tracer("ssl").Start(ctx, "listing ssl certificates")
 	defer span.End()
 	logger := s.logger.With(zap.Strings("domains", req.Domains), zap.Bool("partial", req.IncludePartial))
-	logger.Info("listing certificates for domains")
+	logger.Debug("listing certificates for domains")
 
 	var cond predicate.Certificate
 	if req.IncludePartial {
