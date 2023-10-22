@@ -26,3 +26,20 @@ docker-compose up -d
 ```
 
 For a more sophisticated setup you can of cource configure the docker-compose file to your needs and define other values and parameters.
+
+
+## Manual Actions
+
+The most use cases can be fulfilled be the webfrontend, but there are some edge-cases that require manual interaction with the Database it self.
+
+### Permitting wildcard certificates or IPv4 addresses
+
+By default users are not allowed to create wildcard hosts or IPv4 entries. Some rare applications like the ezProxy or k8s require the creation of wildcard certificates. Also, implementing DoT, DoH and ADD-DDR requires certificates containing a IPv4 address. At the time of writing this can be realized by adding the according records directly to the database.
+
+Therefor, you must have a psql shell for the database `domain` and must execute the following statement. Please replace the fqdn and the owner accordingly to your setup.
+
+```
+domain=# insert into domains(create_time, update_time, fqdn, owner, approved) values (now(),now(), '*.kube.cs.hm.edu', 'florian.ritterhoff@hm.edu', True);
+```
+
+Please keep in mind, that creating wildcard certificates using ACME requires solving DNS challenges!
