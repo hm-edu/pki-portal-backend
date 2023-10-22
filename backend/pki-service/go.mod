@@ -95,7 +95,7 @@ require (
 )
 
 require (
-	github.com/fsnotify/fsnotify v1.6.0 // indirect
+	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hm-edu/portal-common v0.0.0-20230929044603-90d2d27b17f1
