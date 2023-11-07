@@ -6,7 +6,7 @@ require (
 	github.com/getkin/kin-openapi v0.120.0
 	github.com/hm-edu/portal-apis v0.0.0-20230929065638-ad1f7e7c7ab3
 	github.com/hm-edu/portal-common v0.0.0-20230929044603-90d2d27b17f1
-	github.com/labstack/echo/v4 v4.11.2
+	github.com/labstack/echo/v4 v4.11.3
 	github.com/lestrrat-go/jwx v1.2.26
 	github.com/spf13/cobra v1.8.0
 	github.com/swaggo/echo-swagger v1.4.1
