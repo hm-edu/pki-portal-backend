@@ -1,7 +1,7 @@
 FROM golang:1.12.4-alpine as builder
 
 ARG SERVICE
-RUN apk --no-cache add ca-certificates gcc musl-dev
+RUN apk --no-cache add ca-certificates gcc musl-dev git
 COPY backend/common /app/backend/common
 COPY /backend/${SERVICE} /app/backend/${SERVICE}
 WORKDIR /app/backend/${SERVICE}
