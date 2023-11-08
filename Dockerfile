@@ -1,4 +1,4 @@
-FROM golang:1.12.4 as builder
+FROM golang:1.12.4-alpine as builder
 
 ARG SERVICE
 RUN apk --no-cache add ca-certificates gcc musl-dev
