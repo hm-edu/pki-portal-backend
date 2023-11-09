@@ -1,9 +1,9 @@
-FROM golang:1.12.4-alpine as builder
+FROM golang:1.21.4-bookworm as builder
 
 ARG SERVICE
-RUN apk --no-cache add ca-certificates gcc musl-dev git
+RUN apt update && apt install -y ca-certificates wget git && update-ca-certificates
 COPY backend/common /app/backend/common
-COPY /backend/${SERVICE} /app/backend/${SERVICE}
+COPY backend/${SERVICE} /app/backend/${SERVICE}
 WORKDIR /app/backend/${SERVICE}
 RUN CGO_ENABLED=1 GOOS=linux go build -a -ldflags '-linkmode external -extldflags "-static"' -tags sqlite_omit_load_extension -o /app/service .
 # Adding the grpc_health_probe
