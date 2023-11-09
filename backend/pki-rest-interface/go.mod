@@ -1,6 +1,6 @@
 module github.com/hm-edu/pki-rest-interface
 
-go 1.20
+go 1.21
 
 require (
 	github.com/getkin/kin-openapi v0.120.0
