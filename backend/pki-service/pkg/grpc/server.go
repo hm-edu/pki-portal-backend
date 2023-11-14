@@ -58,10 +58,10 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	}
 
 	srv := grpc.NewServer(
+	srv := grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()),
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
 				grpc_recovery.UnaryServerInterceptor(),
-				tracing.NewGRPUnaryServerInterceptor(),
 				grpc_zap.UnaryServerInterceptor(s.logger,
 					grpc_zap.WithDecider(func(fullMethodName string, err error) bool {
 						if fullMethodName == "/grpc.health.v1.Health/Check" && err == nil {
@@ -72,7 +72,6 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 		grpc.StreamInterceptor(
 			grpc_middleware.ChainStreamServer(
 				grpc_recovery.StreamServerInterceptor(),
-				tracing.NewGRPCStreamServerInterceptor(),
 				grpc_zap.StreamServerInterceptor(s.logger))))
 
 	server := NewHealthChecker()
