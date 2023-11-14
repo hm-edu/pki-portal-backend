@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/contrib/propagators/b3"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
@@ -19,28 +18,7 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	"go.uber.org/zap"
-	"google.golang.org/grpc"
 )
-
-// NewGRPUnaryClientInterceptor returns unary client interceptor. It is used with `grpc.WithUnaryInterceptor` method.
-func NewGRPUnaryClientInterceptor() grpc.UnaryClientInterceptor {
-	return otelgrpc.UnaryClientInterceptor()
-}
-
-// NewGRPUnaryServerInterceptor returns unary server interceptor. It is used with `grpc.UnaryInterceptor` method.
-func NewGRPUnaryServerInterceptor() grpc.UnaryServerInterceptor {
-	return otelgrpc.UnaryServerInterceptor()
-}
-
-// NewGRPCStreamClientInterceptor returns stream client interceptor. It is used with `grpc.WithStreamInterceptor` method.
-func NewGRPCStreamClientInterceptor() grpc.StreamClientInterceptor {
-	return otelgrpc.StreamClientInterceptor()
-}
-
-// NewGRPCStreamServerInterceptor returns stream server interceptor. It is used with `grpc.StreamInterceptor` method.
-func NewGRPCStreamServerInterceptor() grpc.StreamServerInterceptor {
-	return otelgrpc.StreamServerInterceptor()
-}
 
 // LoggingHandler is a simple error handler that logs the error.
 type LoggingHandler struct {
