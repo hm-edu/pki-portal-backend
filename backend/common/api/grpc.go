@@ -45,7 +45,7 @@ func ConnectGRPC(host string) (*grpc.ClientConn, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*3)
 	defer cancel()
 	conn, err := grpc.DialContext(ctx, host, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock(),
-		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()))
+		grpc.WithStatsHandler(otelgrpc.NewClientHandler()))
 	if err != nil {
 		return nil, err
 	}
