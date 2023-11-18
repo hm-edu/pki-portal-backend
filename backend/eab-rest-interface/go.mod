@@ -119,7 +119,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.21.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.21.0 // indirect
 	go.step.sm/cli-utils v0.8.0 // indirect
-	go.step.sm/crypto v0.36.1 // indirect
+	go.step.sm/crypto v0.37.0 // indirect
 	go.step.sm/linkedca v0.20.1 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 )
