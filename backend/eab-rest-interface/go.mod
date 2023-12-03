@@ -33,7 +33,7 @@ require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/go-openapi/jsonpointer v0.20.0 // indirect
 	github.com/go-openapi/jsonreference v0.20.2 // indirect
-	github.com/go-openapi/spec v0.20.9 // indirect
+	github.com/go-openapi/spec v0.20.11 // indirect
 	github.com/go-openapi/swag v0.22.4 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
@@ -56,7 +56,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/hm-edu/portal-apis v0.0.0-20230929065638-ad1f7e7c7ab3
 	github.com/labstack/echo/v4 v4.11.3
-	github.com/lestrrat-go/jwx v1.2.26
+	github.com/lestrrat-go/jwx v1.2.27
 	github.com/smallstep/nosql v0.6.0
 	github.com/spf13/cobra v1.8.0
 	github.com/swaggo/echo-swagger v1.4.1
@@ -92,13 +92,13 @@ require (
 	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgproto3/v2 v2.3.2 // indirect
-	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
+	github.com/jackc/pgservicefile v0.0.0-20231201235250-de7065d80cb9 // indirect
 	github.com/jackc/pgtype v1.14.0 // indirect
 	github.com/jackc/pgx/v4 v4.18.1
-	github.com/klauspost/compress v1.17.3 // indirect
+	github.com/klauspost/compress v1.17.4 // indirect
 	github.com/manifoldco/promptui v0.9.0 // indirect
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
-	github.com/micromdm/scep/v2 v2.1.0 // indirect
+	github.com/micromdm/scep/v2 v2.2.0 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/ory/viper v1.7.5 // indirect
@@ -162,6 +162,7 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/smallstep/pkcs7 v0.0.0-20231107075624-be1870d87d13 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
 	github.com/uptrace/opentelemetry-go-extra/otelutil v0.2.3 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
