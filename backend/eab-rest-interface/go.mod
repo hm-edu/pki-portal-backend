@@ -110,7 +110,7 @@ require (
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
-	github.com/slackhq/nebula v1.7.2 // indirect
+	github.com/slackhq/nebula v1.8.0 // indirect
 	github.com/urfave/cli v1.22.14 // indirect
 	go.etcd.io/bbolt v1.3.8 // indirect
 	go.mozilla.org/pkcs7 v0.0.0-20210826202110-33d05740a352 // indirect
@@ -119,7 +119,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.21.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.21.0 // indirect
 	go.step.sm/cli-utils v0.8.0 // indirect
-	go.step.sm/crypto v0.38.0 // indirect
+	go.step.sm/crypto v0.39.0 // indirect
 	go.step.sm/linkedca v0.20.1 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 )
