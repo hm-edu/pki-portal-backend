@@ -116,7 +116,7 @@ require (
 
 require (
 	entgo.io/ent v0.12.5
-	github.com/go-co-op/gocron v1.36.0
+	github.com/go-co-op/gocron v1.36.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jackc/pgx/v4 v4.18.1
