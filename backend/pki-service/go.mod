@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
-	github.com/hm-edu/sectigo-client v0.0.0-20230915044137-7df86146f82c
+	github.com/hm-edu/sectigo-client v0.0.0-20231211052100-b71a1f16b33d
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
