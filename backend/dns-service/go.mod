@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
-	github.com/labstack/gommon v0.4.1
+	github.com/labstack/gommon v0.4.2
 	github.com/miekg/dns v1.1.57
 	go.uber.org/zap v1.26.0
 	google.golang.org/grpc v1.60.1
