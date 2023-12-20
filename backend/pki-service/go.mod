@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
-	github.com/hm-edu/sectigo-client v0.0.0-20231211052100-b71a1f16b33d
+	github.com/hm-edu/sectigo-client v0.0.0-20231219072159-414cdcef9d40
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
@@ -12,7 +12,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.15.0 // indirect
+	ariga.io/atlas v0.16.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
