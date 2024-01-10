@@ -178,7 +178,7 @@ require (
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.21.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.0.0 // indirect
 	golang.org/x/crypto v0.18.0 // indirect
-	golang.org/x/exp v0.0.0-20240103183307-be819d1f06fc // indirect
+	golang.org/x/exp v0.0.0-20240110193028-0dcbfd608b1e // indirect
 	golang.org/x/mod v0.14.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
