@@ -103,7 +103,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.22.0
 	go.uber.org/zap v1.26.0
 	golang.org/x/sys v0.16.0 // indirect
-	google.golang.org/grpc v1.60.1
+	google.golang.org/grpc v1.61.0
 )
 
 replace cloud.google.com/go => cloud.google.com/go v0.110.0
