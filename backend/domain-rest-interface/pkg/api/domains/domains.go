@@ -2,6 +2,7 @@ package domains
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -231,7 +232,7 @@ func (h *Handler) DeleteDomain(c echo.Context) error {
 	}
 
 	if item.Approved {
-		_, err := h.pkiService.RevokeCertificate(ctx, &pb.RevokeSslRequest{Identifier: &pb.RevokeSslRequest_CommonName{CommonName: item.FQDN}, Reason: "Domain deleted"})
+		_, err := h.pkiService.RevokeCertificate(ctx, &pb.RevokeSslRequest{Identifier: &pb.RevokeSslRequest_CommonName{CommonName: item.FQDN}, Reason: fmt.Sprintf("Domain '%s' deleted in PKI-Portal", item.FQDN)})
 		if err != nil {
 			logger.Error("Failed to revoke certificate", zap.Error(err))
 			return &echo.HTTPError{Code: http.StatusInternalServerError, Internal: err, Message: "Failed to revoke certificate"}
