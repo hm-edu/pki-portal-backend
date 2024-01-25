@@ -50,7 +50,7 @@ jobs:
             type=ref,event=tag
             type=ref,event=pr
             type=raw,value={{branch}}-{{sha}}-{{date 'X'}},enable=${{ github.event_name != 'pull_request' }}
-      - uses: dorny/paths-filter@v2
+      - uses: dorny/paths-filter@v3
         id: filter
         with:
           filters: |
