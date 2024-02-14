@@ -112,7 +112,7 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 		metric.WithDescription("Issue timestamp for last SSL Certificates"),
 	)
 	instance := &sslAPIServer{client: client, cfg: cfg, logger: zap.L(), db: db, pendingValidations: make(map[string]interface{})}
-	_, err = meter.RegisterCallback(func(ctx context.Context, observer metric.Observer) error {
+	_, err = meter.RegisterCallback(func(_ context.Context, observer metric.Observer) error {
 		if instance.last != nil {
 			observer.ObserveInt64(gauge, int64(instance.duration.Seconds()))
 			observer.ObserveInt64(gaugeLast, instance.last.UnixMilli())
