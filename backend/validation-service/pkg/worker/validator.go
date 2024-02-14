@@ -44,7 +44,7 @@ func (v *DomainValidator) ValidateDomains() {
 		logger.Panic("failed to initialize instrument: %v", zap.Error(err))
 	}
 
-	_, err = meter.RegisterCallback(func(ctx context.Context, observer metric.Observer) error {
+	_, err = meter.RegisterCallback(func(_ context.Context, observer metric.Observer) error {
 		(*v.observerLock).RLock()
 		data := v.observerValueToReport
 		(*v.observerLock).RUnlock()
