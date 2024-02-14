@@ -18,7 +18,7 @@ var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Starts the servers",
 	Long:  `Starts the HTTP server`,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, _ []string) {
 
 		logger, deferFunc, viper := commonApi.PrepareEnv(cmd)
 		defer deferFunc(logger)
