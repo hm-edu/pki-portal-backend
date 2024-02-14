@@ -128,7 +128,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.0 // indirect
 	github.com/eclipse/paho.mqtt.golang v1.4.3 // indirect
-	github.com/fxamacker/cbor/v2 v2.5.0 // indirect
+	github.com/fxamacker/cbor/v2 v2.6.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-chi/chi/v5 v5.0.11 // indirect
@@ -166,7 +166,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/smallstep/go-attestation v0.4.4-0.20240109183208-413678f90935 // indirect
 	github.com/smallstep/pkcs7 v0.0.0-20231107075624-be1870d87d13 // indirect
-	github.com/smallstep/scep v0.0.0-20231024192529-aee96d7ad34d // indirect
+	github.com/smallstep/scep v0.0.0-20240214080410-892e41795b99 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
 	github.com/uptrace/opentelemetry-go-extra/otelutil v0.2.3 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
