@@ -20,7 +20,7 @@ var validateCmd = &cobra.Command{
 	Use:   "validate",
 	Short: "Syncs the database with the Sectigo API",
 	Long:  `Adds all missing entries from the Sectigo API to the database`,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, _ []string) {
 
 		logger, deferFunc, viper := api.PrepareEnv(cmd)
 		defer deferFunc(logger)
