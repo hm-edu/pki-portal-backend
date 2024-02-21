@@ -6,7 +6,7 @@ require (
 	github.com/hm-edu/sectigo-client v0.0.0-20240214060134-8f69e5220e1d
 	github.com/spf13/cobra v1.8.0
 	go.opentelemetry.io/otel/metric v1.23.1
-	go.uber.org/zap v1.26.0
+	go.uber.org/zap v1.27.0
 )
 
 require (
@@ -53,8 +53,8 @@ require (
 	golang.org/x/mod v0.15.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	golang.org/x/tools v0.18.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20240213162025-012b6fc9bca9 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240213162025-012b6fc9bca9 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20240221002015-b0ce06bbee7c // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240221002015-b0ce06bbee7c // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
