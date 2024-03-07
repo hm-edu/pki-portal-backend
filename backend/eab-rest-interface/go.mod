@@ -35,7 +35,7 @@ require (
 	github.com/go-openapi/jsonreference v0.20.5 // indirect
 	github.com/go-openapi/spec v0.20.15 // indirect
 	github.com/go-openapi/swag v0.22.10 // indirect
-	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
@@ -56,7 +56,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/hm-edu/portal-apis v0.0.0-20230929065638-ad1f7e7c7ab3
 	github.com/labstack/echo/v4 v4.11.4
-	github.com/lestrrat-go/jwx v1.2.28
+	github.com/lestrrat-go/jwx v1.2.29
 	github.com/smallstep/nosql v0.6.0
 	github.com/spf13/cobra v1.8.0
 	github.com/swaggo/echo-swagger v1.4.1
