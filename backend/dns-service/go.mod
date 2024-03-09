@@ -16,10 +16,10 @@ require (
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/getkin/kin-openapi v0.123.0 // indirect
-	github.com/go-openapi/jsonpointer v0.20.3 // indirect
-	github.com/go-openapi/jsonreference v0.20.5 // indirect
-	github.com/go-openapi/spec v0.20.15 // indirect
-	github.com/go-openapi/swag v0.22.10 // indirect
+	github.com/go-openapi/jsonpointer v0.21.0 // indirect
+	github.com/go-openapi/jsonreference v0.21.0 // indirect
+	github.com/go-openapi/spec v0.21.0 // indirect
+	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/glog v1.2.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1 // indirect
