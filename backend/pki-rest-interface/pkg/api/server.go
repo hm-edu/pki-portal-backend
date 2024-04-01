@@ -95,10 +95,11 @@ func (api *Server) wireRoutesAndMiddleware() {
 	})))
 	api.app.Use(logging.ZapLogger(api.logger))
 	api.app.Use(middleware.Recover())
+	
 	if len(api.config.CorsAllowedOrigins) != 0 {
 		api.app.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 			AllowOrigins:     api.config.CorsAllowedOrigins,
-			AllowHeaders:     []string{echo.HeaderContentType, echo.HeaderAuthorization},
+			AllowHeaders:     []string{echo.HeaderContentType, echo.HeaderAuthorization, "sentry-trace", "baggage"},
 			AllowCredentials: false,
 			AllowMethods:     []string{http.MethodGet, http.MethodOptions, http.MethodPost, http.MethodDelete},
 		}))

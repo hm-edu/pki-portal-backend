@@ -7,4 +7,5 @@ type Config struct {
 	Audience           string   `mapstructure:"audience"`
 	JwksURI            string   `mapstructure:"jwks_uri"`
 	CorsAllowedOrigins []string `mapstructure:"cors_allowed_origins"`
+	SentryDSN          string   `mapstructure:"sentry_dsn"`
 }

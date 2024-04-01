@@ -18,8 +18,11 @@ import (
 	commonAuth "github.com/hm-edu/portal-common/auth"
 	"github.com/hm-edu/portal-common/logging"
 
+	"github.com/getsentry/sentry-go"
+	sentryecho "github.com/getsentry/sentry-go/echo"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/gommon/log"
 	"github.com/lestrrat-go/jwx/jwk"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
 	"go.uber.org/zap"
@@ -98,10 +101,24 @@ func (api *Server) wireRoutesAndMiddleware() {
 		return strings.Contains(c.Path(), "/docs") || strings.Contains(c.Path(), "/healthz")
 	})))
 	api.app.Use(middleware.Recover())
+	if api.config.SentryDSN != "" {
+		if err := sentry.Init(sentry.ClientOptions{
+			Dsn: api.config.SentryDSN,
+			// Set TracesSampleRate to 1.0 to capture 100%
+			// of transactions for performance monitoring.
+			// We recommend adjusting this value in production,
+			TracesSampleRate: 1.0,
+		}); err != nil {
+			log.Warnf("Sentry initialization failed: %v\n", err)
+		} else {
+			api.app.Use(sentryecho.New(sentryecho.Options{}))
+		}
+	}
+
 	if len(api.config.CorsAllowedOrigins) != 0 {
 		api.app.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 			AllowOrigins:     api.config.CorsAllowedOrigins,
-			AllowHeaders:     []string{echo.HeaderContentType, echo.HeaderAuthorization},
+			AllowHeaders:     []string{echo.HeaderContentType, echo.HeaderAuthorization, "sentry-trace", "baggage"},
 			AllowCredentials: false,
 			AllowMethods:     []string{http.MethodGet, http.MethodOptions, http.MethodPost, http.MethodDelete},
 		}))
