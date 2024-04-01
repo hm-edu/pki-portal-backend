@@ -126,7 +126,7 @@ require (
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
-	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.0 // indirect
+	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.3.0 // indirect
 	github.com/eclipse/paho.mqtt.golang v1.4.3 // indirect
 	github.com/fxamacker/cbor/v2 v2.6.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
@@ -181,7 +181,7 @@ require (
 	golang.org/x/mod v0.16.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20240325203815-454cdb8f5daa // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20240401170217-c3f982113cda // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240325203815-454cdb8f5daa // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
