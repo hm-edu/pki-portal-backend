@@ -86,6 +86,7 @@ func init() {
 	runCmd.Flags().String("audience", "", "The expected audience")
 	runCmd.Flags().StringSlice("cors_allowed_origins", []string{}, "The allowed origin for CORS")
 	runCmd.Flags().String("db", "", "connection string for the database")
+	runCmd.Flags().String("sentry_dsn", "", "sentry dsn")
 	runCmd.Flags().String("ssl_service", "", "pki backend")
 	runCmd.Flags().String("preseed", "", "path to the preseed file")
 	runCmd.Flags().String("level", "info", "log level debug, info, warn, error, flat or panic")
