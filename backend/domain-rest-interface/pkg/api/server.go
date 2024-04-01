@@ -108,6 +108,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 			// of transactions for performance monitoring.
 			// We recommend adjusting this value in production,
 			TracesSampleRate: 1.0,
+			EnableTracing:    true,
 		}); err != nil {
 			log.Warnf("Sentry initialization failed: %v\n", err)
 		} else {
@@ -178,4 +179,6 @@ func (api *Server) ListenAndServe(stopCh <-chan struct{}) {
 	if err != nil {
 		api.logger.Fatal("Stopping http server failed", zap.Error(err))
 	}
+	defer sentry.Flush(2 * time.Second)
+
 }

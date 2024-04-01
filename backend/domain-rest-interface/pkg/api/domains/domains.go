@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/getsentry/sentry-go"
 	"github.com/hm-edu/domain-rest-interface/ent"
 	"github.com/hm-edu/domain-rest-interface/pkg/model"
 	pb "github.com/hm-edu/portal-apis"
@@ -33,6 +34,25 @@ import (
 func (h *Handler) ListDomains(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "list")
+	hub := sentry.GetHubFromContext(ctx)
+	if hub == nil {
+		// Check the concurrency guide for more details: https://docs.sentry.io/platforms/go/concurrency/
+		hub = sentry.CurrentHub().Clone()
+		ctx = sentry.SetHubOnContext(ctx, hub)
+	}
+
+	options := []sentry.SpanOption{
+		// Set the OP based on values from https://develop.sentry.dev/sdk/performance/span-operations/
+		sentry.WithOpName("http.server"),
+		sentry.ContinueFromRequest(c.Request()),
+		sentry.WithTransactionSource(sentry.SourceURL),
+	}
+
+	transaction := sentry.StartTransaction(ctx,
+		fmt.Sprintf("%s %s", c.Request().Method, c.Request().URL.Path),
+		options...,
+	)
+	defer transaction.Finish()
 	defer span.End()
 
 	user, err := auth.UserFromRequest(c)
