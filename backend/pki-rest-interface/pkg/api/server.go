@@ -95,7 +95,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 	})))
 	api.app.Use(logging.ZapLogger(api.logger))
 	api.app.Use(middleware.Recover())
-	
+
 	if len(api.config.CorsAllowedOrigins) != 0 {
 		api.app.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 			AllowOrigins:     api.config.CorsAllowedOrigins,
