@@ -1,10 +1,8 @@
 package api
 
 import (
-	"context"
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/hm-edu/portal-common/logging"
 	"github.com/joho/godotenv"
@@ -42,10 +40,7 @@ func PrepareEnv(cmd *cobra.Command) (*zap.Logger, func(*zap.Logger), *viper.Vipe
 
 // ConnectGRPC connects to the GRPC server.
 func ConnectGRPC(host string) (*grpc.ClientConn, error) {
-	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*3)
-	defer cancel()
-	conn, err := grpc.DialContext(ctx, host, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock(),
-		grpc.WithStatsHandler(otelgrpc.NewClientHandler()))
+	conn, err := grpc.NewClient(host, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithStatsHandler(otelgrpc.NewClientHandler()))
 	if err != nil {
 		return nil, err
 	}
