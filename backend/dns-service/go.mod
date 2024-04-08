@@ -7,7 +7,7 @@ require (
 	github.com/labstack/gommon v0.4.2
 	github.com/miekg/dns v1.1.58
 	go.uber.org/zap v1.27.0
-	google.golang.org/grpc v1.63.0
+	google.golang.org/grpc v1.63.2
 )
 
 require (
