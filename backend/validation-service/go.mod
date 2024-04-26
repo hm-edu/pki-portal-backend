@@ -5,7 +5,7 @@ go 1.21
 toolchain go1.21.7
 
 require (
-	github.com/hm-edu/sectigo-client v0.0.0-20240302163135-12b356a5758b
+	github.com/hm-edu/sectigo-client v0.0.0-20240426043247-ef80dee61f62
 	github.com/spf13/cobra v1.8.0
 	go.opentelemetry.io/otel/metric v1.26.0
 	go.uber.org/zap v1.27.0
