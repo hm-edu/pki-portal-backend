@@ -7,7 +7,7 @@ require (
 	github.com/hm-edu/portal-common v0.0.0-20230824190016-178fb44809a8
 	go.opentelemetry.io/otel v1.26.0
 	go.uber.org/zap v1.27.0
-	google.golang.org/grpc v1.63.2
+	google.golang.org/grpc v1.64.0
 )
 
 require (
