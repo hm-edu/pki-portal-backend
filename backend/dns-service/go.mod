@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/labstack/gommon v0.4.2
-	github.com/miekg/dns v1.1.59
+	github.com/miekg/dns v1.1.61
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.64.0
 )
@@ -40,7 +40,7 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.27.0 // indirect
 	go.opentelemetry.io/otel/exporters/prometheus v0.49.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.27.0 // indirect
-	go.opentelemetry.io/proto/otlp v1.2.0 // indirect
+	go.opentelemetry.io/proto/otlp v1.3.1 // indirect
 	golang.org/x/crypto v0.24.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
