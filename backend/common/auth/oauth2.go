@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	jwt "github.com/golang-jwt/jwt/v4"
+	jwt "github.com/golang-jwt/jwt/v5"
 	"github.com/hm-edu/portal-common/helper"
 	"github.com/labstack/echo/v4"
 	"github.com/lestrrat-go/jwx/jwk"
@@ -40,16 +40,14 @@ func GetToken(auth string, ks jwk.Set, aud string) (interface{}, error) {
 	}
 
 	// claims are of type `jwt.MapClaims` when token is created with `jwt.Parse`
-	token, err := jwt.Parse(auth, keyFunc)
+	token, err := jwt.Parse(auth, keyFunc, jwt.WithExpirationRequired(), jwt.WithAudience(aud))
 	if err != nil {
 		return nil, err
 	}
 	if !token.Valid {
 		return nil, errors.New("invalid token")
 	}
-	if !token.Claims.(jwt.MapClaims).VerifyAudience(aud, true) {
-		return nil, errors.New("invalid token")
-	}
+
 	return token, nil
 }
 
