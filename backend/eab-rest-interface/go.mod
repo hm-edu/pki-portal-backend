@@ -52,11 +52,11 @@ require (
 )
 
 require (
-	entgo.io/ent v0.13.1
+	entgo.io/ent v0.14.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/hm-edu/portal-apis v0.0.0-20230929065638-ad1f7e7c7ab3
 	github.com/labstack/echo/v4 v4.12.0
-	github.com/lestrrat-go/jwx v1.2.29
+	github.com/lestrrat-go/jwx v1.2.30
 	github.com/smallstep/nosql v0.7.0
 	github.com/spf13/cobra v1.8.1
 	github.com/swaggo/echo-swagger v1.4.1
