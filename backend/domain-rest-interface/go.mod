@@ -51,7 +51,7 @@ require (
 )
 
 require (
-	entgo.io/ent v0.13.1
+	entgo.io/ent v0.14.0
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/getsentry/sentry-go v0.28.1
 	github.com/golang-jwt/jwt/v5 v5.2.1
@@ -59,7 +59,7 @@ require (
 	github.com/hm-edu/portal-apis v0.0.0-20230929065638-ad1f7e7c7ab3
 	github.com/jackc/pgx/v4 v4.18.3
 	github.com/labstack/echo/v4 v4.12.0
-	github.com/lestrrat-go/jwx v1.2.29
+	github.com/lestrrat-go/jwx v1.2.30
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/ory/viper v1.7.5
 	github.com/spf13/cobra v1.8.1
