@@ -7,7 +7,7 @@ require (
 	github.com/labstack/gommon v0.4.2
 	github.com/miekg/dns v1.1.62
 	go.uber.org/zap v1.27.0
-	google.golang.org/grpc v1.65.0
+	google.golang.org/grpc v1.66.0
 )
 
 require (
@@ -35,7 +35,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_golang v1.20.2 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
-	github.com/prometheus/common v0.56.0 // indirect
+	github.com/prometheus/common v0.57.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/swaggo/swag v1.16.3 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.29.0 // indirect
