@@ -4,7 +4,6 @@ package api
 import (
 	"context"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/getkin/kin-openapi/openapi3"
@@ -24,7 +23,6 @@ import (
 	commonAuth "github.com/hm-edu/portal-common/auth"
 	"github.com/hm-edu/portal-common/logging"
 
-	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
 	"go.uber.org/zap"
 
 	// Required for the generation of swagger docs
@@ -90,9 +88,6 @@ func (api *Server) wireRoutesAndMiddleware() {
 	jwtMiddleware := auth.JWTWithConfig(config)
 
 	api.app.Use(middleware.RequestID())
-	api.app.Use(otelecho.Middleware("pki-rest-interface", otelecho.WithSkipper(func(c echo.Context) bool {
-		return strings.Contains(c.Path(), "/docs") || strings.Contains(c.Path(), "/healthz")
-	})))
 	api.app.Use(logging.ZapLogger(api.logger))
 	api.app.Use(middleware.Recover())
 

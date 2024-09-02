@@ -1,6 +1,6 @@
 module github.com/hm-edu/dns-service
 
-go 1.22
+go 1.23
 
 require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
