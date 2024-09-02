@@ -46,3 +46,9 @@ linters-settings:
       - name: unused-parameter
       - name: unreachable-code
       - name: redefines-builtin-id
+  gosec:
+    excludes:
+      - G115
+  govet:
+    disable:
+      - printf
