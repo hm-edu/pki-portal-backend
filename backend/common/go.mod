@@ -1,8 +1,6 @@
 module github.com/hm-edu/portal-common
 
-go 1.22
-
-toolchain go1.22.4
+go 1.23
 
 require (
 	github.com/getkin/kin-openapi v0.127.0

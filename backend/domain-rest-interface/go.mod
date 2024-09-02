@@ -1,10 +1,10 @@
 module github.com/hm-edu/domain-rest-interface
 
-go 1.22.5
+go 1.23.0
 
 require (
 	github.com/getkin/kin-openapi v0.127.0
-	github.com/hm-edu/portal-common v0.0.0-20240705160636-4f9356a7b848
+	github.com/hm-edu/portal-common v0.0.0-20240830051030-23666853028d
 	go.opentelemetry.io/otel v1.29.0
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.66.0
@@ -51,7 +51,7 @@ require (
 )
 
 require (
-	entgo.io/ent v0.14.0
+	entgo.io/ent v0.14.1
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/getsentry/sentry-go v0.28.1
 	github.com/golang-jwt/jwt/v5 v5.2.1
@@ -66,7 +66,6 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/echo-swagger v1.4.1
 	github.com/uptrace/opentelemetry-go-extra/otelzap v0.3.1
-	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.53.0
 )
 
 require (
@@ -106,7 +105,7 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.29.0 // indirect
 	go.opentelemetry.io/otel/exporters/prometheus v0.51.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.29.0 // indirect
-	go.opentelemetry.io/otel/log v0.4.0 // indirect
+	go.opentelemetry.io/otel/log v0.5.0 // indirect
 	go.opentelemetry.io/otel/metric v1.29.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.29.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.3.1 // indirect
@@ -117,7 +116,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.26.0 // indirect
+	ariga.io/atlas v0.26.1 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.3.0 // indirect
 	github.com/go-openapi/inflect v0.21.0 // indirect
@@ -127,7 +126,7 @@ require (
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/hashicorp/hcl/v2 v2.21.0 // indirect
+	github.com/hashicorp/hcl/v2 v2.22.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/labstack/gommon v0.4.2
 	github.com/leodido/go-urn v1.4.0 // indirect

@@ -231,8 +231,6 @@ github.com/valyala/fasttemplate v1.2.2 h1:lxLXG0uE3Qnshl9QyaK6XJxMXlQZELvChBOCmQ
 github.com/valyala/fasttemplate v1.2.2/go.mod h1:KHLXt3tVN2HBp8eijSv/kGJopbvo7S+qRAEEKiv+SiQ=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
-go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.54.0 h1:o3U2xB4Cq6gB5Vr1mg9Mv7sciDewvbcNuGp+jL1BggY=
-go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.54.0/go.mod h1:i69n3/He6DVv7+gUXnxXbnYyVYiXbkyTJOyJRycLPnc=
 go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.54.0 h1:r6I7RJCN86bpD/FQwedZ0vSixDpwuWREjW9oRMsmqDc=
 go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.54.0/go.mod h1:B9yO6b04uB80CzjedvewuqDhxJxi11s7/GtiGa8bAjI=
 go.opentelemetry.io/contrib/propagators/b3 v1.29.0 h1:hNjyoRsAACnhoOLWupItUjABzeYmX3GTTZLzwJluJlk=

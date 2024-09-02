@@ -1,16 +1,15 @@
 module github.com/hm-edu/pki-rest-interface
 
-go 1.22
+go 1.23
 
 require (
 	github.com/getkin/kin-openapi v0.127.0
 	github.com/hm-edu/portal-apis v0.0.0-20230929065638-ad1f7e7c7ab3
-	github.com/hm-edu/portal-common v0.0.0-20240705160636-4f9356a7b848
+	github.com/hm-edu/portal-common v0.0.0-20240830051030-23666853028d
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/lestrrat-go/jwx v1.2.30
 	github.com/spf13/cobra v1.8.1
 	github.com/swaggo/echo-swagger v1.4.1
-	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.54.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.54.0
 	go.opentelemetry.io/otel v1.29.0
 	go.uber.org/zap v1.27.0

@@ -1,6 +1,6 @@
 module github.com/hm-edu/validation-service
 
-go 1.22
+go 1.23
 
 require (
 	github.com/hm-edu/sectigo-client v0.0.0-20240804074249-08f5110cb2c8
@@ -78,7 +78,7 @@ require (
 require (
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/hm-edu/portal-common v0.0.0-20240705160636-4f9356a7b848
+	github.com/hm-edu/portal-common v0.0.0-20240830051030-23666853028d
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
