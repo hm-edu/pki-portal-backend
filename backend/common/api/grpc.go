@@ -6,8 +6,8 @@ import (
 
 	"github.com/hm-edu/portal-common/logging"
 	"github.com/joho/godotenv"
-	"github.com/ory/viper"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
