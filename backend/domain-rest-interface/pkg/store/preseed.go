@@ -8,7 +8,7 @@ import (
 	"github.com/hm-edu/domain-rest-interface/ent"
 	"github.com/hm-edu/domain-rest-interface/ent/domain"
 	"github.com/hm-edu/domain-rest-interface/pkg/database"
-	"github.com/ory/viper"
+	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
 

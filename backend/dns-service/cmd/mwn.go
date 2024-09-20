@@ -3,8 +3,8 @@ package cmd
 import (
 	"github.com/hm-edu/dns-service/pkg/core"
 	"github.com/hm-edu/dns-service/pkg/grpc"
-	"github.com/ory/viper"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
 
