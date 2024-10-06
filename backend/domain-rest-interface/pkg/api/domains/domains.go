@@ -141,13 +141,13 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string, logger *zap
 						continue
 					}
 					if cert.Id == 0 {
-						logger.Debug("Certificate has no ID; Denying deletion of domain.", zap.String("serial", cert.Serial), zap.String("domain", domain.Fqdn), zap.String("user", user))
+						logger.Warn("Denying deletion of domain. Domain has dangling certificate.", zap.String("serial", cert.Serial), zap.String("domain", domain.Fqdn), zap.String("user", user))
 						item.Permissions.CanDelete = false
 						continue
 					}
 					for _, name := range cert.SubjectAlternativeNames {
 						if !helper.Any(filtered, func(i *ent.Domain) bool { return i.Fqdn == name }) {
-							logger.Debug("Certificate has SAN without grant for user; Denying deletion of domain.", zap.Int32("cert_id", cert.Id), zap.Int32("db_id", cert.DbId), zap.String("serial", cert.Serial), zap.String("domain", domain.Fqdn), zap.String("san", name), zap.String("user", user))
+							logger.Info("Denying deletion of domain. Domain has certificate without domain permission for user.", zap.Int32("cert_id", cert.Id), zap.Int32("db_id", cert.DbId), zap.String("serial", cert.Serial), zap.String("domain", domain.Fqdn), zap.String("san", name), zap.String("user", user))
 							item.Permissions.CanDelete = false
 							break
 						}
