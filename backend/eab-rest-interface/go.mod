@@ -4,7 +4,7 @@ go 1.23.0
 
 require (
 	github.com/getkin/kin-openapi v0.128.0
-	github.com/hm-edu/portal-common v0.0.0-20240830051030-23666853028d
+	github.com/hm-edu/portal-common v0.0.0-20241002123136-637d17d23b49
 	github.com/smallstep/certificates v0.27.4
 	go.opentelemetry.io/otel v1.30.0
 	go.uber.org/zap v1.27.0
@@ -134,6 +134,7 @@ require (
 	github.com/go-playground/validator/v10 v10.22.1 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
+	github.com/golang/glog v1.2.2 // indirect
 	github.com/google/certificate-transparency-go v1.2.1 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/go-tpm v0.9.1 // indirect
@@ -192,3 +193,5 @@ replace github.com/hm-edu/portal-common => ../common
 replace github.com/smallstep/nosql => github.com/hm-edu/nosql v0.4.1-0.20230305071512-139857866201
 
 replace github.com/smallstep/certificates => github.com/hm-edu/certificates v0.0.0-20240709054127-a84299cf5f16
+
+replace github.com/dgraph-io/ristretto => github.com/dgraph-io/ristretto v0.1.1
