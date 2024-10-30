@@ -5,7 +5,7 @@ go 1.23.0
 require (
 	github.com/getkin/kin-openapi v0.128.0
 	github.com/hm-edu/portal-common v0.0.0-20241002123136-637d17d23b49
-	github.com/smallstep/certificates v0.27.5
+	github.com/smallstep/certificates v0.28.0
 	go.opentelemetry.io/otel v1.31.0
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.67.1
@@ -96,7 +96,7 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/prometheus/client_golang v1.20.5 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
-	github.com/prometheus/common v0.60.0 // indirect
+	github.com/prometheus/common v0.60.1 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
@@ -111,7 +111,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.31.0 // indirect
 	go.step.sm/cli-utils v0.9.0 // indirect
 	go.step.sm/crypto v0.54.0 // indirect
-	go.step.sm/linkedca v0.22.1 // indirect
+	go.step.sm/linkedca v0.22.2 // indirect
 )
 
 require (
@@ -164,7 +164,7 @@ require (
 	github.com/sagikazarmark/locafero v0.6.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/smallstep/go-attestation v0.4.4-0.20240109183208-413678f90935 // indirect
-	github.com/smallstep/pkcs7 v0.0.0-20240911091500-b1cae6277023 // indirect
+	github.com/smallstep/pkcs7 v0.0.0-20241029111203-fbab67b7673f // indirect
 	github.com/smallstep/scep v0.0.0-20240926084937-8cf1ca453101 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/viper v1.19.0 // indirect
