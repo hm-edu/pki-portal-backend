@@ -21,7 +21,7 @@ require (
 	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.22.0 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.23.0 // indirect
 	github.com/invopop/yaml v0.3.1 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
@@ -77,7 +77,7 @@ require (
 )
 
 require (
-	github.com/fsnotify/fsnotify v1.7.0 // indirect
+	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hm-edu/portal-common v0.0.0-20240830051030-23666853028d
 	github.com/magiconair/properties v1.8.7 // indirect

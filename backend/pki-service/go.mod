@@ -30,7 +30,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.22.0 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.23.0 // indirect
 	github.com/hashicorp/hcl/v2 v2.22.0 // indirect
 	github.com/invopop/yaml v0.3.1 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
@@ -99,7 +99,7 @@ require (
 )
 
 require (
-	github.com/fsnotify/fsnotify v1.7.0 // indirect
+	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hm-edu/portal-common v0.0.0-20240830051030-23666853028d
