@@ -33,6 +33,8 @@ require (
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	go.opentelemetry.io/otel/trace v1.32.0 // indirect
 	golang.org/x/exp v0.0.0-20241108190413-2d47ceb2692f // indirect
+	golang.org/x/mod v0.22.0 // indirect
+	golang.org/x/sync v0.9.0 // indirect
 )
 
 require (
@@ -101,6 +103,7 @@ require (
 require (
 	github.com/getsentry/sentry-go v0.29.1
 	github.com/go-playground/validator/v10 v10.23.0
+	github.com/miekg/dns v1.1.62
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	go.opentelemetry.io/otel v1.32.0
 	go.opentelemetry.io/otel/sdk v1.32.0
