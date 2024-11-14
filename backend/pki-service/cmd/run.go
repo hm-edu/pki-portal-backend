@@ -119,4 +119,7 @@ func init() {
 	runCmd.Flags().String("mail_to", "", "Optional param to send notifications to a specific mail address instead of the orignal issuer.")
 	runCmd.Flags().String("mail_bcc", "", "Optional param to send notifications as blind copy to a specific mail address instead of the orignal issuer.")
 	runCmd.Flags().String("mail_from", "", "The mail from")
+	runCmd.Flags().String("acme_storage", "", "Storage for the internal acme client")
+	runCmd.Flags().String("acme_email", "", "Email for the acme client")
+	runCmd.Flags().String("dns_configs", "", "Config file for the dns provider")
 }
