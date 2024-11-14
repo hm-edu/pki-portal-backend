@@ -24,6 +24,9 @@ type SectigoConfiguration struct {
 	SslTerm              int    `mapstructure:"ssl_term"`
 	SmimeKeyLength       string `mapstructure:"smime_key_length"`
 	SmimeKeyType         string `mapstructure:"smime_key_type"`
+	AcmeStorage          string `mapstructure:"acme_storage"`
+	AcmeEmail            string `mapstructure:"acme_email"`
+	DnsConfigs           string `mapstructure:"dns_configs"`
 }
 
 // CheckSectigoConfiguration checks the sectigo configuration for the syntactical correctness.
