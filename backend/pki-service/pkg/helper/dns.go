@@ -9,6 +9,7 @@ import (
 	"github.com/go-acme/lego/v4/challenge/dns01"
 	portalCommon "github.com/hm-edu/portal-common/helper"
 	"github.com/miekg/dns"
+	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
 )
 
@@ -43,7 +44,14 @@ func NewDNSProvider(config string) (*DNSProvider, error) {
 	providerConfigs := make([]*ProviderConfig, 0)
 	err = yaml.Unmarshal(data, &providerConfigs)
 
-	return &DNSProvider{}, nil
+	if err != nil {
+		fmt.Println("Error unmarshalling config file: ", err)
+		return nil, err
+	}
+
+	return &DNSProvider{
+		Configs: providerConfigs,
+	}, nil
 }
 
 // List returns the current list of records.
@@ -101,17 +109,16 @@ func (r ProviderConfig) sendMessage(msg *dns.Msg) error {
 	if msg.Len() > udpMaxMsgSize {
 		c.Net = "tcp"
 	}
-
 	resp, _, err := c.Exchange(msg, r.WriteNameserver)
-	if err != nil {
-		if resp != nil && resp.Rcode != dns.RcodeSuccess {
-			return err
-		}
+	if resp == nil {
+		return fmt.Errorf("no response received")
 	}
-	if resp != nil && resp.Rcode != dns.RcodeSuccess {
+	if err != nil {
+		return err
+	}
+	if resp.Rcode != dns.RcodeSuccess {
 		return fmt.Errorf("bad return code: %s", dns.RcodeToString[resp.Rcode])
 	}
-
 	return nil
 }
 
@@ -119,10 +126,11 @@ func (d *DNSProvider) Present(domain, token, keyAuth string) error {
 	info := dns01.GetChallengeInfo(domain, keyAuth)
 	// Get the DNS Provider with the best matching domain
 	// Check if the currently selected config is more specific than the previous one
-	matchingConfig, err := d.matchingProvider(info, domain)
+	matchingConfig, err := d.matchingProvider(info)
 	if err != nil {
 		return err
 	}
+	zap.L().Info("Using DNS provider for domain", zap.String("provider", matchingConfig.BaseDomain))
 
 	// Use the matching DNS provider to create the TXT record
 	rr := new(dns.TXT)
@@ -133,15 +141,18 @@ func (d *DNSProvider) Present(domain, token, keyAuth string) error {
 	if err != nil {
 		return fmt.Errorf("error adding TXT record: %v", err)
 	}
-
+	zap.L().Info("Successfully added TXT record", zap.String("fqdn", info.FQDN))
 	return nil
 }
 
-func (d *DNSProvider) matchingProvider(info dns01.ChallengeInfo, domain string) (*ProviderConfig, error) {
+func (d *DNSProvider) matchingProvider(info dns01.ChallengeInfo) (*ProviderConfig, error) {
 	var matchingConfig *ProviderConfig
 	matchingConfig = nil
+	log := zap.L()
+	log.Info("Searching for DNS provider for domain", zap.String("fqdn", info.FQDN))
 	for _, config := range d.Configs {
-		if strings.HasSuffix(info.EffectiveFQDN, fmt.Sprintf(".%s", config.BaseDomain)) {
+
+		if strings.HasSuffix(dns.Fqdn(info.FQDN), fmt.Sprintf(".%s", dns.Fqdn(config.BaseDomain))) {
 			if matchingConfig == nil {
 				matchingConfig = config
 				continue
@@ -150,11 +161,13 @@ func (d *DNSProvider) matchingProvider(info dns01.ChallengeInfo, domain string) 
 			if len(strings.Split(config.BaseDomain, ".")) > len(strings.Split(matchingConfig.BaseDomain, ".")) {
 				matchingConfig = config
 			}
+		} else {
+			log.Info("Domain does not match", zap.String("fqdn", info.FQDN), zap.String("provider", config.BaseDomain))
 		}
 	}
 
 	if matchingConfig == nil {
-		return nil, fmt.Errorf("no matching DNS provider found for domain %s", domain)
+		return nil, fmt.Errorf("no matching DNS provider found for domain %s", info.FQDN)
 	}
 	return matchingConfig, nil
 }
@@ -163,8 +176,9 @@ func (d *DNSProvider) CleanUp(domain, token, keyAuth string) error {
 	// clean up any state you created in Present, like removing the TXT record
 	info := dns01.GetChallengeInfo(domain, keyAuth)
 	// Get the DNS Provider with the best matching domain
-	provider, err := d.matchingProvider(info, domain)
+	provider, err := d.matchingProvider(info)
 	if err != nil {
+		return err
 	}
 	rr := new(dns.TXT)
 	rr.Hdr = dns.RR_Header{Name: info.FQDN, Rrtype: dns.TypeTXT, Class: dns.ClassINET, Ttl: 60}
