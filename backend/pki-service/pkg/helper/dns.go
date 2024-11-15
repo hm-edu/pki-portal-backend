@@ -28,6 +28,7 @@ type ProviderConfig struct {
 	TsigKeyName     string `yaml:"tsig_key_name"`
 	TsigSecret      string `yaml:"tsig_secret"`
 	TsigSecretAlg   string `yaml:"tsig_secret_alg"`
+	Net             string `yaml:"net"`
 }
 
 type DNSProvider struct {
@@ -106,7 +107,7 @@ func (r ProviderConfig) sendMessage(msg *dns.Msg) error {
 	if r.TsigSecretAlg == dns.HmacMD5 {
 		c.TsigProvider = portalCommon.Md5provider(r.TsigSecret)
 	}
-	if msg.Len() > udpMaxMsgSize {
+	if msg.Len() > udpMaxMsgSize || r.Net == "tcp" {
 		c.Net = "tcp"
 	}
 	resp, _, err := c.Exchange(msg, r.WriteNameserver)
