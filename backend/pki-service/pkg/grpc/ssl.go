@@ -16,6 +16,7 @@ import (
 	"github.com/TheZeroSlave/zapsentry"
 	"github.com/getsentry/sentry-go"
 	legoCert "github.com/go-acme/lego/v4/certificate"
+	"github.com/go-acme/lego/v4/challenge/dns01"
 	"github.com/go-acme/lego/v4/lego"
 	legoLog "github.com/go-acme/lego/v4/log"
 
@@ -25,6 +26,7 @@ import (
 	"github.com/hm-edu/pki-service/ent/predicate"
 	"github.com/hm-edu/pki-service/pkg/cfg"
 	pkiHelper "github.com/hm-edu/pki-service/pkg/helper"
+	"github.com/hm-edu/pki-service/pkg/helper/precheck"
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/helper"
 	"github.com/hm-edu/sectigo-client/sectigo"
@@ -182,7 +184,7 @@ func registerAcme(cfg *cfg.SectigoConfiguration) *lego.Client {
 		zap.L().Fatal("Failed to create DNS provider", zap.Error(err))
 	}
 
-	err = legoClient.Challenge.SetDNS01Provider(dns)
+	err = legoClient.Challenge.SetDNS01Provider(dns, dns01.WrapPreCheck(precheck.CheckDNS))
 	if err != nil {
 		zap.L().Fatal("Failed to set DNS01 provider", zap.Error(err))
 	}
