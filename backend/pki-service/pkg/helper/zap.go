@@ -14,6 +14,7 @@ type ZapLogger struct {
 
 // NewZapLogger creates a new logger.
 func NewZapLogger(logger *zap.Logger) *ZapLogger {
+	logger = logger.WithOptions(zap.AddCallerSkip(3))
 	return &ZapLogger{
 		logger: logger,
 	}
@@ -38,7 +39,9 @@ func (z *ZapLogger) Fatalf(format string, args ...interface{}) {
 func (z *ZapLogger) Print(args ...interface{}) {
 	msg := strings.TrimSpace(fmt.Sprint(args...))
 	if strings.HasPrefix(msg, "[WARN]") {
-		z.logger.Sugar().Warn(strings.TrimPrefix(msg, "[WARN]"))
+		z.logger.Sugar().Warn(strings.TrimSpace(strings.TrimPrefix(msg, "[WARN]")))
+	} else if strings.HasPrefix(msg, "[INFO]") {
+		z.logger.Sugar().Info(strings.TrimSpace(strings.TrimPrefix(msg, "[INFO]")))
 	} else {
 		z.logger.Sugar().Info(msg)
 	}
@@ -53,7 +56,9 @@ func (z *ZapLogger) Println(args ...interface{}) {
 func (z *ZapLogger) Printf(format string, args ...interface{}) {
 	msg := strings.TrimSpace(fmt.Sprintf(format, args...))
 	if strings.HasPrefix(msg, "[WARN]") {
-		z.logger.Sugar().Warn(strings.TrimPrefix(msg, "[WARN]"))
+		z.logger.Sugar().Warn(strings.TrimSpace(strings.TrimPrefix(msg, "[WARN]")))
+	} else if strings.HasPrefix(msg, "[INFO]") {
+		z.logger.Sugar().Info(strings.TrimSpace(strings.TrimPrefix(msg, "[INFO]")))
 	} else {
 		z.logger.Sugar().Info(msg)
 	}
