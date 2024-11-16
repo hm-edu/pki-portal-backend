@@ -26,7 +26,11 @@ func SubFromRequest(token interface{}) (string, error) {
 func UserFromRequest(c echo.Context) (string, error) {
 	if token, ok := c.Get("user").(*jwt.Token); ok {
 		if user, ok := token.Claims.(jwt.MapClaims); ok {
-			return user["email"].(string), nil
+			if token, ok := user["email"]; !ok {
+				return "", errors.New("email not found in token")
+			} else {
+				return token.(string), nil
+			}
 		}
 	}
 

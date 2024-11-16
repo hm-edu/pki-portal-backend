@@ -1,6 +1,7 @@
 package ssl
 
 import (
+	"context"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
@@ -8,6 +9,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/getsentry/sentry-go"
 	"github.com/hm-edu/pki-rest-interface/pkg/model"
 	"github.com/hm-edu/portal-common/auth"
 	"github.com/hm-edu/portal-common/helper"
@@ -19,6 +21,28 @@ import (
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 )
+
+func sentryTrace(ctx context.Context, c echo.Context) (context.Context, *sentry.Span) {
+	hub := sentry.GetHubFromContext(ctx)
+	if hub == nil {
+
+		hub = sentry.CurrentHub().Clone()
+		ctx = sentry.SetHubOnContext(ctx, hub)
+	}
+
+	options := []sentry.SpanOption{
+
+		sentry.WithOpName("http.server"),
+		sentry.ContinueFromRequest(c.Request()),
+		sentry.WithTransactionSource(sentry.SourceURL),
+	}
+
+	transaction := sentry.StartTransaction(ctx,
+		fmt.Sprintf("%s %s", c.Request().Method, c.Request().URL.Path),
+		options...,
+	)
+	return ctx, transaction
+}
 
 // Active godoc
 // @Summary SSL List active certificates Endpoint
@@ -34,6 +58,8 @@ func (h *Handler) Active(c echo.Context) error {
 
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "list active ssl certificates for given domain")
+	ctx, transaction := sentryTrace(ctx, c)
+	defer transaction.Finish()
 	defer span.End()
 
 	user, err := auth.UserFromRequest(c)
@@ -91,6 +117,8 @@ func (h *Handler) Active(c echo.Context) error {
 func (h *Handler) List(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "list ssl certificates")
+	ctx, transaction := sentryTrace(ctx, c)
+	defer transaction.Finish()
 	defer span.End()
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
@@ -128,6 +156,8 @@ func (h *Handler) List(c echo.Context) error {
 func (h *Handler) Revoke(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "revoke")
+	ctx, transaction := sentryTrace(ctx, c)
+	defer transaction.Finish()
 	defer span.End()
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
@@ -196,6 +226,8 @@ func (h *Handler) Revoke(c echo.Context) error {
 func (h *Handler) HandleCsr(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "issue new certificate")
+	ctx, transaction := sentryTrace(ctx, c)
+	defer transaction.Finish()
 	defer span.End()
 	user, err := auth.UserFromRequest(c)
 	if err != nil {

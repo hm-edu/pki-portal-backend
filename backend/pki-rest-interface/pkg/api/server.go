@@ -7,8 +7,11 @@ import (
 	"time"
 
 	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/getsentry/sentry-go"
+	sentryecho "github.com/getsentry/sentry-go/echo"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/gommon/log"
 	"github.com/lestrrat-go/jwx/jwk"
 	echoSwagger "github.com/swaggo/echo-swagger"
 
@@ -91,6 +94,20 @@ func (api *Server) wireRoutesAndMiddleware() {
 	api.app.Use(logging.ZapLogger(api.logger))
 	api.app.Use(middleware.Recover())
 
+	if api.config.SentryDSN != "" {
+		if err := sentry.Init(sentry.ClientOptions{
+			Dsn: api.config.SentryDSN,
+			// Set TracesSampleRate to 1.0 to capture 100%
+			// of transactions for performance monitoring.
+			// We recommend adjusting this value in production,
+			TracesSampleRate: 1.0,
+			EnableTracing:    true,
+		}); err != nil {
+			log.Warnf("Sentry initialization failed: %v\n", err)
+		} else {
+			api.app.Use(sentryecho.New(sentryecho.Options{}))
+		}
+	}
 	if len(api.config.CorsAllowedOrigins) != 0 {
 		api.app.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 			AllowOrigins:     api.config.CorsAllowedOrigins,

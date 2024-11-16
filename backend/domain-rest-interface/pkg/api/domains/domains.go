@@ -34,24 +34,9 @@ import (
 func (h *Handler) ListDomains(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "list")
-	hub := sentry.GetHubFromContext(ctx)
-	if hub == nil {
-		// Check the concurrency guide for more details: https://docs.sentry.io/platforms/go/concurrency/
-		hub = sentry.CurrentHub().Clone()
-		ctx = sentry.SetHubOnContext(ctx, hub)
-	}
-
-	options := []sentry.SpanOption{
-		// Set the OP based on values from https://develop.sentry.dev/sdk/performance/span-operations/
-		sentry.WithOpName("http.server"),
-		sentry.ContinueFromRequest(c.Request()),
-		sentry.WithTransactionSource(sentry.SourceURL),
-	}
-
-	transaction := sentry.StartTransaction(ctx,
-		fmt.Sprintf("%s %s", c.Request().Method, c.Request().URL.Path),
-		options...,
-	)
+	// Check the concurrency guide for more details: https://docs.sentry.io/platforms/go/concurrency/
+	// Set the OP based on values from https://develop.sentry.dev/sdk/performance/span-operations/
+	ctx, transaction := sentryTrace(ctx, c)
 	defer transaction.Finish()
 	defer span.End()
 
@@ -70,6 +55,28 @@ func (h *Handler) ListDomains(c echo.Context) error {
 	}
 	logger.Debug("Listing domains", zap.Int("count", len(domains)), zap.Any("domains", domains))
 	return c.JSON(http.StatusOK, domains)
+}
+
+func sentryTrace(ctx context.Context, c echo.Context) (context.Context, *sentry.Span) {
+	hub := sentry.GetHubFromContext(ctx)
+	if hub == nil {
+
+		hub = sentry.CurrentHub().Clone()
+		ctx = sentry.SetHubOnContext(ctx, hub)
+	}
+
+	options := []sentry.SpanOption{
+
+		sentry.WithOpName("http.server"),
+		sentry.ContinueFromRequest(c.Request()),
+		sentry.WithTransactionSource(sentry.SourceURL),
+	}
+
+	transaction := sentry.StartTransaction(ctx,
+		fmt.Sprintf("%s %s", c.Request().Method, c.Request().URL.Path),
+		options...,
+	)
+	return ctx, transaction
 }
 
 func (h *Handler) enumerateDomains(ctx context.Context, user string, logger *zap.Logger) ([]*model.Domain, error) {
@@ -177,6 +184,8 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string, logger *zap
 func (h *Handler) CreateDomain(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "create")
+	ctx, transaction := sentryTrace(ctx, c)
+	defer transaction.Finish()
 	defer span.End()
 
 	user, err := auth.UserFromRequest(c)
@@ -244,6 +253,8 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 func (h *Handler) DeleteDomain(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "delete")
+	ctx, transaction := sentryTrace(ctx, c)
+	defer transaction.Finish()
 	defer span.End()
 
 	item, err := h.evaluatePermission(ctx, c, logger, func(d *model.Domain) bool { return d.Permissions.CanDelete })
@@ -308,6 +319,8 @@ func (h *Handler) evaluatePermission(ctx context.Context, c echo.Context, logger
 func (h *Handler) ApproveDomain(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "approve")
+	ctx, transaction := sentryTrace(ctx, c)
+	defer transaction.Finish()
 	defer span.End()
 
 	item, err := h.evaluatePermission(ctx, c, logger, func(d *model.Domain) bool { return d.Permissions.CanApprove })
@@ -340,6 +353,8 @@ func (h *Handler) ApproveDomain(c echo.Context) error {
 func (h *Handler) TransferDomain(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "transfer")
+	ctx, transaction := sentryTrace(ctx, c)
+	defer transaction.Finish()
 	defer span.End()
 
 	req := &model.TransferRequest{}
@@ -377,6 +392,8 @@ func (h *Handler) TransferDomain(c echo.Context) error {
 func (h *Handler) DeleteDelegation(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "deleteDelegation")
+	ctx, transaction := sentryTrace(ctx, c)
+	defer transaction.Finish()
 	defer span.End()
 
 	item, err := h.evaluatePermission(ctx, c, logger, func(d *model.Domain) bool { return d.Permissions.CanDelegate })
@@ -420,6 +437,8 @@ func (h *Handler) DeleteDelegation(c echo.Context) error {
 func (h *Handler) AddDelegation(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	ctx, span := h.tracer.Start(c.Request().Context(), "addDelegation")
+	ctx, transaction := sentryTrace(ctx, c)
+	defer transaction.Finish()
 	defer span.End()
 
 	req := &model.DelegationRequest{}
