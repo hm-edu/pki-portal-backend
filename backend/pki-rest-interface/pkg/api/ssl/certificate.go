@@ -106,6 +106,7 @@ func (h *Handler) List(c echo.Context) error {
 		ctx = sentry.SetHubOnContext(ctx, hub)
 	}
 
+	span := sentryecho.GetSpanFromContext(c)
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		logger.Error("error getting user from request", zap.Error(err))
@@ -116,7 +117,7 @@ func (h *Handler) List(c echo.Context) error {
 			scope.SetExtra("user", user)
 		})
 	}
-	domains, err := h.domain.ListDomains(ctx, &pb.ListDomainsRequest{User: user, Approved: true})
+	domains, err := h.domain.ListDomains(span.Context(), &pb.ListDomainsRequest{User: user, Approved: true})
 	if err != nil {
 		logger.Error("error getting domains", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while listing certificates"}
@@ -124,17 +125,7 @@ func (h *Handler) List(c echo.Context) error {
 
 	logger.Debug("fetching certificates", zap.Strings("domains", domains.Domains))
 
-	hub2 := sentry.GetHubFromContext(ctx)
-	if hub2 == nil {
-		logger.Warn("no hub found")
-	}
-
-	span := sentry.SpanFromContext(ctx)
-	if span == nil {
-		logger.Warn("no span found")
-	}
-
-	certs, err := h.ssl.ListCertificates(ctx, &pb.ListSslRequest{IncludePartial: false, Domains: domains.Domains})
+	certs, err := h.ssl.ListCertificates(span.Context(), &pb.ListSslRequest{IncludePartial: false, Domains: domains.Domains})
 	if err != nil {
 		logger.Error("error while listing certificates", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while listing certificates"}
