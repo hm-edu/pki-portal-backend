@@ -5,6 +5,9 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/getsentry/sentry-go"
+	grpc_sentry "github.com/johnbellone/grpc-middleware-sentry"
+
 	pb "github.com/hm-edu/portal-apis"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 
@@ -34,6 +37,7 @@ type Server struct {
 type Config struct {
 	Port        int    `mapstructure:"grpc-port"`
 	ServiceName string `mapstructure:"grpc-rest-interface-name"`
+	SentryDSN   string `mapstructure:"sentry-dsn"`
 }
 
 // NewServer creates a new GRPC server
@@ -57,17 +61,41 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 		s.logger.Fatal("failed to listen", zap.Int("port", s.config.Port))
 	}
 
+	interceptors := []grpc.UnaryServerInterceptor{
+		grpc_recovery.UnaryServerInterceptor(),
+		grpc_zap.UnaryServerInterceptor(s.logger,
+			grpc_zap.WithDecider(func(fullMethodName string, err error) bool {
+				if fullMethodName == "/grpc.health.v1.Health/Check" && err == nil {
+					return false
+				}
+				return true
+			}),
+		)}
+
+	if s.config.SentryDSN != "" {
+		if err := sentry.Init(sentry.ClientOptions{
+			Dsn: s.config.SentryDSN,
+			// Set TracesSampleRate to 1.0 to capture 100%
+			// of transactions for performance monitoring.
+			// We recommend adjusting this value in production,
+			TracesSampleRate: 1.0,
+			EnableTracing:    true,
+			BeforeSend: func(event *sentry.Event, hint *sentry.EventHint) *sentry.Event {
+				return event
+			},
+		}); err != nil {
+			zap.L().Sugar().Warnf("Sentry initialization failed: %v\n", err)
+		} else {
+			s.logger.Info("Sentry initialized")
+			interceptors = append(interceptors, grpc_sentry.UnaryServerInterceptor())
+		}
+	}
+
 	srv := grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()),
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
-				grpc_recovery.UnaryServerInterceptor(),
-				grpc_zap.UnaryServerInterceptor(s.logger,
-					grpc_zap.WithDecider(func(fullMethodName string, err error) bool {
-						if fullMethodName == "/grpc.health.v1.Health/Check" && err == nil {
-							return false
-						}
-						return true
-					})))),
+				interceptors...,
+			)),
 		grpc.StreamInterceptor(
 			grpc_middleware.ChainStreamServer(
 				grpc_recovery.StreamServerInterceptor(),
