@@ -117,6 +117,22 @@ func (h *Handler) List(c echo.Context) error {
 	}
 
 	logger.Debug("fetching certificates", zap.Strings("domains", domains.Domains))
+
+	hub := sentry.GetHubFromContext(c.Request().Context())
+	if hub == nil {
+		logger.Warn("no hub found")
+	}
+
+	span := sentry.SpanFromContext(c.Request().Context())
+	if span == nil {
+		logger.Warn("no span found")
+	}
+
+	span = sentryecho.GetSpanFromContext(c)
+	if span == nil {
+		logger.Warn("no span found in echo context")
+	}
+
 	certs, err := h.ssl.ListCertificates(c.Request().Context(), &pb.ListSslRequest{IncludePartial: false, Domains: domains.Domains})
 	if err != nil {
 		logger.Error("error while listing certificates", zap.Error(err))
@@ -206,18 +222,14 @@ func (h *Handler) Revoke(c echo.Context) error {
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) HandleCsr(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
-	ctx, span := h.tracer.Start(c.Request().Context(), "issue new certificate")
-	defer span.End()
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		logger.Error("error getting user from request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
-	span.SetAttributes(attribute.String("user", user))
 
 	req := &model.CsrRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
-		span.RecordError(err)
 		logger.Error("error while parsing csr", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
 	}
@@ -229,14 +241,12 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 
 	csr, err := x509.ParseCertificateRequest(block.Bytes)
 	if err != nil {
-		span.RecordError(err)
 		logger.Error("error while parsing csr", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request. CSR has invalid format."}
 	}
 
 	// Validate the CSR
 	if err := csr.CheckSignature(); err != nil {
-		span.RecordError(err)
 		logger.Error("error while parsing csr", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request. CSR has invalid signature."}
 	}
@@ -266,23 +276,20 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request. No SANs found in CSR"}
 	}
 
-	permissions, err := h.domain.CheckPermission(ctx, &pb.CheckPermissionRequest{User: user, Domains: sans})
+	permissions, err := h.domain.CheckPermission(c.Request().Context(), &pb.CheckPermissionRequest{User: user, Domains: sans})
 	if err != nil {
-		span.RecordError(err)
 		logger.Error("error while checking permissions", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while checking permissions"}
 	}
 	logger.Info("checking permission for certificate issuance", zap.Strings("domains", sans))
 	missing := helper.Map(helper.Where(permissions.Permissions, func(t *pb.Permission) bool { return !t.Granted }), func(t *pb.Permission) string { return t.Domain })
-	span.SetAttributes(attribute.StringSlice("domains", sans), attribute.String("user", user), attribute.StringSlice("missing", missing))
 	logger.Info("permissions checked", zap.Strings("missing", missing), zap.Strings("domains", sans))
 	if len(missing) > 0 {
 		return &echo.HTTPError{Code: http.StatusForbidden, Message: "You are not authorized to issue this certificate. Missing permissions for domains: " + strings.Join(missing, ", ")}
 	}
 
-	resp, err := h.ssl.IssueCertificate(ctx, &pb.IssueSslRequest{Csr: req.CSR, SubjectAlternativeNames: sans, Issuer: user, Source: "API"})
+	resp, err := h.ssl.IssueCertificate(c.Request().Context(), &pb.IssueSslRequest{Csr: req.CSR, SubjectAlternativeNames: sans, Issuer: user, Source: "API"})
 	if err != nil {
-		span.RecordError(err)
 		logger.Error("error while processing CSR", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Internal Error while processing the request."}
 	}
