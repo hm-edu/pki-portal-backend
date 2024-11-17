@@ -124,41 +124,32 @@ func (h *Handler) Active(c echo.Context) error {
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) List(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
-	tracingCtx, span := h.tracer.Start(c.Request().Context(), "list ssl certificates")
-	ctx, transaction := sentryTrace(tracingCtx, c)
+	ctx, transaction := sentryTrace(c.Request().Context(), c)
 	defer transaction.Finish()
-	defer span.End()
+
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		logger.Error("error getting user from request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
-	span.SetAttributes(attribute.String("user", user))
-	transaction.SetData("user", user)
-
-	span.AddEvent("fetching domains")
 	sentry.AddBreadcrumb(&sentry.Breadcrumb{Level: sentry.LevelInfo, Message: "Loading domains"})
 	domains, err := h.domain.ListDomains(ctx, &pb.ListDomainsRequest{User: user, Approved: true})
 	if err != nil {
 		logger.Error("error getting domains", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while listing certificates"}
 	}
-	span.AddEvent("fetching certificates")
+
 	logger.Debug("fetching certificates", zap.Strings("domains", domains.Domains))
-	sentry.AddBreadcrumb(&sentry.Breadcrumb{Level: sentry.LevelInfo, Message: "Loading certificates"})
-
-	if sentry.SpanFromContext(ctx) == nil {
-		logger.Info("No span found")
-	}
-	if sentry.TransactionFromContext(ctx) == nil {
-		logger.Info("No transaction found")
-	}
-
+	sentrySpan := sentry.StartSpan(ctx, "fetching certificates")
 	certs, err := h.ssl.ListCertificates(ctx, &pb.ListSslRequest{IncludePartial: false, Domains: domains.Domains})
 	if err != nil {
 		logger.Error("error while listing certificates", zap.Error(err))
+		sentrySpan.Status = sentry.SpanStatusInternalError
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while listing certificates"}
 	}
+	sentrySpan.Status = sentry.SpanStatusOK
+	sentrySpan.Finish()
+
 	return c.JSON(http.StatusOK, certs.Items)
 }
 
