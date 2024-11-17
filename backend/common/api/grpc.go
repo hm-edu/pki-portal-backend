@@ -39,8 +39,9 @@ func PrepareEnv(cmd *cobra.Command) (*zap.Logger, func(*zap.Logger), *viper.Vipe
 }
 
 // ConnectGRPC connects to the GRPC server.
-func ConnectGRPC(host string) (*grpc.ClientConn, error) {
-	conn, err := grpc.NewClient(host, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithStatsHandler(otelgrpc.NewClientHandler()))
+func ConnectGRPC(host string, options ...grpc.DialOption) (*grpc.ClientConn, error) {
+	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithStatsHandler(otelgrpc.NewClientHandler()))
+	conn, err := grpc.NewClient(host, options...)
 	if err != nil {
 		return nil, err
 	}

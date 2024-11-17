@@ -3,6 +3,8 @@ package api
 
 import (
 	"context"
+	"errors"
+	"google.golang.org/grpc"
 	"net/http"
 	"time"
 
@@ -25,6 +27,7 @@ import (
 	"github.com/hm-edu/portal-common/auth"
 	commonAuth "github.com/hm-edu/portal-common/auth"
 	"github.com/hm-edu/portal-common/logging"
+	grpc_sentry "github.com/johnbellone/grpc-middleware-sentry"
 
 	"go.uber.org/zap"
 
@@ -139,7 +142,8 @@ func (api *Server) wireRoutesAndMiddleware() {
 		if err != nil {
 			api.logger.Fatal("failed to create domain client", zap.Error(err))
 		}
-		sslClient, err := sslClient(api.handlerCfg.SslService)
+
+		sslClient, err := sslClient(api.handlerCfg.SslService, api.config.SentryDSN)
 		if err != nil {
 			api.logger.Fatal("failed to create ssl client", zap.Error(err))
 		}
@@ -185,8 +189,12 @@ func smimeClient(host string) (pb.SmimeServiceClient, error) {
 	return pb.NewSmimeServiceClient(conn), nil
 }
 
-func sslClient(host string) (pb.SSLServiceClient, error) {
-	conn, err := api.ConnectGRPC(host)
+func sslClient(host string, sentryDSN string) (pb.SSLServiceClient, error) {
+	var interceptor []grpc.UnaryClientInterceptor
+	if sentryDSN != "" {
+		interceptor = append(interceptor, grpc_sentry.UnaryClientInterceptor())
+	}
+	conn, err := api.ConnectGRPC(host, grpc.WithChainUnaryInterceptor(interceptor...))
 	if err != nil {
 		return nil, err
 	}
@@ -200,7 +208,7 @@ func (api *Server) ListenAndServe(stopCh <-chan struct{}) {
 	go func() {
 		addr := api.config.Host + ":" + api.config.Port
 		api.logger.Info("Starting HTTP Server.", zap.String("addr", addr))
-		if err := api.app.Start(addr); err != http.ErrServerClosed {
+		if err := api.app.Start(addr); !errors.Is(err, http.ErrServerClosed) {
 			api.logger.Fatal("HTTP server crashed", zap.Error(err))
 		}
 	}()
