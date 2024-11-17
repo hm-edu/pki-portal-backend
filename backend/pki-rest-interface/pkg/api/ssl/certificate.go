@@ -124,8 +124,8 @@ func (h *Handler) Active(c echo.Context) error {
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) List(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
-	ctx, span := h.tracer.Start(c.Request().Context(), "list ssl certificates")
-	ctx, transaction := sentryTrace(ctx, c)
+	tracingCtx, span := h.tracer.Start(c.Request().Context(), "list ssl certificates")
+	ctx, transaction := sentryTrace(tracingCtx, c)
 	defer transaction.Finish()
 	defer span.End()
 	user, err := auth.UserFromRequest(c)
@@ -134,8 +134,10 @@ func (h *Handler) List(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
 	span.SetAttributes(attribute.String("user", user))
+	transaction.SetData("user", user)
 
 	span.AddEvent("fetching domains")
+	sentry.AddBreadcrumb(&sentry.Breadcrumb{Level: sentry.LevelInfo, Message: "Loading domains"})
 	domains, err := h.domain.ListDomains(ctx, &pb.ListDomainsRequest{User: user, Approved: true})
 	if err != nil {
 		logger.Error("error getting domains", zap.Error(err))
@@ -143,6 +145,7 @@ func (h *Handler) List(c echo.Context) error {
 	}
 	span.AddEvent("fetching certificates")
 	logger.Debug("fetching certificates", zap.Strings("domains", domains.Domains))
+	sentry.AddBreadcrumb(&sentry.Breadcrumb{Level: sentry.LevelInfo, Message: "Loading certificates"})
 
 	if sentry.SpanFromContext(ctx) != nil {
 		logger.Info("No span found")
