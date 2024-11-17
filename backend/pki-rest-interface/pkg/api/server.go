@@ -4,9 +4,10 @@ package api
 import (
 	"context"
 	"errors"
-	"google.golang.org/grpc"
 	"net/http"
 	"time"
+
+	"google.golang.org/grpc"
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/getsentry/sentry-go"
@@ -138,7 +139,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 
 	group := api.app.Group("/ssl")
 	{
-		domainClient, err := domainClient(api.handlerCfg.DomainService)
+		domainClient, err := domainClient(api.handlerCfg.DomainService, api.config.SentryDSN)
 		if err != nil {
 			api.logger.Fatal("failed to create domain client", zap.Error(err))
 		}
@@ -158,7 +159,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 
 	group = api.app.Group("/smime")
 	{
-		smimeClient, err := smimeClient(api.handlerCfg.SmimeService)
+		smimeClient, err := smimeClient(api.handlerCfg.SmimeService, api.config.SentryDSN)
 		if err != nil {
 			api.logger.Fatal("failed to create smime client", zap.Error(err))
 		}
@@ -173,16 +174,24 @@ func (api *Server) wireRoutesAndMiddleware() {
 	healthy = 1
 }
 
-func domainClient(host string) (pb.DomainServiceClient, error) {
-	conn, err := api.ConnectGRPC(host)
+func domainClient(host string, sentryDSN string) (pb.DomainServiceClient, error) {
+	var interceptor []grpc.UnaryClientInterceptor
+	if sentryDSN != "" {
+		interceptor = append(interceptor, grpc_sentry.UnaryClientInterceptor())
+	}
+	conn, err := api.ConnectGRPC(host, grpc.WithChainUnaryInterceptor(interceptor...))
 	if err != nil {
 		return nil, err
 	}
 	return pb.NewDomainServiceClient(conn), nil
 }
 
-func smimeClient(host string) (pb.SmimeServiceClient, error) {
-	conn, err := api.ConnectGRPC(host)
+func smimeClient(host string, sentryDSN string) (pb.SmimeServiceClient, error) {
+	var interceptor []grpc.UnaryClientInterceptor
+	if sentryDSN != "" {
+		interceptor = append(interceptor, grpc_sentry.UnaryClientInterceptor())
+	}
+	conn, err := api.ConnectGRPC(host, grpc.WithChainUnaryInterceptor(interceptor...))
 	if err != nil {
 		return nil, err
 	}
