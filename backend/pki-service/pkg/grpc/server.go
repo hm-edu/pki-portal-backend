@@ -37,7 +37,7 @@ type Server struct {
 type Config struct {
 	Port        int    `mapstructure:"grpc-port"`
 	ServiceName string `mapstructure:"grpc-rest-interface-name"`
-	SentryDSN   string `mapstructure:"sentry-dsn"`
+	SentryDSN   string `mapstructure:"sentry_dsn"`
 }
 
 // NewServer creates a new GRPC server
