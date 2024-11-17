@@ -124,8 +124,6 @@ func (h *Handler) Active(c echo.Context) error {
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) List(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
-	ctx, transaction := sentryTrace(c.Request().Context(), c)
-	defer transaction.Finish()
 
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
@@ -133,15 +131,15 @@ func (h *Handler) List(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
 	sentry.AddBreadcrumb(&sentry.Breadcrumb{Level: sentry.LevelInfo, Message: "Loading domains"})
-	domains, err := h.domain.ListDomains(ctx, &pb.ListDomainsRequest{User: user, Approved: true})
+	domains, err := h.domain.ListDomains(c.Request().Context(), &pb.ListDomainsRequest{User: user, Approved: true})
 	if err != nil {
 		logger.Error("error getting domains", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while listing certificates"}
 	}
 
 	logger.Debug("fetching certificates", zap.Strings("domains", domains.Domains))
-	sentrySpan := sentry.StartSpan(ctx, "fetching certificates")
-	certs, err := h.ssl.ListCertificates(ctx, &pb.ListSslRequest{IncludePartial: false, Domains: domains.Domains})
+	sentrySpan := sentry.StartSpan(c.Request().Context(), "fetching certificates")
+	certs, err := h.ssl.ListCertificates(c.Request().Context(), &pb.ListSslRequest{IncludePartial: false, Domains: domains.Domains})
 	if err != nil {
 		logger.Error("error while listing certificates", zap.Error(err))
 		sentrySpan.Status = sentry.SpanStatusInternalError
