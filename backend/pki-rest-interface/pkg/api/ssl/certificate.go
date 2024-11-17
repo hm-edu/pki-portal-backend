@@ -67,7 +67,7 @@ func (h *Handler) Active(c echo.Context) error {
 		logger.Error("error getting user from request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
-	span.SetAttributes(attribute.String("user", user))
+	transaction.SetData("user", user)
 
 	domain := c.QueryParam("domain")
 
@@ -76,7 +76,7 @@ func (h *Handler) Active(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "No domain provided"}
 	}
 
-	span.AddEvent("fetching domains")
+	sentry.AddBreadcrumb(&sentry.Breadcrumb{Level: sentry.LevelInfo, Message: "Loading domains"})
 	domains, err := h.domain.ListDomains(ctx, &pb.ListDomainsRequest{User: user, Approved: true})
 	if err != nil {
 		logger.Error("error getting domains", zap.Error(err))
@@ -88,8 +88,16 @@ func (h *Handler) Active(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusForbidden, Message: "You are not authorized to use this domain"}
 	}
 
-	span.AddEvent("fetching certificates")
+	if sentry.SpanFromContext(ctx) != nil {
+		logger.Info("No span found")
+	}
+	if sentry.TransactionFromContext(ctx) != nil {
+		logger.Info("No transaction found")
+	}
+	sentry.AddBreadcrumb(&sentry.Breadcrumb{Level: sentry.LevelInfo, Message: "Loading certificates"})
+
 	logger.Info("fetching certificates", zap.Strings("domains", domains.Domains))
+
 	certs, err := h.ssl.ListCertificates(ctx, &pb.ListSslRequest{IncludePartial: false, Domains: []string{domain}})
 	if err != nil {
 		logger.Error("error while listing certificates", zap.Error(err))
