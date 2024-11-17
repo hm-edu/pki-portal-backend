@@ -78,11 +78,9 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 			// Set TracesSampleRate to 1.0 to capture 100%
 			// of transactions for performance monitoring.
 			// We recommend adjusting this value in production,
-			TracesSampleRate: 1.0,
-			EnableTracing:    true,
-			BeforeSend: func(event *sentry.Event, hint *sentry.EventHint) *sentry.Event {
-				return event
-			},
+			TracesSampleRate:   1.0,
+			EnableTracing:      true,
+			IgnoreTransactions: []string{"/grpc.health.v1.Health/Check"},
 		}); err != nil {
 			zap.L().Sugar().Warnf("Sentry initialization failed: %v\n", err)
 		} else {
