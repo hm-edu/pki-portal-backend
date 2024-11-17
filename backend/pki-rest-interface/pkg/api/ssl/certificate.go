@@ -88,10 +88,10 @@ func (h *Handler) Active(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusForbidden, Message: "You are not authorized to use this domain"}
 	}
 
-	if sentry.SpanFromContext(ctx) != nil {
+	if sentry.SpanFromContext(ctx) == nil {
 		logger.Info("No span found")
 	}
-	if sentry.TransactionFromContext(ctx) != nil {
+	if sentry.TransactionFromContext(ctx) == nil {
 		logger.Info("No transaction found")
 	}
 	sentry.AddBreadcrumb(&sentry.Breadcrumb{Level: sentry.LevelInfo, Message: "Loading certificates"})
@@ -147,10 +147,10 @@ func (h *Handler) List(c echo.Context) error {
 	logger.Debug("fetching certificates", zap.Strings("domains", domains.Domains))
 	sentry.AddBreadcrumb(&sentry.Breadcrumb{Level: sentry.LevelInfo, Message: "Loading certificates"})
 
-	if sentry.SpanFromContext(ctx) != nil {
+	if sentry.SpanFromContext(ctx) == nil {
 		logger.Info("No span found")
 	}
-	if sentry.TransactionFromContext(ctx) != nil {
+	if sentry.TransactionFromContext(ctx) == nil {
 		logger.Info("No transaction found")
 	}
 
