@@ -143,6 +143,14 @@ func (h *Handler) List(c echo.Context) error {
 	}
 	span.AddEvent("fetching certificates")
 	logger.Debug("fetching certificates", zap.Strings("domains", domains.Domains))
+
+	if sentry.SpanFromContext(ctx) != nil {
+		logger.Info("No span found")
+	}
+	if sentry.TransactionFromContext(ctx) != nil {
+		logger.Info("No transaction found")
+	}
+
 	certs, err := h.ssl.ListCertificates(ctx, &pb.ListSslRequest{IncludePartial: false, Domains: domains.Domains})
 	if err != nil {
 		logger.Error("error while listing certificates", zap.Error(err))
