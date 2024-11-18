@@ -21,13 +21,13 @@ func WaitFor(timeout, interval time.Duration, f func() (bool, error)) error {
 		}
 
 		stop, err := f()
-		if stop {
+		if stop && err == nil {
 			return nil
 		}
-		if err != nil {
-			lastErr = err
+		if stop && err != nil {
+			return err
 		}
-
+		lastErr = err
 		time.Sleep(interval)
 	}
 }

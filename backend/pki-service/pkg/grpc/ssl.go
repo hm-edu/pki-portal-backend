@@ -252,7 +252,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 					return false, nil
 				}
 			}
-			return false, err
+			return true, err
 		}
 		cert = *c
 		return true, nil
