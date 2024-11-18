@@ -152,8 +152,18 @@ func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequ
 
 func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslRequest) (*pb.IssueSslResponse, error) {
 
-	trans := sentry.StartTransaction(ctx, "IssueCertificate")
-	defer trans.Finish()
+	sp := sentry.SpanFromContext(ctx)
+	if sp == nil {
+		s.logger.Sugar().Error("No span found")
+	}
+
+	hub := sentry.GetHubFromContext(ctx)
+	if hub == nil {
+		s.logger.Sugar().Error("No hub found")
+	}
+
+	span := sentry.StartSpan(ctx, "IssueCertificate")
+	defer span.Finish()
 
 	logger := s.logger.With(zap.String("issuer", req.Issuer))
 
