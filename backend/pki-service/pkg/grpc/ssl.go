@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/getsentry/sentry-go"
 	"github.com/hm-edu/pki-service/ent"
 	"github.com/hm-edu/pki-service/ent/certificate"
 	"github.com/hm-edu/pki-service/ent/domain"
@@ -20,10 +21,7 @@ import (
 	"github.com/hm-edu/sectigo-client/sectigo/ssl"
 
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	tracingCodes "go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/metric"
-	"go.opentelemetry.io/otel/trace"
 
 	"go.uber.org/zap"
 
@@ -77,9 +75,9 @@ func flattenCertificates(certs []*x509.Certificate) string {
 	return string(result)
 }
 
-func (s *sslAPIServer) handleError(msg string, span trace.Span, err error, logger *zap.Logger) (*pb.IssueSslResponse, error) {
-	span.RecordError(err)
-	span.AddEvent(msg)
+func (s *sslAPIServer) handleError(msg string, err error, logger *zap.Logger) (*pb.IssueSslResponse, error) {
+	sentry.AddBreadcrumb(&sentry.Breadcrumb{Message: msg, Category: "error", Level: sentry.LevelError})
+	sentry.CaptureException(err)
 	logger.Error(msg, zap.Error(err))
 	return nil, status.Errorf(codes.Internal, msg)
 }
@@ -90,8 +88,6 @@ type sslAPIServer struct {
 	db     *ent.Client
 	cfg    *cfg.SectigoConfiguration
 	logger *zap.Logger
-
-	pendingValidations map[string]interface{}
 
 	last     *time.Time
 	duration *time.Duration
@@ -111,7 +107,7 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 		metric.WithUnit("unixMilli"),
 		metric.WithDescription("Issue timestamp for last SSL Certificates"),
 	)
-	instance := &sslAPIServer{client: client, cfg: cfg, logger: zap.L(), db: db, pendingValidations: make(map[string]interface{})}
+	instance := &sslAPIServer{client: client, cfg: cfg, logger: zap.L(), db: db}
 	_, err = meter.RegisterCallback(func(_ context.Context, observer metric.Observer) error {
 		if instance.last != nil {
 			observer.ObserveInt64(gauge, int64(instance.duration.Seconds()))
@@ -135,8 +131,6 @@ func (s *sslAPIServer) CertificateDetails(ctx context.Context, req *pb.Certifica
 
 func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequest) (*pb.ListSslResponse, error) {
 
-	_, span := otel.GetTracerProvider().Tracer("ssl").Start(ctx, "listing ssl certificates")
-	defer span.End()
 	logger := s.logger.With(zap.Strings("domains", req.Domains), zap.Bool("partial", req.IncludePartial))
 	logger.Debug("listing certificates for domains")
 
@@ -151,8 +145,6 @@ func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequ
 	}
 	certificates, err := s.db.Certificate.Query().WithDomains().Where(cond).All(ctx)
 	if err != nil {
-		span.RecordError(err)
-		span.SetStatus(tracingCodes.Error, "listing certificates failed")
 		return nil, status.Error(codes.Internal, "Error querying certificates")
 	}
 	return &pb.ListSslResponse{Items: helper.Map(certificates, mapCertificate)}, nil
@@ -160,25 +152,27 @@ func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequ
 
 func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslRequest) (*pb.IssueSslResponse, error) {
 
-	_, span := otel.GetTracerProvider().Tracer("ssl").Start(ctx, "issuing server certificate")
-	defer span.End()
-	logger := s.logger.With(zap.String("trace_id", span.SpanContext().TraceID().String()), zap.String("issuer", req.Issuer))
+	trans := sentry.StartTransaction(ctx, "IssueCertificate")
+	defer trans.Finish()
+
+	logger := s.logger.With(zap.String("issuer", req.Issuer))
 
 	block, _ := pem.Decode([]byte(req.Csr))
 
 	if block == nil {
+		sentry.CaptureMessage("Invalid pem block")
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid pem block")
 	}
 
 	csr, err := x509.ParseCertificateRequest(block.Bytes)
 	if err != nil {
-		span.RecordError(err)
+		sentry.AddBreadcrumb(&sentry.Breadcrumb{Message: "Error parsing CSR", Category: "error", Level: sentry.LevelError})
+		sentry.CaptureException(err)
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid CSR")
 	}
 
 	// Validate the CSR
 	if err := csr.CheckSignature(); err != nil {
-		span.RecordError(err)
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid CSR signature")
 	}
 	var sans []string
@@ -193,13 +187,9 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	}
 	ids := []int{}
 
-	if _, ok := s.pendingValidations[req.Csr]; ok {
-		return nil, status.Errorf(codes.AlreadyExists, "Outstanding validation for this CSR")
-	}
 	logger = logger.With(zap.Strings("subject_alternative_names", sans))
 	logger.Info("Issuing new server certificate")
 
-	span.SetAttributes(attribute.StringSlice("subject_alternative_names", sans))
 	for _, fqdn := range sans {
 		id, err := s.db.Domain.Create().
 			SetFqdn(fqdn).
@@ -208,7 +198,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 			ID(ctx)
 
 		if err != nil {
-			return s.handleError("Error while creating certificate", span, err, logger)
+			return s.handleError("Error while creating certificate", err, logger)
 		}
 		ids = append(ids, id)
 	}
@@ -221,9 +211,11 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		Save(ctx)
 
 	if err != nil {
-		return s.handleError("Error while creating certificate", span, err, logger)
+		return s.handleError("Error while creating certificate", err, logger)
 	}
+
 	start := time.Now()
+	sentry.AddBreadcrumb(&sentry.Breadcrumb{Message: "Requesting certificate", Category: "info", Level: sentry.LevelInfo})
 	enrollment, err := s.client.SslService.Enroll(ssl.EnrollmentRequest{
 		OrgID:        s.cfg.SslOrgID,
 		Csr:          req.Csr,
@@ -232,14 +224,13 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		SubjAltNames: strings.Join(req.SubjectAlternativeNames, ","),
 	})
 
-	span.AddEvent("Enrollment request sent")
 	if err != nil {
-		return s.handleError("Error while requesting certificate", span, err, logger)
+		return s.handleError("Error while requesting certificate", err, logger)
 	}
 
 	entry, err = s.db.Certificate.UpdateOneID(entry.ID).SetStatus(certificate.StatusRequested).SetSslId(enrollment.SslID).Save(ctx)
 	if err != nil {
-		return s.handleError("Error while storing certificate", span, err, logger)
+		return s.handleError("Error while storing certificate", err, logger)
 	}
 	cert := ""
 	err = helper.WaitFor(5*time.Minute, 1*time.Second, func() (bool, error) {
@@ -247,21 +238,19 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		if err != nil {
 			if e, ok := err.(*sectigo.ErrorResponse); ok {
 				if e.Code == 0 && e.Description == "Being processed by Sectigo" {
-					span.AddEvent("Certificate not ready yet")
 					s.logger.Debug("Certificate not ready", zap.Int("id", enrollment.SslID), zap.Strings("subject_alternative_names", req.SubjectAlternativeNames))
 					return false, nil
 				}
 			}
 			return false, err
 		}
-		span.AddEvent("Certificate ready")
 		cert = *c
 		return true, nil
 	})
 	if err != nil {
-		return s.handleError("Error collecting certificate", span, err, logger)
+		return s.handleError("Error collecting certificate", err, logger)
 	}
-
+	sentry.AddBreadcrumb(&sentry.Breadcrumb{Message: "Certificate collected", Category: "info", Level: sentry.LevelInfo})
 	stop := time.Now()
 	duration := stop.Sub(start)
 	s.duration = &duration
@@ -269,7 +258,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 
 	certs, err := pkiHelper.ParseCertificates([]byte(cert))
 	if err != nil {
-		return s.handleError("Error parsing certificate", span, err, logger)
+		return s.handleError("Error parsing certificate", err, logger)
 	}
 	pem := certs[0]
 	serial := fmt.Sprintf("%032x", pem.SerialNumber)
@@ -286,7 +275,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		Save(ctx)
 
 	if err != nil {
-		return s.handleError("Error while saving collected certificate", span, err, logger)
+		return s.handleError("Error while saving collected certificate", err, logger)
 	}
 
 	return &pb.IssueSslResponse{Certificate: flattenCertificates(certs)}, nil
@@ -294,9 +283,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 
 func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslRequest) (*emptypb.Empty, error) {
 
-	_, span := otel.GetTracerProvider().Tracer("ssl").Start(ctx, "revoke ssl certificate")
-	defer span.End()
-	logger := s.logger.With(zap.String("trace_id", span.SpanContext().TraceID().String()), zap.String("reason", req.Reason))
+	logger := s.logger.With(zap.String("reason", req.Reason))
 
 	errorReturn := func(err error, logger *zap.Logger) (*emptypb.Empty, error) {
 		logger.Error("Failed to revoke certificate", zap.Error(err))
