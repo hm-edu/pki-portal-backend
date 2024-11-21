@@ -292,6 +292,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		SetCommonName(sans[0]).
 		SetIssuedBy(req.Issuer).
 		SetSource(req.Source).
+		SetCa("zerossl").
 		AddDomainIDs(ids...).
 		Save(ctx)
 
