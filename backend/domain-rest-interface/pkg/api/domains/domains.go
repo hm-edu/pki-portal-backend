@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/getsentry/sentry-go"
 	sentryecho "github.com/getsentry/sentry-go/echo"
 	"github.com/hm-edu/domain-rest-interface/ent"
 	"github.com/hm-edu/domain-rest-interface/pkg/model"
@@ -34,12 +33,12 @@ import (
 func (h *Handler) ListDomains(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 
-	hub := sentryecho.GetHubFromContext(c)
-	if hub == nil {
-		hub = sentry.CurrentHub().Clone()
-	}
 	span := sentryecho.GetSpanFromContext(c)
-	ctx := span.Context()
+	ctx := c.Request().Context()
+	if span == nil {
+		ctx = span.Context()
+	}
+
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		logger.Error("Failed to get user from request", zap.Error(err))
@@ -157,12 +156,12 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string, logger *zap
 func (h *Handler) CreateDomain(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 
-	hub := sentryecho.GetHubFromContext(c)
-	if hub == nil {
-		hub = sentry.CurrentHub().Clone()
-	}
 	span := sentryecho.GetSpanFromContext(c)
-	ctx := span.Context()
+	ctx := c.Request().Context()
+	if span == nil {
+		ctx = span.Context()
+	}
+
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		logger.Error("Failed to get user from request", zap.Error(err))
@@ -225,12 +224,12 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) DeleteDomain(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
-	hub := sentryecho.GetHubFromContext(c)
-	if hub == nil {
-		hub = sentry.CurrentHub().Clone()
-	}
+
 	span := sentryecho.GetSpanFromContext(c)
-	ctx := span.Context()
+	ctx := c.Request().Context()
+	if span == nil {
+		ctx = span.Context()
+	}
 
 	item, err := h.evaluatePermission(ctx, c, logger, func(d *model.Domain) bool { return d.Permissions.CanDelete })
 	if err != nil {
@@ -294,12 +293,11 @@ func (h *Handler) evaluatePermission(ctx context.Context, c echo.Context, logger
 func (h *Handler) ApproveDomain(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 
-	hub := sentryecho.GetHubFromContext(c)
-	if hub == nil {
-		hub = sentry.CurrentHub().Clone()
-	}
 	span := sentryecho.GetSpanFromContext(c)
-	ctx := span.Context()
+	ctx := c.Request().Context()
+	if span == nil {
+		ctx = span.Context()
+	}
 	item, err := h.evaluatePermission(ctx, c, logger, func(d *model.Domain) bool { return d.Permissions.CanApprove })
 	if err != nil {
 		return err
@@ -330,12 +328,11 @@ func (h *Handler) ApproveDomain(c echo.Context) error {
 func (h *Handler) TransferDomain(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 
-	hub := sentryecho.GetHubFromContext(c)
-	if hub == nil {
-		hub = sentry.CurrentHub().Clone()
-	}
 	span := sentryecho.GetSpanFromContext(c)
-	ctx := span.Context()
+	ctx := c.Request().Context()
+	if span == nil {
+		ctx = span.Context()
+	}
 	req := &model.TransferRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest}
@@ -371,12 +368,11 @@ func (h *Handler) TransferDomain(c echo.Context) error {
 func (h *Handler) DeleteDelegation(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 
-	hub := sentryecho.GetHubFromContext(c)
-	if hub == nil {
-		hub = sentry.CurrentHub().Clone()
-	}
 	span := sentryecho.GetSpanFromContext(c)
-	ctx := span.Context()
+	ctx := c.Request().Context()
+	if span == nil {
+		ctx = span.Context()
+	}
 	item, err := h.evaluatePermission(ctx, c, logger, func(d *model.Domain) bool { return d.Permissions.CanDelegate })
 	if err != nil {
 		return err
@@ -417,12 +413,12 @@ func (h *Handler) DeleteDelegation(c echo.Context) error {
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) AddDelegation(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
-	hub := sentryecho.GetHubFromContext(c)
-	if hub == nil {
-		hub = sentry.CurrentHub().Clone()
-	}
+
 	span := sentryecho.GetSpanFromContext(c)
-	ctx := span.Context()
+	ctx := c.Request().Context()
+	if span == nil {
+		ctx = span.Context()
+	}
 	req := &model.DelegationRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
