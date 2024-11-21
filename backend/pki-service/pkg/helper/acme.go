@@ -11,6 +11,7 @@ import (
 	"github.com/go-acme/lego/v4/certcrypto"
 	"github.com/go-acme/lego/v4/lego"
 	"github.com/go-acme/lego/v4/registration"
+	"github.com/hm-edu/pki-service/pkg/cfg"
 )
 
 // User represents an ACME user.
@@ -36,8 +37,13 @@ func (u *User) GetPrivateKey() crypto.PrivateKey {
 }
 
 // RegisterAcme performs a new registration and stores the registration in the given file.
-func RegisterAcme(client *lego.Client, account User, accountFile string, keyFile string) error {
-	reg, err := client.Registration.Register(registration.RegisterOptions{TermsOfServiceAgreed: true})
+func RegisterAcme(client *lego.Client, config *cfg.PKIConfiguration, account User, accountFile string, keyFile string) error {
+	reg, err := client.Registration.RegisterWithExternalAccountBinding(
+		registration.RegisterEABOptions{
+			TermsOfServiceAgreed: true,
+			Kid:                  config.AcmeKid,
+			HmacEncoded:          config.AcmeHmac,
+		})
 	if err != nil {
 		return err
 	}
