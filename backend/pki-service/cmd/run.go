@@ -121,7 +121,7 @@ func init() {
 	runCmd.Flags().String("mail_from", "", "The mail from")
 	runCmd.Flags().String("acme_storage", "", "Storage for the internal acme client")
 	runCmd.Flags().String("acme_email", "", "Email for the acme client")
-	runCmd.Flags().String("acme_eab", "", "EAB for the acme client")
-	runCmd.Flags().String("acme_key", "", "Key for the acme client")
+	runCmd.Flags().String("acme_hmac", "", "EAB HMAC for the acme client")
+	runCmd.Flags().String("acme_kid", "", "Key ID for the acme client")
 	runCmd.Flags().String("dns_configs", "", "Config file for the dns provider")
 }

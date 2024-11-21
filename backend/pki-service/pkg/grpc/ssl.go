@@ -171,7 +171,7 @@ func registerAcme(cfg *cfg.PKIConfiguration) *lego.Client {
 		if err != nil {
 			return nil
 		}
-		err = pkiHelper.RegisterAcme(legoClient, account, accountFile, keyFile)
+		err = pkiHelper.RegisterAcme(legoClient, cfg, account, accountFile, keyFile)
 		if err != nil {
 			return nil
 		}

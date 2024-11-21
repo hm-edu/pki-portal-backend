@@ -26,8 +26,8 @@ type PKIConfiguration struct {
 	SmimeKeyType         string `mapstructure:"smime_key_type"`
 	AcmeStorage          string `mapstructure:"acme_storage"`
 	AcmeEmail            string `mapstructure:"acme_email"`
-	AcmeEab              string `mapstructure:"acme_eab"`
-	AcmeKey              string `mapstructure:"acme_key"`
+	AcmeKid              string `mapstructure:"acme_kid"`
+	AcmeHmac             string `mapstructure:"acme_hmac"`
 	DnsConfigs           string `mapstructure:"dns_configs"`
 }
 
