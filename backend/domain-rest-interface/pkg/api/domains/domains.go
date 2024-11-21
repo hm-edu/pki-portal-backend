@@ -35,7 +35,7 @@ func (h *Handler) ListDomains(c echo.Context) error {
 
 	span := sentryecho.GetSpanFromContext(c)
 	ctx := c.Request().Context()
-	if span == nil {
+	if span != nil {
 		ctx = span.Context()
 	}
 
@@ -158,7 +158,7 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 
 	span := sentryecho.GetSpanFromContext(c)
 	ctx := c.Request().Context()
-	if span == nil {
+	if span != nil {
 		ctx = span.Context()
 	}
 
@@ -227,7 +227,7 @@ func (h *Handler) DeleteDomain(c echo.Context) error {
 
 	span := sentryecho.GetSpanFromContext(c)
 	ctx := c.Request().Context()
-	if span == nil {
+	if span != nil {
 		ctx = span.Context()
 	}
 
@@ -295,7 +295,7 @@ func (h *Handler) ApproveDomain(c echo.Context) error {
 
 	span := sentryecho.GetSpanFromContext(c)
 	ctx := c.Request().Context()
-	if span == nil {
+	if span != nil {
 		ctx = span.Context()
 	}
 	item, err := h.evaluatePermission(ctx, c, logger, func(d *model.Domain) bool { return d.Permissions.CanApprove })
@@ -330,7 +330,7 @@ func (h *Handler) TransferDomain(c echo.Context) error {
 
 	span := sentryecho.GetSpanFromContext(c)
 	ctx := c.Request().Context()
-	if span == nil {
+	if span != nil {
 		ctx = span.Context()
 	}
 	req := &model.TransferRequest{}
@@ -370,7 +370,7 @@ func (h *Handler) DeleteDelegation(c echo.Context) error {
 
 	span := sentryecho.GetSpanFromContext(c)
 	ctx := c.Request().Context()
-	if span == nil {
+	if span != nil {
 		ctx = span.Context()
 	}
 	item, err := h.evaluatePermission(ctx, c, logger, func(d *model.Domain) bool { return d.Permissions.CanDelegate })
@@ -416,7 +416,7 @@ func (h *Handler) AddDelegation(c echo.Context) error {
 
 	span := sentryecho.GetSpanFromContext(c)
 	ctx := c.Request().Context()
-	if span == nil {
+	if span != nil {
 		ctx = span.Context()
 	}
 	req := &model.DelegationRequest{}
