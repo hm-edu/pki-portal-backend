@@ -2,10 +2,10 @@ package cmd
 
 import (
 	"context"
-	"github.com/hm-edu/pki-service/ent/certificate"
 	"time"
 
 	"github.com/go-co-op/gocron"
+	"github.com/hm-edu/pki-service/ent/certificate"
 	"github.com/hm-edu/pki-service/pkg/cfg"
 	"github.com/hm-edu/pki-service/pkg/database"
 	"github.com/hm-edu/pki-service/pkg/grpc"
