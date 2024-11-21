@@ -25,7 +25,7 @@ var syncCmd = &cobra.Command{
 		defer deferFunc(logger)
 
 		// load HTTP server config
-		var sectigoCfg cfg.SectigoConfiguration
+		var sectigoCfg cfg.PKIConfiguration
 		if err := viper.Unmarshal(&sectigoCfg); err != nil {
 			logger.Panic("config unmarshal failed", zap.Error(err))
 		}
