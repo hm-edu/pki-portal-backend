@@ -97,7 +97,7 @@ type sslAPIServer struct {
 	pb.UnimplementedSSLServiceServer
 	client     *sectigo.Client
 	db         *ent.Client
-	cfg        *cfg.SectigoConfiguration
+	cfg        *cfg.PKIConfiguration
 	logger     *zap.Logger
 	legoClient *lego.Client
 
@@ -105,7 +105,7 @@ type sslAPIServer struct {
 	duration *time.Duration
 }
 
-func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *ent.Client) *sslAPIServer {
+func newSslAPIServer(client *sectigo.Client, cfg *cfg.PKIConfiguration, db *ent.Client) *sslAPIServer {
 	var err error
 
 	legoClient := registerAcme(cfg)
@@ -135,7 +135,7 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 	return instance
 }
 
-func registerAcme(cfg *cfg.SectigoConfiguration) *lego.Client {
+func registerAcme(cfg *cfg.PKIConfiguration) *lego.Client {
 	accountFile := filepath.Join(cfg.AcmeStorage, "reg.json")
 	keyFile := filepath.Join(cfg.AcmeStorage, "reg.key")
 
@@ -317,7 +317,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 
 	resp, err := s.legoClient.Certificate.ObtainForCSR(legoCert.ObtainForCSRRequest{CSR: csr, Bundle: true})
 	if err != nil {
-		return s.handleError("Error while obtaining certificate", err, logger)
+		return s.handleError("Error while obtaining certificate", err, logger, hub)
 	}
 	hub.AddBreadcrumb(&sentry.Breadcrumb{Message: "Certificate collected", Category: "info", Level: sentry.LevelInfo}, nil)
 	stop := time.Now()

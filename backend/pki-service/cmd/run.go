@@ -31,7 +31,7 @@ var runCmd = &cobra.Command{
 		}
 
 		// load Sectigo config
-		var sectigoCfg cfg.SectigoConfiguration
+		var sectigoCfg cfg.PKIConfiguration
 		if err := viper.Unmarshal(&sectigoCfg); err != nil {
 			logger.Panic("config unmarshal failed", zap.Error(err))
 		}
@@ -121,5 +121,7 @@ func init() {
 	runCmd.Flags().String("mail_from", "", "The mail from")
 	runCmd.Flags().String("acme_storage", "", "Storage for the internal acme client")
 	runCmd.Flags().String("acme_email", "", "Email for the acme client")
+	runCmd.Flags().String("acme_eab", "", "EAB for the acme client")
+	runCmd.Flags().String("acme_key", "", "Key for the acme client")
 	runCmd.Flags().String("dns_configs", "", "Config file for the dns provider")
 }

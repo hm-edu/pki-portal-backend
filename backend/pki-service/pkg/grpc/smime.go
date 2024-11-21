@@ -27,11 +27,11 @@ import (
 type smimeAPIServer struct {
 	pb.UnimplementedSmimeServiceServer
 	client *sectigo.Client
-	cfg    *cfg.SectigoConfiguration
+	cfg    *cfg.PKIConfiguration
 	logger *zap.Logger
 }
 
-func newSmimeAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration) *smimeAPIServer {
+func newSmimeAPIServer(client *sectigo.Client, cfg *cfg.PKIConfiguration) *smimeAPIServer {
 	return &smimeAPIServer{client: client, cfg: cfg, logger: zap.L()}
 }
 
