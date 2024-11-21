@@ -29,7 +29,7 @@ import (
 type Server struct {
 	logger     *zap.Logger
 	config     *Config
-	sectigoCfg *cfg.SectigoConfiguration
+	sectigoCfg *cfg.PKIConfiguration
 	db         *ent.Client
 }
 
@@ -41,7 +41,7 @@ type Config struct {
 }
 
 // NewServer creates a new GRPC server
-func NewServer(config *Config, logger *zap.Logger, sectigoCfg *cfg.SectigoConfiguration, db *ent.Client) (*Server, error) {
+func NewServer(config *Config, logger *zap.Logger, sectigoCfg *cfg.PKIConfiguration, db *ent.Client) (*Server, error) {
 	srv := &Server{
 		logger:     logger,
 		sectigoCfg: sectigoCfg,
