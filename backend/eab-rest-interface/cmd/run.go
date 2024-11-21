@@ -69,6 +69,7 @@ func init() {
 	runCmd.Flags().StringSlice("cors_allowed_origins", []string{}, "The allowed origin for CORS")
 	runCmd.Flags().String("db", "", "connection string for the database")
 	runCmd.Flags().String("acme_db", "", "connection string for the acme database")
+	runCmd.Flags().String("sentry_dsn", "", "sentry dsn")
 	runCmd.Flags().String("preseed", "", "path to the preseed file")
 	runCmd.Flags().String("provisioner_id", "", "id of the smallstep provisioner to configure")
 	runCmd.Flags().String("domain_service", "", "The domain service to use")
