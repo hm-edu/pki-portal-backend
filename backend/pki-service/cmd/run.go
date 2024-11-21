@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"github.com/hm-edu/pki-service/ent/certificate"
 	"time"
 
 	"github.com/go-co-op/gocron"
@@ -48,6 +49,11 @@ var runCmd = &cobra.Command{
 		sectigoCfg.CheckSectigoConfiguration()
 
 		database.ConnectDb(logger, viper.GetString("db"))
+
+		_, errUpdate := database.DB.Db.Certificate.Update().Where(certificate.CaIsNil()).SetCa("sectigo").Save(context.Background())
+		if errUpdate != nil {
+			logger.Fatal("Error updating certificates", zap.Error(errUpdate))
+		}
 
 		s := gocron.NewScheduler(time.UTC)
 		if viper.GetBool("enable_notifications") {
