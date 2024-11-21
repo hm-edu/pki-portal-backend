@@ -15,6 +15,7 @@ require (
 require (
 	ariga.io/atlas v0.28.1 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
+	github.com/TheZeroSlave/zapsentry v1.23.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -103,7 +104,7 @@ require (
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/hm-edu/portal-common v0.0.0-20240830051030-23666853028d
+	github.com/hm-edu/portal-common v0.0.0-20241121064118-8ab606ee426a
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/spf13/afero v1.11.0 // indirect

@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/TheZeroSlave/zapsentry"
+	sentryecho "github.com/getsentry/sentry-go/echo"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -50,6 +51,8 @@ func ZapLogger(log *zap.Logger, opts ...Option) echo.MiddlewareFunc {
 		return func(c echo.Context) error {
 
 			req := c.Request()
+
+			hub := sentryecho.GetHubFromContext(c)
 			fields := []zapcore.Field{
 				zap.String("remote_ip", c.RealIP()),
 				zap.String("host", req.Host),
@@ -61,10 +64,7 @@ func ZapLogger(log *zap.Logger, opts ...Option) echo.MiddlewareFunc {
 			if id != "" {
 				fields = append(fields, zap.String("request_id", id))
 			}
-			trace := trace.SpanFromContext(req.Context()).SpanContext().TraceID().String()
-			if trace != "" {
-				fields = append(fields, zap.String("trace_id", trace))
-			}
+			fields = append(fields, zapsentry.NewScopeFromScope(hub.Scope()))
 			logger := log.With(fields...)
 
 			c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), LoggingContextKey, logger)))

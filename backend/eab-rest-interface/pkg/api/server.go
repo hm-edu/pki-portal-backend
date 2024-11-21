@@ -7,7 +7,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/TheZeroSlave/zapsentry"
 	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/getsentry/sentry-go"
+	sentryecho "github.com/getsentry/sentry-go/echo"
 	"github.com/hm-edu/eab-rest-interface/pkg/api/docs"
 	"github.com/hm-edu/eab-rest-interface/pkg/api/eab"
 	commonApi "github.com/hm-edu/portal-common/api"
@@ -16,8 +19,10 @@ import (
 	"github.com/hm-edu/portal-common/logging"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/gommon/log"
 	"github.com/lestrrat-go/jwx/jwk"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	echoSwagger "github.com/swaggo/echo-swagger"
 
@@ -82,6 +87,31 @@ func (api *Server) wireRoutesAndMiddleware() {
 
 	jwtMiddleware := auth.JWTWithConfig(config)
 
+	if api.config.SentryDSN != "" {
+		if client, err := sentry.NewClient(sentry.ClientOptions{
+			Dsn: api.config.SentryDSN,
+			// Set TracesSampleRate to 1.0 to capture 100%
+			// of transactions for performance monitoring.
+			// We recommend adjusting this value in production,
+			TracesSampleRate: 1.0,
+			EnableTracing:    true,
+		}); err != nil {
+			log.Warnf("Sentry initialization failed: %v\n", err)
+		} else {
+			sentry.CurrentHub().BindClient(client)
+			cfg := zapsentry.Configuration{
+				Level:             zapcore.WarnLevel, //when to send message to sentry
+				EnableBreadcrumbs: true,              // enable sending breadcrumbs to Sentry
+				BreadcrumbLevel:   zapcore.InfoLevel, // at what level should we sent breadcrumbs to sentry, this level can't be higher than `Level`
+			}
+			core, err := zapsentry.NewCore(cfg, zapsentry.NewSentryClientFromClient(client))
+			if err != nil {
+				log.Error("Sentry initialization failed", zap.Error(err))
+			}
+			api.logger = zapsentry.AttachCoreToLogger(core, api.logger)
+			api.app.Use(sentryecho.New(sentryecho.Options{}))
+		}
+	}
 	api.app.Use(middleware.RequestID())
 	api.app.Use(logging.ZapLogger(api.logger, logging.WithSkipper(func(c echo.Context) bool {
 		return strings.Contains(c.Path(), "/docs") || strings.Contains(c.Path(), "/healthz")

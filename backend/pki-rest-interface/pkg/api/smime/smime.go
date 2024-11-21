@@ -31,21 +31,22 @@ func (h *Handler) List(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 
 	req := &model.ListSmimeCertificatesRequest{}
-	if err := req.Bind(c, h.validator); err != nil {
-		sentry.CaptureException(err)
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
+	hub := sentryecho.GetHubFromContext(c)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
 	}
-
 	user := commonModel.User{}
 	if err := user.Bind(c, h.validator); err != nil {
 		sentry.CaptureException(err)
 		return err
 	}
 
-	if hub := sentryecho.GetHubFromContext(c); hub != nil {
-		hub.ConfigureScope(func(scope *sentry.Scope) {
-			scope.SetExtra("user", user.Email)
-		})
+	hub.ConfigureScope(func(scope *sentry.Scope) {
+		scope.SetExtra("user", user.Email)
+	})
+	if err := req.Bind(c, h.validator); err != nil {
+		hub.CaptureException(err)
+		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
 	}
 
 	span := sentryecho.GetSpanFromContext(c)
@@ -65,7 +66,7 @@ func (h *Handler) List(c echo.Context) error {
 	logger.Debug("requesting smime certificates")
 	certs, err := h.smime.ListCertificates(ctx, &pb.ListSmimeRequest{Email: requestedEmail})
 	if err != nil {
-		sentry.CaptureException(err)
+		hub.CaptureException(err)
 		logger.Error("error requesting smime certificates", zap.Error(err))
 		return err
 	}
@@ -86,22 +87,25 @@ func (h *Handler) List(c echo.Context) error {
 func (h *Handler) Revoke(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 
-	req := &model.RevokeRequest{}
-	if err := req.Bind(c, h.validator); err != nil {
-		sentry.CaptureException(err)
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
+	hub := sentryecho.GetHubFromContext(c)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
 	}
 
 	user := commonModel.User{}
 	if err := user.Bind(c, h.validator); err != nil {
-		sentry.CaptureException(err)
+		hub.CaptureException(err)
 		return err
 	}
 
-	if hub := sentryecho.GetHubFromContext(c); hub != nil {
-		hub.ConfigureScope(func(scope *sentry.Scope) {
-			scope.SetExtra("user", user.Email)
-		})
+	hub.ConfigureScope(func(scope *sentry.Scope) {
+		scope.SetExtra("user", user.Email)
+	})
+
+	req := &model.RevokeRequest{}
+	if err := req.Bind(c, h.validator); err != nil {
+		hub.CaptureException(err)
+		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
 	}
 
 	span := sentryecho.GetSpanFromContext(c)
@@ -110,7 +114,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 	logger.Debug("requesting smime certificate revocation")
 	listRes, err := h.smime.ListCertificates(ctx, &pb.ListSmimeRequest{Email: user.Email})
 	if err != nil {
-		sentry.CaptureException(err)
+		hub.CaptureException(err)
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Internal: err, Message: "Error processing the request"}
 	}
 
@@ -119,7 +123,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 	for _, email := range user.AdditionalSmimeEmails {
 		listRes, err := h.smime.ListCertificates(ctx, &pb.ListSmimeRequest{Email: email})
 		if err != nil {
-			sentry.CaptureException(err)
+			hub.CaptureException(err)
 			continue
 		}
 
@@ -133,7 +137,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 
 	_, err = h.smime.RevokeCertificate(ctx, &pb.RevokeSmimeRequest{Reason: req.Reason, Identifier: &pb.RevokeSmimeRequest_Serial{Serial: req.Serial}})
 	if err != nil {
-		sentry.CaptureException(err)
+		hub.CaptureException(err)
 		logger.Error("error requesting smime certificate revocation", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Internal: err, Message: "Error processing the request"}
 	}
@@ -155,18 +159,19 @@ func (h *Handler) Revoke(c echo.Context) error {
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) HandleCsr(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
-
+	hub := sentryecho.GetHubFromContext(c)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
 	user := commonModel.User{}
 	if err := user.Bind(c, h.validator); err != nil {
 		sentry.CaptureException(err)
 		return err
 	}
 
-	if hub := sentryecho.GetHubFromContext(c); hub != nil {
-		hub.ConfigureScope(func(scope *sentry.Scope) {
-			scope.SetExtra("user", user.Email)
-		})
-	}
+	hub.ConfigureScope(func(scope *sentry.Scope) {
+		scope.SetExtra("user", user.Email)
+	})
 
 	span := sentryecho.GetSpanFromContext(c)
 	ctx := span.Context()
@@ -178,7 +183,7 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 
 	req := &model.CsrRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
-		sentry.CaptureException(err)
+		hub.CaptureException(err)
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
 	}
 
@@ -189,14 +194,14 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 
 	csr, err := x509.ParseCertificateRequest(block.Bytes)
 	if err != nil {
-		sentry.CaptureException(err)
+		hub.CaptureException(err)
 		logger.Error("error while parsing csr", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request. CSR has invalid format."}
 	}
 
 	// Validate the CSR
 	if err := csr.CheckSignature(); err != nil {
-		sentry.CaptureException(err)
+		hub.CaptureException(err)
 		logger.Error("error while parsing csr", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request. CSR has invalid signature."}
 	}
@@ -223,7 +228,7 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 		ValidationStandard: requestedEmail != user.Email,
 	})
 	if err != nil {
-		sentry.CaptureException(err)
+		hub.CaptureException(err)
 		logger.Error("error requesting smime certificate", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Internal: err, Message: "Handling CSR failed"}
 	}

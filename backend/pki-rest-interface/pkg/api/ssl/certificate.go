@@ -34,13 +34,17 @@ import (
 func (h *Handler) Active(c echo.Context) error {
 
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
+	hub := sentryecho.GetHubFromContext(c)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		logger.Error("error getting user from request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
 
-	if hub := sentryecho.GetHubFromContext(c); hub != nil {
+	if hub != nil {
 		hub.ConfigureScope(func(scope *sentry.Scope) {
 			scope.SetExtra("user", user)
 		})
@@ -53,7 +57,7 @@ func (h *Handler) Active(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "No domain provided"}
 	}
 
-	sentry.AddBreadcrumb(&sentry.Breadcrumb{Level: sentry.LevelInfo, Message: "Loading domains"})
+	hub.AddBreadcrumb(&sentry.Breadcrumb{Level: sentry.LevelInfo, Message: "Loading domains"}, nil)
 	domains, err := h.domain.ListDomains(ctx, &pb.ListDomainsRequest{User: user, Approved: true})
 	if err != nil {
 		logger.Error("error getting domains", zap.Error(err))
@@ -65,7 +69,7 @@ func (h *Handler) Active(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusForbidden, Message: "You are not authorized to use this domain"}
 	}
 
-	sentry.AddBreadcrumb(&sentry.Breadcrumb{Level: sentry.LevelInfo, Message: "Loading certificates"})
+	hub.AddBreadcrumb(&sentry.Breadcrumb{Level: sentry.LevelInfo, Message: "Loading certificates"}, nil)
 
 	logger.Info("fetching certificates", zap.Strings("domains", domains.Domains))
 	certs, err := h.ssl.ListCertificates(ctx, &pb.ListSslRequest{IncludePartial: false, Domains: []string{domain}})
@@ -96,17 +100,21 @@ func (h *Handler) List(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 
 	span := sentryecho.GetSpanFromContext(c)
+	hub := sentryecho.GetHubFromContext(c)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		logger.Error("error getting user from request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
-	if hub := sentryecho.GetHubFromContext(c); hub != nil {
+	if hub != nil {
 		hub.ConfigureScope(func(scope *sentry.Scope) {
 			scope.SetExtra("user", user)
 		})
 	}
-	sentry.AddBreadcrumb(&sentry.Breadcrumb{Level: sentry.LevelInfo, Message: "Loading domains"})
+	hub.AddBreadcrumb(&sentry.Breadcrumb{Level: sentry.LevelInfo, Message: "Loading domains"}, nil)
 	domains, err := h.domain.ListDomains(span.Context(), &pb.ListDomainsRequest{User: user, Approved: true})
 	if err != nil {
 		logger.Error("error getting domains", zap.Error(err))
@@ -114,7 +122,7 @@ func (h *Handler) List(c echo.Context) error {
 	}
 
 	logger.Debug("fetching certificates", zap.Strings("domains", domains.Domains))
-	sentry.AddBreadcrumb(&sentry.Breadcrumb{Level: sentry.LevelInfo, Message: "Loading certificates"})
+	hub.AddBreadcrumb(&sentry.Breadcrumb{Level: sentry.LevelInfo, Message: "Loading certificates"}, nil)
 	certs, err := h.ssl.ListCertificates(span.Context(), &pb.ListSslRequest{IncludePartial: false, Domains: domains.Domains})
 	if err != nil {
 		logger.Error("error while listing certificates", zap.Error(err))
@@ -136,12 +144,16 @@ func (h *Handler) List(c echo.Context) error {
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) Revoke(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
+	hub := sentryecho.GetHubFromContext(c)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		logger.Error("error getting user from request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
-	if hub := sentryecho.GetHubFromContext(c); hub != nil {
+	if hub != nil {
 		hub.ConfigureScope(func(scope *sentry.Scope) {
 			scope.SetExtra("user", user)
 		})
@@ -167,7 +179,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 	}
 	domains, err := h.domain.ListDomains(ctx, &pb.ListDomainsRequest{User: user, Approved: true})
 	if err != nil {
-		sentry.CaptureException(err)
+		hub.CaptureException(err)
 		logger.Error("error listing domains for certificate revocation", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while revoking certificate"}
 	}
@@ -180,7 +192,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 	}
 	_, err = h.ssl.RevokeCertificate(ctx, &pb.RevokeSslRequest{Identifier: &pb.RevokeSslRequest_Serial{Serial: req.Serial}, Reason: req.Reason})
 	if err != nil {
-		sentry.CaptureException(err)
+		hub.CaptureException(err)
 		logger.Error("error while revoking certificate", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while revoking certificate"}
 	}
@@ -202,25 +214,28 @@ func (h *Handler) Revoke(c echo.Context) error {
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) HandleCsr(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
+	hub := sentryecho.GetHubFromContext(c)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
+	span := sentryecho.GetSpanFromContext(c)
+	ctx := span.Context()
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
-		sentry.CaptureException(err)
+		hub.CaptureException(err)
 		logger.Error("error getting user from request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
 
-	if hub := sentryecho.GetHubFromContext(c); hub != nil {
+	if hub != nil {
 		hub.ConfigureScope(func(scope *sentry.Scope) {
 			scope.SetExtra("user", user)
 		})
 	}
 
-	span := sentryecho.GetSpanFromContext(c)
-	ctx := span.Context()
-
 	req := &model.CsrRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
-		sentry.CaptureException(err)
+		hub.CaptureException(err)
 		logger.Error("error while parsing csr", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
 	}
@@ -238,7 +253,7 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 
 	// Validate the CSR
 	if err := csr.CheckSignature(); err != nil {
-		sentry.CaptureException(err)
+		hub.CaptureException(err)
 		logger.Error("error while parsing csr", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request. CSR has invalid signature."}
 	}
@@ -270,7 +285,7 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 
 	permissions, err := h.domain.CheckPermission(ctx, &pb.CheckPermissionRequest{User: user, Domains: sans})
 	if err != nil {
-		sentry.CaptureException(err)
+		hub.CaptureException(err)
 		logger.Error("error while checking permissions", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while checking permissions"}
 	}
@@ -283,7 +298,7 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 
 	resp, err := h.ssl.IssueCertificate(ctx, &pb.IssueSslRequest{Csr: req.CSR, SubjectAlternativeNames: sans, Issuer: user, Source: "API"})
 	if err != nil {
-		sentry.CaptureException(err)
+		hub.CaptureException(err)
 		logger.Error("error while processing CSR", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Internal Error while processing the request."}
 	}

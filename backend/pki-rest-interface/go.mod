@@ -5,7 +5,7 @@ go 1.23
 require (
 	github.com/getkin/kin-openapi v0.128.0
 	github.com/hm-edu/portal-apis v0.0.0-20230929065638-ad1f7e7c7ab3
-	github.com/hm-edu/portal-common v0.0.0-20240830051030-23666853028d
+	github.com/hm-edu/portal-common v0.0.0-20241121064118-8ab606ee426a
 	github.com/johnbellone/grpc-middleware-sentry v0.4.0
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/labstack/gommon v0.4.2
@@ -89,6 +89,7 @@ require (
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
+	github.com/TheZeroSlave/zapsentry v1.23.0
 	github.com/getsentry/sentry-go v0.29.1
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/jsonreference v0.21.0 // indirect

@@ -12,9 +12,11 @@ require (
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
+	github.com/TheZeroSlave/zapsentry v1.23.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/getkin/kin-openapi v0.128.0 // indirect
+	github.com/getsentry/sentry-go v0.29.1 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/jsonreference v0.21.0 // indirect
 	github.com/go-openapi/spec v0.21.0 // indirect
@@ -86,7 +88,7 @@ require (
 )
 
 require (
-	github.com/hm-edu/portal-common v0.0.0-20240705160636-4f9356a7b848
+	github.com/hm-edu/portal-common v0.0.0-20241121064118-8ab606ee426a
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 )

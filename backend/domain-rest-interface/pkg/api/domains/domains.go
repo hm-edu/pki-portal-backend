@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/getsentry/sentry-go"
+	sentryecho "github.com/getsentry/sentry-go/echo"
 	"github.com/hm-edu/domain-rest-interface/ent"
 	"github.com/hm-edu/domain-rest-interface/pkg/model"
 	pb "github.com/hm-edu/portal-apis"
@@ -17,7 +18,6 @@ import (
 	"golang.org/x/net/publicsuffix"
 
 	"github.com/labstack/echo/v4"
-	"go.opentelemetry.io/otel/attribute"
 	"go.uber.org/zap"
 )
 
@@ -33,56 +33,29 @@ import (
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) ListDomains(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
-	ctx, span := h.tracer.Start(c.Request().Context(), "list")
-	// Check the concurrency guide for more details: https://docs.sentry.io/platforms/go/concurrency/
-	// Set the OP based on values from https://develop.sentry.dev/sdk/performance/span-operations/
-	ctx, transaction := sentryTrace(ctx, c)
-	defer transaction.Finish()
-	defer span.End()
 
+	hub := sentryecho.GetHubFromContext(c)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
+	span := sentryecho.GetSpanFromContext(c)
+	ctx := span.Context()
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		logger.Error("Failed to get user from request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
-	span.SetAttributes(attribute.String("user", user))
 
 	domains, err := h.enumerateDomains(ctx, user, logger)
 	if err != nil {
 		logger.Error("Listing domains failed", zap.Error(err))
-		span.RecordError(err)
 		return &echo.HTTPError{Internal: err, Code: http.StatusInternalServerError, Message: "Error while listing domains"}
 	}
 	logger.Debug("Listing domains", zap.Int("count", len(domains)), zap.Any("domains", domains))
 	return c.JSON(http.StatusOK, domains)
 }
 
-func sentryTrace(ctx context.Context, c echo.Context) (context.Context, *sentry.Span) {
-	hub := sentry.GetHubFromContext(ctx)
-	if hub == nil {
-
-		hub = sentry.CurrentHub().Clone()
-		ctx = sentry.SetHubOnContext(ctx, hub)
-	}
-
-	options := []sentry.SpanOption{
-
-		sentry.WithOpName("http.server"),
-		sentry.ContinueFromRequest(c.Request()),
-		sentry.WithTransactionSource(sentry.SourceURL),
-	}
-
-	transaction := sentry.StartTransaction(ctx,
-		fmt.Sprintf("%s %s", c.Request().Method, c.Request().URL.Path),
-		options...,
-	)
-	return ctx, transaction
-}
-
 func (h *Handler) enumerateDomains(ctx context.Context, user string, logger *zap.Logger) ([]*model.Domain, error) {
-
-	ctx, span := h.tracer.Start(ctx, "enumerating")
-	defer span.End()
 
 	admin := false
 	if helper.Contains(h.admins, user) {
@@ -183,18 +156,18 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string, logger *zap
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) CreateDomain(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
-	ctx, span := h.tracer.Start(c.Request().Context(), "create")
-	ctx, transaction := sentryTrace(ctx, c)
-	defer transaction.Finish()
-	defer span.End()
 
+	hub := sentryecho.GetHubFromContext(c)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
+	span := sentryecho.GetSpanFromContext(c)
+	ctx := span.Context()
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		logger.Error("Failed to get user from request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
 	}
-
-	span.SetAttributes(attribute.String("user", user))
 
 	req := &model.DomainRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
@@ -252,10 +225,12 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) DeleteDomain(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
-	ctx, span := h.tracer.Start(c.Request().Context(), "delete")
-	ctx, transaction := sentryTrace(ctx, c)
-	defer transaction.Finish()
-	defer span.End()
+	hub := sentryecho.GetHubFromContext(c)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
+	span := sentryecho.GetSpanFromContext(c)
+	ctx := span.Context()
 
 	item, err := h.evaluatePermission(ctx, c, logger, func(d *model.Domain) bool { return d.Permissions.CanDelete })
 	if err != nil {
@@ -318,11 +293,13 @@ func (h *Handler) evaluatePermission(ctx context.Context, c echo.Context, logger
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) ApproveDomain(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
-	ctx, span := h.tracer.Start(c.Request().Context(), "approve")
-	ctx, transaction := sentryTrace(ctx, c)
-	defer transaction.Finish()
-	defer span.End()
 
+	hub := sentryecho.GetHubFromContext(c)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
+	span := sentryecho.GetSpanFromContext(c)
+	ctx := span.Context()
 	item, err := h.evaluatePermission(ctx, c, logger, func(d *model.Domain) bool { return d.Permissions.CanApprove })
 	if err != nil {
 		return err
@@ -352,11 +329,13 @@ func (h *Handler) ApproveDomain(c echo.Context) error {
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) TransferDomain(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
-	ctx, span := h.tracer.Start(c.Request().Context(), "transfer")
-	ctx, transaction := sentryTrace(ctx, c)
-	defer transaction.Finish()
-	defer span.End()
 
+	hub := sentryecho.GetHubFromContext(c)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
+	span := sentryecho.GetSpanFromContext(c)
+	ctx := span.Context()
 	req := &model.TransferRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest}
@@ -391,11 +370,13 @@ func (h *Handler) TransferDomain(c echo.Context) error {
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) DeleteDelegation(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
-	ctx, span := h.tracer.Start(c.Request().Context(), "deleteDelegation")
-	ctx, transaction := sentryTrace(ctx, c)
-	defer transaction.Finish()
-	defer span.End()
 
+	hub := sentryecho.GetHubFromContext(c)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
+	span := sentryecho.GetSpanFromContext(c)
+	ctx := span.Context()
 	item, err := h.evaluatePermission(ctx, c, logger, func(d *model.Domain) bool { return d.Permissions.CanDelegate })
 	if err != nil {
 		return err
@@ -436,11 +417,12 @@ func (h *Handler) DeleteDelegation(c echo.Context) error {
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) AddDelegation(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
-	ctx, span := h.tracer.Start(c.Request().Context(), "addDelegation")
-	ctx, transaction := sentryTrace(ctx, c)
-	defer transaction.Finish()
-	defer span.End()
-
+	hub := sentryecho.GetHubFromContext(c)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
+	span := sentryecho.GetSpanFromContext(c)
+	ctx := span.Context()
 	req := &model.DelegationRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}

@@ -16,3 +16,5 @@ backend/pki-service/acme.key
 backend/pki-service/acme/reg.key
 backend/pki-service/acme/reg.json
 backend/pki-service/acme/dns_configs
+deployment/acme/reg.json
+deployment/acme/reg.key

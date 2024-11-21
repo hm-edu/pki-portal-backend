@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/TheZeroSlave/zapsentry"
 	"github.com/getkin/kin-openapi/openapi3"
 
 	"github.com/hm-edu/domain-rest-interface/pkg/api/docs"
@@ -25,6 +26,7 @@ import (
 	"github.com/labstack/gommon/log"
 	"github.com/lestrrat-go/jwx/jwk"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	echoSwagger "github.com/swaggo/echo-swagger"
 
@@ -92,13 +94,8 @@ func (api *Server) wireRoutesAndMiddleware() {
 
 	jwtMiddleware := auth.JWTWithConfig(config)
 
-	api.app.Use(middleware.RequestID())
-	api.app.Use(logging.ZapLogger(api.logger, logging.WithSkipper(func(c echo.Context) bool {
-		return strings.Contains(c.Path(), "/docs") || strings.Contains(c.Path(), "/healthz")
-	})))
-	api.app.Use(middleware.Recover())
 	if api.config.SentryDSN != "" {
-		if err := sentry.Init(sentry.ClientOptions{
+		if client, err := sentry.NewClient(sentry.ClientOptions{
 			Dsn: api.config.SentryDSN,
 			// Set TracesSampleRate to 1.0 to capture 100%
 			// of transactions for performance monitoring.
@@ -108,9 +105,25 @@ func (api *Server) wireRoutesAndMiddleware() {
 		}); err != nil {
 			log.Warnf("Sentry initialization failed: %v\n", err)
 		} else {
+			sentry.CurrentHub().BindClient(client)
+			cfg := zapsentry.Configuration{
+				Level:             zapcore.WarnLevel, //when to send message to sentry
+				EnableBreadcrumbs: true,              // enable sending breadcrumbs to Sentry
+				BreadcrumbLevel:   zapcore.InfoLevel, // at what level should we sent breadcrumbs to sentry, this level can't be higher than `Level`
+			}
+			core, err := zapsentry.NewCore(cfg, zapsentry.NewSentryClientFromClient(client))
+			if err != nil {
+				log.Error("Sentry initialization failed", zap.Error(err))
+			}
+			api.logger = zapsentry.AttachCoreToLogger(core, api.logger)
 			api.app.Use(sentryecho.New(sentryecho.Options{}))
 		}
 	}
+	api.app.Use(middleware.RequestID())
+	api.app.Use(logging.ZapLogger(api.logger, logging.WithSkipper(func(c echo.Context) bool {
+		return strings.Contains(c.Path(), "/docs") || strings.Contains(c.Path(), "/healthz")
+	})))
+	api.app.Use(middleware.Recover())
 
 	if len(api.config.CorsAllowedOrigins) != 0 {
 		api.app.Use(middleware.CORSWithConfig(middleware.CORSConfig{
