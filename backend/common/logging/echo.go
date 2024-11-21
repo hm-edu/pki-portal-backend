@@ -64,7 +64,9 @@ func ZapLogger(log *zap.Logger, opts ...Option) echo.MiddlewareFunc {
 			if id != "" {
 				fields = append(fields, zap.String("request_id", id))
 			}
-			fields = append(fields, zapsentry.NewScopeFromScope(hub.Scope()))
+			if hub != nil && hub.Scope() != nil {
+				fields = append(fields, zapsentry.NewScopeFromScope(hub.Scope()))
+			}
 			logger := log.With(fields...)
 
 			c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), LoggingContextKey, logger)))
