@@ -51,10 +51,13 @@ var runCmd = &cobra.Command{
 		store.Preseed(logger)
 		stopCh := signals.SetupSignalHandler()
 
-		admins := viper.GetStringSlice("admins")
-		for _, admin := range admins {
+		adminsVar := viper.GetStringSlice("admins")
+		admins := []string{}
+		for _, admin := range adminsVar {
 			if strings.Contains(admin, ",") {
 				admins = append(admins, strings.Split(admin, ",")...)
+			} else {
+				admins = append(admins, admin)
 			}
 		}
 
