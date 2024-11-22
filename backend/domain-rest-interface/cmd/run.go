@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"strings"
 
 	"github.com/hm-edu/domain-rest-interface/pkg/api"
 	"github.com/hm-edu/domain-rest-interface/pkg/database"
@@ -51,6 +52,11 @@ var runCmd = &cobra.Command{
 		stopCh := signals.SetupSignalHandler()
 
 		admins := viper.GetStringSlice("admins")
+		for _, admin := range admins {
+			if strings.Contains(admin, ",") {
+				admins = append(admins, strings.Split(admin, ",")...)
+			}
+		}
 
 		logger.Info("Starting server with admins", zap.Strings("admins", admins))
 
