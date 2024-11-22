@@ -51,6 +51,9 @@ var runCmd = &cobra.Command{
 		stopCh := signals.SetupSignalHandler()
 
 		admins := viper.GetStringSlice("admins")
+
+		logger.Info("Starting server with admins", zap.Strings("admins", admins))
+
 		// start gRPC server
 		if grpcCfg.Port > 0 {
 			grpcSrv, _ := grpc.NewServer(&grpcCfg, logger, store, admins)
