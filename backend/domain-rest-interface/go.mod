@@ -4,7 +4,7 @@ go 1.23.0
 
 require (
 	github.com/getkin/kin-openapi v0.128.0
-	github.com/hm-edu/portal-common v0.0.0-20241121064118-8ab606ee426a
+	github.com/hm-edu/portal-common v0.0.0-20241124061959-4f7fb44c4e25
 	go.opentelemetry.io/otel v1.32.0
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.68.0
@@ -57,6 +57,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/hm-edu/portal-apis v0.0.0-20230929065638-ad1f7e7c7ab3
 	github.com/jackc/pgx/v4 v4.18.3
+	github.com/johnbellone/grpc-middleware-sentry v0.4.0
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/lestrrat-go/jwx v1.2.30
 	github.com/mattn/go-sqlite3 v1.14.16
@@ -77,7 +78,7 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.7 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.23.0 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.24.0 // indirect
 	github.com/invopop/yaml v0.3.1 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.14.3 // indirect

@@ -23,7 +23,7 @@ require (
 	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.23.0 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.24.0 // indirect
 	github.com/invopop/yaml v0.3.1 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
@@ -88,7 +88,7 @@ require (
 )
 
 require (
-	github.com/hm-edu/portal-common v0.0.0-20241121064118-8ab606ee426a
+	github.com/hm-edu/portal-common v0.0.0-20241124061959-4f7fb44c4e25
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 )

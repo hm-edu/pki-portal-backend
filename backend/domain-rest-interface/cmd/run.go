@@ -12,8 +12,10 @@ import (
 	commonApi "github.com/hm-edu/portal-common/api"
 	"github.com/hm-edu/portal-common/signals"
 	"github.com/hm-edu/portal-common/tracing"
+	grpc_sentry "github.com/johnbellone/grpc-middleware-sentry"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
+	googleGrpc "google.golang.org/grpc"
 )
 
 // runCmd represents the run command
@@ -69,7 +71,7 @@ var runCmd = &cobra.Command{
 			go grpcSrv.ListenAndServe(stopCh)
 		}
 
-		client, err := sslClient(viper.GetString("ssl_service"))
+		client, err := sslClient(viper.GetString("ssl_service"), grpcCfg.SentryDSN)
 		if err != nil {
 			logger.Fatal("Error connecting to ssl service", zap.Error(err))
 		}
@@ -80,8 +82,12 @@ var runCmd = &cobra.Command{
 	},
 }
 
-func sslClient(host string) (pb.SSLServiceClient, error) {
-	conn, err := commonApi.ConnectGRPC(host)
+func sslClient(host string, sentryDSN string) (pb.SSLServiceClient, error) {
+	var interceptor []googleGrpc.UnaryClientInterceptor
+	if sentryDSN != "" {
+		interceptor = append(interceptor, grpc_sentry.UnaryClientInterceptor())
+	}
+	conn, err := commonApi.ConnectGRPC(host, googleGrpc.WithChainUnaryInterceptor(interceptor...))
 	if err != nil {
 		return nil, err
 	}

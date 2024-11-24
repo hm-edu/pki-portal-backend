@@ -4,7 +4,7 @@ go 1.23.0
 
 require (
 	github.com/getkin/kin-openapi v0.128.0
-	github.com/hm-edu/portal-common v0.0.0-20241121064118-8ab606ee426a
+	github.com/hm-edu/portal-common v0.0.0-20241124061959-4f7fb44c4e25
 	github.com/smallstep/certificates v0.28.1
 	go.opentelemetry.io/otel v1.32.0
 	go.uber.org/zap v1.27.0
@@ -55,6 +55,7 @@ require (
 	github.com/getsentry/sentry-go v0.29.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/hm-edu/portal-apis v0.0.0-20230929065638-ad1f7e7c7ab3
+	github.com/johnbellone/grpc-middleware-sentry v0.4.0
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/labstack/gommon v0.4.2
 	github.com/lestrrat-go/jwx v1.2.30
@@ -144,7 +145,7 @@ require (
 	github.com/google/go-tspi v0.3.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.23.0 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.24.0 // indirect
 	github.com/hashicorp/hcl/v2 v2.23.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/invopop/yaml v0.3.1 // indirect
