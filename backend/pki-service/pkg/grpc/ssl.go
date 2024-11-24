@@ -131,11 +131,10 @@ func (s *sslAPIServer) CertificateDetails(ctx context.Context, req *pb.Certifica
 }
 
 func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequest) (*pb.ListSslResponse, error) {
-
-	span := sentry.StartSpan(ctx, "Listing SSL Certificates")
-	defer span.Finish()
-	ctx = span.Context()
 	hub := sentry.GetHubFromContext(ctx)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
 	log := s.logger
 	if hub != nil && hub.Scope() != nil {
 		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
@@ -161,18 +160,15 @@ func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequ
 }
 
 func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslRequest) (*pb.IssueSslResponse, error) {
-
-	span := sentry.StartSpan(ctx, "Issuing SSL Certificate")
-	defer span.Finish()
-	ctx = span.Context()
 	hub := sentry.GetHubFromContext(ctx)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
 	log := s.logger
 	if hub != nil && hub.Scope() != nil {
 		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
+		hub.Scope().SetUser(sentry.User{Email: req.Issuer})
 	}
-	hub.ConfigureScope(func(scope *sentry.Scope) {
-		scope.SetUser(sentry.User{Email: req.Issuer})
-	})
 
 	logger := log.With(zap.String("issuer", req.Issuer))
 
@@ -301,10 +297,10 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 }
 
 func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslRequest) (*emptypb.Empty, error) {
-	span := sentry.StartSpan(ctx, "Revoke SSL Certificates")
-	defer span.Finish()
-	ctx = span.Context()
 	hub := sentry.GetHubFromContext(ctx)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
 	log := s.logger
 	if hub != nil && hub.Scope() != nil {
 		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))

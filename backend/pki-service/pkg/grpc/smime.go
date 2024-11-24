@@ -37,14 +37,13 @@ func newSmimeAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration) *s
 
 func (s *smimeAPIServer) ListCertificates(ctx context.Context, req *pb.ListSmimeRequest) (*pb.ListSmimeResponse, error) {
 	hub := sentry.GetHubFromContext(ctx)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
 	log := s.logger
 	if hub != nil && hub.Scope() != nil {
 		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
 		hub.Scope().SetUser(sentry.User{Email: req.Email})
-	} else if hub == nil {
-		log.Info("No hub found")
-	} else if hub.Scope() == nil {
-		log.Info("No scope found")
 	}
 	logger := log.With(zap.String("user", req.Email))
 
@@ -72,15 +71,15 @@ func (s *smimeAPIServer) ListCertificates(ctx context.Context, req *pb.ListSmime
 	})}, nil
 }
 func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmimeRequest) (*pb.IssueSmimeResponse, error) {
-
 	hub := sentry.GetHubFromContext(ctx)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
 	log := s.logger
 	if hub != nil && hub.Scope() != nil {
 		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
+		hub.Scope().SetUser(sentry.User{Email: req.Email})
 	}
-	hub.ConfigureScope(func(scope *sentry.Scope) {
-		scope.SetUser(sentry.User{Email: req.Email})
-	})
 	hub.AddBreadcrumb(&sentry.Breadcrumb{Message: "Issuing new smime certificate", Category: "info"}, nil)
 
 	logger := log.With(zap.String("user", req.Email))
@@ -217,10 +216,10 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 
 }
 func (s *smimeAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSmimeRequest) (*emptypb.Empty, error) {
-	span := sentry.StartSpan(ctx, "Revoke S/MIME Certificate")
-	defer span.Finish()
-	ctx = span.Context()
 	hub := sentry.GetHubFromContext(ctx)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
 	log := s.logger
 	if hub != nil && hub.Scope() != nil {
 		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))

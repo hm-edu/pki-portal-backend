@@ -29,10 +29,10 @@ func newEabAPIServer(domainService pb.DomainServiceClient, logger *zap.Logger, p
 
 // ResolveAccountId resolves the user using the provided account id and returns the EAB ID and the username.
 func (api *eabAPIServer) ResolveAccountId(ctx context.Context, req *pb.ResolveAccountIdRequest) (*pb.ResolveAccountIdResponse, error) { // nolint
-	span := sentry.StartSpan(ctx, "Resolve Account ID")
-	defer span.Finish()
-	ctx = span.Context()
 	hub := sentry.GetHubFromContext(ctx)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
 	log := api.logger
 	if hub != nil && hub.Scope() != nil {
 		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
@@ -47,9 +47,9 @@ func (api *eabAPIServer) ResolveAccountId(ctx context.Context, req *pb.ResolveAc
 	}
 	key, err := database.DB.Db.EABKey.Query().Where(eabkey.EabKey(eak.ID)).First(ctx)
 
-	hub.ConfigureScope(func(scope *sentry.Scope) {
-		scope.SetUser(sentry.User{Email: key.User})
-	})
+	if hub != nil && hub.Scope() != nil {
+		hub.Scope().SetUser(sentry.User{Email: key.User})
+	}
 	if err != nil {
 		if _, ok := err.(*ent.NotFoundError); ok {
 			log.Warn("Key not found", zap.String("key", eak.ID), zap.Error(err))
@@ -65,10 +65,10 @@ func (api *eabAPIServer) ResolveAccountId(ctx context.Context, req *pb.ResolveAc
 
 // CheckEABPermissions resolves the user and validates the issue permission for the requested domains.
 func (api *eabAPIServer) CheckEABPermissions(ctx context.Context, req *pb.CheckEABPermissionRequest) (*pb.CheckEABPermissionResponse, error) {
-	span := sentry.StartSpan(ctx, "Check EAB Permissions")
-	defer span.Finish()
-	ctx = span.Context()
 	hub := sentry.GetHubFromContext(ctx)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
 	log := api.logger
 	if hub != nil && hub.Scope() != nil {
 		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
@@ -77,9 +77,9 @@ func (api *eabAPIServer) CheckEABPermissions(ctx context.Context, req *pb.CheckE
 
 	key, err := database.DB.Db.EABKey.Query().Where(eabkey.EabKey(req.EabKey)).First(ctx)
 
-	hub.ConfigureScope(func(scope *sentry.Scope) {
-		scope.SetUser(sentry.User{Email: key.User})
-	})
+	if hub != nil && hub.Scope() != nil {
+		hub.Scope().SetUser(sentry.User{Email: key.User})
+	}
 	if err != nil {
 		if _, ok := err.(*ent.NotFoundError); ok {
 			log.Warn("Key not found", zap.String("key", req.EabKey), zap.Error(err))

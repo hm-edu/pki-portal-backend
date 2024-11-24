@@ -25,17 +25,15 @@ func newDomainAPIServer(store *store.DomainStore, logger *zap.Logger, admins []s
 }
 
 func (api *domainAPIServer) CheckPermission(ctx context.Context, req *pb.CheckPermissionRequest) (*pb.CheckPermissionResponse, error) {
-	span := sentry.StartSpan(ctx, "Check Permission")
-	defer span.Finish()
-	ctx = span.Context()
 	log := api.logger
 	hub := sentry.GetHubFromContext(ctx)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
 	if hub != nil && hub.Scope() != nil {
 		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
+		hub.Scope().SetUser(sentry.User{Email: req.User})
 	}
-	hub.ConfigureScope(func(scope *sentry.Scope) {
-		scope.SetUser(sentry.User{Email: req.User})
-	})
 	domains, err := api.store.ListDomains(ctx, req.User, true, false)
 	if err != nil {
 		return nil, err
@@ -56,12 +54,11 @@ func (api *domainAPIServer) CheckPermission(ctx context.Context, req *pb.CheckPe
 }
 
 func (api *domainAPIServer) CheckRegistration(ctx context.Context, req *pb.CheckRegistrationRequest) (*pb.CheckRegistrationResponse, error) {
-
-	span := sentry.StartSpan(ctx, "Check Registration")
-	defer span.Finish()
-	ctx = span.Context()
 	log := api.logger
 	hub := sentry.GetHubFromContext(ctx)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
 	if hub != nil && hub.Scope() != nil {
 		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
 	}
@@ -83,17 +80,15 @@ func (api *domainAPIServer) CheckRegistration(ctx context.Context, req *pb.Check
 }
 
 func (api *domainAPIServer) ListDomains(ctx context.Context, req *pb.ListDomainsRequest) (*pb.ListDomainsResponse, error) {
-	span := sentry.StartSpan(ctx, "List Domains")
-	defer span.Finish()
-	ctx = span.Context()
 	log := api.logger
 	hub := sentry.GetHubFromContext(ctx)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
 	if hub != nil && hub.Scope() != nil {
 		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
+		hub.Scope().SetUser(sentry.User{Email: req.User})
 	}
-	hub.ConfigureScope(func(scope *sentry.Scope) {
-		scope.SetUser(sentry.User{Email: req.User})
-	})
 
 	log.Info("Listing domains", zap.String("user", req.User))
 	domains, err := api.store.ListDomains(ctx, req.User, req.Approved, helper.Contains(api.admins, req.User))
