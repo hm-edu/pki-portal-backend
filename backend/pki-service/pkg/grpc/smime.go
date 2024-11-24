@@ -37,15 +37,15 @@ func newSmimeAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration) *s
 
 func (s *smimeAPIServer) ListCertificates(ctx context.Context, req *pb.ListSmimeRequest) (*pb.ListSmimeResponse, error) {
 	hub := sentry.GetHubFromContext(ctx)
-	span := sentry.StartSpan(ctx, "List S/MIME Certificates")
-	defer span.Finish()
 	log := s.logger
 	if hub != nil && hub.Scope() != nil {
 		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
+		hub.Scope().SetUser(sentry.User{Email: req.Email})
+	} else if hub == nil {
+		log.Info("No hub found")
+	} else if hub.Scope() == nil {
+		log.Info("No scope found")
 	}
-	hub.ConfigureScope(func(scope *sentry.Scope) {
-		scope.SetUser(sentry.User{Email: req.Email})
-	})
 	logger := log.With(zap.String("user", req.Email))
 
 	logger.Info("Requesting issued smime certificates")
