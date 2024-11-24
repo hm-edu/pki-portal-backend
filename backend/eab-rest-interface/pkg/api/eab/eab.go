@@ -46,7 +46,7 @@ func (h *Handler) GetExternalAccountKeys(c echo.Context) error {
 	}
 
 	hub.ConfigureScope(func(scope *sentry.Scope) {
-		scope.SetExtra("user", user)
+		scope.SetUser(sentry.User{Email: user})
 	})
 	logger.Info("Requesting external account keys")
 	keys, _, err := database.DB.NoSQL.GetExternalAccountKeys(ctx, h.provisionerID, "", -1)
@@ -103,7 +103,7 @@ func (h *Handler) CreateNewKey(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
 	hub.ConfigureScope(func(scope *sentry.Scope) {
-		scope.SetExtra("user", user)
+		scope.SetUser(sentry.User{Email: user})
 	})
 	req := &models.EabRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
@@ -160,7 +160,7 @@ func (h *Handler) DeleteKey(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
 	hub.ConfigureScope(func(scope *sentry.Scope) {
-		scope.SetExtra("user", user)
+		scope.SetUser(sentry.User{Email: user})
 	})
 	key := c.Param("id")
 	logger = logger.With(zap.String("keyid", key))

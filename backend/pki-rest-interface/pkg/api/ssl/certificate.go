@@ -46,7 +46,7 @@ func (h *Handler) Active(c echo.Context) error {
 
 	if hub != nil {
 		hub.ConfigureScope(func(scope *sentry.Scope) {
-			scope.SetExtra("user", user)
+			scope.SetUser(sentry.User{Email: user})
 		})
 	}
 	span := sentryecho.GetSpanFromContext(c)
@@ -111,7 +111,7 @@ func (h *Handler) List(c echo.Context) error {
 	}
 	if hub != nil {
 		hub.ConfigureScope(func(scope *sentry.Scope) {
-			scope.SetExtra("user", user)
+			scope.SetUser(sentry.User{Email: user})
 		})
 	}
 	hub.AddBreadcrumb(&sentry.Breadcrumb{Level: sentry.LevelInfo, Message: "Loading domains"}, nil)
@@ -155,7 +155,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 	}
 	if hub != nil {
 		hub.ConfigureScope(func(scope *sentry.Scope) {
-			scope.SetExtra("user", user)
+			scope.SetUser(sentry.User{Email: user})
 		})
 	}
 
@@ -229,7 +229,7 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 
 	if hub != nil {
 		hub.ConfigureScope(func(scope *sentry.Scope) {
-			scope.SetExtra("user", user)
+			scope.SetUser(sentry.User{Email: user})
 		})
 	}
 

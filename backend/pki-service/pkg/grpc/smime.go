@@ -45,7 +45,7 @@ func (s *smimeAPIServer) ListCertificates(ctx context.Context, req *pb.ListSmime
 		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
 	}
 	hub.ConfigureScope(func(scope *sentry.Scope) {
-		scope.SetExtra("user", req.Email)
+		scope.SetUser(sentry.User{Email: req.Email})
 	})
 	logger := log.With(zap.String("user", req.Email))
 
@@ -82,7 +82,7 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
 	}
 	hub.ConfigureScope(func(scope *sentry.Scope) {
-		scope.SetExtra("user", req.Email)
+		scope.SetUser(sentry.User{Email: req.Email})
 	})
 	hub.AddBreadcrumb(&sentry.Breadcrumb{Message: "Issuing new smime certificate", Category: "info"}, nil)
 

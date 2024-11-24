@@ -171,7 +171,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
 	}
 	hub.ConfigureScope(func(scope *sentry.Scope) {
-		scope.SetExtra("user", req.Issuer)
+		scope.SetUser(sentry.User{Email: req.Issuer})
 	})
 
 	logger := log.With(zap.String("issuer", req.Issuer))

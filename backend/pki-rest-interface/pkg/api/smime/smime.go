@@ -42,7 +42,7 @@ func (h *Handler) List(c echo.Context) error {
 	}
 
 	hub.ConfigureScope(func(scope *sentry.Scope) {
-		scope.SetExtra("user", user.Email)
+		scope.SetUser(sentry.User{Email: user.Email})
 	})
 	if err := req.Bind(c, h.validator); err != nil {
 		hub.CaptureException(err)
@@ -99,7 +99,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 	}
 
 	hub.ConfigureScope(func(scope *sentry.Scope) {
-		scope.SetExtra("user", user.Email)
+		scope.SetUser(sentry.User{Email: user.Email})
 	})
 
 	req := &model.RevokeRequest{}
@@ -170,7 +170,7 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 	}
 
 	hub.ConfigureScope(func(scope *sentry.Scope) {
-		scope.SetExtra("user", user.Email)
+		scope.SetUser(sentry.User{Email: user.Email})
 	})
 
 	span := sentryecho.GetSpanFromContext(c)

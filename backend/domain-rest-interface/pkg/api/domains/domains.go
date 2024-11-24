@@ -50,7 +50,7 @@ func (h *Handler) ListDomains(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
 	hub.ConfigureScope(func(scope *sentry.Scope) {
-		scope.SetExtra("user", user)
+		scope.SetUser(sentry.User{Email: user})
 	})
 
 	domains, err := h.enumerateDomains(ctx, user, logger)
@@ -180,7 +180,7 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
 	}
 	hub.ConfigureScope(func(scope *sentry.Scope) {
-		scope.SetExtra("user", user)
+		scope.SetUser(sentry.User{Email: user})
 	})
 
 	req := &model.DomainRequest{}
@@ -283,7 +283,7 @@ func (h *Handler) evaluatePermission(ctx context.Context, c echo.Context, logger
 		return nil, &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
 	hub.ConfigureScope(func(scope *sentry.Scope) {
-		scope.SetExtra("user", user)
+		scope.SetUser(sentry.User{Email: user})
 	})
 	logger = logger.With(zap.Int("domain_id", id))
 	domains, err := h.enumerateDomains(ctx, user, logger)
