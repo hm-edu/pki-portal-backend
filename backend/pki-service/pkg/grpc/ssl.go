@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/TheZeroSlave/zapsentry"
 	"github.com/getsentry/sentry-go"
 	"github.com/hm-edu/pki-service/ent"
 	"github.com/hm-edu/pki-service/ent/certificate"
@@ -75,9 +76,9 @@ func flattenCertificates(certs []*x509.Certificate) string {
 	return string(result)
 }
 
-func (s *sslAPIServer) handleError(msg string, err error, logger *zap.Logger) (*pb.IssueSslResponse, error) {
-	sentry.AddBreadcrumb(&sentry.Breadcrumb{Message: msg, Category: "error", Level: sentry.LevelError})
-	sentry.CaptureException(err)
+func (s *sslAPIServer) handleError(msg string, err error, logger *zap.Logger, hub *sentry.Hub) (*pb.IssueSslResponse, error) {
+	hub.AddBreadcrumb(&sentry.Breadcrumb{Message: msg, Category: "error", Level: sentry.LevelError}, nil)
+	hub.CaptureException(err)
 	logger.Error(msg, zap.Error(err))
 	return nil, status.Errorf(codes.Internal, msg)
 }
@@ -131,7 +132,16 @@ func (s *sslAPIServer) CertificateDetails(ctx context.Context, req *pb.Certifica
 
 func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequest) (*pb.ListSslResponse, error) {
 
-	logger := s.logger.With(zap.Strings("domains", req.Domains), zap.Bool("partial", req.IncludePartial))
+	span := sentry.StartSpan(ctx, "Listing SSL Certificates")
+	defer span.Finish()
+	ctx = span.Context()
+	hub := sentry.GetHubFromContext(ctx)
+	log := s.logger
+	if hub != nil && hub.Scope() != nil {
+		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
+	}
+
+	logger := log.With(zap.Strings("domains", req.Domains), zap.Bool("partial", req.IncludePartial))
 	logger.Debug("listing certificates for domains")
 
 	var cond predicate.Certificate
@@ -152,26 +162,28 @@ func (s *sslAPIServer) ListCertificates(ctx context.Context, req *pb.ListSslRequ
 
 func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslRequest) (*pb.IssueSslResponse, error) {
 
-	span := sentry.StartSpan(ctx, "IssueCertificate")
+	span := sentry.StartSpan(ctx, "Issuing SSL Certificate")
 	defer span.Finish()
+	ctx = span.Context()
+	hub := sentry.GetHubFromContext(ctx)
+	log := s.logger
+	if hub != nil && hub.Scope() != nil {
+		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
+	}
 
-	sentry.ConfigureScope(func(scope *sentry.Scope) {
-		scope.SetSpan(span)
-	})
-
-	logger := s.logger.With(zap.String("issuer", req.Issuer))
+	logger := log.With(zap.String("issuer", req.Issuer))
 
 	block, _ := pem.Decode([]byte(req.Csr))
 
 	if block == nil {
-		sentry.CaptureMessage("Invalid pem block")
+		hub.CaptureMessage("Invalid pem block")
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid pem block")
 	}
 
 	csr, err := x509.ParseCertificateRequest(block.Bytes)
 	if err != nil {
-		sentry.AddBreadcrumb(&sentry.Breadcrumb{Message: "Error parsing CSR", Category: "error", Level: sentry.LevelError})
-		sentry.CaptureException(err)
+		hub.AddBreadcrumb(&sentry.Breadcrumb{Message: "Error parsing CSR", Category: "error", Level: sentry.LevelError}, nil)
+		hub.CaptureException(err)
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid CSR")
 	}
 
@@ -202,7 +214,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 			ID(ctx)
 
 		if err != nil {
-			return s.handleError("Error while creating certificate", err, logger)
+			return s.handleError("Error while creating certificate", err, logger, hub)
 		}
 		ids = append(ids, id)
 	}
@@ -215,11 +227,11 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		Save(ctx)
 
 	if err != nil {
-		return s.handleError("Error while creating certificate", err, logger)
+		return s.handleError("Error while creating certificate", err, logger, hub)
 	}
 
 	start := time.Now()
-	sentry.AddBreadcrumb(&sentry.Breadcrumb{Message: "Requesting certificate", Category: "info", Level: sentry.LevelInfo})
+	hub.AddBreadcrumb(&sentry.Breadcrumb{Message: "Requesting certificate", Category: "info", Level: sentry.LevelInfo}, nil)
 	enrollment, err := s.client.SslService.Enroll(ssl.EnrollmentRequest{
 		OrgID:        s.cfg.SslOrgID,
 		Csr:          req.Csr,
@@ -229,12 +241,12 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	})
 
 	if err != nil {
-		return s.handleError("Error while requesting certificate", err, logger)
+		return s.handleError("Error while requesting certificate", err, logger, hub)
 	}
 
 	entry, err = s.db.Certificate.UpdateOneID(entry.ID).SetStatus(certificate.StatusRequested).SetSslId(enrollment.SslID).Save(ctx)
 	if err != nil {
-		return s.handleError("Error while storing certificate", err, logger)
+		return s.handleError("Error while storing certificate", err, logger, hub)
 	}
 	cert := ""
 	err = helper.WaitFor(5*time.Minute, 1*time.Second, func() (bool, error) {
@@ -252,9 +264,9 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		return true, nil
 	})
 	if err != nil {
-		return s.handleError("Error collecting certificate", err, logger)
+		return s.handleError("Error collecting certificate", err, logger, hub)
 	}
-	sentry.AddBreadcrumb(&sentry.Breadcrumb{Message: "Certificate collected", Category: "info", Level: sentry.LevelInfo})
+	hub.AddBreadcrumb(&sentry.Breadcrumb{Message: "Certificate collected", Category: "info", Level: sentry.LevelInfo}, nil)
 	stop := time.Now()
 	duration := stop.Sub(start)
 	s.duration = &duration
@@ -262,7 +274,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 
 	certs, err := pkiHelper.ParseCertificates([]byte(cert))
 	if err != nil {
-		return s.handleError("Error parsing certificate", err, logger)
+		return s.handleError("Error parsing certificate", err, logger, hub)
 	}
 	pem := certs[0]
 	serial := fmt.Sprintf("%032x", pem.SerialNumber)
@@ -279,15 +291,23 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		Save(ctx)
 
 	if err != nil {
-		return s.handleError("Error while saving collected certificate", err, logger)
+		return s.handleError("Error while saving collected certificate", err, logger, hub)
 	}
 
 	return &pb.IssueSslResponse{Certificate: flattenCertificates(certs)}, nil
 }
 
 func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslRequest) (*emptypb.Empty, error) {
+	span := sentry.StartSpan(ctx, "Revoke SSL Certificates")
+	defer span.Finish()
+	ctx = span.Context()
+	hub := sentry.GetHubFromContext(ctx)
+	log := s.logger
+	if hub != nil && hub.Scope() != nil {
+		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
+	}
 
-	logger := s.logger.With(zap.String("reason", req.Reason))
+	logger := log.With(zap.String("reason", req.Reason))
 
 	errorReturn := func(err error, logger *zap.Logger) (*emptypb.Empty, error) {
 		logger.Error("Failed to revoke certificate", zap.Error(err))

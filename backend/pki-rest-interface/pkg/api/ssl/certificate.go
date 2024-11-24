@@ -173,7 +173,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 	details, err := h.ssl.CertificateDetails(ctx, &pb.CertificateDetailsRequest{Serial: req.Serial})
 
 	if err != nil {
-		sentry.CaptureException(err)
+		hub.CaptureException(err)
 		logger.Error("error while revoking certificate", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while revoking certificate"}
 	}

@@ -4,6 +4,7 @@ go 1.23.0
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
+	github.com/TheZeroSlave/zapsentry v1.23.0
 	github.com/getsentry/sentry-go v0.29.1
 	github.com/hm-edu/sectigo-client v0.0.0-20241031061939-624d3bb3496f
 	github.com/mattn/go-sqlite3 v1.14.16
@@ -15,7 +16,6 @@ require (
 require (
 	ariga.io/atlas v0.28.1 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
-	github.com/TheZeroSlave/zapsentry v1.23.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -95,7 +95,7 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.57.0
 	go.opentelemetry.io/otel v1.32.0
 	go.opentelemetry.io/otel/sdk v1.32.0 // indirect
-	go.opentelemetry.io/otel/trace v1.32.0
+	go.opentelemetry.io/otel/trace v1.32.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	google.golang.org/protobuf v1.35.2
 )
@@ -104,7 +104,7 @@ require (
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/hm-edu/portal-common v0.0.0-20241124061959-4f7fb44c4e25
+	github.com/hm-edu/portal-common v0.0.0-20241124074043-6e0d187c3c95
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/spf13/afero v1.11.0 // indirect

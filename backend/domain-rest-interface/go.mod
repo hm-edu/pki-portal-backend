@@ -4,8 +4,8 @@ go 1.23.0
 
 require (
 	github.com/getkin/kin-openapi v0.128.0
-	github.com/hm-edu/portal-common v0.0.0-20241124061959-4f7fb44c4e25
-	go.opentelemetry.io/otel v1.32.0
+	github.com/hm-edu/portal-common v0.0.0-20241124074043-6e0d187c3c95
+	go.opentelemetry.io/otel v1.32.0 // indirect
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.68.0
 )
@@ -38,7 +38,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/swaggo/swag v1.16.4
 	go.opentelemetry.io/otel/sdk v1.32.0 // indirect
-	go.opentelemetry.io/otel/trace v1.32.0
+	go.opentelemetry.io/otel/trace v1.32.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/net v0.31.0
 	golang.org/x/sys v0.27.0 // indirect
@@ -65,7 +65,6 @@ require (
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/echo-swagger v1.4.1
-	github.com/uptrace/opentelemetry-go-extra/otelzap v0.3.2
 )
 
 require (
@@ -101,13 +100,11 @@ require (
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/swaggo/files/v2 v2.0.1 // indirect
-	github.com/uptrace/opentelemetry-go-extra/otelutil v0.3.2 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.32.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.32.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.32.0 // indirect
 	go.opentelemetry.io/otel/exporters/prometheus v0.54.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.32.0 // indirect
-	go.opentelemetry.io/otel/log v0.8.0 // indirect
 	go.opentelemetry.io/otel/metric v1.32.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.32.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.3.1 // indirect

@@ -37,7 +37,7 @@ func (h *Handler) List(c echo.Context) error {
 	}
 	user := commonModel.User{}
 	if err := user.Bind(c, h.validator); err != nil {
-		sentry.CaptureException(err)
+		hub.CaptureException(err)
 		return err
 	}
 
@@ -165,7 +165,7 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 	}
 	user := commonModel.User{}
 	if err := user.Bind(c, h.validator); err != nil {
-		sentry.CaptureException(err)
+		hub.CaptureException(err)
 		return err
 	}
 

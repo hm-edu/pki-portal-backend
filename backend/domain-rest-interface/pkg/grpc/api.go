@@ -3,15 +3,13 @@ package grpc
 import (
 	"context"
 
+	"github.com/TheZeroSlave/zapsentry"
+	"github.com/getsentry/sentry-go"
 	"github.com/hm-edu/domain-rest-interface/ent"
 	"github.com/hm-edu/domain-rest-interface/pkg/store"
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/helper"
-	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 )
 
@@ -19,35 +17,36 @@ type domainAPIServer struct {
 	pb.UnimplementedDomainServiceServer
 	store  *store.DomainStore
 	logger *zap.Logger
-	tracer trace.Tracer
 	admins []string
 }
 
 func newDomainAPIServer(store *store.DomainStore, logger *zap.Logger, admins []string) *domainAPIServer {
-	tracer := otel.GetTracerProvider().Tracer("domains")
-	return &domainAPIServer{store: store, logger: logger, tracer: tracer, admins: admins}
+	return &domainAPIServer{store: store, logger: logger, admins: admins}
 }
 
 func (api *domainAPIServer) CheckPermission(ctx context.Context, req *pb.CheckPermissionRequest) (*pb.CheckPermissionResponse, error) {
-
-	ctx, span := api.tracer.Start(ctx, "CheckPermission")
-	defer span.End()
-	span.SetAttributes(attribute.String("user", req.User), attribute.StringSlice("domains", req.Domains))
+	span := sentry.StartSpan(ctx, "Check Permission")
+	defer span.Finish()
+	ctx = span.Context()
+	log := api.logger
+	hub := sentry.GetHubFromContext(ctx)
+	if hub != nil && hub.Scope() != nil {
+		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
+	}
 	domains, err := api.store.ListDomains(ctx, req.User, true, false)
-	log := otelzap.New(api.logger.With(zap.String("user", req.User), zap.Strings("domains", req.Domains)))
 	if err != nil {
 		return nil, err
 	}
-	log.Ctx(ctx).Info("Checking permissions", zap.String("user", req.User), zap.Strings("domains", req.Domains))
+	log.Info("Checking permissions", zap.String("user", req.User), zap.Strings("domains", req.Domains))
 	permissions := helper.Map(req.Domains, func(t string) *pb.Permission {
 		if helper.Any(domains, func(d *ent.Domain) bool { return d.Fqdn == t }) {
-			log.Ctx(ctx).Info("Permission granted", zap.String("user", req.User), zap.String("domain", t))
+			log.Info("Permission granted", zap.String("user", req.User), zap.String("domain", t))
 			return &pb.Permission{Domain: t, Granted: true}
 		}
-		log.Ctx(ctx).Info("Permission denied", zap.String("user", req.User), zap.String("domain", t))
+		log.Info("Permission denied", zap.String("user", req.User), zap.String("domain", t))
 		return &pb.Permission{Domain: t, Granted: false}
 	})
-	log.Ctx(ctx).Info("Checked permissions", zap.String("user", req.User), zap.Any("permissions", permissions))
+	log.Info("Checked permissions", zap.String("user", req.User), zap.Any("permissions", permissions))
 	resp := pb.CheckPermissionResponse{Permissions: permissions}
 
 	return &resp, nil
@@ -55,14 +54,19 @@ func (api *domainAPIServer) CheckPermission(ctx context.Context, req *pb.CheckPe
 
 func (api *domainAPIServer) CheckRegistration(ctx context.Context, req *pb.CheckRegistrationRequest) (*pb.CheckRegistrationResponse, error) {
 
-	ctx, span := api.tracer.Start(ctx, "CheckRegistration")
-	defer span.End()
+	span := sentry.StartSpan(ctx, "Check Registration")
+	defer span.Finish()
+	ctx = span.Context()
+	log := api.logger
+	hub := sentry.GetHubFromContext(ctx)
+	if hub != nil && hub.Scope() != nil {
+		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
+	}
 
-	api.logger.Info("Checking registrations domains", zap.Strings("domains", req.Domains))
+	log.Info("Checking registrations domains", zap.Strings("domains", req.Domains))
 	domains, err := api.store.ListAllDomains(ctx, true)
 	if err != nil {
-		span.RecordError(err)
-		api.logger.Error("Checking registrations failed", zap.Strings("domains", req.Domains), zap.Error(err))
+		log.Error("Checking registrations failed", zap.Strings("domains", req.Domains), zap.Error(err))
 		return nil, err
 	}
 
@@ -71,21 +75,27 @@ func (api *domainAPIServer) CheckRegistration(ctx context.Context, req *pb.Check
 			return d == t
 		})
 	})
-	api.logger.Info("Checked registrations", zap.Strings("domains", req.Domains), zap.Strings("missing", missing))
+	log.Info("Checked registrations", zap.Strings("domains", req.Domains), zap.Strings("missing", missing))
 	return &pb.CheckRegistrationResponse{Missing: missing}, nil
 }
 
 func (api *domainAPIServer) ListDomains(ctx context.Context, req *pb.ListDomainsRequest) (*pb.ListDomainsResponse, error) {
-	ctx, span := api.tracer.Start(ctx, "ListDomains")
-	defer span.End()
-	api.logger.Info("Listing domains", zap.String("user", req.User))
+	span := sentry.StartSpan(ctx, "List Domains")
+	defer span.Finish()
+	ctx = span.Context()
+	log := api.logger
+	hub := sentry.GetHubFromContext(ctx)
+	if hub != nil && hub.Scope() != nil {
+		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
+	}
+
+	log.Info("Listing domains", zap.String("user", req.User))
 	domains, err := api.store.ListDomains(ctx, req.User, req.Approved, helper.Contains(api.admins, req.User))
 	if err != nil {
-		span.RecordError(err)
-		api.logger.Error("Listing domains failed", zap.String("user", req.User), zap.Error(err))
+		log.Error("Listing domains failed", zap.String("user", req.User), zap.Error(err))
 		return nil, err
 	}
-	api.logger.Debug("Listed domains", zap.String("user", req.User), zap.Any("domains", domains))
+	log.Debug("Listed domains", zap.String("user", req.User), zap.Any("domains", domains))
 	resp := pb.ListDomainsResponse{Domains: helper.Map(domains, func(t *ent.Domain) string { return t.Fqdn })}
 	return &resp, nil
 }

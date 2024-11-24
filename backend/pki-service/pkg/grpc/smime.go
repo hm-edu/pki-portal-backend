@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/TheZeroSlave/zapsentry"
+	"github.com/getsentry/sentry-go"
 	"github.com/hm-edu/pki-service/pkg/cfg"
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/helper"
@@ -15,9 +17,6 @@ import (
 	"github.com/hm-edu/sectigo-client/sectigo/client"
 	"github.com/hm-edu/sectigo-client/sectigo/person"
 
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -30,19 +29,22 @@ type smimeAPIServer struct {
 	client *sectigo.Client
 	cfg    *cfg.SectigoConfiguration
 	logger *zap.Logger
-
-	tracer trace.Tracer
 }
 
 func newSmimeAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration) *smimeAPIServer {
-	tracer := otel.GetTracerProvider().Tracer("smime")
-	return &smimeAPIServer{client: client, cfg: cfg, logger: zap.L(), tracer: tracer}
+	return &smimeAPIServer{client: client, cfg: cfg, logger: zap.L()}
 }
 
 func (s *smimeAPIServer) ListCertificates(ctx context.Context, req *pb.ListSmimeRequest) (*pb.ListSmimeResponse, error) {
-	_, span := s.tracer.Start(ctx, "listCertificates")
-	defer span.End()
-	logger := s.logger.With(zap.String("user", req.Email), zap.String("trace_id", span.SpanContext().TraceID().String()))
+	span := sentry.StartSpan(ctx, "List S/MIME Certificates")
+	defer span.Finish()
+	ctx = span.Context()
+	hub := sentry.GetHubFromContext(ctx)
+	log := s.logger
+	if hub != nil && hub.Scope() != nil {
+		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
+	}
+	logger := log.With(zap.String("user", req.Email))
 
 	logger.Info("Requesting issued smime certificates")
 	items, err := s.client.ClientService.ListByEmail(req.Email)
@@ -54,7 +56,7 @@ func (s *smimeAPIServer) ListCertificates(ctx context.Context, req *pb.ListSmime
 			}
 		}
 		logger.Info("Error while requesting smime certificates", zap.Error(err))
-		span.RecordError(err)
+		hub.CaptureException(err)
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	logger.Info("Successfully requested smime certificates", zap.Int("count", len(*items)))
@@ -68,11 +70,17 @@ func (s *smimeAPIServer) ListCertificates(ctx context.Context, req *pb.ListSmime
 	})}, nil
 }
 func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmimeRequest) (*pb.IssueSmimeResponse, error) {
-	_, span := s.tracer.Start(ctx, "handleCsr")
-	defer span.End()
-	span.AddEvent("Validating csr")
+	span := sentry.StartSpan(ctx, "Issue S/MIME Certificate")
+	defer span.Finish()
+	ctx = span.Context()
+	hub := sentry.GetHubFromContext(ctx)
+	log := s.logger
+	if hub != nil && hub.Scope() != nil {
+		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
+	}
+	hub.AddBreadcrumb(&sentry.Breadcrumb{Message: "Issuing new smime certificate", Category: "info"}, nil)
 
-	logger := s.logger.With(zap.String("user", req.Email), zap.String("trace_id", span.SpanContext().TraceID().String()))
+	logger := log.With(zap.String("user", req.Email))
 	logger.Info("Issuing new smime certificate")
 	block, _ := pem.Decode([]byte(req.Csr))
 
@@ -80,14 +88,14 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 	// The "real" user-data will be filled in by sectigo so we can sort of ignore any data provided by the user and simply pass the CSR to sectigo
 	csr, err := x509.ParseCertificateRequest(block.Bytes)
 	if err != nil {
-		span.RecordError(err)
+		hub.CaptureException(err)
 		logger.Error("Error while parsing CSR", zap.Error(err))
 		return nil, status.Error(codes.InvalidArgument, "Invalid CSR")
 	}
 
 	// Validate the CSR
 	if err := csr.CheckSignature(); err != nil {
-		span.RecordError(err)
+		hub.CaptureException(err)
 		logger.Error("Error while validating CSR", zap.Error(err))
 		return nil, status.Error(codes.InvalidArgument, "Invalid CSR")
 	}
@@ -111,7 +119,7 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 
 	persons, err := s.client.PersonService.List(&person.ListParams{Email: req.Email})
 	if err != nil {
-		span.RecordError(err)
+		hub.CaptureException(err)
 		logger.Error("Error while requesting person", zap.Error(err))
 		return nil, status.Error(codes.Internal, "Error requesting person")
 	}
@@ -130,7 +138,6 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 
 	if len(*persons) == 0 {
 		logger.Info("No person found. Creating new")
-		span.AddEvent("Creating new person")
 		err = s.client.PersonService.CreatePerson(person.CreateRequest{
 			FirstName:      req.FirstName,
 			LastName:       req.LastName,
@@ -141,7 +148,6 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 			Phone:          "",
 		})
 		if err != nil {
-			span.RecordError(err)
 			logger.Error("Error while creating person", zap.Error(err))
 			return nil, status.Error(codes.Internal, "Error creating person")
 		}
@@ -156,14 +162,13 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 				CommonName:     req.CommonName,
 			})
 			if err != nil {
-				span.RecordError(err)
+				hub.CaptureException(err)
 				logger.Error("Error while updating person", zap.Error(err))
 				return nil, status.Error(codes.Internal, "Error updating person")
 			}
 		}
 	}
 
-	span.AddEvent("Enrolling certificate")
 	resp, err := s.client.ClientService.Enroll(client.EnrollmentRequest{
 		OrgID:           s.cfg.SmimeOrgID,
 		FirstName:       req.FirstName,
@@ -179,7 +184,7 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 		Eppn:            "",
 	})
 	if err != nil {
-		span.RecordError(err)
+		hub.CaptureException(err)
 		logger.Error("Error while enrolling certificate", zap.Error(err))
 		return nil, status.Error(codes.Internal, "Error enrolling certificate")
 	}
@@ -189,21 +194,19 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 		if err != nil {
 			if e, ok := err.(*sectigo.ErrorResponse); ok {
 				if e.Code == 0 && e.Description == "Being processed by Sectigo" {
-					span.AddEvent("Certificate not ready yet")
 					logger.Debug("Certificate not ready", zap.Int("id", resp.OrderNumber), zap.String("email", req.Email))
 					return false, nil
 				}
 			}
 			return false, err
 		}
-		span.AddEvent("Certificate ready")
 		logger.Info("Certificate ready", zap.Int("id", resp.OrderNumber))
 		cert = *c
 		return true, nil
 	})
 
 	if err != nil {
-		span.RecordError(err)
+		hub.CaptureException(err)
 		return nil, status.Error(codes.Internal, "Error obtaining certificate")
 	}
 
@@ -211,19 +214,24 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 
 }
 func (s *smimeAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSmimeRequest) (*emptypb.Empty, error) {
-	_, span := s.tracer.Start(ctx, "listCertificates")
-	defer span.End()
+	span := sentry.StartSpan(ctx, "Revoke S/MIME Certificate")
+	defer span.Finish()
+	ctx = span.Context()
+	hub := sentry.GetHubFromContext(ctx)
+	log := s.logger
+	if hub != nil && hub.Scope() != nil {
+		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
+	}
 
-	logger := s.logger.With(zap.String("trace_id", span.SpanContext().TraceID().String()), zap.String("reason", req.Reason))
+	logger := log.With(zap.String("reason", req.Reason))
 
 	switch req.Identifier.(type) {
 	case *pb.RevokeSmimeRequest_Email:
 		logger = logger.With(zap.String("email", req.GetEmail()))
 		logger.Info("Revoking smime certificate")
-		span.SetAttributes(attribute.String("email", req.GetEmail()))
 		err := s.client.ClientService.RevokeByEmail(client.RevokeByEmailRequest{Email: req.GetEmail(), Reason: req.GetReason()})
 		if err != nil {
-			span.RecordError(err)
+			hub.CaptureException(err)
 			logger.Error("Error while revoking certificate", zap.Error(err))
 			return nil, status.Error(codes.Internal, err.Error())
 		}
@@ -232,6 +240,7 @@ func (s *smimeAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSm
 	case *pb.RevokeSmimeRequest_Serial:
 		err := s.client.ClientService.RevokeBySerial(client.RevokeBySerialRequest{Serial: req.GetSerial(), Reason: req.GetReason()})
 		if err != nil {
+			hub.CaptureException(err)
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 		return &emptypb.Empty{}, nil

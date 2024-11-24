@@ -3,6 +3,7 @@ package eab
 import (
 	"net/http"
 
+	"github.com/getsentry/sentry-go"
 	"github.com/hm-edu/eab-rest-interface/ent"
 	"github.com/hm-edu/eab-rest-interface/ent/eabkey"
 	"github.com/hm-edu/eab-rest-interface/pkg/api/models"
@@ -28,8 +29,9 @@ import (
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) GetExternalAccountKeys(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
-	ctx, span := h.tracer.Start(c.Request().Context(), "listing eab keys")
-	defer span.End()
+	span := sentry.StartSpan(c.Request().Context(), "Get External Account Keys")
+	ctx := span.Context()
+	defer span.Finish()
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		logger.Error("Error getting user from request", zap.Error(err))
@@ -75,8 +77,9 @@ func (h *Handler) GetExternalAccountKeys(c echo.Context) error {
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) CreateNewKey(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
-	ctx, span := h.tracer.Start(c.Request().Context(), "add eab key")
-	defer span.End()
+	span := sentry.StartSpan(c.Request().Context(), "Create New EAB Key")
+	ctx := span.Context()
+	defer span.Finish()
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		logger.Error("Error getting user from request", zap.Error(err))
@@ -121,9 +124,10 @@ func (h *Handler) CreateNewKey(c echo.Context) error {
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) DeleteKey(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
-	ctx, span := h.tracer.Start(c.Request().Context(), "delete")
+	span := sentry.StartSpan(c.Request().Context(), "Delete EAB Key")
+	ctx := span.Context()
+	defer span.Finish()
 
-	defer span.End()
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		logger.Error("Failed to get user from request", zap.Error(err))

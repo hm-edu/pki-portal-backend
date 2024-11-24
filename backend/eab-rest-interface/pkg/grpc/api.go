@@ -3,18 +3,16 @@ package grpc
 import (
 	"context"
 
+	"github.com/TheZeroSlave/zapsentry"
+	"github.com/getsentry/sentry-go"
 	"github.com/hm-edu/eab-rest-interface/ent"
 	"github.com/hm-edu/eab-rest-interface/ent/eabkey"
 	"github.com/hm-edu/eab-rest-interface/pkg/database"
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/helper"
-	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 )
 
@@ -22,24 +20,28 @@ type eabAPIServer struct {
 	pb.UnimplementedEABServiceServer
 	domainService pb.DomainServiceClient
 	logger        *zap.Logger
-	tracer        trace.Tracer
 	provisionerID string
 }
 
 func newEabAPIServer(domainService pb.DomainServiceClient, logger *zap.Logger, provisionerID string) *eabAPIServer {
-	tracer := otel.GetTracerProvider().Tracer("eab")
-	return &eabAPIServer{domainService: domainService, logger: logger, tracer: tracer, provisionerID: provisionerID}
+	return &eabAPIServer{domainService: domainService, logger: logger, provisionerID: provisionerID}
 }
 
 // ResolveAccountId resolves the user using the provided account id and returns the EAB ID and the username.
 func (api *eabAPIServer) ResolveAccountId(ctx context.Context, req *pb.ResolveAccountIdRequest) (*pb.ResolveAccountIdResponse, error) { // nolint
-	ctx, span := api.tracer.Start(ctx, "CheckEABPermissions")
-	defer span.End()
+	span := sentry.StartSpan(ctx, "Resolve Account ID")
+	defer span.Finish()
+	ctx = span.Context()
+	hub := sentry.GetHubFromContext(ctx)
+	log := api.logger
+	if hub != nil && hub.Scope() != nil {
+		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
+	}
+	log = log.With(zap.String("user", req.AccountId))
 
-	log := otelzap.New(api.logger.With(zap.String("user", req.AccountId)))
 	eak, err := database.DB.NoSQL.GetExternalAccountKeyByAccountID(ctx, api.provisionerID, req.AccountId)
 	if err != nil {
-		span.RecordError(err)
+		hub.CaptureException(err)
 		log.Error("Error looking up user", zap.String("acc", req.AccountId), zap.Error(err))
 		return nil, status.Error(codes.Internal, "Error looking up user")
 	}
@@ -50,22 +52,26 @@ func (api *eabAPIServer) ResolveAccountId(ctx context.Context, req *pb.ResolveAc
 			log.Warn("Key not found", zap.String("key", eak.ID), zap.Error(err))
 			return nil, status.Error(codes.Unauthenticated, "Key not found")
 		}
-		span.RecordError(err)
+		hub.CaptureException(err)
 		log.Error("Error looking up user", zap.String("key", eak.ID), zap.Error(err))
 		return nil, status.Error(codes.Internal, "Error looking up user")
 	}
-	span.SetAttributes(attribute.String("key", eak.ID), attribute.String("user", key.User))
 	log.Info("User found", zap.String("key", eak.ID), zap.String("user", key.User))
 	return &pb.ResolveAccountIdResponse{User: key.User, EabKey: eak.ID}, nil
 }
 
 // CheckEABPermissions resolves the user and validates the issue permission for the requested domains.
 func (api *eabAPIServer) CheckEABPermissions(ctx context.Context, req *pb.CheckEABPermissionRequest) (*pb.CheckEABPermissionResponse, error) {
+	span := sentry.StartSpan(ctx, "Check EAB Permissions")
+	defer span.Finish()
+	ctx = span.Context()
+	hub := sentry.GetHubFromContext(ctx)
+	log := api.logger
+	if hub != nil && hub.Scope() != nil {
+		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
+	}
+	log = log.With(zap.String("user", req.EabKey))
 
-	ctx, span := api.tracer.Start(ctx, "CheckEABPermissions")
-	defer span.End()
-	log := otelzap.New(api.logger.With(zap.String("user", req.EabKey), zap.Strings("domains", req.Domains)))
-	span.SetAttributes(attribute.String("key", req.EabKey), attribute.StringSlice("domains", req.Domains))
 	key, err := database.DB.Db.EABKey.Query().Where(eabkey.EabKey(req.EabKey)).First(ctx)
 
 	if err != nil {
@@ -73,22 +79,19 @@ func (api *eabAPIServer) CheckEABPermissions(ctx context.Context, req *pb.CheckE
 			log.Warn("Key not found", zap.String("key", req.EabKey), zap.Error(err))
 			return nil, status.Error(codes.Unauthenticated, "Key not found")
 		}
-		span.RecordError(err)
+		hub.CaptureException(err)
 		log.Error("Error looking up user", zap.String("key", req.EabKey), zap.Error(err))
 		return nil, status.Error(codes.Internal, "Error looking up user")
 	}
-
-	span.SetAttributes(attribute.String("key", req.EabKey), attribute.StringSlice("domains", req.Domains), attribute.String("user", key.User))
+	hub.AddBreadcrumb(&sentry.Breadcrumb{Message: "Checking permissions", Category: "info"}, nil)
 	log.Info("Checking registrations for user", zap.String("key", key.EabKey), zap.String("user", key.User), zap.Strings("domains", req.Domains))
 	permissions, err := api.domainService.CheckPermission(ctx, &pb.CheckPermissionRequest{User: key.User, Domains: req.Domains})
 	if err != nil {
-		span.RecordError(err)
+		hub.CaptureException(err)
 		log.Error("Error checking permissions", zap.Error(err))
 		return nil, status.Error(codes.Internal, "Error checking permissions")
 	}
-
 	missing := helper.Map(helper.Where(permissions.Permissions, func(t *pb.Permission) bool { return !t.Granted }), func(t *pb.Permission) string { return t.Domain })
-	span.SetAttributes(attribute.String("key", req.EabKey), attribute.StringSlice("domains", req.Domains), attribute.String("user", key.User), attribute.StringSlice("missing", missing))
 	log.Info("Permissions checked", zap.Strings("missing", missing), zap.String("key", key.EabKey), zap.String("user", key.User))
 	return &pb.CheckEABPermissionResponse{Missing: missing}, nil
 }

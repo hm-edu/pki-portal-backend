@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/TheZeroSlave/zapsentry"
 	"github.com/getsentry/sentry-go"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
@@ -15,6 +16,7 @@ import (
 	"github.com/hm-edu/portal-common/api"
 
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
@@ -68,7 +70,8 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 		)}
 
 	if s.config.SentryDSN != "" {
-		if err := sentry.Init(sentry.ClientOptions{
+
+		if client, err := sentry.NewClient(sentry.ClientOptions{
 			Dsn: s.config.SentryDSN,
 			// Set TracesSampleRate to 1.0 to capture 100%
 			// of transactions for performance monitoring.
@@ -77,9 +80,18 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 			EnableTracing:      true,
 			IgnoreTransactions: []string{"/grpc.health.v1.Health/Check"},
 		}); err != nil {
-			zap.L().Sugar().Warnf("Sentry initialization failed: %v\n", err)
+			s.logger.Sugar().Warnf("Sentry initialization failed: %v\n", err)
 		} else {
-			s.logger.Info("Sentry initialized")
+			cfg := zapsentry.Configuration{
+				Level:             zapcore.WarnLevel, //when to send message to sentry
+				EnableBreadcrumbs: true,              // enable sending breadcrumbs to Sentry
+				BreadcrumbLevel:   zapcore.InfoLevel, // at what level should we sent breadcrumbs to sentry, this level can't be higher than `Level`
+			}
+			core, err := zapsentry.NewCore(cfg, zapsentry.NewSentryClientFromClient(client))
+			if err != nil {
+				s.logger.Error("Sentry initialization failed", zap.Error(err))
+			}
+			s.logger = zapsentry.AttachCoreToLogger(core, s.logger)
 			interceptors = append(interceptors, grpc_sentry.UnaryServerInterceptor())
 		}
 	}
