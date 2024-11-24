@@ -33,6 +33,9 @@ func (api *domainAPIServer) CheckPermission(ctx context.Context, req *pb.CheckPe
 	if hub != nil && hub.Scope() != nil {
 		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
 	}
+	hub.ConfigureScope(func(scope *sentry.Scope) {
+		scope.SetExtra("user", req.User)
+	})
 	domains, err := api.store.ListDomains(ctx, req.User, true, false)
 	if err != nil {
 		return nil, err
@@ -88,6 +91,9 @@ func (api *domainAPIServer) ListDomains(ctx context.Context, req *pb.ListDomains
 	if hub != nil && hub.Scope() != nil {
 		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
 	}
+	hub.ConfigureScope(func(scope *sentry.Scope) {
+		scope.SetExtra("user", req.User)
+	})
 
 	log.Info("Listing domains", zap.String("user", req.User))
 	domains, err := api.store.ListDomains(ctx, req.User, req.Approved, helper.Contains(api.admins, req.User))
