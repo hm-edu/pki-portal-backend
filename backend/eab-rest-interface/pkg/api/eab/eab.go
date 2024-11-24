@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/getsentry/sentry-go"
+	sentryecho "github.com/getsentry/sentry-go/echo"
 	"github.com/hm-edu/eab-rest-interface/ent"
 	"github.com/hm-edu/eab-rest-interface/ent/eabkey"
 	"github.com/hm-edu/eab-rest-interface/pkg/api/models"
@@ -29,14 +30,24 @@ import (
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) GetExternalAccountKeys(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
-	span := sentry.StartSpan(c.Request().Context(), "Get External Account Keys")
-	ctx := span.Context()
-	defer span.Finish()
+	span := sentryecho.GetSpanFromContext(c)
+	ctx := c.Request().Context()
+	if span != nil {
+		ctx = span.Context()
+	}
+	hub := sentryecho.GetHubFromContext(c)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		logger.Error("Error getting user from request", zap.Error(err))
 		return echo.NewHTTPError(http.StatusInternalServerError, "Error getting user from request")
 	}
+
+	hub.ConfigureScope(func(scope *sentry.Scope) {
+		scope.SetExtra("user", user)
+	})
 	logger.Info("Requesting external account keys")
 	keys, _, err := database.DB.NoSQL.GetExternalAccountKeys(ctx, h.provisionerID, "", -1)
 	if err != nil {
@@ -77,14 +88,23 @@ func (h *Handler) GetExternalAccountKeys(c echo.Context) error {
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) CreateNewKey(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
-	span := sentry.StartSpan(c.Request().Context(), "Create New EAB Key")
-	ctx := span.Context()
-	defer span.Finish()
+	span := sentryecho.GetSpanFromContext(c)
+	ctx := c.Request().Context()
+	if span != nil {
+		ctx = span.Context()
+	}
+	hub := sentryecho.GetHubFromContext(c)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		logger.Error("Error getting user from request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
+	hub.ConfigureScope(func(scope *sentry.Scope) {
+		scope.SetExtra("user", user)
+	})
 	req := &models.EabRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
 		logger.Error("Binding request failed", zap.Error(err))
@@ -124,15 +144,24 @@ func (h *Handler) CreateNewKey(c echo.Context) error {
 // @Response default {object} echo.HTTPError "Error processing the request"
 func (h *Handler) DeleteKey(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
-	span := sentry.StartSpan(c.Request().Context(), "Delete EAB Key")
-	ctx := span.Context()
-	defer span.Finish()
+	span := sentryecho.GetSpanFromContext(c)
+	ctx := c.Request().Context()
+	if span != nil {
+		ctx = span.Context()
+	}
+	hub := sentryecho.GetHubFromContext(c)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
 
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		logger.Error("Failed to get user from request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
+	hub.ConfigureScope(func(scope *sentry.Scope) {
+		scope.SetExtra("user", user)
+	})
 	key := c.Param("id")
 	logger = logger.With(zap.String("keyid", key))
 	logger.Info("Requesting deletion of external account key")

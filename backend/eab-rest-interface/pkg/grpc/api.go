@@ -47,6 +47,9 @@ func (api *eabAPIServer) ResolveAccountId(ctx context.Context, req *pb.ResolveAc
 	}
 	key, err := database.DB.Db.EABKey.Query().Where(eabkey.EabKey(eak.ID)).First(ctx)
 
+	hub.ConfigureScope(func(scope *sentry.Scope) {
+		scope.SetExtra("user", key.User)
+	})
 	if err != nil {
 		if _, ok := err.(*ent.NotFoundError); ok {
 			log.Warn("Key not found", zap.String("key", eak.ID), zap.Error(err))
@@ -74,6 +77,9 @@ func (api *eabAPIServer) CheckEABPermissions(ctx context.Context, req *pb.CheckE
 
 	key, err := database.DB.Db.EABKey.Query().Where(eabkey.EabKey(req.EabKey)).First(ctx)
 
+	hub.ConfigureScope(func(scope *sentry.Scope) {
+		scope.SetExtra("user", key.User)
+	})
 	if err != nil {
 		if _, ok := err.(*ent.NotFoundError); ok {
 			log.Warn("Key not found", zap.String("key", req.EabKey), zap.Error(err))

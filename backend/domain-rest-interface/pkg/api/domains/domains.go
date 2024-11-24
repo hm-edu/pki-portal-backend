@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/getsentry/sentry-go"
 	sentryecho "github.com/getsentry/sentry-go/echo"
 	"github.com/hm-edu/domain-rest-interface/ent"
 	"github.com/hm-edu/domain-rest-interface/pkg/model"
@@ -38,12 +39,19 @@ func (h *Handler) ListDomains(c echo.Context) error {
 	if span != nil {
 		ctx = span.Context()
 	}
+	hub := sentryecho.GetHubFromContext(c)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
 
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		logger.Error("Failed to get user from request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
+	hub.ConfigureScope(func(scope *sentry.Scope) {
+		scope.SetExtra("user", user)
+	})
 
 	domains, err := h.enumerateDomains(ctx, user, logger)
 	if err != nil {
@@ -161,12 +169,19 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 	if span != nil {
 		ctx = span.Context()
 	}
+	hub := sentryecho.GetHubFromContext(c)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
 
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		logger.Error("Failed to get user from request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
 	}
+	hub.ConfigureScope(func(scope *sentry.Scope) {
+		scope.SetExtra("user", user)
+	})
 
 	req := &model.DomainRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
@@ -258,11 +273,18 @@ func (h *Handler) evaluatePermission(ctx context.Context, c echo.Context, logger
 		logger.Error("Invalid domain id", zap.Error(err))
 		return nil, &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid domain ID"}
 	}
+	hub := sentryecho.GetHubFromContext(c)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		logger.Error("Failed to get user from request", zap.Error(err))
 		return nil, &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
 	}
+	hub.ConfigureScope(func(scope *sentry.Scope) {
+		scope.SetExtra("user", user)
+	})
 	logger = logger.With(zap.Int("domain_id", id))
 	domains, err := h.enumerateDomains(ctx, user, logger)
 	if err != nil {
