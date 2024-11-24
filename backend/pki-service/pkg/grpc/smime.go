@@ -36,10 +36,9 @@ func newSmimeAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration) *s
 }
 
 func (s *smimeAPIServer) ListCertificates(ctx context.Context, req *pb.ListSmimeRequest) (*pb.ListSmimeResponse, error) {
+	hub := sentry.GetHubFromContext(ctx)
 	span := sentry.StartSpan(ctx, "List S/MIME Certificates")
 	defer span.Finish()
-	ctx = span.Context()
-	hub := sentry.GetHubFromContext(ctx)
 	log := s.logger
 	if hub != nil && hub.Scope() != nil {
 		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
@@ -73,9 +72,7 @@ func (s *smimeAPIServer) ListCertificates(ctx context.Context, req *pb.ListSmime
 	})}, nil
 }
 func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmimeRequest) (*pb.IssueSmimeResponse, error) {
-	span := sentry.StartSpan(ctx, "Issue S/MIME Certificate")
-	defer span.Finish()
-	ctx = span.Context()
+
 	hub := sentry.GetHubFromContext(ctx)
 	log := s.logger
 	if hub != nil && hub.Scope() != nil {
