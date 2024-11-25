@@ -1,7 +1,6 @@
 package grpc
 
 import (
-	"context"
 	"fmt"
 	"net"
 
@@ -21,7 +20,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -30,18 +28,6 @@ type Server struct {
 	logger        *zap.Logger
 	config        *Config
 	provisionerID string
-}
-
-func (s *Server) metadataLogger(ctx context.Context,
-	req interface{},
-	info *grpc.UnaryServerInfo,
-	handler grpc.UnaryHandler) (interface{}, error) {
-
-	md, _ := metadata.FromIncomingContext(ctx) // nil check in ContinueFromGrpcMetadata
-	for k, v := range md {
-		s.logger.Info("metadata", zap.String("key", k), zap.String("value", fmt.Sprintf("%v", v)))
-	}
-	return handler(ctx, req)
 }
 
 // Config is the basic structure of the GRPC configuration
@@ -81,7 +67,7 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 				}
 				return true
 			}),
-		), s.metadataLogger}
+		)}
 
 	if s.config.SentryDSN != "" {
 
