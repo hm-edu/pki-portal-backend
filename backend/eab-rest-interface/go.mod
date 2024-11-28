@@ -54,7 +54,7 @@ require (
 	github.com/TheZeroSlave/zapsentry v1.23.0
 	github.com/getsentry/sentry-go v0.29.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
-	github.com/hm-edu/portal-apis v0.0.0-20230929065638-ad1f7e7c7ab3
+	github.com/hm-edu/portal-apis v0.0.0-20241128063248-b872e0b712f3
 	github.com/johnbellone/grpc-middleware-sentry v0.4.0
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/labstack/gommon v0.4.2
