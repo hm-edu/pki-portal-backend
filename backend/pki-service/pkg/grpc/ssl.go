@@ -62,6 +62,10 @@ func mapCertificate(x *ent.Certificate) *pb.SslCertificateDetails {
 	if x.Source != nil {
 		source = *x.Source
 	}
+	ca := ""
+	if x.Ca != nil {
+		ca = *x.Ca
+	}
 	return &pb.SslCertificateDetails{
 		Id:                      int32(x.SslId),
 		DbId:                    int32(x.ID),
@@ -74,6 +78,7 @@ func mapCertificate(x *ent.Certificate) *pb.SslCertificateDetails {
 		Source:                  source,
 		IssuedBy:                issuedBy,
 		Created:                 created,
+		Ca:                      ca,
 	}
 }
 
