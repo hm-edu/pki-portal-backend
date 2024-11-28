@@ -2,24 +2,34 @@ package grpc
 
 import (
 	"context"
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
 	"crypto/x509"
+	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"strings"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/TheZeroSlave/zapsentry"
 	"github.com/getsentry/sentry-go"
+	legoCert "github.com/go-acme/lego/v4/certificate"
+	"github.com/go-acme/lego/v4/challenge/dns01"
+	"github.com/go-acme/lego/v4/lego"
+	legoLog "github.com/go-acme/lego/v4/log"
+
 	"github.com/hm-edu/pki-service/ent"
 	"github.com/hm-edu/pki-service/ent/certificate"
 	"github.com/hm-edu/pki-service/ent/domain"
 	"github.com/hm-edu/pki-service/ent/predicate"
 	"github.com/hm-edu/pki-service/pkg/cfg"
 	pkiHelper "github.com/hm-edu/pki-service/pkg/helper"
+	"github.com/hm-edu/pki-service/pkg/helper/precheck"
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/helper"
 	"github.com/hm-edu/sectigo-client/sectigo"
-	"github.com/hm-edu/sectigo-client/sectigo/ssl"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/metric"
@@ -52,6 +62,10 @@ func mapCertificate(x *ent.Certificate) *pb.SslCertificateDetails {
 	if x.Source != nil {
 		source = *x.Source
 	}
+	ca := ""
+	if x.Ca != nil {
+		ca = *x.Ca
+	}
 	return &pb.SslCertificateDetails{
 		Id:                      int32(x.SslId),
 		DbId:                    int32(x.ID),
@@ -64,6 +78,7 @@ func mapCertificate(x *ent.Certificate) *pb.SslCertificateDetails {
 		Source:                  source,
 		IssuedBy:                issuedBy,
 		Created:                 created,
+		Ca:                      ca,
 	}
 }
 
@@ -85,17 +100,20 @@ func (s *sslAPIServer) handleError(msg string, err error, logger *zap.Logger, hu
 
 type sslAPIServer struct {
 	pb.UnimplementedSSLServiceServer
-	client *sectigo.Client
-	db     *ent.Client
-	cfg    *cfg.SectigoConfiguration
-	logger *zap.Logger
+	client     *sectigo.Client
+	db         *ent.Client
+	cfg        *cfg.PKIConfiguration
+	logger     *zap.Logger
+	legoClient *lego.Client
 
 	last     *time.Time
 	duration *time.Duration
 }
 
-func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *ent.Client) *sslAPIServer {
+func newSslAPIServer(client *sectigo.Client, cfg *cfg.PKIConfiguration, db *ent.Client) *sslAPIServer {
 	var err error
+
+	legoClient := registerAcme(cfg)
 
 	gauge, _ := meter.Int64ObservableGauge(
 		"ssl.issue.last.duration",
@@ -108,7 +126,7 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 		metric.WithUnit("unixMilli"),
 		metric.WithDescription("Issue timestamp for last SSL Certificates"),
 	)
-	instance := &sslAPIServer{client: client, cfg: cfg, logger: zap.L(), db: db}
+	instance := &sslAPIServer{client: client, legoClient: legoClient, cfg: cfg, logger: zap.L(), db: db}
 	_, err = meter.RegisterCallback(func(_ context.Context, observer metric.Observer) error {
 		if instance.last != nil {
 			observer.ObserveInt64(gauge, int64(instance.duration.Seconds()))
@@ -120,6 +138,70 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *
 		zap.L().Error("Failed to register callback", zap.Error(err))
 	}
 	return instance
+}
+
+func registerAcme(cfg *cfg.PKIConfiguration) *lego.Client {
+	accountFile := filepath.Join(cfg.AcmeStorage, "reg.json")
+	keyFile := filepath.Join(cfg.AcmeStorage, "reg.key")
+
+	var account pkiHelper.User
+	if ok, _ := pkiHelper.FileExists(accountFile); !ok {
+		// Actually we would not need a private key but the lego API requires one.
+		privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+		if err != nil {
+			return nil
+		}
+
+		account = pkiHelper.User{
+			Key: privateKey, Email: cfg.AcmeEmail,
+		}
+
+	} else {
+		data, err := os.ReadFile(accountFile) //#nosec
+		if err != nil {
+			return nil
+		}
+		err = json.Unmarshal(data, &account)
+		if err != nil {
+			return nil
+		}
+		account.Key, err = pkiHelper.LoadPrivateKey(keyFile)
+		if err != nil {
+			return nil
+		}
+
+	}
+	legoCfg := lego.NewConfig(&account)
+
+	legoLog.Logger = pkiHelper.NewZapLogger(zap.L())
+	legoCfg.Certificate.Timeout = time.Duration(5) * time.Minute
+	if account.Registration == nil {
+		legoClient, err := lego.NewClient(legoCfg)
+
+		if err != nil {
+			return nil
+		}
+		err = pkiHelper.RegisterAcme(legoClient, cfg, account, accountFile, keyFile)
+		if err != nil {
+			return nil
+		}
+	}
+
+	legoClient, err := lego.NewClient(legoCfg)
+	if err != nil {
+		zap.L().Fatal("Failed to create lego client", zap.Error(err))
+	}
+	dns, err := pkiHelper.NewDNSProvider(cfg.DnsConfigs)
+	if err != nil {
+		zap.L().Fatal("Failed to create DNS provider", zap.Error(err))
+	}
+
+	err = legoClient.Challenge.SetDNS01Provider(dns, dns01.WrapPreCheck(precheck.CheckDNS))
+	if err != nil {
+		zap.L().Fatal("Failed to set DNS01 provider", zap.Error(err))
+	}
+
+	return legoClient
 }
 
 func (s *sslAPIServer) CertificateDetails(ctx context.Context, req *pb.CertificateDetailsRequest) (*pb.SslCertificateDetails, error) {
@@ -222,6 +304,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		SetCommonName(sans[0]).
 		SetIssuedBy(req.Issuer).
 		SetSource(req.Source).
+		SetCa("zerossl").
 		AddDomainIDs(ids...).
 		Save(ctx)
 
@@ -231,39 +314,15 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 
 	start := time.Now()
 	hub.AddBreadcrumb(&sentry.Breadcrumb{Message: "Requesting certificate", Category: "info", Level: sentry.LevelInfo}, nil)
-	enrollment, err := s.client.SslService.Enroll(ssl.EnrollmentRequest{
-		OrgID:        s.cfg.SslOrgID,
-		Csr:          req.Csr,
-		Term:         s.cfg.SslTerm,
-		CertType:     s.cfg.SslProfile,
-		SubjAltNames: strings.Join(req.SubjectAlternativeNames, ","),
-	})
 
-	if err != nil {
-		return s.handleError("Error while requesting certificate", err, logger, hub)
-	}
-
-	entry, err = s.db.Certificate.UpdateOneID(entry.ID).SetStatus(certificate.StatusRequested).SetSslId(enrollment.SslID).Save(ctx)
+	entry, err = s.db.Certificate.UpdateOneID(entry.ID).SetStatus(certificate.StatusRequested).Save(ctx)
 	if err != nil {
 		return s.handleError("Error while storing certificate", err, logger, hub)
 	}
-	cert := ""
-	err = helper.WaitFor(5*time.Minute, 1*time.Second, func() (bool, error) {
-		c, err := s.client.SslService.Collect(enrollment.SslID, "x509R")
-		if err != nil {
-			if e, ok := err.(*sectigo.ErrorResponse); ok {
-				if e.Code == 0 && e.Description == "Being processed by Sectigo" {
-					s.logger.Debug("Certificate not ready", zap.Int("id", enrollment.SslID), zap.Strings("subject_alternative_names", req.SubjectAlternativeNames))
-					return false, nil
-				}
-			}
-			return true, err
-		}
-		cert = *c
-		return true, nil
-	})
+
+	resp, err := s.legoClient.Certificate.ObtainForCSR(legoCert.ObtainForCSRRequest{CSR: csr, Bundle: true})
 	if err != nil {
-		return s.handleError("Error collecting certificate", err, logger, hub)
+		return s.handleError("Error while obtaining certificate", err, logger, hub)
 	}
 	hub.AddBreadcrumb(&sentry.Breadcrumb{Message: "Certificate collected", Category: "info", Level: sentry.LevelInfo}, nil)
 	stop := time.Now()
@@ -271,7 +330,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	s.duration = &duration
 	s.last = &stop
 
-	certs, err := pkiHelper.ParseCertificates([]byte(cert))
+	certs, err := pkiHelper.ParseCertificates(resp.Certificate)
 	if err != nil {
 		return s.handleError("Error parsing certificate", err, logger, hub)
 	}

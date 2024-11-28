@@ -4,7 +4,7 @@ go 1.23.0
 
 require (
 	github.com/getkin/kin-openapi v0.128.0
-	github.com/hm-edu/portal-common v0.0.0-20241124074043-6e0d187c3c95
+	github.com/hm-edu/portal-common v0.0.0-20241127091109-fb34d94d9320
 	github.com/smallstep/certificates v0.28.1
 	go.opentelemetry.io/otel v1.32.0 // indirect
 	go.uber.org/zap v1.27.0
@@ -156,6 +156,7 @@ require (
 	github.com/lestrrat-go/option v1.0.1 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/miekg/dns v1.1.62 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect

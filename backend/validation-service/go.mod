@@ -81,7 +81,7 @@ require (
 require (
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/hm-edu/portal-common v0.0.0-20241124074043-6e0d187c3c95
+	github.com/hm-edu/portal-common v0.0.0-20241127091109-fb34d94d9320
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
