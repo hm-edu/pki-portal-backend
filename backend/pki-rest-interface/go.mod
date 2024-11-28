@@ -4,7 +4,7 @@ go 1.23
 
 require (
 	github.com/getkin/kin-openapi v0.128.0
-	github.com/hm-edu/portal-apis v0.0.0-20230929065638-ad1f7e7c7ab3
+	github.com/hm-edu/portal-apis v0.0.0-20241128063248-b872e0b712f3
 	github.com/hm-edu/portal-common v0.0.0-20241124074043-6e0d187c3c95
 	github.com/johnbellone/grpc-middleware-sentry v0.4.0
 	github.com/labstack/echo/v4 v4.12.0
