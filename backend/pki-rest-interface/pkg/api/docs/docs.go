@@ -39,6 +39,13 @@ const docTemplate = `{
                     "SMIME"
                 ],
                 "summary": "SMIME List Endpoint",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "email",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "certificates",
@@ -399,6 +406,9 @@ const docTemplate = `{
         "portal_apis.SslCertificateDetails": {
             "type": "object",
             "properties": {
+                "ca": {
+                    "type": "string"
+                },
                 "common_name": {
                     "type": "string"
                 },
