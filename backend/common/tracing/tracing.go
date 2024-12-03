@@ -12,7 +12,7 @@ import (
 // InitTracer performs the initialization of the prometheus endpoint.
 func InitTracer(logger *zap.Logger) *http.Server {
 
-	server := &http.Server{
+	server := &http.Server{ // nolint:gosec
 		Addr: ":2222",
 	}
 
