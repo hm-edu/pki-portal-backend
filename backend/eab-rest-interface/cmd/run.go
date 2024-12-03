@@ -36,7 +36,7 @@ var runCmd = &cobra.Command{
 
 		database.ConnectDb(logger, viper.GetString("db"), viper.GetString("acme_db"))
 
-		tp := tracing.InitTracer(logger, "eab-rest-interface")
+		tp := tracing.InitTracer(logger)
 
 		defer func() {
 			if err := tp.Shutdown(context.Background()); err != nil {

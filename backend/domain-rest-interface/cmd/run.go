@@ -39,7 +39,7 @@ var runCmd = &cobra.Command{
 			logger.Panic("config unmarshal failed", zap.Error(err))
 		}
 
-		tp := tracing.InitTracer(logger, "domain-rest-interface")
+		tp := tracing.InitTracer(logger)
 
 		defer func() {
 			if err := tp.Shutdown(context.Background()); err != nil {

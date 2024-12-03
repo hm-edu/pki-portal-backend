@@ -21,11 +21,11 @@ func prepare(cmd *cobra.Command, _ []string) (grpc.Config, *zap.Logger, func()) 
 		logger.Panic("config unmarshal failed", zap.Error(err))
 	}
 
-	tp := tracing.InitTracer(logger, "dns-service")
+	server := tracing.InitTracer(logger)
 
 	deferFunc := func() {
 		deferLoggerFunc(logger)
-		if err := tp.Shutdown(context.Background()); err != nil {
+		if err := server.Shutdown(context.Background()); err != nil {
 			logger.Fatal("Error shutting down tracer provider.", zap.Error(err))
 		}
 	}

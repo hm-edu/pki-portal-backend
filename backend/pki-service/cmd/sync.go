@@ -30,7 +30,7 @@ var syncCmd = &cobra.Command{
 			logger.Panic("config unmarshal failed", zap.Error(err))
 		}
 
-		tp := tracing.InitTracer(logger, "pki-service")
+		tp := tracing.InitTracer(logger)
 
 		defer func() {
 			if err := tp.Shutdown(context.Background()); err != nil {
