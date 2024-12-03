@@ -40,7 +40,7 @@ var runCmd = &cobra.Command{
 		if err := viper.Unmarshal(&handlerCfg); err != nil {
 			logger.Panic("config unmarshal failed", zap.Error(err))
 		}
-		tp := tracing.InitTracer(logger, "pki-rest-interface")
+		tp := tracing.InitTracer(logger)
 
 		defer func() {
 			if err := tp.Shutdown(context.Background()); err != nil {

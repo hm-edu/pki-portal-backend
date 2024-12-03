@@ -21,8 +21,8 @@ import (
 	"github.com/hm-edu/sectigo-client/sectigo"
 	"github.com/hm-edu/sectigo-client/sectigo/ssl"
 
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/metric"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 
 	"go.uber.org/zap"
 
@@ -31,8 +31,6 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
-
-var meter = otel.GetMeterProvider().Meter("pki-service")
 
 func mapCertificate(x *ent.Certificate) *pb.SslCertificateDetails {
 
@@ -94,31 +92,31 @@ type sslAPIServer struct {
 	duration *time.Duration
 }
 
-func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *ent.Client) *sslAPIServer {
-	var err error
+func newSslAPIServer(client *sectigo.Client, cfg *cfg.PKIConfiguration, db *ent.Client) *sslAPIServer {
 
-	gauge, _ := meter.Int64ObservableGauge(
-		"ssl.issue.last.duration",
-		metric.WithUnit("seconds"),
-		metric.WithDescription("Required time for last SSL Certificates"),
-	)
+	legoClient := registerAcme(cfg)
 
-	gaugeLast, _ := meter.Int64ObservableGauge(
-		"ssl.issue.last.unix",
-		metric.WithUnit("unixMilli"),
-		metric.WithDescription("Issue timestamp for last SSL Certificates"),
-	)
-	instance := &sslAPIServer{client: client, cfg: cfg, logger: zap.L(), db: db}
-	_, err = meter.RegisterCallback(func(_ context.Context, observer metric.Observer) error {
-		if instance.last != nil {
-			observer.ObserveInt64(gauge, int64(instance.duration.Seconds()))
-			observer.ObserveInt64(gaugeLast, instance.last.UnixMilli())
+	instance := &sslAPIServer{client: client, legoClient: legoClient, cfg: cfg, logger: zap.L(), db: db}
+	_ = promauto.NewGaugeFunc(prometheus.GaugeOpts{
+		Name: "ssl_issue_last_duration",
+		Help: "Required time for last SSL Certificates",
+	}, func() float64 {
+		if instance.duration != nil {
+			return instance.duration.Seconds()
 		}
-		return nil
-	}, gauge, gaugeLast)
-	if err != nil {
-		zap.L().Error("Failed to register callback", zap.Error(err))
-	}
+		return 0
+	})
+
+	_ = promauto.NewGaugeFunc(prometheus.GaugeOpts{
+		Name: "ssl_issue_last_timestamp",
+		Help: "Timestamp of last SSL Certificate",
+	}, func() float64 {
+		if instance.last != nil {
+			return float64(instance.last.UnixMilli())
+		}
+		return 0
+	})
+
 	return instance
 }
 
