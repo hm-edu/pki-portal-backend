@@ -5,11 +5,11 @@ go 1.23.0
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/TheZeroSlave/zapsentry v1.23.0
-	github.com/getsentry/sentry-go v0.29.1
-	github.com/hm-edu/sectigo-client v0.0.0-20241031061939-624d3bb3496f
+	github.com/getsentry/sentry-go v0.30.0
+	github.com/hm-edu/sectigo-client v0.0.0-20241203213233-31e0bf071c15
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/spf13/cobra v1.8.1
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	go.uber.org/zap v1.27.0
 )
 
