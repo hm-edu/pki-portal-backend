@@ -92,11 +92,9 @@ type sslAPIServer struct {
 	duration *time.Duration
 }
 
-func newSslAPIServer(client *sectigo.Client, cfg *cfg.PKIConfiguration, db *ent.Client) *sslAPIServer {
+func newSslAPIServer(client *sectigo.Client, cfg *cfg.SectigoConfiguration, db *ent.Client) *sslAPIServer {
 
-	legoClient := registerAcme(cfg)
-
-	instance := &sslAPIServer{client: client, legoClient: legoClient, cfg: cfg, logger: zap.L(), db: db}
+	instance := &sslAPIServer{client: client, cfg: cfg, logger: zap.L(), db: db}
 	_ = promauto.NewGaugeFunc(prometheus.GaugeOpts{
 		Name: "ssl_issue_last_duration",
 		Help: "Required time for last SSL Certificates",
