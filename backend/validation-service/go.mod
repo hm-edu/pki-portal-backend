@@ -3,7 +3,7 @@ module github.com/hm-edu/validation-service
 go 1.23
 
 require (
-	github.com/hm-edu/sectigo-client v0.0.0-20241031061939-624d3bb3496f
+	github.com/hm-edu/sectigo-client v0.0.0-20241203213233-31e0bf071c15
 	github.com/spf13/cobra v1.8.1
 	go.opentelemetry.io/otel/metric v1.32.0
 	go.uber.org/zap v1.27.0
@@ -15,7 +15,7 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/getkin/kin-openapi v0.128.0 // indirect
-	github.com/getsentry/sentry-go v0.29.1 // indirect
+	github.com/getsentry/sentry-go v0.30.0 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/jsonreference v0.21.0 // indirect
 	github.com/go-openapi/spec v0.21.0 // indirect

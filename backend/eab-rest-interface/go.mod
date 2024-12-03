@@ -51,7 +51,7 @@ require (
 require (
 	entgo.io/ent v0.14.1
 	github.com/TheZeroSlave/zapsentry v1.23.0
-	github.com/getsentry/sentry-go v0.29.1
+	github.com/getsentry/sentry-go v0.30.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/hm-edu/portal-apis v0.0.0-20241128063248-b872e0b712f3
 	github.com/johnbellone/grpc-middleware-sentry v0.4.0
