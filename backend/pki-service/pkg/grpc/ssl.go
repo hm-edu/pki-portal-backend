@@ -311,7 +311,7 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 
 	switch req.Identifier.(type) {
 	case *pb.RevokeSslRequest_Serial:
-		serial := req.GetSerial()
+		serial := pkiHelper.NormalizeSerial(req.GetSerial())
 		logger := logger.With(zap.String("serial", serial))
 		logger.Info("Revoking certificate by serial")
 		c, err := s.db.Certificate.Query().Where(certificate.Serial(serial)).First(ctx)
