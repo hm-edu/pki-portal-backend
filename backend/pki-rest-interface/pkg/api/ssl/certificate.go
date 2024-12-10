@@ -72,18 +72,26 @@ func (h *Handler) Active(c echo.Context) error {
 	hub.AddBreadcrumb(&sentry.Breadcrumb{Level: sentry.LevelInfo, Message: "Loading certificates"}, nil)
 
 	logger.Info("fetching certificates", zap.Strings("domains", domains.Domains))
-	certs, err := h.ssl.ListCertificates(ctx, &pb.ListSslRequest{IncludePartial: false, Domains: []string{domain}})
+	certs, err := h.ssl.ListCertificates(ctx, &pb.ListSslRequest{IncludePartial: true, Domains: []string{domain}})
 	if err != nil {
 		logger.Error("error while listing certificates", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while listing certificates"}
 	}
 
 	active := make([]*pb.SslCertificateDetails, 0)
+
 	for _, cert := range certs.Items {
 		if cert.Status == "Issued" {
-			active = append(active, cert)
+			for _, san := range cert.SubjectAlternativeNames {
+				if !helper.Contains(domains.Domains, san) {
+					logger.Warn("domain not found. Usage not allowed.", zap.String("domain", san))
+					continue
+				}
+				active = append(active, cert)
+			}
 		}
 	}
+
 	return c.JSON(http.StatusOK, active)
 }
 
