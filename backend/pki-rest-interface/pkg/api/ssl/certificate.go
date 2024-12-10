@@ -82,11 +82,15 @@ func (h *Handler) Active(c echo.Context) error {
 
 	for _, cert := range certs.Items {
 		if cert.Status == "Issued" {
+			permitted := true
 			for _, san := range cert.SubjectAlternativeNames {
 				if !helper.Contains(domains.Domains, san) {
 					logger.Warn("domain not found. Usage not allowed.", zap.String("domain", san))
-					continue
+					permitted = false
+					break
 				}
+			}
+			if permitted {
 				active = append(active, cert)
 			}
 		}
