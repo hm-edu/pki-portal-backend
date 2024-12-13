@@ -13,6 +13,8 @@ require (
 	go.uber.org/zap v1.27.0
 )
 
+require go.opentelemetry.io/auto/sdk v1.1.0 // indirect
+
 require (
 	ariga.io/atlas v0.29.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
@@ -41,7 +43,7 @@ require (
 	github.com/jackc/pgtype v1.14.4 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
-	github.com/labstack/echo/v4 v4.13.0 // indirect
+	github.com/labstack/echo/v4 v4.13.2 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
@@ -66,13 +68,13 @@ require (
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/zclconf/go-cty v1.15.1 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
-	golang.org/x/crypto v0.30.0 // indirect
-	golang.org/x/exp v0.0.0-20241204233417-43b7b7cde48d // indirect
+	golang.org/x/crypto v0.31.0 // indirect
+	golang.org/x/exp v0.0.0-20241210194714-1829a127f884 // indirect
 	golang.org/x/mod v0.22.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
 	golang.org/x/time v0.8.0 // indirect
 	golang.org/x/tools v0.28.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20241202173237-19429a94021a // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20241209162323-e6fa225c2576 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
@@ -81,9 +83,9 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/hm-edu/portal-apis v0.0.0-20241128063248-b872e0b712f3
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.57.0
-	go.opentelemetry.io/otel v1.32.0 // indirect
-	go.opentelemetry.io/otel/trace v1.32.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.58.0
+	go.opentelemetry.io/otel v1.33.0 // indirect
+	go.opentelemetry.io/otel/trace v1.33.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	google.golang.org/protobuf v1.35.2
 )
@@ -92,8 +94,8 @@ require (
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/hm-edu/portal-common v0.0.0-20241202113645-1700bb7f541a
-	github.com/magiconair/properties v1.8.7 // indirect
+	github.com/hm-edu/portal-common v0.0.0-20241210123407-8b7f3d70d1e8
+	github.com/magiconair/properties v1.8.9 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.7.0 // indirect
@@ -101,7 +103,7 @@ require (
 	golang.org/x/net v0.32.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
-	google.golang.org/grpc v1.68.1
+	google.golang.org/grpc v1.69.0
 	gopkg.in/ini.v1 v1.67.0 // indirect
 )
 
@@ -114,7 +116,7 @@ require (
 	github.com/johnbellone/grpc-middleware-sentry v0.4.0
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	go.opentelemetry.io/otel/metric v1.32.0 // indirect
+	go.opentelemetry.io/otel/metric v1.33.0 // indirect
 )
 
 replace github.com/hm-edu/portal-common => ../common
