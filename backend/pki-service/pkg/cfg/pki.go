@@ -28,6 +28,7 @@ type PKIConfiguration struct {
 	AcmeEmail            string `mapstructure:"acme_email"`
 	AcmeKid              string `mapstructure:"acme_kid"`
 	AcmeHmac             string `mapstructure:"acme_hmac"`
+	AcmeServer           string `mapstructure:"acme_server"`
 	DnsConfigs           string `mapstructure:"dns_configs"`
 }
 
