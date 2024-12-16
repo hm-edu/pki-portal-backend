@@ -167,7 +167,7 @@ func registerAcme(cfg *cfg.PKIConfiguration) *lego.Client {
 
 	}
 	legoCfg := lego.NewConfig(&account)
-
+	legoCfg.CADirURL = cfg.AcmeServer
 	legoLog.Logger = pkiHelper.NewZapLogger(zap.L())
 	legoCfg.Certificate.Timeout = time.Duration(5) * time.Minute
 	if account.Registration == nil {
