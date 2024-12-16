@@ -31,8 +31,8 @@ var runCmd = &cobra.Command{
 		}
 
 		// load Sectigo config
-		var sectigoCfg cfg.SectigoConfiguration
-		if err := viper.Unmarshal(&sectigoCfg); err != nil {
+		var pkiCfg cfg.PKIConfiguration
+		if err := viper.Unmarshal(&pkiCfg); err != nil {
 			logger.Panic("config unmarshal failed", zap.Error(err))
 		}
 
@@ -46,7 +46,7 @@ var runCmd = &cobra.Command{
 
 		stopCh := signals.SetupSignalHandler()
 
-		sectigoCfg.CheckSectigoConfiguration()
+		pkiCfg.CheckSectigoConfiguration()
 
 		database.ConnectDb(logger, viper.GetString("db"))
 
@@ -86,7 +86,7 @@ var runCmd = &cobra.Command{
 		s.StartAsync()
 		// start gRPC server
 		if grpcCfg.Port > 0 {
-			grpcSrv, _ := grpc.NewServer(&grpcCfg, logger, &sectigoCfg, database.DB.Db)
+			grpcSrv, _ := grpc.NewServer(&grpcCfg, logger, &pkiCfg, database.DB.Db)
 			grpcSrv.ListenAndServe(stopCh)
 		}
 	},
@@ -119,4 +119,10 @@ func init() {
 	runCmd.Flags().String("mail_to", "", "Optional param to send notifications to a specific mail address instead of the orignal issuer.")
 	runCmd.Flags().String("mail_bcc", "", "Optional param to send notifications as blind copy to a specific mail address instead of the orignal issuer.")
 	runCmd.Flags().String("mail_from", "", "The mail from")
+	runCmd.Flags().String("acme_storage", "", "Storage for the internal acme client")
+	runCmd.Flags().String("acme_email", "", "Email for the acme client")
+	runCmd.Flags().String("acme_hmac", "", "EAB HMAC for the acme client")
+	runCmd.Flags().String("acme_kid", "", "Key ID for the acme client")
+	runCmd.Flags().String("acme_server", "", "Server for the acme client")
+	runCmd.Flags().String("dns_configs", "", "Config file for the dns provider")
 }

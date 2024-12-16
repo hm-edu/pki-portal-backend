@@ -9,8 +9,8 @@ import (
 	"go.uber.org/zap"
 )
 
-// SectigoConfiguration handles different configuration properties for the sectigo client
-type SectigoConfiguration struct {
+// PKIConfiguration handles different configuration properties for the sectigo client
+type PKIConfiguration struct {
 	User                 string `mapstructure:"sectigo_user"`
 	Password             string `mapstructure:"sectigo_password"`
 	CustomerURI          string `mapstructure:"sectigo_customeruri"`
@@ -24,10 +24,16 @@ type SectigoConfiguration struct {
 	SslTerm              int    `mapstructure:"ssl_term"`
 	SmimeKeyLength       string `mapstructure:"smime_key_length"`
 	SmimeKeyType         string `mapstructure:"smime_key_type"`
+	AcmeStorage          string `mapstructure:"acme_storage"`
+	AcmeEmail            string `mapstructure:"acme_email"`
+	AcmeKid              string `mapstructure:"acme_kid"`
+	AcmeHmac             string `mapstructure:"acme_hmac"`
+	AcmeServer           string `mapstructure:"acme_server"`
+	DnsConfigs           string `mapstructure:"dns_configs"`
 }
 
 // CheckSectigoConfiguration checks the sectigo configuration for the syntactical correctness.
-func (cfg *SectigoConfiguration) CheckSectigoConfiguration() {
+func (cfg *PKIConfiguration) CheckSectigoConfiguration() {
 
 	logger := zap.L()
 
