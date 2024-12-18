@@ -135,7 +135,7 @@ require (
 	github.com/golang/glog v1.2.3 // indirect
 	github.com/google/certificate-transparency-go v1.3.0 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/google/go-tpm v0.9.2 // indirect
+	github.com/google/go-tpm v0.9.3 // indirect
 	github.com/google/go-tspi v0.3.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
@@ -172,7 +172,7 @@ require (
 	github.com/zclconf/go-cty v1.15.1 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	golang.org/x/crypto v0.31.0 // indirect
-	golang.org/x/exp v0.0.0-20241215155358-4a5509556b9e // indirect
+	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67 // indirect
 	golang.org/x/mod v0.22.0 // indirect
 	golang.org/x/oauth2 v0.24.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
