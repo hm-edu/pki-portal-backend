@@ -8,7 +8,6 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -40,7 +39,7 @@ func PrepareEnv(cmd *cobra.Command) (*zap.Logger, func(*zap.Logger), *viper.Vipe
 
 // ConnectGRPC connects to the GRPC server.
 func ConnectGRPC(host string, options ...grpc.DialOption) (*grpc.ClientConn, error) {
-	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithStatsHandler(otelgrpc.NewClientHandler()))
+	options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	conn, err := grpc.NewClient(host, options...)
 	if err != nil {
 		return nil, err

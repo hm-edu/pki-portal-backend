@@ -1,23 +1,29 @@
 module github.com/hm-edu/pki-service
 
-go 1.23.0
+go 1.23.3
+
+toolchain go1.23.4
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/TheZeroSlave/zapsentry v1.23.0
 	github.com/getsentry/sentry-go v0.30.0
-	github.com/hm-edu/sectigo-client v0.0.0-20241203213233-31e0bf071c15
+	github.com/hm-edu/harica v0.0.0-20250102061629-52e03afeef0c
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/zap v1.27.0
 )
 
-require go.opentelemetry.io/auto/sdk v1.1.0 // indirect
-
 require (
-	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
+	github.com/boombuler/barcode v1.0.2 // indirect
+	github.com/go-co-op/gocron/v2 v2.14.0 // indirect
+	github.com/go-resty/resty/v2 v2.16.2 // indirect
+	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
+	github.com/jonboulle/clockwork v0.4.0 // indirect
 	github.com/magiconair/properties v1.8.9 // indirect
+	github.com/pquerna/otp v1.4.0 // indirect
+	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
 )
 
@@ -31,7 +37,6 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/getkin/kin-openapi v0.128.0 // indirect
-	github.com/go-jose/go-jose/v4 v4.0.4 // indirect
 	github.com/go-openapi/inflect v0.21.0 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/jsonreference v0.21.0 // indirect
@@ -55,7 +60,7 @@ require (
 	github.com/mailru/easyjson v0.9.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/miekg/dns v1.1.62
+	github.com/miekg/dns v1.1.62 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
@@ -83,16 +88,12 @@ require (
 	golang.org/x/time v0.8.0 // indirect
 	golang.org/x/tools v0.28.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241230172942-26aa7a208def // indirect
-	gopkg.in/yaml.v3 v3.0.1
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
+require github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776
+
 require (
-	github.com/go-logr/logr v1.4.2 // indirect
-	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/google/go-querystring v1.1.0 // indirect
-	github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.58.0
-	go.opentelemetry.io/otel v1.33.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.32.0 // indirect
 	go.opentelemetry.io/otel/trace v1.33.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
@@ -116,7 +117,6 @@ require (
 
 require (
 	entgo.io/ent v0.14.1
-	github.com/go-acme/lego/v4 v4.21.0
 	github.com/go-co-op/gocron v1.37.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect

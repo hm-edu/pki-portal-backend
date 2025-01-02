@@ -32,7 +32,7 @@ func init() {
 	// certificate.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
 	certificate.UpdateDefaultUpdateTime = certificateDescUpdateTime.UpdateDefault.(func() time.Time)
 	// certificateDescCommonName is the schema descriptor for commonName field.
-	certificateDescCommonName := certificateFields[2].Descriptor()
+	certificateDescCommonName := certificateFields[3].Descriptor()
 	// certificate.CommonNameValidator is a validator for the "commonName" field. It is called by the builders before save.
 	certificate.CommonNameValidator = certificateDescCommonName.Validators[0].(func(string) error)
 	domainFields := schema.Domain{}.Fields()

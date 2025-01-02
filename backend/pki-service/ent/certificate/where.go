@@ -70,6 +70,11 @@ func SslId(v int) predicate.Certificate {
 	return predicate.Certificate(sql.FieldEQ(FieldSslId, v))
 }
 
+// TransactionId applies equality check predicate on the "transactionId" field. It's identical to TransactionIdEQ.
+func TransactionId(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldEQ(FieldTransactionId, v))
+}
+
 // Serial applies equality check predicate on the "serial" field. It's identical to SerialEQ.
 func Serial(v string) predicate.Certificate {
 	return predicate.Certificate(sql.FieldEQ(FieldSerial, v))
@@ -238,6 +243,81 @@ func SslIdIsNil() predicate.Certificate {
 // SslIdNotNil applies the NotNil predicate on the "sslId" field.
 func SslIdNotNil() predicate.Certificate {
 	return predicate.Certificate(sql.FieldNotNull(FieldSslId))
+}
+
+// TransactionIdEQ applies the EQ predicate on the "transactionId" field.
+func TransactionIdEQ(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldEQ(FieldTransactionId, v))
+}
+
+// TransactionIdNEQ applies the NEQ predicate on the "transactionId" field.
+func TransactionIdNEQ(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldNEQ(FieldTransactionId, v))
+}
+
+// TransactionIdIn applies the In predicate on the "transactionId" field.
+func TransactionIdIn(vs ...string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldIn(FieldTransactionId, vs...))
+}
+
+// TransactionIdNotIn applies the NotIn predicate on the "transactionId" field.
+func TransactionIdNotIn(vs ...string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldNotIn(FieldTransactionId, vs...))
+}
+
+// TransactionIdGT applies the GT predicate on the "transactionId" field.
+func TransactionIdGT(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldGT(FieldTransactionId, v))
+}
+
+// TransactionIdGTE applies the GTE predicate on the "transactionId" field.
+func TransactionIdGTE(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldGTE(FieldTransactionId, v))
+}
+
+// TransactionIdLT applies the LT predicate on the "transactionId" field.
+func TransactionIdLT(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldLT(FieldTransactionId, v))
+}
+
+// TransactionIdLTE applies the LTE predicate on the "transactionId" field.
+func TransactionIdLTE(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldLTE(FieldTransactionId, v))
+}
+
+// TransactionIdContains applies the Contains predicate on the "transactionId" field.
+func TransactionIdContains(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldContains(FieldTransactionId, v))
+}
+
+// TransactionIdHasPrefix applies the HasPrefix predicate on the "transactionId" field.
+func TransactionIdHasPrefix(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldHasPrefix(FieldTransactionId, v))
+}
+
+// TransactionIdHasSuffix applies the HasSuffix predicate on the "transactionId" field.
+func TransactionIdHasSuffix(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldHasSuffix(FieldTransactionId, v))
+}
+
+// TransactionIdIsNil applies the IsNil predicate on the "transactionId" field.
+func TransactionIdIsNil() predicate.Certificate {
+	return predicate.Certificate(sql.FieldIsNull(FieldTransactionId))
+}
+
+// TransactionIdNotNil applies the NotNil predicate on the "transactionId" field.
+func TransactionIdNotNil() predicate.Certificate {
+	return predicate.Certificate(sql.FieldNotNull(FieldTransactionId))
+}
+
+// TransactionIdEqualFold applies the EqualFold predicate on the "transactionId" field.
+func TransactionIdEqualFold(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldEqualFold(FieldTransactionId, v))
+}
+
+// TransactionIdContainsFold applies the ContainsFold predicate on the "transactionId" field.
+func TransactionIdContainsFold(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldContainsFold(FieldTransactionId, v))
 }
 
 // SerialEQ applies the EQ predicate on the "serial" field.

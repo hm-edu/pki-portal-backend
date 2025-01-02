@@ -2,23 +2,16 @@ package grpc
 
 import (
 	"context"
-	"crypto/ecdsa"
-	"crypto/elliptic"
-	"crypto/rand"
 	"crypto/x509"
-	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/TheZeroSlave/zapsentry"
 	"github.com/getsentry/sentry-go"
-	legoCert "github.com/go-acme/lego/v4/certificate"
-	"github.com/go-acme/lego/v4/challenge/dns01"
-	"github.com/go-acme/lego/v4/lego"
-	legoLog "github.com/go-acme/lego/v4/log"
+
+	harica "github.com/hm-edu/harica/client"
+	"github.com/hm-edu/harica/models"
 
 	"github.com/hm-edu/pki-service/ent"
 	"github.com/hm-edu/pki-service/ent/certificate"
@@ -26,10 +19,8 @@ import (
 	"github.com/hm-edu/pki-service/ent/predicate"
 	"github.com/hm-edu/pki-service/pkg/cfg"
 	pkiHelper "github.com/hm-edu/pki-service/pkg/helper"
-	"github.com/hm-edu/pki-service/pkg/helper/precheck"
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/helper"
-	"github.com/hm-edu/sectigo-client/sectigo"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -77,6 +68,7 @@ func mapCertificate(x *ent.Certificate) *pb.SslCertificateDetails {
 		IssuedBy:                issuedBy,
 		Created:                 created,
 		Ca:                      ca,
+		TransactionId:           x.TransactionId,
 	}
 }
 
@@ -98,20 +90,26 @@ func (s *sslAPIServer) handleError(msg string, err error, logger *zap.Logger, hu
 
 type sslAPIServer struct {
 	pb.UnimplementedSSLServiceServer
-	client     *sectigo.Client
-	db         *ent.Client
-	cfg        *cfg.PKIConfiguration
-	logger     *zap.Logger
-	legoClient *lego.Client
+	client           *harica.Client
+	validationClient *harica.Client
+	db               *ent.Client
+	cfg              *cfg.PKIConfiguration
+	logger           *zap.Logger
 
 	last     *time.Time
 	duration *time.Duration
 }
 
-func newSslAPIServer(client *sectigo.Client, cfg *cfg.PKIConfiguration, db *ent.Client) *sslAPIServer {
-
-	legoClient := registerAcme(cfg)
-	instance := &sslAPIServer{client: client, legoClient: legoClient, cfg: cfg, logger: zap.L(), db: db}
+func newSslAPIServer(cfg *cfg.PKIConfiguration, db *ent.Client) (*sslAPIServer, error) {
+	client, err := harica.NewClient(cfg.User, cfg.Password, cfg.TotpSeed)
+	if err != nil {
+		return nil, err
+	}
+	validationClient, err := harica.NewClient(cfg.ValidationUser, cfg.ValidationPassword, cfg.ValidationTotpSeed)
+	if err != nil {
+		return nil, err
+	}
+	instance := &sslAPIServer{client: client, validationClient: validationClient, cfg: cfg, logger: zap.L(), db: db}
 	_ = promauto.NewGaugeFunc(prometheus.GaugeOpts{
 		Name: "ssl_issue_last_duration",
 		Help: "Required time for last SSL Certificates",
@@ -132,71 +130,7 @@ func newSslAPIServer(client *sectigo.Client, cfg *cfg.PKIConfiguration, db *ent.
 		return 0
 	})
 
-	return instance
-}
-
-func registerAcme(cfg *cfg.PKIConfiguration) *lego.Client {
-	accountFile := filepath.Join(cfg.AcmeStorage, "reg.json")
-	keyFile := filepath.Join(cfg.AcmeStorage, "reg.key")
-
-	var account pkiHelper.User
-	if ok, _ := pkiHelper.FileExists(accountFile); !ok {
-		// Actually we would not need a private key but the lego API requires one.
-		privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-		if err != nil {
-			return nil
-		}
-
-		account = pkiHelper.User{
-			Key: privateKey, Email: cfg.AcmeEmail,
-		}
-
-	} else {
-		data, err := os.ReadFile(accountFile) //#nosec
-		if err != nil {
-			return nil
-		}
-		err = json.Unmarshal(data, &account)
-		if err != nil {
-			return nil
-		}
-		account.Key, err = pkiHelper.LoadPrivateKey(keyFile)
-		if err != nil {
-			return nil
-		}
-
-	}
-	legoCfg := lego.NewConfig(&account)
-	legoCfg.CADirURL = cfg.AcmeServer
-	legoLog.Logger = pkiHelper.NewZapLogger(zap.L())
-	legoCfg.Certificate.Timeout = time.Duration(5) * time.Minute
-	if account.Registration == nil {
-		legoClient, err := lego.NewClient(legoCfg)
-
-		if err != nil {
-			return nil
-		}
-		err = pkiHelper.RegisterAcme(legoClient, cfg, account, accountFile, keyFile)
-		if err != nil {
-			return nil
-		}
-	}
-
-	legoClient, err := lego.NewClient(legoCfg)
-	if err != nil {
-		zap.L().Fatal("Failed to create lego client", zap.Error(err))
-	}
-	dns, err := pkiHelper.NewDNSProvider(cfg.DnsConfigs)
-	if err != nil {
-		zap.L().Fatal("Failed to create DNS provider", zap.Error(err))
-	}
-
-	err = legoClient.Challenge.SetDNS01Provider(dns, dns01.WrapPreCheck(precheck.CheckDNS))
-	if err != nil {
-		zap.L().Fatal("Failed to set DNS01 provider", zap.Error(err))
-	}
-
-	return legoClient
+	return instance, nil
 }
 
 func (s *sslAPIServer) CertificateDetails(ctx context.Context, req *pb.CertificateDetailsRequest) (*pb.SslCertificateDetails, error) {
@@ -299,7 +233,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		SetCommonName(sans[0]).
 		SetIssuedBy(req.Issuer).
 		SetSource(req.Source).
-		SetCa("zerossl").
+		SetCa("harica").
 		AddDomainIDs(ids...).
 		Save(ctx)
 
@@ -315,7 +249,35 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		return s.handleError("Error while storing certificate", err, logger, hub)
 	}
 
-	resp, err := s.legoClient.Certificate.ObtainForCSR(legoCert.ObtainForCSRRequest{CSR: csr, Bundle: true})
+	orgs, err := s.client.CheckMatchingOrganization(sans)
+	if err != nil || len(orgs) == 0 {
+		return s.handleError("Error while checking organization", err, logger, hub)
+	}
+
+	transaction, err := s.client.RequestCertificate(sans, req.Csr, "OV", orgs[0])
+	if err != nil {
+		return s.handleError("Error while requesting certificate", err, logger, hub)
+	}
+
+	reviews, err := s.validationClient.GetPendingReviews()
+	if err != nil {
+		return s.handleError("Error while fetching pending reviews", err, logger, hub)
+	}
+
+	logger.Info("Certificate requested. Approving Request", zap.String("transaction_id", transaction.TransactionID))
+	for _, r := range reviews {
+		if r.TransactionID == transaction.TransactionID {
+			for _, sub := range r.ReviewGetDTOs {
+				err = s.validationClient.ApproveRequest(sub.ReviewID, "Auto Approval", sub.ReviewValue)
+				if err != nil {
+					return s.handleError("Error while approving request", err, logger, hub)
+				}
+			}
+			break
+		}
+	}
+	logger.Info("Request approved. Collecting certificate")
+	cert, err := s.client.GetCertificate(transaction.TransactionID)
 	if err != nil {
 		return s.handleError("Error while obtaining certificate", err, logger, hub)
 	}
@@ -324,8 +286,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	duration := stop.Sub(start)
 	s.duration = &duration
 	s.last = &stop
-
-	certs, err := pkiHelper.ParseCertificates(resp.Certificate)
+	certs, err := pkiHelper.ParseCertificates([]byte(cert.PemBundle))
 	if err != nil {
 		return s.handleError("Error parsing certificate", err, logger, hub)
 	}
@@ -341,6 +302,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		SetNotAfter(pem.NotAfter).
 		SetNotBefore(pem.NotBefore).
 		SetCreated(stop).
+		SetTransactionId(transaction.TransactionID).
 		Save(ctx)
 
 	if err != nil {
@@ -376,10 +338,9 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 		if err != nil {
 			return errorReturn(err, logger)
 		}
-		err = s.client.SslService.RevokeBySslID(fmt.Sprint(c.SslId), req.Reason)
-		if sectigoError, ok := err.(*sectigo.ErrorResponse); ok && sectigoError.Code == -102 {
-			logger.Info("Certificate already revoked")
-		} else if err != nil {
+		logger.Info("Skipping certificate. Not issued by HARICA", zap.Int("id", c.ID))
+		err = s.client.RevokeCertificate(models.RevocationReasonsResponse{}, req.Reason, c.TransactionId)
+		if err != nil {
 			logger.Error("Revoking request failed", zap.Error(err))
 			return errorReturn(err, logger)
 		}
@@ -404,16 +365,16 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 		ret := make(chan struct{ err error }, len(certs))
 
 		for _, c := range certs {
+			if c.Ca == nil || *c.Ca != "harica" {
+				logger.Info("Skipping certificate. Not issued by HARICA", zap.Int("id", c.ID))
+				continue
+			}
 			go func(c *ent.Certificate, ret chan struct{ err error }) {
-				err := s.client.SslService.RevokeBySslID(fmt.Sprint(c.SslId), req.Reason)
+
+				err = s.client.RevokeCertificate(models.RevocationReasonsResponse{}, req.Reason, c.TransactionId)
 				if err != nil {
-					if sectigoError, ok := err.(*sectigo.ErrorResponse); ok && sectigoError.Code == -102 {
-						logger.Info("Certificate already revoked")
-					} else {
-						logger.Error("Revoking request failed", zap.Error(err))
-						ret <- struct{ err error }{err}
-						return
-					}
+					ret <- struct{ err error }{err}
+					return
 				}
 				_, err = s.db.Certificate.UpdateOneID(c.ID).SetStatus(certificate.StatusRevoked).Save(ctx)
 				if err != nil {

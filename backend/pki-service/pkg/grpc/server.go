@@ -3,13 +3,11 @@ package grpc
 import (
 	"fmt"
 	"net"
-	"net/http"
 
 	"github.com/getsentry/sentry-go"
 	grpc_sentry "github.com/johnbellone/grpc-middleware-sentry"
 
 	pb "github.com/hm-edu/portal-apis"
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
@@ -17,7 +15,6 @@ import (
 
 	"github.com/hm-edu/pki-service/ent"
 	"github.com/hm-edu/pki-service/pkg/cfg"
-	"github.com/hm-edu/sectigo-client/sectigo"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -27,10 +24,10 @@ import (
 
 // Server is the basic structure of the GRPC server.
 type Server struct {
-	logger     *zap.Logger
-	config     *Config
-	sectigoCfg *cfg.PKIConfiguration
-	db         *ent.Client
+	logger *zap.Logger
+	config *Config
+	pkiCfg *cfg.PKIConfiguration
+	db     *ent.Client
 }
 
 // Config is the basic structure of the GRPC configuration
@@ -43,10 +40,10 @@ type Config struct {
 // NewServer creates a new GRPC server
 func NewServer(config *Config, logger *zap.Logger, sectigoCfg *cfg.PKIConfiguration, db *ent.Client) (*Server, error) {
 	srv := &Server{
-		logger:     logger,
-		sectigoCfg: sectigoCfg,
-		config:     config,
-		db:         db,
+		logger: logger,
+		pkiCfg: sectigoCfg,
+		config: config,
+		db:     db,
 	}
 
 	return srv, nil
@@ -89,7 +86,7 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 		}
 	}
 
-	srv := grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()),
+	srv := grpc.NewServer(
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
 				interceptors...,
@@ -106,11 +103,12 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	// "Clients are safe for concurrent use by multiple goroutines."
 	// => one http client is fine ;)
 
-	c := sectigo.NewClient(http.DefaultClient, s.logger, s.sectigoCfg.User, s.sectigoCfg.Password, s.sectigoCfg.CustomerURI)
-
-	ssl := newSslAPIServer(c, s.sectigoCfg, s.db)
+	ssl, err := newSslAPIServer(s.pkiCfg, s.db)
+	if err != nil {
+		s.logger.Fatal("failed to create ssl server", zap.Error(err))
+	}
 	pb.RegisterSSLServiceServer(srv, ssl)
-	smime := newSmimeAPIServer(c, s.sectigoCfg)
+	smime := newSmimeAPIServer(s.pkiCfg)
 	pb.RegisterSmimeServiceServer(srv, smime)
 	grpc_health_v1.RegisterHealthServer(srv, server)
 
