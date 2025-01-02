@@ -62,6 +62,26 @@ func (cu *CertificateUpdate) ClearSslId() *CertificateUpdate {
 	return cu
 }
 
+// SetTransactionId sets the "transactionId" field.
+func (cu *CertificateUpdate) SetTransactionId(s string) *CertificateUpdate {
+	cu.mutation.SetTransactionId(s)
+	return cu
+}
+
+// SetNillableTransactionId sets the "transactionId" field if the given value is not nil.
+func (cu *CertificateUpdate) SetNillableTransactionId(s *string) *CertificateUpdate {
+	if s != nil {
+		cu.SetTransactionId(*s)
+	}
+	return cu
+}
+
+// ClearTransactionId clears the value of the "transactionId" field.
+func (cu *CertificateUpdate) ClearTransactionId() *CertificateUpdate {
+	cu.mutation.ClearTransactionId()
+	return cu
+}
+
 // SetSerial sets the "serial" field.
 func (cu *CertificateUpdate) SetSerial(s string) *CertificateUpdate {
 	cu.mutation.SetSerial(s)
@@ -352,6 +372,12 @@ func (cu *CertificateUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if cu.mutation.SslIdCleared() {
 		_spec.ClearField(certificate.FieldSslId, field.TypeInt)
 	}
+	if value, ok := cu.mutation.TransactionId(); ok {
+		_spec.SetField(certificate.FieldTransactionId, field.TypeString, value)
+	}
+	if cu.mutation.TransactionIdCleared() {
+		_spec.ClearField(certificate.FieldTransactionId, field.TypeString)
+	}
 	if value, ok := cu.mutation.Serial(); ok {
 		_spec.SetField(certificate.FieldSerial, field.TypeString, value)
 	}
@@ -495,6 +521,26 @@ func (cuo *CertificateUpdateOne) AddSslId(i int) *CertificateUpdateOne {
 // ClearSslId clears the value of the "sslId" field.
 func (cuo *CertificateUpdateOne) ClearSslId() *CertificateUpdateOne {
 	cuo.mutation.ClearSslId()
+	return cuo
+}
+
+// SetTransactionId sets the "transactionId" field.
+func (cuo *CertificateUpdateOne) SetTransactionId(s string) *CertificateUpdateOne {
+	cuo.mutation.SetTransactionId(s)
+	return cuo
+}
+
+// SetNillableTransactionId sets the "transactionId" field if the given value is not nil.
+func (cuo *CertificateUpdateOne) SetNillableTransactionId(s *string) *CertificateUpdateOne {
+	if s != nil {
+		cuo.SetTransactionId(*s)
+	}
+	return cuo
+}
+
+// ClearTransactionId clears the value of the "transactionId" field.
+func (cuo *CertificateUpdateOne) ClearTransactionId() *CertificateUpdateOne {
+	cuo.mutation.ClearTransactionId()
 	return cuo
 }
 
@@ -817,6 +863,12 @@ func (cuo *CertificateUpdateOne) sqlSave(ctx context.Context) (_node *Certificat
 	}
 	if cuo.mutation.SslIdCleared() {
 		_spec.ClearField(certificate.FieldSslId, field.TypeInt)
+	}
+	if value, ok := cuo.mutation.TransactionId(); ok {
+		_spec.SetField(certificate.FieldTransactionId, field.TypeString, value)
+	}
+	if cuo.mutation.TransactionIdCleared() {
+		_spec.ClearField(certificate.FieldTransactionId, field.TypeString)
 	}
 	if value, ok := cuo.mutation.Serial(); ok {
 		_spec.SetField(certificate.FieldSerial, field.TypeString, value)

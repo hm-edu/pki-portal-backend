@@ -65,6 +65,20 @@ func (cc *CertificateCreate) SetNillableSslId(i *int) *CertificateCreate {
 	return cc
 }
 
+// SetTransactionId sets the "transactionId" field.
+func (cc *CertificateCreate) SetTransactionId(s string) *CertificateCreate {
+	cc.mutation.SetTransactionId(s)
+	return cc
+}
+
+// SetNillableTransactionId sets the "transactionId" field if the given value is not nil.
+func (cc *CertificateCreate) SetNillableTransactionId(s *string) *CertificateCreate {
+	if s != nil {
+		cc.SetTransactionId(*s)
+	}
+	return cc
+}
+
 // SetSerial sets the "serial" field.
 func (cc *CertificateCreate) SetSerial(s string) *CertificateCreate {
 	cc.mutation.SetSerial(s)
@@ -319,6 +333,10 @@ func (cc *CertificateCreate) createSpec() (*Certificate, *sqlgraph.CreateSpec) {
 		_spec.SetField(certificate.FieldSslId, field.TypeInt, value)
 		_node.SslId = value
 	}
+	if value, ok := cc.mutation.TransactionId(); ok {
+		_spec.SetField(certificate.FieldTransactionId, field.TypeString, value)
+		_node.TransactionId = value
+	}
 	if value, ok := cc.mutation.Serial(); ok {
 		_spec.SetField(certificate.FieldSerial, field.TypeString, value)
 		_node.Serial = value
@@ -456,6 +474,24 @@ func (u *CertificateUpsert) AddSslId(v int) *CertificateUpsert {
 // ClearSslId clears the value of the "sslId" field.
 func (u *CertificateUpsert) ClearSslId() *CertificateUpsert {
 	u.SetNull(certificate.FieldSslId)
+	return u
+}
+
+// SetTransactionId sets the "transactionId" field.
+func (u *CertificateUpsert) SetTransactionId(v string) *CertificateUpsert {
+	u.Set(certificate.FieldTransactionId, v)
+	return u
+}
+
+// UpdateTransactionId sets the "transactionId" field to the value that was provided on create.
+func (u *CertificateUpsert) UpdateTransactionId() *CertificateUpsert {
+	u.SetExcluded(certificate.FieldTransactionId)
+	return u
+}
+
+// ClearTransactionId clears the value of the "transactionId" field.
+func (u *CertificateUpsert) ClearTransactionId() *CertificateUpsert {
+	u.SetNull(certificate.FieldTransactionId)
 	return u
 }
 
@@ -693,6 +729,27 @@ func (u *CertificateUpsertOne) UpdateSslId() *CertificateUpsertOne {
 func (u *CertificateUpsertOne) ClearSslId() *CertificateUpsertOne {
 	return u.Update(func(s *CertificateUpsert) {
 		s.ClearSslId()
+	})
+}
+
+// SetTransactionId sets the "transactionId" field.
+func (u *CertificateUpsertOne) SetTransactionId(v string) *CertificateUpsertOne {
+	return u.Update(func(s *CertificateUpsert) {
+		s.SetTransactionId(v)
+	})
+}
+
+// UpdateTransactionId sets the "transactionId" field to the value that was provided on create.
+func (u *CertificateUpsertOne) UpdateTransactionId() *CertificateUpsertOne {
+	return u.Update(func(s *CertificateUpsert) {
+		s.UpdateTransactionId()
+	})
+}
+
+// ClearTransactionId clears the value of the "transactionId" field.
+func (u *CertificateUpsertOne) ClearTransactionId() *CertificateUpsertOne {
+	return u.Update(func(s *CertificateUpsert) {
+		s.ClearTransactionId()
 	})
 }
 
@@ -1121,6 +1178,27 @@ func (u *CertificateUpsertBulk) UpdateSslId() *CertificateUpsertBulk {
 func (u *CertificateUpsertBulk) ClearSslId() *CertificateUpsertBulk {
 	return u.Update(func(s *CertificateUpsert) {
 		s.ClearSslId()
+	})
+}
+
+// SetTransactionId sets the "transactionId" field.
+func (u *CertificateUpsertBulk) SetTransactionId(v string) *CertificateUpsertBulk {
+	return u.Update(func(s *CertificateUpsert) {
+		s.SetTransactionId(v)
+	})
+}
+
+// UpdateTransactionId sets the "transactionId" field to the value that was provided on create.
+func (u *CertificateUpsertBulk) UpdateTransactionId() *CertificateUpsertBulk {
+	return u.Update(func(s *CertificateUpsert) {
+		s.UpdateTransactionId()
+	})
+}
+
+// ClearTransactionId clears the value of the "transactionId" field.
+func (u *CertificateUpsertBulk) ClearTransactionId() *CertificateUpsertBulk {
+	return u.Update(func(s *CertificateUpsert) {
+		s.ClearTransactionId()
 	})
 }
 

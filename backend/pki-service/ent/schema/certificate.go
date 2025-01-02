@@ -18,6 +18,7 @@ type Certificate struct {
 func (Certificate) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("sslId").Optional(),
+		field.String("transactionId").Optional(),
 		field.String("serial").Optional().Unique(),
 		field.String("commonName").NotEmpty(),
 		field.Time("notBefore").Nillable().Optional(),

@@ -10,7 +10,6 @@ import (
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpc_sentry "github.com/johnbellone/grpc-middleware-sentry"
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/api"
@@ -96,7 +95,7 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 		}
 	}
 
-	srv := grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()),
+	srv := grpc.NewServer(
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
 				interceptors...,

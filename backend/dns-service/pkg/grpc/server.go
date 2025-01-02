@@ -6,7 +6,6 @@ import (
 
 	"github.com/hm-edu/dns-service/pkg/core"
 	pb "github.com/hm-edu/portal-apis"
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
@@ -52,7 +51,7 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	if err != nil {
 		s.logger.Fatal("failed to listen", zap.Int("port", s.config.Port))
 	}
-	srv := grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()),
+	srv := grpc.NewServer(
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(grpc_recovery.UnaryServerInterceptor(), grpc_zap.UnaryServerInterceptor(s.logger))),
 		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(grpc_recovery.StreamServerInterceptor(), grpc_zap.StreamServerInterceptor(s.logger))))
 

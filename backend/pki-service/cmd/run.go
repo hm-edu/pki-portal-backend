@@ -46,8 +46,6 @@ var runCmd = &cobra.Command{
 
 		stopCh := signals.SetupSignalHandler()
 
-		pkiCfg.CheckSectigoConfiguration()
-
 		database.ConnectDb(logger, viper.GetString("db"))
 
 		_, errUpdate := database.DB.Db.Certificate.Update().Where(certificate.CaIsNil()).SetCa("sectigo").Save(context.Background())
@@ -98,20 +96,8 @@ func init() {
 	runCmd.Flags().String("host", "", "Host to bind service to")
 	runCmd.Flags().Int("grpc-port", 8081, "GRPC port to bind service to")
 	runCmd.Flags().String("sentry_dsn", "", "The sentry dsn to use")
-	runCmd.Flags().String("sectigo_user", "", "The sectigo user")
-	runCmd.Flags().String("sectigo_password", "", "The password for the sectigo user")
-	runCmd.Flags().String("sectigo_customeruri", "", "The sectigo customerUri")
-	runCmd.Flags().Int("smime_profile", 0, "The (default) smime profile id")
-	runCmd.Flags().Int("smime_profile_standard", 0, "The (default) smime profile id for validation level standard")
-	runCmd.Flags().Int("smime_org_id", 0, "The (default) org id")
-	runCmd.Flags().Int("smime_term", 0, "The (default) lifetime of an employee certificate")
-	runCmd.Flags().Int("smime_student_term", 0, "The (default) lifetime of a student certificate")
 	runCmd.Flags().Int("smime_key_length", 365, "The (expected) key length")
-	runCmd.Flags().String("smime_key_type", "", "The (expected) key type")
 	runCmd.Flags().String("db", "", "connection string for the database")
-	runCmd.Flags().Int("ssl_profile", 0, "The (default) ssl profile id")
-	runCmd.Flags().Int("ssl_org_id", 0, "The (default) ssl org id")
-	runCmd.Flags().Int("ssl_term", 0, "The (default) ssl lifetime")
 	runCmd.Flags().String("level", "info", "log level debug, info, warn, error, flat or panic")
 	runCmd.Flags().Bool("enable_notifications", false, "Enable notifications")
 	runCmd.Flags().String("mail_host", "", "The mail host")
@@ -119,10 +105,4 @@ func init() {
 	runCmd.Flags().String("mail_to", "", "Optional param to send notifications to a specific mail address instead of the orignal issuer.")
 	runCmd.Flags().String("mail_bcc", "", "Optional param to send notifications as blind copy to a specific mail address instead of the orignal issuer.")
 	runCmd.Flags().String("mail_from", "", "The mail from")
-	runCmd.Flags().String("acme_storage", "", "Storage for the internal acme client")
-	runCmd.Flags().String("acme_email", "", "Email for the acme client")
-	runCmd.Flags().String("acme_hmac", "", "EAB HMAC for the acme client")
-	runCmd.Flags().String("acme_kid", "", "Key ID for the acme client")
-	runCmd.Flags().String("acme_server", "", "Server for the acme client")
-	runCmd.Flags().String("dns_configs", "", "Config file for the dns provider")
 }

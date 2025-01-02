@@ -23,6 +23,8 @@ type Certificate struct {
 	UpdateTime time.Time `json:"update_time,omitempty"`
 	// SslId holds the value of the "sslId" field.
 	SslId int `json:"sslId,omitempty"`
+	// TransactionId holds the value of the "transactionId" field.
+	TransactionId string `json:"transactionId,omitempty"`
 	// Serial holds the value of the "serial" field.
 	Serial string `json:"serial,omitempty"`
 	// CommonName holds the value of the "commonName" field.
@@ -72,7 +74,7 @@ func (*Certificate) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case certificate.FieldID, certificate.FieldSslId:
 			values[i] = new(sql.NullInt64)
-		case certificate.FieldSerial, certificate.FieldCommonName, certificate.FieldIssuedBy, certificate.FieldSource, certificate.FieldStatus, certificate.FieldCa:
+		case certificate.FieldTransactionId, certificate.FieldSerial, certificate.FieldCommonName, certificate.FieldIssuedBy, certificate.FieldSource, certificate.FieldStatus, certificate.FieldCa:
 			values[i] = new(sql.NullString)
 		case certificate.FieldCreateTime, certificate.FieldUpdateTime, certificate.FieldNotBefore, certificate.FieldNotAfter, certificate.FieldCreated:
 			values[i] = new(sql.NullTime)
@@ -114,6 +116,12 @@ func (c *Certificate) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field sslId", values[i])
 			} else if value.Valid {
 				c.SslId = int(value.Int64)
+			}
+		case certificate.FieldTransactionId:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field transactionId", values[i])
+			} else if value.Valid {
+				c.TransactionId = value.String
 			}
 		case certificate.FieldSerial:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -223,6 +231,9 @@ func (c *Certificate) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("sslId=")
 	builder.WriteString(fmt.Sprintf("%v", c.SslId))
+	builder.WriteString(", ")
+	builder.WriteString("transactionId=")
+	builder.WriteString(c.TransactionId)
 	builder.WriteString(", ")
 	builder.WriteString("serial=")
 	builder.WriteString(c.Serial)

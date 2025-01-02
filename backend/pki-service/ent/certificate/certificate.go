@@ -22,6 +22,8 @@ const (
 	FieldUpdateTime = "update_time"
 	// FieldSslId holds the string denoting the sslid field in the database.
 	FieldSslId = "ssl_id"
+	// FieldTransactionId holds the string denoting the transactionid field in the database.
+	FieldTransactionId = "transaction_id"
 	// FieldSerial holds the string denoting the serial field in the database.
 	FieldSerial = "serial"
 	// FieldCommonName holds the string denoting the commonname field in the database.
@@ -57,6 +59,7 @@ var Columns = []string{
 	FieldCreateTime,
 	FieldUpdateTime,
 	FieldSslId,
+	FieldTransactionId,
 	FieldSerial,
 	FieldCommonName,
 	FieldNotBefore,
@@ -159,6 +162,11 @@ func ByUpdateTime(opts ...sql.OrderTermOption) OrderOption {
 // BySslId orders the results by the sslId field.
 func BySslId(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSslId, opts...).ToFunc()
+}
+
+// ByTransactionId orders the results by the transactionId field.
+func ByTransactionId(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTransactionId, opts...).ToFunc()
 }
 
 // BySerial orders the results by the serial field.

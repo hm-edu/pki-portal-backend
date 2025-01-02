@@ -39,6 +39,7 @@ type CertificateMutation struct {
 	update_time    *time.Time
 	sslId          *int
 	addsslId       *int
+	transactionId  *string
 	serial         *string
 	commonName     *string
 	notBefore      *time.Time
@@ -295,6 +296,55 @@ func (m *CertificateMutation) ResetSslId() {
 	m.sslId = nil
 	m.addsslId = nil
 	delete(m.clearedFields, certificate.FieldSslId)
+}
+
+// SetTransactionId sets the "transactionId" field.
+func (m *CertificateMutation) SetTransactionId(s string) {
+	m.transactionId = &s
+}
+
+// TransactionId returns the value of the "transactionId" field in the mutation.
+func (m *CertificateMutation) TransactionId() (r string, exists bool) {
+	v := m.transactionId
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTransactionId returns the old "transactionId" field's value of the Certificate entity.
+// If the Certificate object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CertificateMutation) OldTransactionId(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTransactionId is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTransactionId requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTransactionId: %w", err)
+	}
+	return oldValue.TransactionId, nil
+}
+
+// ClearTransactionId clears the value of the "transactionId" field.
+func (m *CertificateMutation) ClearTransactionId() {
+	m.transactionId = nil
+	m.clearedFields[certificate.FieldTransactionId] = struct{}{}
+}
+
+// TransactionIdCleared returns if the "transactionId" field was cleared in this mutation.
+func (m *CertificateMutation) TransactionIdCleared() bool {
+	_, ok := m.clearedFields[certificate.FieldTransactionId]
+	return ok
+}
+
+// ResetTransactionId resets all changes to the "transactionId" field.
+func (m *CertificateMutation) ResetTransactionId() {
+	m.transactionId = nil
+	delete(m.clearedFields, certificate.FieldTransactionId)
 }
 
 // SetSerial sets the "serial" field.
@@ -800,7 +850,7 @@ func (m *CertificateMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CertificateMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 13)
 	if m.create_time != nil {
 		fields = append(fields, certificate.FieldCreateTime)
 	}
@@ -809,6 +859,9 @@ func (m *CertificateMutation) Fields() []string {
 	}
 	if m.sslId != nil {
 		fields = append(fields, certificate.FieldSslId)
+	}
+	if m.transactionId != nil {
+		fields = append(fields, certificate.FieldTransactionId)
 	}
 	if m.serial != nil {
 		fields = append(fields, certificate.FieldSerial)
@@ -851,6 +904,8 @@ func (m *CertificateMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdateTime()
 	case certificate.FieldSslId:
 		return m.SslId()
+	case certificate.FieldTransactionId:
+		return m.TransactionId()
 	case certificate.FieldSerial:
 		return m.Serial()
 	case certificate.FieldCommonName:
@@ -884,6 +939,8 @@ func (m *CertificateMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldUpdateTime(ctx)
 	case certificate.FieldSslId:
 		return m.OldSslId(ctx)
+	case certificate.FieldTransactionId:
+		return m.OldTransactionId(ctx)
 	case certificate.FieldSerial:
 		return m.OldSerial(ctx)
 	case certificate.FieldCommonName:
@@ -931,6 +988,13 @@ func (m *CertificateMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetSslId(v)
+		return nil
+	case certificate.FieldTransactionId:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTransactionId(v)
 		return nil
 	case certificate.FieldSerial:
 		v, ok := value.(string)
@@ -1043,6 +1107,9 @@ func (m *CertificateMutation) ClearedFields() []string {
 	if m.FieldCleared(certificate.FieldSslId) {
 		fields = append(fields, certificate.FieldSslId)
 	}
+	if m.FieldCleared(certificate.FieldTransactionId) {
+		fields = append(fields, certificate.FieldTransactionId)
+	}
 	if m.FieldCleared(certificate.FieldSerial) {
 		fields = append(fields, certificate.FieldSerial)
 	}
@@ -1081,6 +1148,9 @@ func (m *CertificateMutation) ClearField(name string) error {
 	case certificate.FieldSslId:
 		m.ClearSslId()
 		return nil
+	case certificate.FieldTransactionId:
+		m.ClearTransactionId()
+		return nil
 	case certificate.FieldSerial:
 		m.ClearSerial()
 		return nil
@@ -1118,6 +1188,9 @@ func (m *CertificateMutation) ResetField(name string) error {
 		return nil
 	case certificate.FieldSslId:
 		m.ResetSslId()
+		return nil
+	case certificate.FieldTransactionId:
+		m.ResetTransactionId()
 		return nil
 	case certificate.FieldSerial:
 		m.ResetSerial()

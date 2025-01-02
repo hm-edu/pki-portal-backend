@@ -15,6 +15,7 @@ var (
 		{Name: "create_time", Type: field.TypeTime},
 		{Name: "update_time", Type: field.TypeTime},
 		{Name: "ssl_id", Type: field.TypeInt, Nullable: true},
+		{Name: "transaction_id", Type: field.TypeString, Nullable: true},
 		{Name: "serial", Type: field.TypeString, Unique: true, Nullable: true},
 		{Name: "common_name", Type: field.TypeString},
 		{Name: "not_before", Type: field.TypeTime, Nullable: true},

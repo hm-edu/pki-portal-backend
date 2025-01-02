@@ -5,15 +5,12 @@ go 1.23.0
 require (
 	github.com/getkin/kin-openapi v0.128.0
 	github.com/hm-edu/portal-common v0.0.0-20241218063258-fbc57509a1e8
-	go.opentelemetry.io/otel v1.33.0 // indirect
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.69.2
 )
 
 require (
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
-	github.com/go-logr/logr v1.4.2 // indirect
-	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/magiconair/properties v1.8.9 // indirect
@@ -22,7 +19,6 @@ require (
 	github.com/spf13/cast v1.7.1 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.58.0
 	gopkg.in/ini.v1 v1.67.0 // indirect
 )
 
@@ -97,7 +93,6 @@ require (
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/swaggo/files/v2 v2.0.2 // indirect
-	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/otel/metric v1.33.0 // indirect
 	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67 // indirect
 	golang.org/x/sync v0.10.0 // indirect

@@ -444,6 +444,9 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                },
+                "transaction_id": {
+                    "type": "string"
                 }
             }
         },
