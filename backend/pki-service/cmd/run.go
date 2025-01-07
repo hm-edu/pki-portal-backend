@@ -111,11 +111,4 @@ func init() {
 	runCmd.Flags().String("validation_user", "", "The user for the HARICA API")
 	runCmd.Flags().String("validation_password", "", "The password for the HARICA API")
 	runCmd.Flags().String("validation_totp_seed", "", "The totp seed for the HARICA API")
-
-	_ = runCmd.MarkFlagRequired("user")
-	_ = runCmd.MarkFlagRequired("password")
-	_ = runCmd.MarkFlagRequired("totp_seed")
-	_ = runCmd.MarkFlagRequired("validation_user")
-	_ = runCmd.MarkFlagRequired("validation_password")
-	_ = runCmd.MarkFlagRequired("validation_totp_seed")
 }
