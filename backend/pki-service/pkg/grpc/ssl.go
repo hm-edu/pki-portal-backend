@@ -356,6 +356,7 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 		if reason == nil {
 			return errorReturn(fmt.Errorf("Revocation reason not found"), logger)
 		}
+		logger.Info("Revoking certificate", zap.String("transaction_id", c.TransactionId), zap.String("reason", reason.Name), zap.String("description", req.Reason))
 		err = s.client.RevokeCertificate(*reason, req.Reason, c.TransactionId)
 		if err != nil {
 			logger.Error("Revoking request failed", zap.Error(err))
