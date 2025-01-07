@@ -357,7 +357,7 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 			return errorReturn(fmt.Errorf("Revocation reason not found"), logger)
 		}
 		logger.Info("Revoking certificate", zap.String("transaction_id", c.TransactionId), zap.String("reason", reason.Name), zap.String("description", req.Reason))
-		err = s.client.RevokeCertificate(*reason, req.Reason, c.TransactionId)
+		err = s.validationClient.RevokeCertificate(*reason, req.Reason, c.TransactionId)
 		if err != nil {
 			logger.Error("Revoking request failed", zap.Error(err))
 			return errorReturn(err, logger)
@@ -389,7 +389,7 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 			}
 			go func(c *ent.Certificate, ret chan struct{ err error }) {
 
-				err = s.client.RevokeCertificate(models.RevocationReasonsResponse{}, req.Reason, c.TransactionId)
+				err = s.validationClient.RevokeCertificate(models.RevocationReasonsResponse{}, req.Reason, c.TransactionId)
 				if err != nil {
 					ret <- struct{ err error }{err}
 					return
