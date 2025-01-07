@@ -105,4 +105,17 @@ func init() {
 	runCmd.Flags().String("mail_to", "", "Optional param to send notifications to a specific mail address instead of the orignal issuer.")
 	runCmd.Flags().String("mail_bcc", "", "Optional param to send notifications as blind copy to a specific mail address instead of the orignal issuer.")
 	runCmd.Flags().String("mail_from", "", "The mail from")
+	runCmd.Flags().String("user", "", "The user for the HARICA API")
+	runCmd.Flags().String("password", "", "The password for the HARICA API")
+	runCmd.Flags().String("totp_seed", "", "The totp seed for the HARICA API")
+	runCmd.Flags().String("validation_user", "", "The user for the HARICA API")
+	runCmd.Flags().String("validation_password", "", "The password for the HARICA API")
+	runCmd.Flags().String("validation_totp_seed", "", "The totp seed for the HARICA API")
+
+	_ = runCmd.MarkFlagRequired("user")
+	_ = runCmd.MarkFlagRequired("password")
+	_ = runCmd.MarkFlagRequired("totp_seed")
+	_ = runCmd.MarkFlagRequired("validation_user")
+	_ = runCmd.MarkFlagRequired("validation_password")
+	_ = runCmd.MarkFlagRequired("validation_totp_seed")
 }

@@ -7,8 +7,8 @@ toolchain go1.23.4
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/TheZeroSlave/zapsentry v1.23.0
-	github.com/getsentry/sentry-go v0.30.0
-	github.com/hm-edu/harica v0.0.0-20250102061629-52e03afeef0c
+	github.com/getsentry/sentry-go v0.31.1
+	github.com/hm-edu/harica v1.0.0
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.10.0
@@ -17,10 +17,11 @@ require (
 
 require (
 	github.com/boombuler/barcode v1.0.2 // indirect
+	github.com/getsentry/sentry-go/echo v0.31.1 // indirect
 	github.com/go-co-op/gocron/v2 v2.14.0 // indirect
 	github.com/go-resty/resty/v2 v2.16.2 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
-	github.com/jonboulle/clockwork v0.4.0 // indirect
+	github.com/jonboulle/clockwork v0.5.0 // indirect
 	github.com/magiconair/properties v1.8.9 // indirect
 	github.com/pquerna/otp v1.4.0 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
@@ -87,7 +88,7 @@ require (
 	golang.org/x/sync v0.10.0 // indirect
 	golang.org/x/time v0.8.0 // indirect
 	golang.org/x/tools v0.28.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20241230172942-26aa7a208def // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250102185135-69823020774d // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
