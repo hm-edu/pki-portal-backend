@@ -38,10 +38,10 @@ type Config struct {
 }
 
 // NewServer creates a new GRPC server
-func NewServer(config *Config, logger *zap.Logger, sectigoCfg *cfg.PKIConfiguration, db *ent.Client) (*Server, error) {
+func NewServer(config *Config, logger *zap.Logger, pkiCfg *cfg.PKIConfiguration, db *ent.Client) (*Server, error) {
 	srv := &Server{
 		logger: logger,
-		pkiCfg: sectigoCfg,
+		pkiCfg: pkiCfg,
 		config: config,
 		db:     db,
 	}

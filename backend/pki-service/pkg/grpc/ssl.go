@@ -338,8 +338,25 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 		if err != nil {
 			return errorReturn(err, logger)
 		}
-		logger.Info("Skipping certificate. Not issued by HARICA", zap.Int("id", c.ID))
-		err = s.client.RevokeCertificate(models.RevocationReasonsResponse{}, req.Reason, c.TransactionId)
+		if c.Ca == nil || *c.Ca != "harica" {
+			logger.Info("Skipping certificate. Not issued by HARICA", zap.Int("id", c.ID))
+			return &emptypb.Empty{}, nil
+		}
+		reasons, err := s.client.GetRevocationReasons()
+		if err != nil {
+			return errorReturn(err, logger)
+		}
+		var reason *models.RevocationReasonsResponse
+		for _, r := range reasons {
+			if r.Name == "4.9.1.1.1.1" {
+				reason = &r
+				break
+			}
+		}
+		if reason == nil {
+			return errorReturn(fmt.Errorf("Revocation reason not found"), logger)
+		}
+		err = s.client.RevokeCertificate(*reason, req.Reason, c.TransactionId)
 		if err != nil {
 			logger.Error("Revoking request failed", zap.Error(err))
 			return errorReturn(err, logger)
