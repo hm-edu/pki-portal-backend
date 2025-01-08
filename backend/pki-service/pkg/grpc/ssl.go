@@ -132,12 +132,12 @@ func newSslAPIServer(cfg *cfg.PKIConfiguration, db *ent.Client) (*sslAPIServer, 
 	})
 
 	s := gocron.NewScheduler(time.UTC)
-	s.Every(5).Minutes().Do(func() {
-		err := client.SessionRefresh()
+	s.Every(1).Hour().Do(func() {
+		err := client.SessionRefresh(true)
 		if err != nil {
 			instance.logger.Error("Error refreshing client", zap.Error(err))
 		}
-		err = validationClient.SessionRefresh()
+		err = validationClient.SessionRefresh(true)
 		if err != nil {
 			instance.logger.Error("Error refreshing validation client", zap.Error(err))
 		}
