@@ -9,6 +9,7 @@ import (
 
 	"github.com/TheZeroSlave/zapsentry"
 	"github.com/getsentry/sentry-go"
+	"github.com/go-co-op/gocron"
 
 	harica "github.com/hm-edu/harica/client"
 	"github.com/hm-edu/harica/models"
@@ -101,11 +102,11 @@ type sslAPIServer struct {
 }
 
 func newSslAPIServer(cfg *cfg.PKIConfiguration, db *ent.Client) (*sslAPIServer, error) {
-	client, err := harica.NewClient(cfg.User, cfg.Password, cfg.TotpSeed)
+	client, err := harica.NewClient(cfg.User, cfg.Password, cfg.TotpSeed, harica.WithRefreshInterval(5*time.Minute))
 	if err != nil {
 		return nil, err
 	}
-	validationClient, err := harica.NewClient(cfg.ValidationUser, cfg.ValidationPassword, cfg.ValidationTotpSeed)
+	validationClient, err := harica.NewClient(cfg.ValidationUser, cfg.ValidationPassword, cfg.ValidationTotpSeed, harica.WithRefreshInterval(5*time.Minute))
 	if err != nil {
 		return nil, err
 	}
@@ -130,6 +131,18 @@ func newSslAPIServer(cfg *cfg.PKIConfiguration, db *ent.Client) (*sslAPIServer, 
 		return 0
 	})
 
+	s := gocron.NewScheduler(time.UTC)
+	s.Every(5).Minutes().Do(func() {
+		err := client.SessionRefresh()
+		if err != nil {
+			instance.logger.Error("Error refreshing client", zap.Error(err))
+		}
+		err = validationClient.SessionRefresh()
+		if err != nil {
+			instance.logger.Error("Error refreshing validation client", zap.Error(err))
+		}
+	})
+	s.StartAsync()
 	return instance, nil
 }
 
