@@ -8,7 +8,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/TheZeroSlave/zapsentry v1.23.0
 	github.com/getsentry/sentry-go v0.31.1
-	github.com/hm-edu/harica v0.0.0-20250108184730-ea05769d6933
+	github.com/hm-edu/harica v0.0.0-20250108193546-6dce26cbc9d5
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.10.0
@@ -18,10 +18,8 @@ require (
 require (
 	github.com/boombuler/barcode v1.0.2 // indirect
 	github.com/getsentry/sentry-go/echo v0.31.1 // indirect
-	github.com/go-co-op/gocron/v2 v2.14.1 // indirect
 	github.com/go-resty/resty/v2 v2.16.2 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
-	github.com/jonboulle/clockwork v0.5.0 // indirect
 	github.com/magiconair/properties v1.8.9 // indirect
 	github.com/pquerna/otp v1.4.0 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
