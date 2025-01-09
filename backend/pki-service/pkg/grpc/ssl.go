@@ -267,7 +267,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		return s.handleError("Error while checking organization", err, logger, hub)
 	}
 
-	transaction, err := s.client.RequestCertificate(sans, req.Csr, "OV", orgs[0])
+	transaction, err := s.client.RequestCertificate(sans, req.Csr, s.cfg.CertType, orgs[0])
 	if err != nil {
 		return s.handleError("Error while requesting certificate", err, logger, hub)
 	}

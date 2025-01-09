@@ -9,4 +9,5 @@ type PKIConfiguration struct {
 	ValidationPassword string `mapstructure:"validation_password"`
 	ValidationTotpSeed string `mapstructure:"validation_totp_seed"`
 	SmimeKeyLength     string `mapstructure:"smime_key_length"`
+	CertType           string `mapstructure:"cert_type"`
 }
