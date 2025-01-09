@@ -26,8 +26,6 @@ require (
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67 // indirect
-	golang.org/x/mod v0.22.0 // indirect
-	golang.org/x/sync v0.10.0 // indirect
 )
 
 require (
@@ -87,7 +85,6 @@ require (
 require (
 	github.com/getsentry/sentry-go v0.30.0
 	github.com/go-playground/validator/v10 v10.23.0
-	github.com/miekg/dns v1.1.62
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	go.opentelemetry.io/otel v1.33.0 // indirect
 	go.uber.org/zap v1.27.0
