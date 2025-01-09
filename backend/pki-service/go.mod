@@ -8,7 +8,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/TheZeroSlave/zapsentry v1.23.0
 	github.com/getsentry/sentry-go v0.31.1
-	github.com/hm-edu/harica v0.0.0-20250108195105-42f8cc50becc
+	github.com/hm-edu/harica v1.1.0
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.10.0
@@ -18,7 +18,7 @@ require (
 require (
 	github.com/boombuler/barcode v1.0.2 // indirect
 	github.com/getsentry/sentry-go/echo v0.31.1 // indirect
-	github.com/go-resty/resty/v2 v2.16.2 // indirect
+	github.com/go-resty/resty/v2 v2.16.3 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/magiconair/properties v1.8.9 // indirect
 	github.com/pquerna/otp v1.4.0 // indirect
@@ -59,7 +59,6 @@ require (
 	github.com/mailru/easyjson v0.9.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/miekg/dns v1.1.62 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
