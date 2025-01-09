@@ -18,8 +18,7 @@ func Cleanup(logger *zap.Logger, db *ent.Client) error {
 	}
 	for _, cert := range certs {
 		// Mark certificate as expired
-		cert.Status = certificate.StatusExpired
-		if _, err := db.Certificate.UpdateOne(cert).Save(context.Background()); err != nil {
+		if _, err := db.Certificate.UpdateOneID(cert.ID).SetStatus(certificate.StatusExpired).Save(context.Background()); err != nil {
 			return err
 		}
 		logger.Info("Certificate expired", zap.String("common_name", cert.CommonName), zap.String("serial_number", cert.Serial))
