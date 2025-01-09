@@ -127,7 +127,7 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string, logger *zap
 					if cert.Status == "Invalid" {
 						continue
 					}
-					if cert.Id == 0 {
+					if (cert.Id == 0 && strings.EqualFold(cert.Ca, "sectigo")) || (strings.EqualFold(cert.Ca, "harica") && cert.TransactionId == "") {
 						logger.Warn("Denying deletion of domain. Domain has dangling certificate.", zap.String("serial", cert.Serial), zap.String("domain", domain.Fqdn), zap.String("user", user))
 						item.Permissions.CanDelete = false
 						continue
