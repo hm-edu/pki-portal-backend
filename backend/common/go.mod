@@ -85,7 +85,7 @@ require (
 
 require (
 	github.com/getsentry/sentry-go v0.31.1 // indirect
-	github.com/go-playground/validator/v10 v10.23.0
+	github.com/go-playground/validator/v10 v10.24.0
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	go.opentelemetry.io/otel v1.33.0 // indirect
 	go.uber.org/zap v1.27.0
