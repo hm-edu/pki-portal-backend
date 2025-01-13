@@ -8,7 +8,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/TheZeroSlave/zapsentry v1.23.0
 	github.com/getsentry/sentry-go v0.31.1
-	github.com/hm-edu/harica v1.2.0
+	github.com/hm-edu/harica v1.3.0
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.10.0
@@ -102,7 +102,7 @@ require (
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/hm-edu/portal-common v0.0.0-20241218063258-fbc57509a1e8
+	github.com/hm-edu/portal-common v0.0.0-20250110125908-54196b8c154a
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/spf13/cast v1.7.1 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect

@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/TheZeroSlave/zapsentry"
@@ -290,6 +291,19 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 				}
 			}
 			break
+		}
+	}
+
+	transactions, err := s.client.GetMyTransactions()
+	if err != nil {
+		return s.handleError("Error while fetching transactions", err, logger, hub)
+	}
+
+	for _, t := range transactions {
+		if t.TransactionID == transaction.TransactionID {
+			if t.IsHighRisk && strings.EqualFold(t.TransactionStatus, "Pending") {
+				return s.handleError("pending transaction is high risk", fmt.Errorf("high risk transaction"), logger, hub)
+			}
 		}
 	}
 	logger.Info("Request approved. Collecting certificate")
