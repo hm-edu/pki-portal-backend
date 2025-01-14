@@ -90,5 +90,5 @@ require (
 	go.opentelemetry.io/otel v1.33.0 // indirect
 	go.uber.org/zap v1.27.0
 	golang.org/x/sys v0.29.0 // indirect
-	google.golang.org/grpc v1.69.2
+	google.golang.org/grpc v1.69.4
 )
