@@ -5,7 +5,7 @@ go 1.23
 require (
 	github.com/hm-edu/sectigo-client v0.0.0-20241203213233-31e0bf071c15
 	github.com/spf13/cobra v1.8.1
-	go.opentelemetry.io/otel/metric v1.33.0
+	go.opentelemetry.io/otel/metric v1.34.0
 	go.uber.org/zap v1.27.0
 )
 
@@ -51,7 +51,7 @@ require (
 	golang.org/x/sync v0.10.0 // indirect
 	golang.org/x/time v0.9.0 // indirect
 	golang.org/x/tools v0.29.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250122153221-138b5a5a4fd4 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
@@ -60,8 +60,8 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776
-	go.opentelemetry.io/otel v1.33.0
-	go.opentelemetry.io/otel/trace v1.33.0 // indirect
+	go.opentelemetry.io/otel v1.34.0
+	go.opentelemetry.io/otel/trace v1.34.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	google.golang.org/protobuf v1.36.3 // indirect
 )
