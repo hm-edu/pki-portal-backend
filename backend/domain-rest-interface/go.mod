@@ -6,7 +6,7 @@ require (
 	github.com/getkin/kin-openapi v0.128.0
 	github.com/hm-edu/portal-common v0.0.0-20241218063258-fbc57509a1e8
 	go.uber.org/zap v1.27.0
-	google.golang.org/grpc v1.69.4
+	google.golang.org/grpc v1.70.0
 )
 
 require (

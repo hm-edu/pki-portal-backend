@@ -7,7 +7,7 @@ require (
 	github.com/hm-edu/portal-common v0.0.0-20241218063258-fbc57509a1e8
 	github.com/smallstep/certificates v0.28.1
 	go.uber.org/zap v1.27.0
-	google.golang.org/grpc v1.69.4
+	google.golang.org/grpc v1.70.0
 )
 
 require (
@@ -145,7 +145,7 @@ require (
 	github.com/lestrrat-go/option v1.0.1 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/miekg/dns v1.1.62 // indirect
+	github.com/miekg/dns v1.1.63 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect

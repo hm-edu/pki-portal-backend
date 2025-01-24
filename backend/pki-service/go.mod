@@ -92,7 +92,6 @@ require (
 require github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776
 
 require (
-	go.opentelemetry.io/otel/sdk v1.32.0 // indirect
 	go.opentelemetry.io/otel/trace v1.33.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	google.golang.org/protobuf v1.36.3
@@ -109,7 +108,7 @@ require (
 	golang.org/x/net v0.34.0 // indirect
 	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
-	google.golang.org/grpc v1.69.4
+	google.golang.org/grpc v1.70.0
 	gopkg.in/ini.v1 v1.67.0 // indirect
 )
 

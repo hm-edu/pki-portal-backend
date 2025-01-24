@@ -5,9 +5,9 @@ go 1.23
 require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/labstack/gommon v0.4.2
-	github.com/miekg/dns v1.1.62
+	github.com/miekg/dns v1.1.63
 	go.uber.org/zap v1.27.0
-	google.golang.org/grpc v1.69.4
+	google.golang.org/grpc v1.70.0
 )
 
 require (
