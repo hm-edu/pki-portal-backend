@@ -101,7 +101,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/slackhq/nebula v1.9.5 // indirect
 	github.com/urfave/cli v1.22.16 // indirect
-	go.etcd.io/bbolt v1.3.11 // indirect
+	go.etcd.io/bbolt v1.4.0 // indirect
 	go.step.sm/crypto v0.57.1 // indirect
 	go.step.sm/linkedca v0.22.2 // indirect
 )
