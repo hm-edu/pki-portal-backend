@@ -103,11 +103,11 @@ type sslAPIServer struct {
 }
 
 func newSslAPIServer(cfg *cfg.PKIConfiguration, db *ent.Client) (*sslAPIServer, error) {
-	client, err := harica.NewClient(cfg.User, cfg.Password, cfg.TotpSeed, harica.WithRefreshInterval(5*time.Minute))
+	client, err := harica.NewClient(cfg.User, cfg.Password, cfg.TotpSeed, harica.WithRefreshInterval(5*time.Minute), harica.WithRetry(3))
 	if err != nil {
 		return nil, err
 	}
-	validationClient, err := harica.NewClient(cfg.ValidationUser, cfg.ValidationPassword, cfg.ValidationTotpSeed, harica.WithRefreshInterval(5*time.Minute))
+	validationClient, err := harica.NewClient(cfg.ValidationUser, cfg.ValidationPassword, cfg.ValidationTotpSeed, harica.WithRefreshInterval(5*time.Minute), harica.WithRetry(3))
 	if err != nil {
 		return nil, err
 	}
