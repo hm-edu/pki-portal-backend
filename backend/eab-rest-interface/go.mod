@@ -158,7 +158,7 @@ require (
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/smallstep/cli-utils v0.10.0 // indirect
 	github.com/smallstep/go-attestation v0.4.4-0.20240109183208-413678f90935 // indirect
-	github.com/smallstep/pkcs7 v0.1.1 // indirect
+	github.com/smallstep/pkcs7 v0.2.0 // indirect
 	github.com/smallstep/scep v0.0.0-20241223071629-a37a330173bc // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/viper v1.19.0 // indirect
