@@ -30,7 +30,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.31.0 // indirect
+	ariga.io/atlas v0.31.1-0.20250212144724-069be8033e83 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
@@ -115,7 +115,7 @@ require (
 )
 
 require (
-	entgo.io/ent v0.14.1
+	entgo.io/ent v0.14.2
 	github.com/go-co-op/gocron v1.37.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect

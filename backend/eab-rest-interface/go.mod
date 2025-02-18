@@ -44,7 +44,7 @@ require (
 )
 
 require (
-	entgo.io/ent v0.14.1
+	entgo.io/ent v0.14.2
 	github.com/TheZeroSlave/zapsentry v1.23.0
 	github.com/getsentry/sentry-go v0.31.1
 	github.com/getsentry/sentry-go/echo v0.31.1
@@ -75,7 +75,7 @@ require (
 	github.com/dgraph-io/ristretto v1.0.1 // indirect
 	github.com/dgryski/go-farm v0.0.0-20240924180020-3414d57e47da // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/go-sql-driver/mysql v1.8.1 // indirect
+	github.com/go-sql-driver/mysql v1.9.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/huandu/xstrings v1.5.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
@@ -107,7 +107,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.31.0 // indirect
+	ariga.io/atlas v0.31.1-0.20250212144724-069be8033e83 // indirect
 	dario.cat/mergo v1.0.1 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
