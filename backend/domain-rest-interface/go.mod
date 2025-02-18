@@ -44,7 +44,7 @@ require (
 )
 
 require (
-	entgo.io/ent v0.14.1
+	entgo.io/ent v0.14.2
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/TheZeroSlave/zapsentry v1.23.0
 	github.com/getsentry/sentry-go v0.31.1
@@ -103,7 +103,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.31.0 // indirect
+	ariga.io/atlas v0.31.1-0.20250212144724-069be8033e83 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.3.0 // indirect
 	github.com/go-openapi/inflect v0.21.0 // indirect
