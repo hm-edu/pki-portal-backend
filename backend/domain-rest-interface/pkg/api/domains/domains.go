@@ -127,11 +127,6 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string, logger *zap
 					if cert.Status == "Invalid" {
 						continue
 					}
-					if (cert.Id == 0 && strings.EqualFold(cert.Ca, "sectigo")) || (strings.EqualFold(cert.Ca, "harica") && cert.TransactionId == "") {
-						logger.Warn("Denying deletion of domain. Domain has dangling certificate.", zap.String("serial", cert.Serial), zap.String("domain", domain.Fqdn), zap.String("user", user))
-						item.Permissions.CanDelete = false
-						continue
-					}
 					for _, name := range cert.SubjectAlternativeNames {
 						if !helper.Any(filtered, func(i *ent.Domain) bool { return i.Fqdn == name }) {
 							logger.Info("Denying deletion of domain. Domain has certificate without domain permission for user.", zap.Int32("cert_id", cert.Id), zap.Int32("db_id", cert.DbId), zap.String("serial", cert.Serial), zap.String("domain", domain.Fqdn), zap.String("san", name), zap.String("user", user))

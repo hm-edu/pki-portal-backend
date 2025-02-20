@@ -359,6 +359,20 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 		return nil, status.Errorf(codes.Internal, "Failed to revoke certificate")
 	}
 
+	reasons, err := s.client.GetRevocationReasons()
+	if err != nil {
+		return errorReturn(err, logger)
+	}
+	var reason *models.RevocationReasonsResponse
+	for _, r := range reasons {
+		if r.Name == "4.9.1.1.1.1" {
+			reason = &r
+			break
+		}
+	}
+	if reason == nil {
+		return errorReturn(fmt.Errorf("Revocation reason not found"), logger)
+	}
 	switch req.Identifier.(type) {
 	case *pb.RevokeSslRequest_Serial:
 		serial := pkiHelper.NormalizeSerial(req.GetSerial())
@@ -372,19 +386,9 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 			logger.Info("Skipping certificate. Not issued by HARICA", zap.Int("id", c.ID))
 			return &emptypb.Empty{}, nil
 		}
-		reasons, err := s.client.GetRevocationReasons()
-		if err != nil {
-			return errorReturn(err, logger)
-		}
-		var reason *models.RevocationReasonsResponse
-		for _, r := range reasons {
-			if r.Name == "4.9.1.1.1.1" {
-				reason = &r
-				break
-			}
-		}
-		if reason == nil {
-			return errorReturn(fmt.Errorf("Revocation reason not found"), logger)
+		if c.TransactionId == "" {
+			logger.Warn("Certificate has no transaction id", zap.Int("id", c.ID))
+			return &emptypb.Empty{}, nil
 		}
 		logger.Info("Revoking certificate", zap.String("transaction_id", c.TransactionId), zap.String("reason", reason.Name), zap.String("description", req.Reason))
 		err = s.validationClient.RevokeCertificate(*reason, req.Reason, c.TransactionId)
@@ -418,8 +422,12 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 				continue
 			}
 			go func(c *ent.Certificate, ret chan struct{ err error }) {
-
-				err = s.validationClient.RevokeCertificate(models.RevocationReasonsResponse{}, req.Reason, c.TransactionId)
+				if c.TransactionId == "" {
+					logger.Warn("Certificate has no transaction id", zap.Int("id", c.ID))
+					ret <- struct{ err error }{}
+					return
+				}
+				err = s.validationClient.RevokeCertificate(*reason, req.Reason, c.TransactionId)
 				if err != nil {
 					ret <- struct{ err error }{err}
 					return
