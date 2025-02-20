@@ -50,8 +50,10 @@ func (h *Handler) List(c echo.Context) error {
 	}
 
 	span := sentryecho.GetSpanFromContext(c)
-	ctx := span.Context()
-
+	ctx := c.Request().Context()
+	if span != nil {
+		ctx = span.Context()
+	}
 	// use requested email if provided, otherwise use the user's primary email
 	requestedEmail := user.Email
 	if len(req.Email) > 0 {
@@ -109,7 +111,10 @@ func (h *Handler) Revoke(c echo.Context) error {
 	}
 
 	span := sentryecho.GetSpanFromContext(c)
-	ctx := span.Context()
+	ctx := c.Request().Context()
+	if span != nil {
+		ctx = span.Context()
+	}
 
 	logger.Debug("requesting smime certificate revocation")
 	listRes, err := h.smime.ListCertificates(ctx, &pb.ListSmimeRequest{Email: user.Email})
@@ -174,7 +179,10 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 	})
 
 	span := sentryecho.GetSpanFromContext(c)
-	ctx := span.Context()
+	ctx := c.Request().Context()
+	if span != nil {
+		ctx = span.Context()
+	}
 
 	if user.Student && h.rejectStudents {
 		logger.Warn("rejecting student", zap.String("email", user.Email))

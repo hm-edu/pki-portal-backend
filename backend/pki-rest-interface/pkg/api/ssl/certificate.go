@@ -50,7 +50,10 @@ func (h *Handler) Active(c echo.Context) error {
 		})
 	}
 	span := sentryecho.GetSpanFromContext(c)
-	ctx := span.Context()
+	ctx := c.Request().Context()
+	if span != nil {
+		ctx = span.Context()
+	}
 	domain := c.QueryParam("domain")
 	if domain == "" {
 		logger.Warn("no domain provided")
@@ -112,6 +115,10 @@ func (h *Handler) List(c echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 
 	span := sentryecho.GetSpanFromContext(c)
+	ctx := c.Request().Context()
+	if span != nil {
+		ctx = span.Context()
+	}
 	hub := sentryecho.GetHubFromContext(c)
 	if hub == nil {
 		hub = sentry.CurrentHub().Clone()
@@ -127,7 +134,7 @@ func (h *Handler) List(c echo.Context) error {
 		})
 	}
 	hub.AddBreadcrumb(&sentry.Breadcrumb{Level: sentry.LevelInfo, Message: "Loading domains"}, nil)
-	domains, err := h.domain.ListDomains(span.Context(), &pb.ListDomainsRequest{User: user, Approved: true})
+	domains, err := h.domain.ListDomains(ctx, &pb.ListDomainsRequest{User: user, Approved: true})
 	if err != nil {
 		logger.Error("error getting domains", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while listing certificates"}
@@ -135,7 +142,7 @@ func (h *Handler) List(c echo.Context) error {
 
 	logger.Debug("fetching certificates", zap.Strings("domains", domains.Domains))
 	hub.AddBreadcrumb(&sentry.Breadcrumb{Level: sentry.LevelInfo, Message: "Loading certificates"}, nil)
-	certs, err := h.ssl.ListCertificates(span.Context(), &pb.ListSslRequest{IncludePartial: false, Domains: domains.Domains})
+	certs, err := h.ssl.ListCertificates(ctx, &pb.ListSslRequest{IncludePartial: false, Domains: domains.Domains})
 	if err != nil {
 		logger.Error("error while listing certificates", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Error while listing certificates"}
@@ -172,7 +179,10 @@ func (h *Handler) Revoke(c echo.Context) error {
 	}
 
 	span := sentryecho.GetSpanFromContext(c)
-	ctx := span.Context()
+	ctx := c.Request().Context()
+	if span != nil {
+		ctx = span.Context()
+	}
 
 	req := &model.RevokeRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
@@ -231,7 +241,10 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 		hub = sentry.CurrentHub().Clone()
 	}
 	span := sentryecho.GetSpanFromContext(c)
-	ctx := span.Context()
+	ctx := c.Request().Context()
+	if span != nil {
+		ctx = span.Context()
+	}
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		hub.CaptureException(err)
