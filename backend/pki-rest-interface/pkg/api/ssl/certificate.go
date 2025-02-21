@@ -84,7 +84,7 @@ func (h *Handler) Active(c echo.Context) error {
 	active := make([]*pb.SslCertificateDetails, 0)
 
 	for _, cert := range certs.Items {
-		if cert.Status == "Issued" {
+		if cert.Status == "Issued" && cert.Ca == "harica" {
 			permitted := true
 			for _, san := range cert.SubjectAlternativeNames {
 				if !helper.Contains(domains.Domains, san) {

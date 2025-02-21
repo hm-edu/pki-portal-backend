@@ -417,11 +417,12 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 		ret := make(chan struct{ err error }, len(certs))
 
 		for _, c := range certs {
-			if c.Ca == nil || *c.Ca != "harica" {
-				logger.Info("Skipping certificate. Not issued by HARICA", zap.Int("id", c.ID))
-				continue
-			}
 			go func(c *ent.Certificate, ret chan struct{ err error }) {
+				if c.Ca == nil || *c.Ca != "harica" {
+					logger.Info("Skipping certificate. Not issued by HARICA", zap.Int("id", c.ID))
+					ret <- struct{ err error }{}
+					return
+				}
 				if c.TransactionId == "" {
 					logger.Warn("Certificate has no transaction id", zap.Int("id", c.ID))
 					ret <- struct{ err error }{}
