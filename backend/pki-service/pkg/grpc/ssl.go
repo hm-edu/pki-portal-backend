@@ -276,6 +276,11 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		return s.handleError("Error while requesting certificate", err, logger, hub)
 	}
 
+	entry, err = s.db.Certificate.UpdateOneID(entry.ID).SetTransactionId(transaction.TransactionID).Save(ctx)
+	if err != nil {
+		return s.handleError("Error while storing certificate", err, logger, hub)
+	}
+
 	reviews, err := s.validationClient.GetPendingReviews()
 	if err != nil {
 		return s.handleError("Error while fetching pending reviews", err, logger, hub)
