@@ -1,11 +1,11 @@
 module github.com/hm-edu/eab-rest-interface
 
-go 1.23.0
+go 1.23.6
 
 require (
 	github.com/getkin/kin-openapi v0.129.0
 	github.com/hm-edu/portal-common v0.0.0-20241218063258-fbc57509a1e8
-	github.com/smallstep/certificates v0.28.1
+	github.com/smallstep/certificates v0.28.2
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.70.0
 )
@@ -102,7 +102,7 @@ require (
 	github.com/slackhq/nebula v1.9.5 // indirect
 	github.com/urfave/cli v1.22.16 // indirect
 	go.etcd.io/bbolt v1.4.0 // indirect
-	go.step.sm/crypto v0.57.1 // indirect
+	go.step.sm/crypto v0.58.0 // indirect
 	go.step.sm/linkedca v0.22.2 // indirect
 )
 
@@ -113,14 +113,14 @@ require (
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
 	github.com/coreos/go-oidc/v3 v3.12.0 // indirect
-	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.3.0 // indirect
+	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.4.0 // indirect
 	github.com/eclipse/paho.mqtt.golang v1.5.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.7.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-chi/chi/v5 v5.2.1 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.3 // indirect
-	github.com/go-jose/go-jose/v4 v4.0.4 // indirect
+	github.com/go-jose/go-jose/v4 v4.0.5 // indirect
 	github.com/go-openapi/inflect v0.21.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
@@ -129,7 +129,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/golang/glog v1.2.4 // indirect
 	github.com/google/certificate-transparency-go v1.3.1 // indirect
-	github.com/google/go-cmp v0.6.0 // indirect
+	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/go-tpm v0.9.3 // indirect
 	github.com/google/go-tspi v0.3.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
@@ -156,10 +156,10 @@ require (
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
-	github.com/smallstep/cli-utils v0.10.0 // indirect
+	github.com/smallstep/cli-utils v0.11.0 // indirect
 	github.com/smallstep/go-attestation v0.4.4-0.20240109183208-413678f90935 // indirect
 	github.com/smallstep/pkcs7 v0.2.1 // indirect
-	github.com/smallstep/scep v0.0.0-20241223071629-a37a330173bc // indirect
+	github.com/smallstep/scep v0.0.0-20250221100424-171a5fa4fb1b // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/viper v1.19.0 // indirect
 	github.com/swaggo/files/v2 v2.0.2 // indirect
@@ -167,13 +167,13 @@ require (
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/zclconf/go-cty v1.16.2 // indirect
 	github.com/zclconf/go-cty-yaml v1.1.0 // indirect
-	golang.org/x/crypto v0.33.0 // indirect
+	golang.org/x/crypto v0.35.0 // indirect
 	golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa // indirect
 	golang.org/x/mod v0.23.0 // indirect
-	golang.org/x/oauth2 v0.26.0 // indirect
+	golang.org/x/oauth2 v0.27.0 // indirect
 	golang.org/x/sync v0.11.0 // indirect
 	golang.org/x/time v0.10.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250219182151-9fdb1cabc7b2 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250224174004-546df14abb99 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
