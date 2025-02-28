@@ -102,7 +102,7 @@ require (
 	github.com/slackhq/nebula v1.9.5 // indirect
 	github.com/urfave/cli v1.22.16 // indirect
 	go.etcd.io/bbolt v1.4.0 // indirect
-	go.step.sm/crypto v0.58.1 // indirect
+	go.step.sm/crypto v0.59.0 // indirect
 	go.step.sm/linkedca v0.22.2 // indirect
 )
 
@@ -156,7 +156,7 @@ require (
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
-	github.com/smallstep/cli-utils v0.11.0 // indirect
+	github.com/smallstep/cli-utils v0.12.1 // indirect
 	github.com/smallstep/go-attestation v0.4.4-0.20240109183208-413678f90935 // indirect
 	github.com/smallstep/pkcs7 v0.2.1 // indirect
 	github.com/smallstep/scep v0.0.0-20250221100424-171a5fa4fb1b // indirect
@@ -168,12 +168,12 @@ require (
 	github.com/zclconf/go-cty v1.16.2 // indirect
 	github.com/zclconf/go-cty-yaml v1.1.0 // indirect
 	golang.org/x/crypto v0.35.0 // indirect
-	golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa // indirect
+	golang.org/x/exp v0.0.0-20250228200357-dead58393ab7 // indirect
 	golang.org/x/mod v0.23.0 // indirect
 	golang.org/x/oauth2 v0.27.0 // indirect
 	golang.org/x/sync v0.11.0 // indirect
 	golang.org/x/time v0.10.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250224174004-546df14abb99 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250227231956-55c901821b1e // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
