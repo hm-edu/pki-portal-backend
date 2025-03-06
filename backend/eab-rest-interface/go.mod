@@ -7,7 +7,7 @@ require (
 	github.com/hm-edu/portal-common v0.0.0-20241218063258-fbc57509a1e8
 	github.com/smallstep/certificates v0.28.2
 	go.uber.org/zap v1.27.0
-	google.golang.org/grpc v1.70.0
+	google.golang.org/grpc v1.71.0
 )
 
 require (
@@ -35,10 +35,10 @@ require (
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/swaggo/swag v1.16.4
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/net v0.35.0 // indirect
-	golang.org/x/sys v0.30.0 // indirect
-	golang.org/x/text v0.22.0 // indirect
-	golang.org/x/tools v0.30.0 // indirect
+	golang.org/x/net v0.37.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
+	golang.org/x/tools v0.31.0 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
@@ -91,7 +91,7 @@ require (
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
-	github.com/prometheus/client_golang v1.21.0 // indirect
+	github.com/prometheus/client_golang v1.21.1 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.62.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
@@ -102,7 +102,7 @@ require (
 	github.com/slackhq/nebula v1.9.5 // indirect
 	github.com/urfave/cli v1.22.16 // indirect
 	go.etcd.io/bbolt v1.4.0 // indirect
-	go.step.sm/crypto v0.58.1 // indirect
+	go.step.sm/crypto v0.59.1 // indirect
 	go.step.sm/linkedca v0.22.2 // indirect
 )
 
@@ -156,7 +156,7 @@ require (
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
-	github.com/smallstep/cli-utils v0.11.0 // indirect
+	github.com/smallstep/cli-utils v0.12.1 // indirect
 	github.com/smallstep/go-attestation v0.4.4-0.20240109183208-413678f90935 // indirect
 	github.com/smallstep/pkcs7 v0.2.1 // indirect
 	github.com/smallstep/scep v0.0.0-20250221100424-171a5fa4fb1b // indirect
@@ -167,13 +167,13 @@ require (
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/zclconf/go-cty v1.16.2 // indirect
 	github.com/zclconf/go-cty-yaml v1.1.0 // indirect
-	golang.org/x/crypto v0.35.0 // indirect
-	golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa // indirect
-	golang.org/x/mod v0.23.0 // indirect
-	golang.org/x/oauth2 v0.27.0 // indirect
-	golang.org/x/sync v0.11.0 // indirect
-	golang.org/x/time v0.10.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250224174004-546df14abb99 // indirect
+	golang.org/x/crypto v0.36.0 // indirect
+	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
+	golang.org/x/mod v0.24.0 // indirect
+	golang.org/x/oauth2 v0.28.0 // indirect
+	golang.org/x/sync v0.12.0 // indirect
+	golang.org/x/time v0.11.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250303144028-a0af3efb3deb // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
