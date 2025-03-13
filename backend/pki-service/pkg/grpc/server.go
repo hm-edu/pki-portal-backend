@@ -108,7 +108,10 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 		s.logger.Fatal("failed to create ssl server", zap.Error(err))
 	}
 	pb.RegisterSSLServiceServer(srv, ssl)
-	smime := newSmimeAPIServer(s.pkiCfg)
+	smime, err := newSmimeAPIServer(s.pkiCfg, s.db)
+	if err != nil {
+		s.logger.Fatal("failed to create smime server", zap.Error(err))
+	}
 	pb.RegisterSmimeServiceServer(srv, smime)
 	grpc_health_v1.RegisterHealthServer(srv, server)
 
