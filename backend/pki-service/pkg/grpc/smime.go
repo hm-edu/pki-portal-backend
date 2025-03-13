@@ -236,7 +236,7 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 		SetStatus(smimecertificate.StatusIssued).
 		SetTransactionId(cert.TransactionID).Save(ctx)
 
-	cert.Certificate = fmt.Sprintf("%s\n%s",
+	cert.Certificate = fmt.Sprintf("%s\n%s\n%s",
 		cert.Certificate,
 		geantIssuer,
 		haricaRoot,
