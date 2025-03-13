@@ -35,7 +35,17 @@ func (r *User) Bind(c echo.Context, v *Validator) error {
 		}
 	}
 	if claim, ok := claims["eduPersonScopedAffiliation"]; ok {
-		r.Student = strings.Contains((claim.(string)), "student@")
+		if affiliations, ok := claim.([]string); ok {
+			for _, affiliation := range affiliations {
+				if strings.Contains(affiliation, "student@") {
+					r.Student = true
+				}
+			}
+		} else if affiliation, ok := claim.(string); ok {
+			if strings.Contains(affiliation, "student@") {
+				r.Student = true
+			}
+		}
 	} else {
 		r.Student = false
 	}
