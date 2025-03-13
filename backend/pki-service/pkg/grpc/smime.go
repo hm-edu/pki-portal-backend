@@ -282,7 +282,11 @@ func (s *smimeAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSm
 		if err != nil {
 			return nil, status.Error(codes.Internal, "Error fetching certificates")
 		}
+		if len(certs) == 0 {
+			return nil, status.Error(codes.NotFound, "Certificate not found")
+		}
 		for _, cert := range certs {
+			s.logger.Info("Revoking smime certificate", zap.String("serial", req.GetSerial()), zap.String("email", cert.Email), zap.String("transaction_id", cert.TransactionId))
 			err := s.validationClient.RevokeSmimeBulkCertificateEntry(cert.TransactionId, req.Reason, reason.Name)
 			if err != nil {
 				return nil, status.Error(codes.Internal, "Error revoking certificate")
@@ -297,7 +301,11 @@ func (s *smimeAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSm
 		if err != nil {
 			return nil, status.Error(codes.Internal, "Error fetching certificates")
 		}
+		if len(certs) == 0 {
+			return nil, status.Error(codes.NotFound, "Certificate not found")
+		}
 		for _, cert := range certs {
+			s.logger.Info("Revoking smime certificate", zap.String("serial", req.GetSerial()), zap.String("email", cert.Email), zap.String("transaction_id", cert.TransactionId))
 			err := s.validationClient.RevokeSmimeBulkCertificateEntry(cert.TransactionId, req.Reason, reason.Name)
 			if err != nil {
 				return nil, status.Error(codes.Internal, "Error revoking certificate")
