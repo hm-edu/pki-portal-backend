@@ -151,7 +151,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 
 // HandleCsr godoc
 // @Summary SMIME CSR Endpoint
-// @Description This endpoint handles a provided CSR. The validity of the CSR is checked and passed to the sectigo server in combination with the basic user information extracted from the JWT.
+// @Description This endpoint handles a provided CSR. The validity of the CSR is checked and passed to the harica server in combination with the basic user information extracted from the JWT.
 // @Description The server uses his own configuration, so the profile and the lifetime of the certificate can not be modified.
 // @Description Afterwards the new certificate is returned as X509 certificate.
 // @Tags SMIME
@@ -226,14 +226,13 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 
 	logger.Info("Issuing new smime certificate")
 	cert, err := h.smime.IssueCertificate(ctx, &pb.IssueSmimeRequest{
-		Csr:                req.CSR,
-		Email:              requestedEmail,
-		FirstName:          user.FirstName,
-		LastName:           user.LastName,
-		MiddleName:         user.MiddleName,
-		CommonName:         user.CommonName,
-		Student:            user.Student,
-		ValidationStandard: requestedEmail != user.Email,
+		Csr:        req.CSR,
+		Email:      requestedEmail,
+		FirstName:  user.FirstName,
+		LastName:   user.LastName,
+		MiddleName: user.MiddleName,
+		CommonName: user.CommonName,
+		Student:    user.Student,
 	})
 	if err != nil {
 		hub.CaptureException(err)

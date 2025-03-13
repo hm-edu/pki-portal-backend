@@ -11,3 +11,6 @@ type Certificate func(*sql.Selector)
 
 // Domain is the predicate function for domain builders.
 type Domain func(*sql.Selector)
+
+// SmimeCertificate is the predicate function for smimecertificate builders.
+type SmimeCertificate func(*sql.Selector)

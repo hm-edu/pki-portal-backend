@@ -14,6 +14,7 @@ import (
 	"github.com/hm-edu/pki-service/ent/certificate"
 	"github.com/hm-edu/pki-service/ent/domain"
 	"github.com/hm-edu/pki-service/ent/predicate"
+	"github.com/hm-edu/pki-service/ent/smimecertificate"
 )
 
 const (
@@ -25,8 +26,9 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeCertificate = "Certificate"
-	TypeDomain      = "Domain"
+	TypeCertificate      = "Certificate"
+	TypeDomain           = "Domain"
+	TypeSmimeCertificate = "SmimeCertificate"
 )
 
 // CertificateMutation represents an operation that mutates the Certificate nodes in the graph.
@@ -1724,4 +1726,914 @@ func (m *DomainMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Domain edge %s", name)
+}
+
+// SmimeCertificateMutation represents an operation that mutates the SmimeCertificate nodes in the graph.
+type SmimeCertificateMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	create_time   *time.Time
+	update_time   *time.Time
+	transactionId *string
+	email         *string
+	serial        *string
+	notBefore     *time.Time
+	notAfter      *time.Time
+	created       *time.Time
+	status        *smimecertificate.Status
+	ca            *string
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*SmimeCertificate, error)
+	predicates    []predicate.SmimeCertificate
+}
+
+var _ ent.Mutation = (*SmimeCertificateMutation)(nil)
+
+// smimecertificateOption allows management of the mutation configuration using functional options.
+type smimecertificateOption func(*SmimeCertificateMutation)
+
+// newSmimeCertificateMutation creates new mutation for the SmimeCertificate entity.
+func newSmimeCertificateMutation(c config, op Op, opts ...smimecertificateOption) *SmimeCertificateMutation {
+	m := &SmimeCertificateMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeSmimeCertificate,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withSmimeCertificateID sets the ID field of the mutation.
+func withSmimeCertificateID(id int) smimecertificateOption {
+	return func(m *SmimeCertificateMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *SmimeCertificate
+		)
+		m.oldValue = func(ctx context.Context) (*SmimeCertificate, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().SmimeCertificate.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withSmimeCertificate sets the old SmimeCertificate of the mutation.
+func withSmimeCertificate(node *SmimeCertificate) smimecertificateOption {
+	return func(m *SmimeCertificateMutation) {
+		m.oldValue = func(context.Context) (*SmimeCertificate, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m SmimeCertificateMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m SmimeCertificateMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *SmimeCertificateMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *SmimeCertificateMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().SmimeCertificate.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreateTime sets the "create_time" field.
+func (m *SmimeCertificateMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
+}
+
+// CreateTime returns the value of the "create_time" field in the mutation.
+func (m *SmimeCertificateMutation) CreateTime() (r time.Time, exists bool) {
+	v := m.create_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreateTime returns the old "create_time" field's value of the SmimeCertificate entity.
+// If the SmimeCertificate object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SmimeCertificateMutation) OldCreateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreateTime: %w", err)
+	}
+	return oldValue.CreateTime, nil
+}
+
+// ResetCreateTime resets all changes to the "create_time" field.
+func (m *SmimeCertificateMutation) ResetCreateTime() {
+	m.create_time = nil
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (m *SmimeCertificateMutation) SetUpdateTime(t time.Time) {
+	m.update_time = &t
+}
+
+// UpdateTime returns the value of the "update_time" field in the mutation.
+func (m *SmimeCertificateMutation) UpdateTime() (r time.Time, exists bool) {
+	v := m.update_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdateTime returns the old "update_time" field's value of the SmimeCertificate entity.
+// If the SmimeCertificate object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SmimeCertificateMutation) OldUpdateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdateTime: %w", err)
+	}
+	return oldValue.UpdateTime, nil
+}
+
+// ResetUpdateTime resets all changes to the "update_time" field.
+func (m *SmimeCertificateMutation) ResetUpdateTime() {
+	m.update_time = nil
+}
+
+// SetTransactionId sets the "transactionId" field.
+func (m *SmimeCertificateMutation) SetTransactionId(s string) {
+	m.transactionId = &s
+}
+
+// TransactionId returns the value of the "transactionId" field in the mutation.
+func (m *SmimeCertificateMutation) TransactionId() (r string, exists bool) {
+	v := m.transactionId
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTransactionId returns the old "transactionId" field's value of the SmimeCertificate entity.
+// If the SmimeCertificate object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SmimeCertificateMutation) OldTransactionId(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTransactionId is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTransactionId requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTransactionId: %w", err)
+	}
+	return oldValue.TransactionId, nil
+}
+
+// ClearTransactionId clears the value of the "transactionId" field.
+func (m *SmimeCertificateMutation) ClearTransactionId() {
+	m.transactionId = nil
+	m.clearedFields[smimecertificate.FieldTransactionId] = struct{}{}
+}
+
+// TransactionIdCleared returns if the "transactionId" field was cleared in this mutation.
+func (m *SmimeCertificateMutation) TransactionIdCleared() bool {
+	_, ok := m.clearedFields[smimecertificate.FieldTransactionId]
+	return ok
+}
+
+// ResetTransactionId resets all changes to the "transactionId" field.
+func (m *SmimeCertificateMutation) ResetTransactionId() {
+	m.transactionId = nil
+	delete(m.clearedFields, smimecertificate.FieldTransactionId)
+}
+
+// SetEmail sets the "email" field.
+func (m *SmimeCertificateMutation) SetEmail(s string) {
+	m.email = &s
+}
+
+// Email returns the value of the "email" field in the mutation.
+func (m *SmimeCertificateMutation) Email() (r string, exists bool) {
+	v := m.email
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEmail returns the old "email" field's value of the SmimeCertificate entity.
+// If the SmimeCertificate object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SmimeCertificateMutation) OldEmail(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEmail is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEmail requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEmail: %w", err)
+	}
+	return oldValue.Email, nil
+}
+
+// ResetEmail resets all changes to the "email" field.
+func (m *SmimeCertificateMutation) ResetEmail() {
+	m.email = nil
+}
+
+// SetSerial sets the "serial" field.
+func (m *SmimeCertificateMutation) SetSerial(s string) {
+	m.serial = &s
+}
+
+// Serial returns the value of the "serial" field in the mutation.
+func (m *SmimeCertificateMutation) Serial() (r string, exists bool) {
+	v := m.serial
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSerial returns the old "serial" field's value of the SmimeCertificate entity.
+// If the SmimeCertificate object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SmimeCertificateMutation) OldSerial(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSerial is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSerial requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSerial: %w", err)
+	}
+	return oldValue.Serial, nil
+}
+
+// ResetSerial resets all changes to the "serial" field.
+func (m *SmimeCertificateMutation) ResetSerial() {
+	m.serial = nil
+}
+
+// SetNotBefore sets the "notBefore" field.
+func (m *SmimeCertificateMutation) SetNotBefore(t time.Time) {
+	m.notBefore = &t
+}
+
+// NotBefore returns the value of the "notBefore" field in the mutation.
+func (m *SmimeCertificateMutation) NotBefore() (r time.Time, exists bool) {
+	v := m.notBefore
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNotBefore returns the old "notBefore" field's value of the SmimeCertificate entity.
+// If the SmimeCertificate object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SmimeCertificateMutation) OldNotBefore(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNotBefore is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNotBefore requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNotBefore: %w", err)
+	}
+	return oldValue.NotBefore, nil
+}
+
+// ClearNotBefore clears the value of the "notBefore" field.
+func (m *SmimeCertificateMutation) ClearNotBefore() {
+	m.notBefore = nil
+	m.clearedFields[smimecertificate.FieldNotBefore] = struct{}{}
+}
+
+// NotBeforeCleared returns if the "notBefore" field was cleared in this mutation.
+func (m *SmimeCertificateMutation) NotBeforeCleared() bool {
+	_, ok := m.clearedFields[smimecertificate.FieldNotBefore]
+	return ok
+}
+
+// ResetNotBefore resets all changes to the "notBefore" field.
+func (m *SmimeCertificateMutation) ResetNotBefore() {
+	m.notBefore = nil
+	delete(m.clearedFields, smimecertificate.FieldNotBefore)
+}
+
+// SetNotAfter sets the "notAfter" field.
+func (m *SmimeCertificateMutation) SetNotAfter(t time.Time) {
+	m.notAfter = &t
+}
+
+// NotAfter returns the value of the "notAfter" field in the mutation.
+func (m *SmimeCertificateMutation) NotAfter() (r time.Time, exists bool) {
+	v := m.notAfter
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNotAfter returns the old "notAfter" field's value of the SmimeCertificate entity.
+// If the SmimeCertificate object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SmimeCertificateMutation) OldNotAfter(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNotAfter is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNotAfter requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNotAfter: %w", err)
+	}
+	return oldValue.NotAfter, nil
+}
+
+// ClearNotAfter clears the value of the "notAfter" field.
+func (m *SmimeCertificateMutation) ClearNotAfter() {
+	m.notAfter = nil
+	m.clearedFields[smimecertificate.FieldNotAfter] = struct{}{}
+}
+
+// NotAfterCleared returns if the "notAfter" field was cleared in this mutation.
+func (m *SmimeCertificateMutation) NotAfterCleared() bool {
+	_, ok := m.clearedFields[smimecertificate.FieldNotAfter]
+	return ok
+}
+
+// ResetNotAfter resets all changes to the "notAfter" field.
+func (m *SmimeCertificateMutation) ResetNotAfter() {
+	m.notAfter = nil
+	delete(m.clearedFields, smimecertificate.FieldNotAfter)
+}
+
+// SetCreated sets the "created" field.
+func (m *SmimeCertificateMutation) SetCreated(t time.Time) {
+	m.created = &t
+}
+
+// Created returns the value of the "created" field in the mutation.
+func (m *SmimeCertificateMutation) Created() (r time.Time, exists bool) {
+	v := m.created
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreated returns the old "created" field's value of the SmimeCertificate entity.
+// If the SmimeCertificate object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SmimeCertificateMutation) OldCreated(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreated is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreated requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreated: %w", err)
+	}
+	return oldValue.Created, nil
+}
+
+// ClearCreated clears the value of the "created" field.
+func (m *SmimeCertificateMutation) ClearCreated() {
+	m.created = nil
+	m.clearedFields[smimecertificate.FieldCreated] = struct{}{}
+}
+
+// CreatedCleared returns if the "created" field was cleared in this mutation.
+func (m *SmimeCertificateMutation) CreatedCleared() bool {
+	_, ok := m.clearedFields[smimecertificate.FieldCreated]
+	return ok
+}
+
+// ResetCreated resets all changes to the "created" field.
+func (m *SmimeCertificateMutation) ResetCreated() {
+	m.created = nil
+	delete(m.clearedFields, smimecertificate.FieldCreated)
+}
+
+// SetStatus sets the "status" field.
+func (m *SmimeCertificateMutation) SetStatus(s smimecertificate.Status) {
+	m.status = &s
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *SmimeCertificateMutation) Status() (r smimecertificate.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the SmimeCertificate entity.
+// If the SmimeCertificate object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SmimeCertificateMutation) OldStatus(ctx context.Context) (v smimecertificate.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *SmimeCertificateMutation) ResetStatus() {
+	m.status = nil
+}
+
+// SetCa sets the "ca" field.
+func (m *SmimeCertificateMutation) SetCa(s string) {
+	m.ca = &s
+}
+
+// Ca returns the value of the "ca" field in the mutation.
+func (m *SmimeCertificateMutation) Ca() (r string, exists bool) {
+	v := m.ca
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCa returns the old "ca" field's value of the SmimeCertificate entity.
+// If the SmimeCertificate object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SmimeCertificateMutation) OldCa(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCa is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCa requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCa: %w", err)
+	}
+	return oldValue.Ca, nil
+}
+
+// ClearCa clears the value of the "ca" field.
+func (m *SmimeCertificateMutation) ClearCa() {
+	m.ca = nil
+	m.clearedFields[smimecertificate.FieldCa] = struct{}{}
+}
+
+// CaCleared returns if the "ca" field was cleared in this mutation.
+func (m *SmimeCertificateMutation) CaCleared() bool {
+	_, ok := m.clearedFields[smimecertificate.FieldCa]
+	return ok
+}
+
+// ResetCa resets all changes to the "ca" field.
+func (m *SmimeCertificateMutation) ResetCa() {
+	m.ca = nil
+	delete(m.clearedFields, smimecertificate.FieldCa)
+}
+
+// Where appends a list predicates to the SmimeCertificateMutation builder.
+func (m *SmimeCertificateMutation) Where(ps ...predicate.SmimeCertificate) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the SmimeCertificateMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *SmimeCertificateMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.SmimeCertificate, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *SmimeCertificateMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *SmimeCertificateMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (SmimeCertificate).
+func (m *SmimeCertificateMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *SmimeCertificateMutation) Fields() []string {
+	fields := make([]string, 0, 10)
+	if m.create_time != nil {
+		fields = append(fields, smimecertificate.FieldCreateTime)
+	}
+	if m.update_time != nil {
+		fields = append(fields, smimecertificate.FieldUpdateTime)
+	}
+	if m.transactionId != nil {
+		fields = append(fields, smimecertificate.FieldTransactionId)
+	}
+	if m.email != nil {
+		fields = append(fields, smimecertificate.FieldEmail)
+	}
+	if m.serial != nil {
+		fields = append(fields, smimecertificate.FieldSerial)
+	}
+	if m.notBefore != nil {
+		fields = append(fields, smimecertificate.FieldNotBefore)
+	}
+	if m.notAfter != nil {
+		fields = append(fields, smimecertificate.FieldNotAfter)
+	}
+	if m.created != nil {
+		fields = append(fields, smimecertificate.FieldCreated)
+	}
+	if m.status != nil {
+		fields = append(fields, smimecertificate.FieldStatus)
+	}
+	if m.ca != nil {
+		fields = append(fields, smimecertificate.FieldCa)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *SmimeCertificateMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case smimecertificate.FieldCreateTime:
+		return m.CreateTime()
+	case smimecertificate.FieldUpdateTime:
+		return m.UpdateTime()
+	case smimecertificate.FieldTransactionId:
+		return m.TransactionId()
+	case smimecertificate.FieldEmail:
+		return m.Email()
+	case smimecertificate.FieldSerial:
+		return m.Serial()
+	case smimecertificate.FieldNotBefore:
+		return m.NotBefore()
+	case smimecertificate.FieldNotAfter:
+		return m.NotAfter()
+	case smimecertificate.FieldCreated:
+		return m.Created()
+	case smimecertificate.FieldStatus:
+		return m.Status()
+	case smimecertificate.FieldCa:
+		return m.Ca()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *SmimeCertificateMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case smimecertificate.FieldCreateTime:
+		return m.OldCreateTime(ctx)
+	case smimecertificate.FieldUpdateTime:
+		return m.OldUpdateTime(ctx)
+	case smimecertificate.FieldTransactionId:
+		return m.OldTransactionId(ctx)
+	case smimecertificate.FieldEmail:
+		return m.OldEmail(ctx)
+	case smimecertificate.FieldSerial:
+		return m.OldSerial(ctx)
+	case smimecertificate.FieldNotBefore:
+		return m.OldNotBefore(ctx)
+	case smimecertificate.FieldNotAfter:
+		return m.OldNotAfter(ctx)
+	case smimecertificate.FieldCreated:
+		return m.OldCreated(ctx)
+	case smimecertificate.FieldStatus:
+		return m.OldStatus(ctx)
+	case smimecertificate.FieldCa:
+		return m.OldCa(ctx)
+	}
+	return nil, fmt.Errorf("unknown SmimeCertificate field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SmimeCertificateMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case smimecertificate.FieldCreateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreateTime(v)
+		return nil
+	case smimecertificate.FieldUpdateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdateTime(v)
+		return nil
+	case smimecertificate.FieldTransactionId:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTransactionId(v)
+		return nil
+	case smimecertificate.FieldEmail:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEmail(v)
+		return nil
+	case smimecertificate.FieldSerial:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSerial(v)
+		return nil
+	case smimecertificate.FieldNotBefore:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNotBefore(v)
+		return nil
+	case smimecertificate.FieldNotAfter:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNotAfter(v)
+		return nil
+	case smimecertificate.FieldCreated:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreated(v)
+		return nil
+	case smimecertificate.FieldStatus:
+		v, ok := value.(smimecertificate.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case smimecertificate.FieldCa:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCa(v)
+		return nil
+	}
+	return fmt.Errorf("unknown SmimeCertificate field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *SmimeCertificateMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *SmimeCertificateMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SmimeCertificateMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown SmimeCertificate numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *SmimeCertificateMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(smimecertificate.FieldTransactionId) {
+		fields = append(fields, smimecertificate.FieldTransactionId)
+	}
+	if m.FieldCleared(smimecertificate.FieldNotBefore) {
+		fields = append(fields, smimecertificate.FieldNotBefore)
+	}
+	if m.FieldCleared(smimecertificate.FieldNotAfter) {
+		fields = append(fields, smimecertificate.FieldNotAfter)
+	}
+	if m.FieldCleared(smimecertificate.FieldCreated) {
+		fields = append(fields, smimecertificate.FieldCreated)
+	}
+	if m.FieldCleared(smimecertificate.FieldCa) {
+		fields = append(fields, smimecertificate.FieldCa)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *SmimeCertificateMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *SmimeCertificateMutation) ClearField(name string) error {
+	switch name {
+	case smimecertificate.FieldTransactionId:
+		m.ClearTransactionId()
+		return nil
+	case smimecertificate.FieldNotBefore:
+		m.ClearNotBefore()
+		return nil
+	case smimecertificate.FieldNotAfter:
+		m.ClearNotAfter()
+		return nil
+	case smimecertificate.FieldCreated:
+		m.ClearCreated()
+		return nil
+	case smimecertificate.FieldCa:
+		m.ClearCa()
+		return nil
+	}
+	return fmt.Errorf("unknown SmimeCertificate nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *SmimeCertificateMutation) ResetField(name string) error {
+	switch name {
+	case smimecertificate.FieldCreateTime:
+		m.ResetCreateTime()
+		return nil
+	case smimecertificate.FieldUpdateTime:
+		m.ResetUpdateTime()
+		return nil
+	case smimecertificate.FieldTransactionId:
+		m.ResetTransactionId()
+		return nil
+	case smimecertificate.FieldEmail:
+		m.ResetEmail()
+		return nil
+	case smimecertificate.FieldSerial:
+		m.ResetSerial()
+		return nil
+	case smimecertificate.FieldNotBefore:
+		m.ResetNotBefore()
+		return nil
+	case smimecertificate.FieldNotAfter:
+		m.ResetNotAfter()
+		return nil
+	case smimecertificate.FieldCreated:
+		m.ResetCreated()
+		return nil
+	case smimecertificate.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case smimecertificate.FieldCa:
+		m.ResetCa()
+		return nil
+	}
+	return fmt.Errorf("unknown SmimeCertificate field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *SmimeCertificateMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *SmimeCertificateMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *SmimeCertificateMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *SmimeCertificateMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *SmimeCertificateMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *SmimeCertificateMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *SmimeCertificateMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown SmimeCertificate unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *SmimeCertificateMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown SmimeCertificate edge %s", name)
 }

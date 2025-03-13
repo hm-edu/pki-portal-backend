@@ -16,6 +16,8 @@ type Tx struct {
 	Certificate *CertificateClient
 	// Domain is the client for interacting with the Domain builders.
 	Domain *DomainClient
+	// SmimeCertificate is the client for interacting with the SmimeCertificate builders.
+	SmimeCertificate *SmimeCertificateClient
 
 	// lazily loaded.
 	client     *Client
@@ -149,6 +151,7 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.Certificate = NewCertificateClient(tx.config)
 	tx.Domain = NewDomainClient(tx.config)
+	tx.SmimeCertificate = NewSmimeCertificateClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

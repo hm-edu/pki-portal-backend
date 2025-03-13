@@ -43,6 +43,26 @@ var (
 		Columns:    DomainsColumns,
 		PrimaryKey: []*schema.Column{DomainsColumns[0]},
 	}
+	// SmimeCertificatesColumns holds the columns for the "smime_certificates" table.
+	SmimeCertificatesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "update_time", Type: field.TypeTime},
+		{Name: "transaction_id", Type: field.TypeString, Nullable: true},
+		{Name: "email", Type: field.TypeString},
+		{Name: "serial", Type: field.TypeString},
+		{Name: "not_before", Type: field.TypeTime, Nullable: true},
+		{Name: "not_after", Type: field.TypeTime, Nullable: true},
+		{Name: "created", Type: field.TypeTime, Nullable: true},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"Invalid", "Requested", "Approved", "Declined", "Applied", "Issued", "Revoked", "Expired", "Replaced", "Rejected", "Unmanaged", "SAApproved", "Init"}, Default: "Invalid"},
+		{Name: "ca", Type: field.TypeString, Nullable: true},
+	}
+	// SmimeCertificatesTable holds the schema information for the "smime_certificates" table.
+	SmimeCertificatesTable = &schema.Table{
+		Name:       "smime_certificates",
+		Columns:    SmimeCertificatesColumns,
+		PrimaryKey: []*schema.Column{SmimeCertificatesColumns[0]},
+	}
 	// CertificateDomainsColumns holds the columns for the "certificate_domains" table.
 	CertificateDomainsColumns = []*schema.Column{
 		{Name: "certificate_id", Type: field.TypeInt},
@@ -72,6 +92,7 @@ var (
 	Tables = []*schema.Table{
 		CertificatesTable,
 		DomainsTable,
+		SmimeCertificatesTable,
 		CertificateDomainsTable,
 	}
 )

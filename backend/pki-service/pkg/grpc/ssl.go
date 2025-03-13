@@ -103,15 +103,33 @@ type sslAPIServer struct {
 }
 
 func newSslAPIServer(cfg *cfg.PKIConfiguration, db *ent.Client) (*sslAPIServer, error) {
-	client, err := harica.NewClient(cfg.User, cfg.Password, cfg.TotpSeed, harica.WithRefreshInterval(5*time.Minute), harica.WithRetry(3))
+	client, err := harica.NewClient(
+		cfg.User,
+		cfg.Password,
+		cfg.TotpSeed,
+		harica.WithRefreshInterval(5*time.Minute),
+		harica.WithRetry(3),
+	)
 	if err != nil {
 		return nil, err
 	}
-	validationClient, err := harica.NewClient(cfg.ValidationUser, cfg.ValidationPassword, cfg.ValidationTotpSeed, harica.WithRefreshInterval(5*time.Minute), harica.WithRetry(3))
+	validationClient, err := harica.NewClient(
+		cfg.ValidationUser,
+		cfg.ValidationPassword,
+		cfg.ValidationTotpSeed,
+		harica.WithRefreshInterval(5*time.Minute),
+		harica.WithRetry(3),
+	)
 	if err != nil {
 		return nil, err
 	}
-	instance := &sslAPIServer{client: client, validationClient: validationClient, cfg: cfg, logger: zap.L(), db: db}
+	instance := &sslAPIServer{
+		client:           client,
+		validationClient: validationClient,
+		cfg:              cfg,
+		logger:           zap.L(),
+		db:               db,
+	}
 	_ = promauto.NewGaugeFunc(prometheus.GaugeOpts{
 		Name: "ssl_issue_last_duration",
 		Help: "Required time for last SSL Certificates",

@@ -8,6 +8,7 @@ import (
 	"github.com/hm-edu/pki-service/ent/certificate"
 	"github.com/hm-edu/pki-service/ent/domain"
 	"github.com/hm-edu/pki-service/ent/schema"
+	"github.com/hm-edu/pki-service/ent/smimecertificate"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -41,9 +42,34 @@ func init() {
 	domainDescFqdn := domainFields[0].Descriptor()
 	// domain.FqdnValidator is a validator for the "fqdn" field. It is called by the builders before save.
 	domain.FqdnValidator = domainDescFqdn.Validators[0].(func(string) error)
+	smimecertificateMixin := schema.SmimeCertificate{}.Mixin()
+	smimecertificateHooks := schema.SmimeCertificate{}.Hooks()
+	smimecertificate.Hooks[0] = smimecertificateHooks[0]
+	smimecertificateMixinFields0 := smimecertificateMixin[0].Fields()
+	_ = smimecertificateMixinFields0
+	smimecertificateFields := schema.SmimeCertificate{}.Fields()
+	_ = smimecertificateFields
+	// smimecertificateDescCreateTime is the schema descriptor for create_time field.
+	smimecertificateDescCreateTime := smimecertificateMixinFields0[0].Descriptor()
+	// smimecertificate.DefaultCreateTime holds the default value on creation for the create_time field.
+	smimecertificate.DefaultCreateTime = smimecertificateDescCreateTime.Default.(func() time.Time)
+	// smimecertificateDescUpdateTime is the schema descriptor for update_time field.
+	smimecertificateDescUpdateTime := smimecertificateMixinFields0[1].Descriptor()
+	// smimecertificate.DefaultUpdateTime holds the default value on creation for the update_time field.
+	smimecertificate.DefaultUpdateTime = smimecertificateDescUpdateTime.Default.(func() time.Time)
+	// smimecertificate.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	smimecertificate.UpdateDefaultUpdateTime = smimecertificateDescUpdateTime.UpdateDefault.(func() time.Time)
+	// smimecertificateDescEmail is the schema descriptor for email field.
+	smimecertificateDescEmail := smimecertificateFields[1].Descriptor()
+	// smimecertificate.EmailValidator is a validator for the "email" field. It is called by the builders before save.
+	smimecertificate.EmailValidator = smimecertificateDescEmail.Validators[0].(func(string) error)
+	// smimecertificateDescSerial is the schema descriptor for serial field.
+	smimecertificateDescSerial := smimecertificateFields[2].Descriptor()
+	// smimecertificate.SerialValidator is a validator for the "serial" field. It is called by the builders before save.
+	smimecertificate.SerialValidator = smimecertificateDescSerial.Validators[0].(func(string) error)
 }
 
 const (
-	Version = "v0.14.1"                                         // Version of ent codegen.
-	Sum     = "h1:fUERL506Pqr92EPHJqr8EYxbPioflJo6PudkrEA8a/s=" // Sum of ent codegen.
+	Version = "v0.14.2"                                         // Version of ent codegen.
+	Sum     = "h1:ywld/j2Rx4EmnIKs8eZ29cbFA1zpB+DA9TLL5l3rlq0=" // Sum of ent codegen.
 )

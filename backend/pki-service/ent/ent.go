@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/hm-edu/pki-service/ent/certificate"
 	"github.com/hm-edu/pki-service/ent/domain"
+	"github.com/hm-edu/pki-service/ent/smimecertificate"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -74,8 +75,9 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			certificate.Table: certificate.ValidColumn,
-			domain.Table:      domain.ValidColumn,
+			certificate.Table:      certificate.ValidColumn,
+			domain.Table:           domain.ValidColumn,
+			smimecertificate.Table: smimecertificate.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

@@ -54,3 +54,36 @@ func (Certificate) Hooks() []ent.Hook {
 		hook.Reject(ent.OpDelete | ent.OpDeleteOne),
 	}
 }
+
+// Certificate holds the schema definition for the Certificate entity.
+type SmimeCertificate struct {
+	ent.Schema
+}
+
+// Fields of the Certificate.
+func (SmimeCertificate) Fields() []ent.Field {
+	return []ent.Field{
+		field.String("transactionId").Optional(),
+		field.String("email").NotEmpty(),
+		field.String("serial").NotEmpty(),
+		field.Time("notBefore").Nillable().Optional(),
+		field.Time("notAfter").Optional(),
+		field.Time("created").Nillable().Optional(),
+		field.Enum("status").Values("Invalid", "Requested", "Approved", "Declined", "Applied", "Issued", "Revoked", "Expired", "Replaced", "Rejected", "Unmanaged", "SAApproved", "Init").Default("Invalid"),
+		field.String("ca").Nillable().Optional(),
+	}
+}
+
+// Mixin adds default time fields to this model.
+func (SmimeCertificate) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		mixin.Time{},
+	}
+}
+
+// Hooks of the certificate.
+func (SmimeCertificate) Hooks() []ent.Hook {
+	return []ent.Hook{
+		hook.Reject(ent.OpDelete | ent.OpDeleteOne),
+	}
+}
