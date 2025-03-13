@@ -259,5 +259,54 @@ func (s *smimeAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSm
 	logger := log.With(zap.String("reason", req.Reason))
 	logger.Info("Revoking smime certificate")
 
+	reasons, err := s.validationClient.GetRevocationReasons()
+	if err != nil {
+		return nil, status.Error(codes.Internal, "Error fetching revocation reasons")
+	}
+	var reason *models.RevocationReasonsResponse
+	for _, r := range reasons {
+		if r.Name == "4.9.1.1.1.1" {
+			reason = &r
+			break
+		}
+	}
+	if reason == nil {
+		return nil, status.Error(codes.Internal, "Error fetching revocation reasons")
+	}
+
+	switch req.Identifier.(type) {
+	case *pb.RevokeSmimeRequest_Email:
+		logger = logger.With(zap.String("email", req.GetEmail()))
+		logger.Info("Revoking smime certificate")
+		certs, err := s.db.SmimeCertificate.Query().Where(smimecertificate.EmailEQ(req.GetEmail())).All(ctx)
+		if err != nil {
+			return nil, status.Error(codes.Internal, "Error fetching certificates")
+		}
+		for _, cert := range certs {
+			err := s.validationClient.RevokeSmimeBulkCertificateEntry(cert.TransactionId, req.Reason, reason.Name)
+			if err != nil {
+				return nil, status.Error(codes.Internal, "Error revoking certificate")
+			}
+			s.db.SmimeCertificate.UpdateOneID(cert.ID).SetStatus(smimecertificate.StatusRevoked).Save(ctx)
+		}
+
+		logger.Info("Successfully revoked smime certificate")
+		return &emptypb.Empty{}, nil
+	case *pb.RevokeSmimeRequest_Serial:
+		certs, err := s.db.SmimeCertificate.Query().Where(smimecertificate.Serial(req.GetSerial())).All(ctx)
+		if err != nil {
+			return nil, status.Error(codes.Internal, "Error fetching certificates")
+		}
+		for _, cert := range certs {
+			err := s.validationClient.RevokeSmimeBulkCertificateEntry(cert.TransactionId, req.Reason, reason.Name)
+			if err != nil {
+				return nil, status.Error(codes.Internal, "Error revoking certificate")
+			}
+			s.db.SmimeCertificate.UpdateOneID(cert.ID).SetStatus(smimecertificate.StatusRevoked).Save(ctx)
+		}
+
+		return &emptypb.Empty{}, nil
+	}
+
 	return nil, status.Errorf(codes.Unimplemented, "method RevokeCertificate not implemented")
 }
