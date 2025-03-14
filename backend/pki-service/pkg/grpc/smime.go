@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/TheZeroSlave/zapsentry"
@@ -201,13 +202,20 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 		logger.Error("Error fetching organizations", zap.Error(err))
 		return nil, status.Error(codes.Internal, "Error fetching organizations")
 	}
-
-	cert, err := s.validationClient.RequestSmimeBulkCertificates(groups[0].OrganizationID, models.SmimeBulkRequest{
+	params := models.SmimeBulkRequest{
 		Email:        req.Email,
 		FriendlyName: req.CommonName,
 		CertType:     "email_only",
 		CSR:          req.Csr,
-	})
+	}
+	if ok, err := regexp.MatchString(`^[a-zA-Z \-]`, req.FirstName); ok && err == nil {
+		if ok, err := regexp.MatchString(`^[a-zA-Z \-]`, req.LastName); ok && err == nil {
+			params.GivenName = req.FirstName
+			params.Surname = req.LastName
+			params.CertType = "natural_legal_lcp"
+		}
+	}
+	cert, err := s.validationClient.RequestSmimeBulkCertificates(groups[0].OrganizationID, params)
 	if err != nil {
 		hub.CaptureException(err)
 		logger.Error("Error requesting certificate", zap.Error(err))
