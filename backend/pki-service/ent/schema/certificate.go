@@ -55,7 +55,7 @@ func (Certificate) Hooks() []ent.Hook {
 	}
 }
 
-// Certificate holds the schema definition for the Certificate entity.
+// SmimeCertificate holds the schema definition for the SmimeCertificate entity.
 type SmimeCertificate struct {
 	ent.Schema
 }

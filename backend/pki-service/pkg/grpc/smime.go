@@ -206,7 +206,7 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 		Email:        req.Email,
 		FriendlyName: req.CommonName,
 		CertType:     "email_only",
-		CSR:          string(req.Csr),
+		CSR:          req.Csr,
 	})
 	if err != nil {
 		hub.CaptureException(err)
@@ -227,7 +227,7 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 		return nil, status.Error(codes.Internal, "Error parsing certificate")
 	}
 
-	s.db.SmimeCertificate.Create().
+	_, err = s.db.SmimeCertificate.Create().
 		SetCreateTime(time.Now()).
 		SetEmail(req.Email).
 		SetSerial(certX509.SerialNumber.String()).
@@ -235,6 +235,12 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 		SetNotBefore(certX509.NotBefore).
 		SetStatus(smimecertificate.StatusIssued).
 		SetTransactionId(cert.TransactionID).Save(ctx)
+
+	if err != nil {
+		hub.CaptureException(err)
+		logger.Error("Error saving certificate", zap.Error(err))
+		return nil, status.Error(codes.Internal, "Error saving certificate")
+	}
 
 	cert.Certificate = fmt.Sprintf("%s\n%s\n%s",
 		cert.Certificate,
@@ -291,7 +297,11 @@ func (s *smimeAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSm
 			if err != nil {
 				return nil, status.Error(codes.Internal, "Error revoking certificate")
 			}
-			s.db.SmimeCertificate.UpdateOneID(cert.ID).SetStatus(smimecertificate.StatusRevoked).Save(ctx)
+			_, err = s.db.SmimeCertificate.UpdateOneID(cert.ID).SetStatus(smimecertificate.StatusRevoked).Save(ctx)
+			if err != nil {
+				return nil, status.Error(codes.Internal, "Error updating certificate")
+			}
+
 		}
 
 		logger.Info("Successfully revoked smime certificate")
@@ -310,7 +320,10 @@ func (s *smimeAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSm
 			if err != nil {
 				return nil, status.Error(codes.Internal, "Error revoking certificate")
 			}
-			s.db.SmimeCertificate.UpdateOneID(cert.ID).SetStatus(smimecertificate.StatusRevoked).Save(ctx)
+			_, err = s.db.SmimeCertificate.UpdateOneID(cert.ID).SetStatus(smimecertificate.StatusRevoked).Save(ctx)
+			if err != nil {
+				return nil, status.Error(codes.Internal, "Error updating certificate")
+			}
 		}
 
 		return &emptypb.Empty{}, nil
