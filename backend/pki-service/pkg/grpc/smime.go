@@ -11,6 +11,7 @@ import (
 
 	"github.com/TheZeroSlave/zapsentry"
 	"github.com/getsentry/sentry-go"
+	"github.com/go-co-op/gocron"
 	harica "github.com/hm-edu/harica/client"
 	"github.com/hm-edu/harica/models"
 	"github.com/hm-edu/pki-service/ent"
@@ -34,7 +35,7 @@ type smimeAPIServer struct {
 }
 
 func newSmimeAPIServer(cfg *cfg.PKIConfiguration, db *ent.Client) (*smimeAPIServer, error) {
-	validationClient, err := harica.NewClient(
+	haricaClient, err := harica.NewClient(
 		cfg.ValidationUser,
 		cfg.ValidationPassword,
 		cfg.ValidationTotpSeed,
@@ -44,13 +45,24 @@ func newSmimeAPIServer(cfg *cfg.PKIConfiguration, db *ent.Client) (*smimeAPIServ
 	if err != nil {
 		return nil, err
 	}
-	return &smimeAPIServer{
-			cfg:              cfg,
-			logger:           zap.L(),
-			validationClient: validationClient,
-			db:               db,
-		},
-		nil
+	instance := &smimeAPIServer{
+		cfg:              cfg,
+		logger:           zap.L(),
+		validationClient: haricaClient,
+		db:               db,
+	}
+	s := gocron.NewScheduler(time.UTC)
+	_, err = s.Every(1).Hour().Do(func() {
+		err = haricaClient.SessionRefresh(true)
+		if err != nil {
+			instance.logger.Error("Error refreshing validation client", zap.Error(err))
+		}
+	})
+	if err != nil {
+		return nil, err
+	}
+	s.StartAsync()
+	return instance, nil
 }
 
 const (
