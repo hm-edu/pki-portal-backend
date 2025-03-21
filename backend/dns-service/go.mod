@@ -7,7 +7,7 @@ toolchain go1.23.6
 require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/labstack/gommon v0.4.2
-	github.com/miekg/dns v1.1.63
+	github.com/miekg/dns v1.1.64
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.71.0
 )
@@ -16,7 +16,7 @@ require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/TheZeroSlave/zapsentry v1.23.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/getkin/kin-openapi v0.130.0 // indirect
+	github.com/getkin/kin-openapi v0.131.0 // indirect
 	github.com/getsentry/sentry-go v0.31.1 // indirect
 	github.com/getsentry/sentry-go/echo v0.31.1 // indirect
 	github.com/go-openapi/jsonpointer v0.21.1 // indirect

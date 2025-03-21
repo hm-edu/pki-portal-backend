@@ -6,9 +6,9 @@ toolchain go1.23.6
 
 require (
 	github.com/TheZeroSlave/zapsentry v1.23.0
-	github.com/getkin/kin-openapi v0.130.0
+	github.com/getkin/kin-openapi v0.131.0
 	github.com/getsentry/sentry-go/echo v0.31.1
-	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/lestrrat-go/jwx v1.2.30

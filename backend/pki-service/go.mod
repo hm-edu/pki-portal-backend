@@ -20,7 +20,7 @@ require (
 	github.com/getsentry/sentry-go/echo v0.31.1 // indirect
 	github.com/go-resty/resty/v2 v2.16.5 // indirect
 	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
-	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
+	github.com/golang-jwt/jwt/v5 v5.2.2 // indirect
 	github.com/oasdiff/yaml v0.0.0-20250309154309-f31be36b4037 // indirect
 	github.com/oasdiff/yaml3 v0.0.0-20250309153720-d2182401db90 // indirect
 	github.com/pquerna/otp v1.4.0 // indirect
@@ -38,7 +38,7 @@ require (
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/getkin/kin-openapi v0.130.0 // indirect
+	github.com/getkin/kin-openapi v0.131.0 // indirect
 	github.com/go-openapi/inflect v0.21.2 // indirect
 	github.com/go-openapi/jsonpointer v0.21.1 // indirect
 	github.com/go-openapi/jsonreference v0.21.0 // indirect
@@ -109,7 +109,7 @@ require (
 )
 
 require (
-	entgo.io/ent v0.14.3
+	entgo.io/ent v0.14.4
 	github.com/go-co-op/gocron v1.37.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect

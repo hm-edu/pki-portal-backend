@@ -16,7 +16,7 @@ require (
 	github.com/TheZeroSlave/zapsentry v1.23.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/getkin/kin-openapi v0.130.0 // indirect
+	github.com/getkin/kin-openapi v0.131.0 // indirect
 	github.com/getsentry/sentry-go v0.31.1 // indirect
 	github.com/getsentry/sentry-go/echo v0.31.1 // indirect
 	github.com/go-openapi/jsonpointer v0.21.1 // indirect
@@ -83,7 +83,7 @@ require (
 require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
-	github.com/miekg/dns v1.1.63
+	github.com/miekg/dns v1.1.64
 	github.com/spf13/pflag v1.0.6 // indirect
 )
 
