@@ -3,7 +3,7 @@ module github.com/hm-edu/domain-rest-interface
 go 1.23.0
 
 require (
-	github.com/getkin/kin-openapi v0.130.0
+	github.com/getkin/kin-openapi v0.131.0
 	github.com/hm-edu/portal-common v0.0.0-20241218063258-fbc57509a1e8
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.71.0
@@ -39,12 +39,12 @@ require (
 )
 
 require (
-	entgo.io/ent v0.14.3
+	entgo.io/ent v0.14.4
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/TheZeroSlave/zapsentry v1.23.0
 	github.com/getsentry/sentry-go v0.31.1
 	github.com/getsentry/sentry-go/echo v0.31.1
-	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776
 	github.com/jackc/pgx/v4 v4.18.3
