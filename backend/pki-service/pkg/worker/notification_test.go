@@ -38,9 +38,9 @@ func TestLoadCertificates(t *testing.T) {
 		t.Error(err)
 	}
 	if len(certs) != 2 {
-		t.Errorf("Expected 2 certificates, got %d", len(certs))
+		t.Errorf("expected 2 certificates, got %d", len(certs))
 	}
 	if len(certs[1].domains) != 2 {
-		t.Errorf("Expected 2 domains, got %d", len(certs[1].domains))
+		t.Errorf("expected 2 domains, got %d", len(certs[1].domains))
 	}
 }

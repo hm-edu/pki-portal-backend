@@ -18,7 +18,7 @@ func ParseCertificates(cert []byte) ([]*x509.Certificate, error) {
 			}
 			certs = append(certs, cert)
 		default:
-			return nil, errors.New("Unknown entry in cert chain")
+			return nil, errors.New("unknown entry in cert chain")
 		}
 	}
 	return certs, nil
