@@ -220,8 +220,8 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 		CertType:     "email_only",
 		CSR:          req.Csr,
 	}
-	if ok, err := regexp.MatchString(`^[a-zA-Z \-]`, req.FirstName); ok && err == nil {
-		if ok, err := regexp.MatchString(`^[a-zA-Z \-]`, req.LastName); ok && err == nil {
+	if ok, err := regexp.MatchString(`^[a-zA-Z \-]+$`, req.FirstName); ok && err == nil {
+		if ok, err := regexp.MatchString(`^[a-zA-Z \-]+$`, req.LastName); ok && err == nil {
 			params.GivenName = req.FirstName
 			params.Surname = req.LastName
 			params.CertType = "natural_legal_lcp"
