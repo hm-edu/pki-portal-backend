@@ -105,8 +105,8 @@ github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 h1:UH//fgunKIs4JdUbpDl1VZCDa
 github.com/grpc-ecosystem/go-grpc-middleware v1.4.0/go.mod h1:g5qyo/la0ALbONm6Vbp88Yd8NsDy6rZz+RcrMPxvld8=
 github.com/hashicorp/hcl/v2 v2.23.0 h1:Fphj1/gCylPxHutVSEOf2fBOh1VE4AuLV7+kbJf3qos=
 github.com/hashicorp/hcl/v2 v2.23.0/go.mod h1:62ZYHrXgPoX8xBnzl8QzbWq4dyDsDtfCRgIq1rbJEvA=
-github.com/hm-edu/harica v1.7.5 h1:0lC0mENilKL+Rk/jbVKS0TGs0z57ppkGl3yBvK811g8=
-github.com/hm-edu/harica v1.7.5/go.mod h1:6sC/sgiVtgxAbgAd6U7jv9fefDGUmg5UBEJmolT1V6A=
+github.com/hm-edu/harica v1.7.6 h1:C7jL72bsTnV/ikmkQ3YxrPRJrKXfFUa/uDw/1WKE4bo=
+github.com/hm-edu/harica v1.7.6/go.mod h1:K+Mryx+7y/X8IUxXNvAByuNQgEkHZYkJW8Am0Hd4I94=
 github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776 h1:5XAf2vZQ6aMyLeHqZg1V7Dn/y6fzN0cpbo/jk7dWJC0=
 github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776/go.mod h1:HoVbhQCLyk/XKtKjVahdTTkCa5KLYIi/HyzrExss1Zo=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=

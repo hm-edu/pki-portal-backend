@@ -8,7 +8,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/TheZeroSlave/zapsentry v1.23.0
 	github.com/getsentry/sentry-go v0.31.1
-	github.com/hm-edu/harica v1.7.5
+	github.com/hm-edu/harica v1.7.6
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
