@@ -120,7 +120,7 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string, logger *zap
 		}
 		if item.Permissions.CanDelete {
 			matchingCerts := helper.Where(certificates.Items, func(t *pb.SslCertificateDetails) bool {
-				return t.Status != "Revoked" && helper.Contains(t.SubjectAlternativeNames, item.FQDN)
+				return t.Status != "Revoked" && t.Status != "Expired" && helper.Contains(t.SubjectAlternativeNames, item.FQDN) && t.Ca != "sectigo"
 			})
 			if len(matchingCerts) > 0 {
 				for _, cert := range matchingCerts {
