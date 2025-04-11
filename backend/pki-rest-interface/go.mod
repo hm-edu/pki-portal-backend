@@ -6,7 +6,7 @@ toolchain go1.23.6
 
 require (
 	github.com/getkin/kin-openapi v0.131.0
-	github.com/getsentry/sentry-go/echo v0.31.1
+	github.com/getsentry/sentry-go/echo v0.32.0
 	github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776
 	github.com/hm-edu/portal-common v0.0.0-20241218063258-fbc57509a1e8
 	github.com/johnbellone/grpc-middleware-sentry v0.4.0
@@ -53,7 +53,7 @@ require (
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_golang v1.22.0 // indirect
-	github.com/prometheus/client_model v0.6.1 // indirect
+	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.63.0 // indirect
 	github.com/prometheus/procfs v0.16.0 // indirect
 	github.com/sagikazarmark/locafero v0.9.0 // indirect
@@ -77,7 +77,7 @@ require (
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/TheZeroSlave/zapsentry v1.23.0
-	github.com/getsentry/sentry-go v0.31.1
+	github.com/getsentry/sentry-go v0.32.0
 	github.com/go-openapi/jsonpointer v0.21.1 // indirect
 	github.com/go-openapi/jsonreference v0.21.0 // indirect
 	github.com/go-openapi/spec v0.21.0 // indirect
