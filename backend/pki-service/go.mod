@@ -7,7 +7,7 @@ toolchain go1.23.4
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/TheZeroSlave/zapsentry v1.23.0
-	github.com/getsentry/sentry-go v0.31.1
+	github.com/getsentry/sentry-go v0.32.0
 	github.com/hm-edu/harica v1.7.6
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/spf13/cobra v1.9.1
@@ -17,7 +17,7 @@ require (
 
 require (
 	github.com/boombuler/barcode v1.0.2 // indirect
-	github.com/getsentry/sentry-go/echo v0.31.1 // indirect
+	github.com/getsentry/sentry-go/echo v0.32.0 // indirect
 	github.com/go-resty/resty/v2 v2.16.5 // indirect
 	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.2 // indirect
@@ -67,7 +67,7 @@ require (
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/client_golang v1.22.0
-	github.com/prometheus/client_model v0.6.1 // indirect
+	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.63.0 // indirect
 	github.com/prometheus/procfs v0.16.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
