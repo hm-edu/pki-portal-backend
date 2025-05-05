@@ -34,6 +34,7 @@ func (s *HealthChecker) Watch(_ *grpc_health_v1.HealthCheckRequest, server grpc_
 	})
 }
 
+// List implements the List method of the HealthServer interface.
 func (s *HealthChecker) List(ctx context.Context, _ *grpc_health_v1.HealthListRequest) (*grpc_health_v1.HealthListResponse, error) {
 	return &grpc_health_v1.HealthListResponse{
 		Statuses: map[string]*grpc_health_v1.HealthCheckResponse{},
