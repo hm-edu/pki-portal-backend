@@ -7,7 +7,7 @@ require (
 	github.com/hm-edu/portal-common v0.0.0-20241218063258-fbc57509a1e8
 	github.com/smallstep/certificates v0.28.3
 	go.uber.org/zap v1.27.0
-	google.golang.org/grpc v1.72.1
+	google.golang.org/grpc v1.72.2
 )
 
 require (

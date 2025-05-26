@@ -17,7 +17,7 @@ require (
 	github.com/swaggo/echo-swagger v1.4.1
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.61.0
 	go.uber.org/zap v1.27.0
-	google.golang.org/grpc v1.72.1
+	google.golang.org/grpc v1.72.2
 )
 
 require (
