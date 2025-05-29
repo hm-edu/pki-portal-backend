@@ -90,12 +90,12 @@ require (
 	github.com/swaggo/files/v2 v2.0.2 // indirect
 	github.com/zclconf/go-cty-yaml v1.1.0 // indirect
 	golang.org/x/sync v0.14.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250519155744-55703ea1f237 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250528174236-200df99c418a // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 require (
-	ariga.io/atlas v0.33.1 // indirect
+	ariga.io/atlas v0.34.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.4.0 // indirect
 	github.com/go-openapi/inflect v0.21.2 // indirect
