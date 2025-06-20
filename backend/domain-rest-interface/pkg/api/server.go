@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/MicahParks/keyfunc/v3"
 	"github.com/TheZeroSlave/zapsentry"
 	"github.com/getkin/kin-openapi/openapi3"
 
@@ -24,7 +25,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
-	"github.com/lestrrat-go/jwx/jwk"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -70,25 +70,18 @@ func NewServer(logger *zap.Logger, config *commonApi.Config, store *store.Domain
 }
 
 func (api *Server) wireRoutesAndMiddleware() {
-	ar := jwk.NewAutoRefresh(context.Background())
 
 	api.app.HideBanner = true
 	api.app.HidePort = true
 
-	ar.Configure(api.config.JwksURI, jwk.WithMinRefreshInterval(15*time.Minute))
-	_, err := ar.Refresh(context.Background(), api.config.JwksURI)
-
+	jwks, err := keyfunc.NewDefault([]string{api.config.JwksURI})
 	if err != nil {
 		api.logger.Fatal("fetching jwk set failed", zap.Error(err))
 	}
 
 	config := auth.JWTConfig{
 		ParseTokenFunc: func(auth string, c echo.Context) (interface{}, error) {
-			ks, err := ar.Fetch(c.Request().Context(), api.config.JwksURI)
-			if err != nil {
-				return nil, err
-			}
-			return commonAuth.GetToken(auth, ks, api.config.Audience)
+			return commonAuth.GetToken(auth, jwks, api.config.Audience)
 		},
 	}
 
