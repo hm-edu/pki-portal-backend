@@ -404,7 +404,7 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 		}
 	}
 	if reason == nil {
-		return errorReturn(fmt.Errorf("Revocation reason not found"), logger)
+		return errorReturn(fmt.Errorf("revocation reason not found"), logger)
 	}
 	switch req.Identifier.(type) {
 	case *pb.RevokeSslRequest_Serial:
