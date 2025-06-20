@@ -100,7 +100,7 @@ require (
 	github.com/slackhq/nebula v1.9.5 // indirect
 	github.com/urfave/cli v1.22.17 // indirect
 	go.etcd.io/bbolt v1.4.1 // indirect
-	go.step.sm/crypto v0.66.0 // indirect
+	go.step.sm/crypto v0.67.0 // indirect
 	go.step.sm/linkedca v0.22.2 // indirect
 )
 
@@ -116,7 +116,7 @@ require (
 	github.com/fxamacker/cbor/v2 v2.8.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.9 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
-	github.com/go-chi/chi/v5 v5.2.1 // indirect
+	github.com/go-chi/chi/v5 v5.2.2 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.4 // indirect
 	github.com/go-jose/go-jose/v4 v4.1.0 // indirect
 	github.com/go-openapi/inflect v0.21.2 // indirect
