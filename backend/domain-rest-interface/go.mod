@@ -1,6 +1,8 @@
 module github.com/hm-edu/domain-rest-interface
 
-go 1.23.0
+go 1.24
+
+toolchain go1.24.4
 
 require (
 	github.com/getkin/kin-openapi v0.132.0
@@ -66,7 +68,7 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/gabriel-vasile/mimetype v1.4.9 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
-	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
+	github.com/go-viper/mapstructure/v2 v2.3.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.14.3 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
@@ -95,7 +97,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.34.0 // indirect
+	ariga.io/atlas v0.35.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.4.0 // indirect
 	github.com/go-openapi/inflect v0.21.2 // indirect

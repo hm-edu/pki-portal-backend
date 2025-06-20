@@ -1,14 +1,14 @@
 module github.com/hm-edu/pki-service
 
-go 1.23.3
+go 1.24
 
-toolchain go1.23.4
+toolchain go1.24.4
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/TheZeroSlave/zapsentry v1.23.0
 	github.com/getsentry/sentry-go v0.33.0
-	github.com/hm-edu/harica v1.7.8
+	github.com/hm-edu/harica v1.9.0
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
@@ -19,7 +19,7 @@ require (
 	github.com/boombuler/barcode v1.0.2 // indirect
 	github.com/getsentry/sentry-go/echo v0.33.0 // indirect
 	github.com/go-resty/resty/v2 v2.16.5 // indirect
-	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
+	github.com/go-viper/mapstructure/v2 v2.3.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.2 // indirect
 	github.com/oasdiff/yaml v0.0.0-20250309154309-f31be36b4037 // indirect
 	github.com/oasdiff/yaml3 v0.0.0-20250309153720-d2182401db90 // indirect
@@ -30,7 +30,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.34.0 // indirect
+	ariga.io/atlas v0.35.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
