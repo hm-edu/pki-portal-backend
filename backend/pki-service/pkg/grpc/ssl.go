@@ -87,7 +87,7 @@ func (s *sslAPIServer) handleError(msg string, err error, logger *zap.Logger, hu
 	hub.AddBreadcrumb(&sentry.Breadcrumb{Message: msg, Category: "error", Level: sentry.LevelError}, nil)
 	hub.CaptureException(err)
 	logger.Error(msg, zap.Error(err))
-	return nil, status.Errorf(codes.Internal, msg)
+	return nil, status.Error(codes.Internal, msg)
 }
 
 type sslAPIServer struct {
