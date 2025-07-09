@@ -1,4 +1,4 @@
-FROM golang:1.24.4-bookworm AS builder
+FROM golang:1.24.5-bookworm AS builder
 
 ARG SERVICE
 RUN apt update && apt install -y ca-certificates wget git && update-ca-certificates
