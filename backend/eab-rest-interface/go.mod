@@ -97,7 +97,7 @@ require (
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
-	github.com/slackhq/nebula v1.9.5 // indirect
+	github.com/slackhq/nebula v1.9.6 // indirect
 	github.com/urfave/cli v1.22.17 // indirect
 	go.etcd.io/bbolt v1.4.2 // indirect
 	go.step.sm/crypto v0.67.0 // indirect
@@ -160,7 +160,7 @@ require (
 	github.com/zclconf/go-cty v1.16.3 // indirect
 	github.com/zclconf/go-cty-yaml v1.1.0 // indirect
 	golang.org/x/crypto v0.40.0 // indirect
-	golang.org/x/exp v0.0.0-20250717185816-542afb5b7346 // indirect
+	golang.org/x/exp v0.0.0-20250718183923-645b1fa84792 // indirect
 	golang.org/x/mod v0.26.0 // indirect
 	golang.org/x/oauth2 v0.30.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect
