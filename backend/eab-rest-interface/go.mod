@@ -97,7 +97,7 @@ require (
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
-	github.com/slackhq/nebula v1.9.5 // indirect
+	github.com/slackhq/nebula v1.9.6 // indirect
 	github.com/urfave/cli v1.22.17 // indirect
 	go.etcd.io/bbolt v1.4.2 // indirect
 	go.step.sm/crypto v0.67.0 // indirect
@@ -105,7 +105,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.35.0 // indirect
+	ariga.io/atlas v0.36.0 // indirect
 	dario.cat/mergo v1.0.2 // indirect
 	github.com/MicahParks/jwkset v0.9.6 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
@@ -160,12 +160,12 @@ require (
 	github.com/zclconf/go-cty v1.16.3 // indirect
 	github.com/zclconf/go-cty-yaml v1.1.0 // indirect
 	golang.org/x/crypto v0.40.0 // indirect
-	golang.org/x/exp v0.0.0-20250717185816-542afb5b7346 // indirect
+	golang.org/x/exp v0.0.0-20250718183923-645b1fa84792 // indirect
 	golang.org/x/mod v0.26.0 // indirect
 	golang.org/x/oauth2 v0.30.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect
 	golang.org/x/time v0.12.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250715232539-7130f93afb79 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250721164621-a45f3dfb1074 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
