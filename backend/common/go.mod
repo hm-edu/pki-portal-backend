@@ -81,5 +81,5 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	go.uber.org/zap v1.27.0
 	golang.org/x/sys v0.34.0 // indirect
-	google.golang.org/grpc v1.73.0
+	google.golang.org/grpc v1.74.2
 )

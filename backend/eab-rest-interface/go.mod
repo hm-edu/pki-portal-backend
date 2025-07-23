@@ -9,7 +9,7 @@ require (
 	github.com/hm-edu/portal-common v0.0.0-20241218063258-fbc57509a1e8
 	github.com/smallstep/certificates v0.28.4
 	go.uber.org/zap v1.27.0
-	google.golang.org/grpc v1.73.0
+	google.golang.org/grpc v1.74.2
 )
 
 require (
@@ -105,7 +105,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.36.0 // indirect
+	ariga.io/atlas v0.36.1 // indirect
 	dario.cat/mergo v1.0.2 // indirect
 	github.com/MicahParks/jwkset v0.9.6 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect

@@ -16,7 +16,7 @@ require (
 )
 
 require (
-	github.com/boombuler/barcode v1.0.2 // indirect
+	github.com/boombuler/barcode v1.1.0 // indirect
 	github.com/getsentry/sentry-go/echo v0.34.1 // indirect
 	github.com/go-resty/resty/v2 v2.16.5 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
@@ -30,7 +30,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.36.0 // indirect
+	ariga.io/atlas v0.36.1 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
@@ -104,7 +104,7 @@ require (
 	golang.org/x/net v0.42.0 // indirect
 	golang.org/x/sys v0.34.0 // indirect
 	golang.org/x/text v0.27.0 // indirect
-	google.golang.org/grpc v1.73.0
+	google.golang.org/grpc v1.74.2
 )
 
 require (
