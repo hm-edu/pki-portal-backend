@@ -8,7 +8,7 @@ require (
 	github.com/getkin/kin-openapi v0.132.0
 	github.com/hm-edu/portal-common v0.0.0-20250610072651-42b57b6db465
 	go.uber.org/zap v1.27.0
-	google.golang.org/grpc v1.73.0
+	google.golang.org/grpc v1.74.2
 )
 
 require (
@@ -98,7 +98,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.36.0 // indirect
+	ariga.io/atlas v0.36.1 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/go-openapi/inflect v0.21.2 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
