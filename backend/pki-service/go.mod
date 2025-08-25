@@ -1,8 +1,8 @@
 module github.com/hm-edu/pki-service
 
-go 1.24
+go 1.24.0
 
-toolchain go1.24.4
+toolchain go1.24.6
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
@@ -26,6 +26,7 @@ require (
 	github.com/pquerna/otp v1.5.0 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/afero v1.14.0 // indirect
+	github.com/woodsbury/decimal128 v1.4.0 // indirect
 	github.com/zclconf/go-cty-yaml v1.1.0 // indirect
 )
 
@@ -38,7 +39,7 @@ require (
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/getkin/kin-openapi v0.132.0 // indirect
+	github.com/getkin/kin-openapi v0.133.0 // indirect
 	github.com/go-openapi/inflect v0.21.3 // indirect
 	github.com/go-openapi/jsonpointer v0.21.2 // indirect
 	github.com/go-openapi/jsonreference v0.21.0 // indirect
@@ -84,7 +85,7 @@ require (
 	golang.org/x/sync v0.16.0 // indirect
 	golang.org/x/time v0.12.0 // indirect
 	golang.org/x/tools v0.36.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250818200422-3122310a409c // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250825161204-c5933d9347a5 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
