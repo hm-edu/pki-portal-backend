@@ -8,7 +8,7 @@ require (
 	github.com/getkin/kin-openapi v0.133.0
 	github.com/hm-edu/portal-common v0.0.0-20250610072651-42b57b6db465
 	go.uber.org/zap v1.27.0
-	google.golang.org/grpc v1.75.0
+	google.golang.org/grpc v1.75.1
 )
 
 require (
@@ -35,7 +35,7 @@ require (
 	golang.org/x/net v0.44.0
 	golang.org/x/sys v0.36.0 // indirect
 	golang.org/x/text v0.29.0 // indirect
-	golang.org/x/tools v0.36.0 // indirect
+	golang.org/x/tools v0.37.0 // indirect
 	google.golang.org/protobuf v1.36.9
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
@@ -45,8 +45,8 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/MicahParks/keyfunc/v3 v3.6.1
 	github.com/TheZeroSlave/zapsentry v1.23.0
-	github.com/getsentry/sentry-go v0.35.1
-	github.com/getsentry/sentry-go/echo v0.35.1
+	github.com/getsentry/sentry-go v0.35.2
+	github.com/getsentry/sentry-go/echo v0.35.2
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776
@@ -104,7 +104,7 @@ require (
 	github.com/swaggo/files/v2 v2.0.2 // indirect
 	github.com/woodsbury/decimal128 v1.4.0 // indirect
 	github.com/zclconf/go-cty-yaml v1.1.0 // indirect
-	go.yaml.in/yaml/v2 v2.4.2 // indirect
+	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/sync v0.17.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250908214217-97024824d090 // indirect
