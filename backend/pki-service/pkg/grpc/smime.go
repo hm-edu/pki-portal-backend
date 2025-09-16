@@ -208,6 +208,12 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 		logger.Warn("Invalid key length", zap.String("key_length", fmt.Sprintf("%d", size)))
 		return nil, status.Error(codes.InvalidArgument, "Invalid CSR")
 	}
+	// Ensure we have a valid session
+	err = s.validationClient.SessionRefresh(true)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "Error refreshing validation client session")
+	}
+	// Fetch the available groups and use the first one (should be the only one)
 	groups, err := s.validationClient.GetOrganizationsBulk()
 	if err != nil {
 		hub.CaptureException(err)

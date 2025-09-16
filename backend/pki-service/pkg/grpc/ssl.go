@@ -294,6 +294,18 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		return s.handleError("Error while storing certificate", err, logger, hub)
 	}
 
+	// Ensure we have a valid session
+	err = s.client.SessionRefresh(true)
+	if err != nil {
+		return s.handleError("Error while refreshing session", err, logger, hub)
+	}
+	// Ensure we have a valid session
+	err = s.validationClient.SessionRefresh(true)
+	if err != nil {
+		return s.handleError("Error while refreshing session", err, logger, hub)
+	}
+
+	// Check which organization the domains belong to
 	orgs, err := s.client.CheckMatchingOrganization(sans)
 	if err != nil || len(orgs) == 0 {
 		return s.handleError("Error while checking organization", err, logger, hub)
