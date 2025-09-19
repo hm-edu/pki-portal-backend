@@ -1,8 +1,8 @@
 module github.com/hm-edu/domain-rest-interface
 
-go 1.24.0
+go 1.24.6
 
-toolchain go1.24.6
+toolchain go1.24.7
 
 require (
 	github.com/getkin/kin-openapi v0.133.0
@@ -53,7 +53,7 @@ require (
 	github.com/jackc/pgx/v4 v4.18.3
 	github.com/johnbellone/grpc-middleware-sentry v0.4.0
 	github.com/labstack/echo/v4 v4.13.4
-	github.com/mattn/go-sqlite3 v1.14.17
+	github.com/mattn/go-sqlite3 v1.14.28
 	github.com/spf13/cobra v1.10.1
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.11.1
@@ -99,8 +99,7 @@ require (
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.66.1 // indirect
 	github.com/prometheus/procfs v0.17.0 // indirect
-	github.com/sagikazarmark/locafero v0.11.0 // indirect
-	github.com/sourcegraph/conc v0.3.1-0.20240121214520-5f936abd7ae8 // indirect
+	github.com/sagikazarmark/locafero v0.12.0 // indirect
 	github.com/swaggo/files/v2 v2.0.2 // indirect
 	github.com/woodsbury/decimal128 v1.4.0 // indirect
 	github.com/zclconf/go-cty-yaml v1.1.0 // indirect
@@ -112,7 +111,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.36.1 // indirect
+	ariga.io/atlas v0.37.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/go-openapi/inflect v0.21.3 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
