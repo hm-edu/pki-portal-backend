@@ -1,8 +1,8 @@
 module github.com/hm-edu/eab-rest-interface
 
-go 1.24.0
+go 1.24.6
 
-toolchain go1.24.6
+toolchain go1.24.7
 
 require (
 	github.com/getkin/kin-openapi v0.133.0
@@ -105,7 +105,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.36.1 // indirect
+	ariga.io/atlas v0.37.0 // indirect
 	dario.cat/mergo v1.0.2 // indirect
 	github.com/MicahParks/jwkset v0.10.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
@@ -158,12 +158,11 @@ require (
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rs/xid v1.6.0 // indirect
-	github.com/sagikazarmark/locafero v0.11.0 // indirect
+	github.com/sagikazarmark/locafero v0.12.0 // indirect
 	github.com/smallstep/cli-utils v0.12.1 // indirect
 	github.com/smallstep/go-attestation v0.4.4-0.20241119153605-2306d5b464ca // indirect
 	github.com/smallstep/pkcs7 v0.2.1 // indirect
 	github.com/smallstep/scep v0.0.0-20250318231241-a25cabb69492 // indirect
-	github.com/sourcegraph/conc v0.3.1-0.20240121214520-5f936abd7ae8 // indirect
 	github.com/spf13/viper v1.21.0 // indirect
 	github.com/swaggo/files/v2 v2.0.2 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
