@@ -34,21 +34,16 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.10 // indirect
-	github.com/go-openapi/jsonpointer v0.22.0 // indirect
-	github.com/go-openapi/jsonreference v0.21.1 // indirect
-	github.com/go-openapi/spec v0.21.0 // indirect
-	github.com/go-openapi/swag v0.25.0 // indirect
-	github.com/go-openapi/swag/cmdutils v0.25.0 // indirect
-	github.com/go-openapi/swag/conv v0.25.0 // indirect
-	github.com/go-openapi/swag/fileutils v0.25.0 // indirect
-	github.com/go-openapi/swag/jsonname v0.25.0 // indirect
-	github.com/go-openapi/swag/jsonutils v0.25.0 // indirect
-	github.com/go-openapi/swag/loading v0.25.0 // indirect
-	github.com/go-openapi/swag/mangling v0.25.0 // indirect
-	github.com/go-openapi/swag/netutils v0.25.0 // indirect
-	github.com/go-openapi/swag/stringutils v0.25.0 // indirect
-	github.com/go-openapi/swag/typeutils v0.25.0 // indirect
-	github.com/go-openapi/swag/yamlutils v0.25.0 // indirect
+	github.com/go-openapi/jsonpointer v0.22.1 // indirect
+	github.com/go-openapi/jsonreference v0.21.2 // indirect
+	github.com/go-openapi/spec v0.22.0 // indirect
+	github.com/go-openapi/swag/conv v0.25.1 // indirect
+	github.com/go-openapi/swag/jsonname v0.25.1 // indirect
+	github.com/go-openapi/swag/jsonutils v0.25.1 // indirect
+	github.com/go-openapi/swag/loading v0.25.1 // indirect
+	github.com/go-openapi/swag/stringutils v0.25.1 // indirect
+	github.com/go-openapi/swag/typeutils v0.25.1 // indirect
+	github.com/go-openapi/swag/yamlutils v0.25.1 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
@@ -83,7 +78,7 @@ require (
 	golang.org/x/text v0.29.0 // indirect
 	golang.org/x/time v0.13.0 // indirect
 	golang.org/x/tools v0.37.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250922171735-9219d122eba9 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250929231259-57b25ae835d4 // indirect
 	google.golang.org/protobuf v1.36.9 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
