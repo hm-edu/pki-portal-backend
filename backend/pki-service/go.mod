@@ -92,7 +92,7 @@ require (
 	golang.org/x/sync v0.17.0 // indirect
 	golang.org/x/time v0.13.0 // indirect
 	golang.org/x/tools v0.37.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250929231259-57b25ae835d4 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20251002232023-7c0ddcbb5797 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
@@ -100,7 +100,7 @@ require github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776
 
 require (
 	go.uber.org/multierr v1.11.0 // indirect
-	google.golang.org/protobuf v1.36.9
+	google.golang.org/protobuf v1.36.10
 )
 
 require (
