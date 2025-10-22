@@ -8,7 +8,7 @@ require (
 	github.com/MicahParks/keyfunc/v3 v3.7.0
 	github.com/TheZeroSlave/zapsentry v1.23.0
 	github.com/getkin/kin-openapi v0.133.0
-	github.com/getsentry/sentry-go/echo v0.36.0
+	github.com/getsentry/sentry-go/echo v0.36.1
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.13.4
@@ -84,7 +84,7 @@ require (
 )
 
 require (
-	github.com/getsentry/sentry-go v0.36.0 // indirect
+	github.com/getsentry/sentry-go v0.36.1 // indirect
 	github.com/go-playground/validator/v10 v10.28.0
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	go.uber.org/zap v1.27.0
