@@ -166,7 +166,7 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 	logger.Info("Issuing new smime certificate")
 	block, _ := pem.Decode([]byte(req.Csr))
 
-	client, err := harica.NewClient(s.cfg.ValidationUser, s.cfg.ValidationPassword, s.cfg.TotpSeed)
+	client, err := harica.NewClient(s.cfg.ValidationUser, s.cfg.ValidationPassword, s.cfg.ValidationTotpSeed)
 	if err != nil {
 		hub.CaptureException(err)
 		logger.Error("Error creating validation client", zap.Error(err))
