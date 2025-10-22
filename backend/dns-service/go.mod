@@ -17,8 +17,8 @@ require (
 	github.com/TheZeroSlave/zapsentry v1.23.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/getkin/kin-openapi v0.133.0 // indirect
-	github.com/getsentry/sentry-go v0.36.0 // indirect
-	github.com/getsentry/sentry-go/echo v0.36.0 // indirect
+	github.com/getsentry/sentry-go v0.36.1 // indirect
+	github.com/getsentry/sentry-go/echo v0.36.1 // indirect
 	github.com/go-openapi/jsonpointer v0.22.1 // indirect
 	github.com/go-openapi/jsonreference v0.21.2 // indirect
 	github.com/go-openapi/spec v0.22.0 // indirect

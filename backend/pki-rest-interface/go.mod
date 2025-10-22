@@ -7,7 +7,7 @@ toolchain go1.24.6
 require (
 	github.com/MicahParks/keyfunc/v3 v3.7.0
 	github.com/getkin/kin-openapi v0.133.0
-	github.com/getsentry/sentry-go/echo v0.36.0
+	github.com/getsentry/sentry-go/echo v0.36.1
 	github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776
 	github.com/hm-edu/portal-common v0.0.0-20250610072651-42b57b6db465
 	github.com/johnbellone/grpc-middleware-sentry v0.4.0
@@ -80,7 +80,7 @@ require (
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/TheZeroSlave/zapsentry v1.23.0
-	github.com/getsentry/sentry-go v0.36.0
+	github.com/getsentry/sentry-go v0.36.1
 	github.com/go-openapi/jsonpointer v0.22.1 // indirect
 	github.com/go-openapi/jsonreference v0.21.2 // indirect
 	github.com/go-openapi/spec v0.22.0 // indirect
