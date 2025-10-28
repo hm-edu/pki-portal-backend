@@ -17,8 +17,8 @@ require (
 	github.com/TheZeroSlave/zapsentry v1.23.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/getkin/kin-openapi v0.133.0 // indirect
-	github.com/getsentry/sentry-go v0.36.1 // indirect
-	github.com/getsentry/sentry-go/echo v0.36.1 // indirect
+	github.com/getsentry/sentry-go v0.36.2 // indirect
+	github.com/getsentry/sentry-go/echo v0.36.2 // indirect
 	github.com/go-openapi/jsonpointer v0.22.1 // indirect
 	github.com/go-openapi/jsonreference v0.21.2 // indirect
 	github.com/go-openapi/spec v0.22.0 // indirect
@@ -41,7 +41,7 @@ require (
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/prometheus/client_golang v1.23.2 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
-	github.com/prometheus/common v0.67.1 // indirect
+	github.com/prometheus/common v0.67.2 // indirect
 	github.com/prometheus/procfs v0.19.1 // indirect
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
 	github.com/swaggo/swag v1.16.6 // indirect

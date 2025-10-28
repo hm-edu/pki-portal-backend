@@ -8,7 +8,7 @@ require (
 	github.com/MicahParks/keyfunc/v3 v3.7.0
 	github.com/TheZeroSlave/zapsentry v1.23.0
 	github.com/getkin/kin-openapi v0.133.0
-	github.com/getsentry/sentry-go/echo v0.36.1
+	github.com/getsentry/sentry-go/echo v0.36.2
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.13.4
@@ -59,7 +59,7 @@ require (
 	github.com/oasdiff/yaml3 v0.0.0-20250309153720-d2182401db90 // indirect
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
-	github.com/prometheus/common v0.67.1 // indirect
+	github.com/prometheus/common v0.67.2 // indirect
 	github.com/prometheus/procfs v0.19.1 // indirect
 	github.com/rogpeppe/go-internal v1.13.1 // indirect
 	github.com/spf13/afero v1.15.0 // indirect
@@ -84,7 +84,7 @@ require (
 )
 
 require (
-	github.com/getsentry/sentry-go v0.36.1 // indirect
+	github.com/getsentry/sentry-go v0.36.2 // indirect
 	github.com/go-playground/validator/v10 v10.28.0
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	go.uber.org/zap v1.27.0
