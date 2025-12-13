@@ -7,7 +7,7 @@ toolchain go1.24.6
 require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/labstack/gommon v0.4.2
-	github.com/miekg/dns v1.1.68
+	github.com/miekg/dns v1.1.69
 	go.uber.org/zap v1.27.1
 	google.golang.org/grpc v1.77.0
 )
@@ -31,7 +31,7 @@ require (
 	github.com/go-openapi/swag/yamlutils v0.25.4 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
-	github.com/labstack/echo/v4 v4.13.4 // indirect
+	github.com/labstack/echo/v4 v4.14.0 // indirect
 	github.com/mailru/easyjson v0.9.1 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
@@ -51,7 +51,7 @@ require (
 	golang.org/x/crypto v0.46.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20251213004720-97cd9d5aeac2 // indirect
 )
 
 require (
@@ -70,7 +70,7 @@ require (
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/text v0.32.0 // indirect
-	google.golang.org/protobuf v1.36.10
+	google.golang.org/protobuf v1.36.11
 )
 
 require (
