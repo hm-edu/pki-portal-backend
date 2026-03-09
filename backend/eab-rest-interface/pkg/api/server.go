@@ -128,7 +128,7 @@ func (api *Server) wireRoutesAndMiddleware() {
 	})
 
 	api.app.GET("/docs/*", echoSwagger.EchoWrapHandler(func(c *echoSwagger.Config) {
-		c.URLs = []string{"/docs/spec.json"}
+		c.URL = "/docs/spec.json"
 	}))
 	api.app.GET("/healthz", api.healthzHandler)
 	api.app.GET("/readyz", api.readyzHandler)
