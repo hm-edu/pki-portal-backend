@@ -14,7 +14,6 @@ import (
 	"github.com/hm-edu/eab-rest-interface/pkg/api/docs"
 	"github.com/hm-edu/eab-rest-interface/pkg/api/eab"
 	commonApi "github.com/hm-edu/portal-common/api"
-	"github.com/hm-edu/portal-common/auth"
 	commonAuth "github.com/hm-edu/portal-common/auth"
 	"github.com/hm-edu/portal-common/logging"
 	"github.com/labstack/echo/v4"
@@ -61,26 +60,26 @@ func NewServer(logger *zap.Logger, config *commonApi.Config, provisionerID strin
 	return &Server{app: echo.New(), logger: logger, config: config, provisionerID: provisionerID}
 }
 
-func (api *Server) wireRoutesAndMiddleware() {
-	api.app.HideBanner = true
-	api.app.HidePort = true
+func (server *Server) wireRoutesAndMiddleware() {
+	server.app.HideBanner = true
+	server.app.HidePort = true
 
-	jwks, err := keyfunc.NewDefault([]string{api.config.JwksURI})
+	jwks, err := keyfunc.NewDefault([]string{server.config.JwksURI})
 	if err != nil {
-		api.logger.Fatal("fetching jwk set failed", zap.Error(err))
+		server.logger.Fatal("fetching jwk set failed", zap.Error(err))
 	}
 
-	config := auth.JWTConfig{
+	config := commonAuth.JWTConfig{
 		ParseTokenFunc: func(auth string, _ echo.Context) (interface{}, error) {
-			return commonAuth.GetToken(auth, jwks, api.config.Audience)
+			return commonAuth.GetToken(auth, jwks, server.config.Audience)
 		},
 	}
 
-	jwtMiddleware := auth.JWTWithConfig(config)
+	jwtMiddleware := commonAuth.JWTWithConfig(config)
 
-	if api.config.SentryDSN != "" {
+	if server.config.SentryDSN != "" {
 		if client, err := sentry.NewClient(sentry.ClientOptions{
-			Dsn: api.config.SentryDSN,
+			Dsn: server.config.SentryDSN,
 			// Set TracesSampleRate to 1.0 to capture 100%
 			// of transactions for performance monitoring.
 			// We recommend adjusting this value in production,
@@ -99,24 +98,24 @@ func (api *Server) wireRoutesAndMiddleware() {
 			if err != nil {
 				log.Error("Sentry initialization failed", zap.Error(err))
 			}
-			api.logger = zapsentry.AttachCoreToLogger(core, api.logger)
-			api.app.Use(sentryecho.New(sentryecho.Options{}))
+			server.logger = zapsentry.AttachCoreToLogger(core, server.logger)
+			server.app.Use(sentryecho.New(sentryecho.Options{}))
 		}
 	}
-	api.app.Use(middleware.RequestID())
-	api.app.Use(logging.ZapLogger(api.logger, logging.WithSkipper(func(c echo.Context) bool {
+	server.app.Use(middleware.RequestID())
+	server.app.Use(logging.ZapLogger(server.logger, logging.WithSkipper(func(c echo.Context) bool {
 		return strings.Contains(c.Path(), "/docs") || strings.Contains(c.Path(), "/healthz")
 	})))
-	api.app.Use(middleware.Recover())
-	if len(api.config.CorsAllowedOrigins) != 0 {
-		api.app.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-			AllowOrigins:     api.config.CorsAllowedOrigins,
+	server.app.Use(middleware.Recover())
+	if len(server.config.CorsAllowedOrigins) != 0 {
+		server.app.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins:     server.config.CorsAllowedOrigins,
 			AllowHeaders:     []string{echo.HeaderContentType, echo.HeaderAuthorization, "sentry-trace", "baggage"},
 			AllowCredentials: false,
 			AllowMethods:     []string{http.MethodGet, http.MethodOptions, http.MethodPost, http.MethodDelete},
 		}))
 	}
-	api.app.GET("/docs/spec.json", func(c echo.Context) error {
+	server.app.GET("/docs/spec.json", func(c echo.Context) error {
 		if openAPISpec == nil {
 			spec, err := commonApi.ToOpenAPI3(docs.SwaggerInfo)
 			if err != nil {
@@ -127,18 +126,18 @@ func (api *Server) wireRoutesAndMiddleware() {
 		return c.JSON(http.StatusOK, openAPISpec)
 	})
 
-	api.app.GET("/docs/*", echoSwagger.EchoWrapHandler(func(c *echoSwagger.Config) {
+	server.app.GET("/docs/*", echoSwagger.EchoWrapHandler(func(c *echoSwagger.Config) {
 		c.URL = "/docs/spec.json"
 	}))
-	api.app.GET("/healthz", api.healthzHandler)
-	api.app.GET("/readyz", api.readyzHandler)
-	api.app.GET("/whoami", api.whoamiHandler, jwtMiddleware)
+	server.app.GET("/healthz", server.healthzHandler)
+	server.app.GET("/readyz", server.readyzHandler)
+	server.app.GET("/whoami", server.whoamiHandler, jwtMiddleware)
 
-	v1 := api.app.Group("/eab")
+	v1 := server.app.Group("/eab")
 	{
-		h := eab.NewHandler(api.provisionerID)
+		h := eab.NewHandler(server.provisionerID)
 		v1.Use(jwtMiddleware)
-		v1.Use(auth.HasScope("EAB"))
+		v1.Use(commonAuth.HasScope("EAB"))
 		v1.GET("/", h.GetExternalAccountKeys)
 		v1.POST("/", h.CreateNewKey)
 		v1.DELETE("/:id", h.DeleteKey)
@@ -147,23 +146,23 @@ func (api *Server) wireRoutesAndMiddleware() {
 }
 
 // ListenAndServe starts the http server and waits for the channel to stop the server.
-func (api *Server) ListenAndServe(stopCh <-chan struct{}) {
+func (server *Server) ListenAndServe(stopCh <-chan struct{}) {
 
-	api.wireRoutesAndMiddleware()
+	server.wireRoutesAndMiddleware()
 	go func() {
-		addr := api.config.Host + ":" + api.config.Port
-		api.logger.Info("Starting HTTP Server.", zap.String("addr", addr))
-		if err := api.app.Start(addr); err != http.ErrServerClosed {
-			api.logger.Fatal("HTTP server crashed", zap.Error(err))
+		addr := server.config.Host + ":" + server.config.Port
+		server.logger.Info("Starting HTTP Server.", zap.String("addr", addr))
+		if err := server.app.Start(addr); err != http.ErrServerClosed {
+			server.logger.Fatal("HTTP server crashed", zap.Error(err))
 		}
 	}()
 
 	ready = 1
 
 	<-stopCh
-	api.logger.Info("Stopping HTTP Server.")
-	err := api.app.Shutdown(context.Background())
+	server.logger.Info("Stopping HTTP Server.")
+	err := server.app.Shutdown(context.Background())
 	if err != nil {
-		api.logger.Fatal("Stopping http server failed", zap.Error(err))
+		server.logger.Fatal("Stopping http server failed", zap.Error(err))
 	}
 }
