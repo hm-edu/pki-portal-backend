@@ -64,10 +64,7 @@ func (h *Handler) ListDomains(c echo.Context) error {
 
 func (h *Handler) enumerateDomains(ctx context.Context, user string, logger *zap.Logger) ([]*model.Domain, error) {
 
-	admin := false
-	if helper.Contains(h.admins, user) {
-		admin = true
-	}
+	admin := helper.Contains(h.admins, user)
 
 	domains, err := h.domainStore.ListDomains(ctx, user, false, admin)
 	if err != nil {

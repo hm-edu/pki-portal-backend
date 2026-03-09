@@ -24,8 +24,6 @@ import (
 	"github.com/hm-edu/pki-rest-interface/pkg/cfg"
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/api"
-	commonApi "github.com/hm-edu/portal-common/api"
-	"github.com/hm-edu/portal-common/auth"
 	commonAuth "github.com/hm-edu/portal-common/auth"
 	"github.com/hm-edu/portal-common/logging"
 	grpc_sentry "github.com/johnbellone/grpc-middleware-sentry"
@@ -61,35 +59,35 @@ var (
 type Server struct {
 	app        *echo.Echo
 	logger     *zap.Logger
-	config     *commonApi.Config
+	config     *api.Config
 	handlerCfg *cfg.HandlerConfiguration
 }
 
 // NewServer creates a new server
-func NewServer(logger *zap.Logger, config *commonApi.Config, handlerCfg *cfg.HandlerConfiguration) *Server {
+func NewServer(logger *zap.Logger, config *api.Config, handlerCfg *cfg.HandlerConfiguration) *Server {
 	return &Server{app: echo.New(), logger: logger, config: config, handlerCfg: handlerCfg}
 }
 
-func (api *Server) wireRoutesAndMiddleware() {
-	api.app.HideBanner = true
-	api.app.HidePort = true
+func (server *Server) wireRoutesAndMiddleware() {
+	server.app.HideBanner = true
+	server.app.HidePort = true
 
-	jwks, err := keyfunc.NewDefault([]string{api.config.JwksURI})
+	jwks, err := keyfunc.NewDefault([]string{server.config.JwksURI})
 	if err != nil {
-		api.logger.Fatal("fetching jwk set failed", zap.Error(err))
+		server.logger.Fatal("fetching jwk set failed", zap.Error(err))
 	}
 
-	config := auth.JWTConfig{
+	config := commonAuth.JWTConfig{
 		ParseTokenFunc: func(auth string, _ echo.Context) (interface{}, error) {
-			return commonAuth.GetToken(auth, jwks, api.config.Audience)
+			return commonAuth.GetToken(auth, jwks, server.config.Audience)
 		},
 	}
 
-	jwtMiddleware := auth.JWTWithConfig(config)
+	jwtMiddleware := commonAuth.JWTWithConfig(config)
 
-	if api.config.SentryDSN != "" {
+	if server.config.SentryDSN != "" {
 		if client, err := sentry.NewClient(sentry.ClientOptions{
-			Dsn: api.config.SentryDSN,
+			Dsn: server.config.SentryDSN,
 			// Set TracesSampleRate to 1.0 to capture 100%
 			// of transactions for performance monitoring.
 			// We recommend adjusting this value in production,
@@ -108,25 +106,25 @@ func (api *Server) wireRoutesAndMiddleware() {
 			if err != nil {
 				log.Error("Sentry initialization failed", zap.Error(err))
 			}
-			api.logger = zapsentry.AttachCoreToLogger(core, api.logger)
-			api.app.Use(sentryecho.New(sentryecho.Options{}))
+			server.logger = zapsentry.AttachCoreToLogger(core, server.logger)
+			server.app.Use(sentryecho.New(sentryecho.Options{}))
 		}
 	}
-	api.app.Use(middleware.RequestID())
-	api.app.Use(logging.ZapLogger(api.logger))
-	api.app.Use(middleware.Recover())
+	server.app.Use(middleware.RequestID())
+	server.app.Use(logging.ZapLogger(server.logger))
+	server.app.Use(middleware.Recover())
 
-	if len(api.config.CorsAllowedOrigins) != 0 {
-		api.app.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-			AllowOrigins:     api.config.CorsAllowedOrigins,
+	if len(server.config.CorsAllowedOrigins) != 0 {
+		server.app.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins:     server.config.CorsAllowedOrigins,
 			AllowHeaders:     []string{echo.HeaderContentType, echo.HeaderAuthorization, "sentry-trace", "baggage"},
 			AllowCredentials: false,
 			AllowMethods:     []string{http.MethodGet, http.MethodOptions, http.MethodPost, http.MethodDelete},
 		}))
 	}
-	api.app.GET("/docs/spec.json", func(c echo.Context) error {
+	server.app.GET("/docs/spec.json", func(c echo.Context) error {
 		if openAPISpec == nil {
-			spec, err := commonApi.ToOpenAPI3(docs.SwaggerInfo)
+			spec, err := api.ToOpenAPI3(docs.SwaggerInfo)
 			if err != nil {
 				return err
 			}
@@ -134,42 +132,42 @@ func (api *Server) wireRoutesAndMiddleware() {
 		}
 		return c.JSON(http.StatusOK, openAPISpec)
 	})
-	api.app.GET("/docs/*", echoSwagger.EchoWrapHandler(func(c *echoSwagger.Config) {
+	server.app.GET("/docs/*", echoSwagger.EchoWrapHandler(func(c *echoSwagger.Config) {
 		c.URL = "/docs/spec.json"
 	})) // default
-	api.app.GET("/healthz", api.healthzHandler)
-	api.app.GET("/readyz", api.readyzHandler)
-	api.app.GET("/whoami", api.whoamiHandler, jwtMiddleware)
+	server.app.GET("/healthz", server.healthzHandler)
+	server.app.GET("/readyz", server.readyzHandler)
+	server.app.GET("/whoami", server.whoamiHandler, jwtMiddleware)
 
-	group := api.app.Group("/ssl")
+	group := server.app.Group("/ssl")
 	{
-		domainClient, err := domainClient(api.handlerCfg.DomainService, api.config.SentryDSN)
+		domainClient, err := domainClient(server.handlerCfg.DomainService, server.config.SentryDSN)
 		if err != nil {
-			api.logger.Fatal("failed to create domain client", zap.Error(err))
+			server.logger.Fatal("failed to create domain client", zap.Error(err))
 		}
 
-		sslClient, err := sslClient(api.handlerCfg.SslService, api.config.SentryDSN)
+		sslClient, err := sslClient(server.handlerCfg.SslService, server.config.SentryDSN)
 		if err != nil {
-			api.logger.Fatal("failed to create ssl client", zap.Error(err))
+			server.logger.Fatal("failed to create ssl client", zap.Error(err))
 		}
 		ssl := ssl.NewHandler(domainClient, sslClient)
 		group.Use(jwtMiddleware)
-		group.Use(auth.HasScope("Certificates"))
+		group.Use(commonAuth.HasScope("Certificates"))
 		group.GET("/", ssl.List)
 		group.GET("/active", ssl.Active)
 		group.POST("/revoke", ssl.Revoke)
 		group.POST("/csr", ssl.HandleCsr)
 	}
 
-	group = api.app.Group("/smime")
+	group = server.app.Group("/smime")
 	{
-		smimeClient, err := smimeClient(api.handlerCfg.SmimeService, api.config.SentryDSN)
+		smimeClient, err := smimeClient(server.handlerCfg.SmimeService, server.config.SentryDSN)
 		if err != nil {
-			api.logger.Fatal("failed to create smime client", zap.Error(err))
+			server.logger.Fatal("failed to create smime client", zap.Error(err))
 		}
-		handler := smime.NewHandler(smimeClient, api.handlerCfg.RejectStudents)
+		handler := smime.NewHandler(smimeClient, server.handlerCfg.RejectStudents)
 		group.Use(jwtMiddleware)
-		group.Use(auth.HasScope("Certificates"))
+		group.Use(commonAuth.HasScope("Certificates"))
 		group.GET("/", handler.List)
 		group.POST("/revoke", handler.Revoke)
 		group.POST("/csr", handler.HandleCsr)
@@ -215,19 +213,19 @@ func sslClient(host string, sentryDSN string) (pb.SSLServiceClient, error) {
 }
 
 // ListenAndServe starts the http server and waits for the channel to stop the server
-func (api *Server) ListenAndServe(stopCh <-chan struct{}) {
+func (server *Server) ListenAndServe(stopCh <-chan struct{}) {
 
-	api.wireRoutesAndMiddleware()
+	server.wireRoutesAndMiddleware()
 	go func() {
-		addr := api.config.Host + ":" + api.config.Port
-		api.logger.Info("Starting HTTP Server.", zap.String("addr", addr))
-		if err := api.app.Start(addr); !errors.Is(err, http.ErrServerClosed) {
-			api.logger.Fatal("HTTP server crashed", zap.Error(err))
+		addr := server.config.Host + ":" + server.config.Port
+		server.logger.Info("Starting HTTP Server.", zap.String("addr", addr))
+		if err := server.app.Start(addr); !errors.Is(err, http.ErrServerClosed) {
+			server.logger.Fatal("HTTP server crashed", zap.Error(err))
 		}
 	}()
 	<-stopCh
-	err := api.app.Shutdown(context.Background())
+	err := server.app.Shutdown(context.Background())
 	if err != nil {
-		api.logger.Fatal("Stopping http server failed", zap.Error(err))
+		server.logger.Fatal("Stopping http server failed", zap.Error(err))
 	}
 }

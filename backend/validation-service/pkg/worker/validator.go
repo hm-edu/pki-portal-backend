@@ -84,10 +84,10 @@ func (v *DomainValidator) ValidateDomains() {
 			var duration time.Duration
 			if v.Force {
 				duration = 0 * time.Second
-			} else if validation.ExpirationDate.Time.Before(x) {
+			} else if validation.ExpirationDate.Before(x) {
 				duration = 1 * time.Hour
 			} else {
-				duration = validation.ExpirationDate.Time.Sub(x)
+				duration = validation.ExpirationDate.Sub(x)
 			}
 			pending[duration] = append(pending[duration], validation.Domain)
 			(*v.observerLock).Lock()
@@ -192,7 +192,7 @@ func (v *DomainValidator) validateDomains(duration time.Duration, domains []stri
 		}
 		logger.Debug("Deleted validation record")
 
-		pending[status.ExpirationDate.Time.Sub(x)] = append(pending[status.ExpirationDate.Time.Sub(x)], d)
+		pending[status.ExpirationDate.Sub(x)] = append(pending[status.ExpirationDate.Sub(x)], d)
 	}
 
 	for duration, domains := range pending {

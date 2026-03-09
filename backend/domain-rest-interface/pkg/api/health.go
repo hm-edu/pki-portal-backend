@@ -13,7 +13,7 @@ type healthResponse struct {
 }
 
 // healthzHandler godoc
-func (s *Server) healthzHandler(c echo.Context) (err error) {
+func (server *Server) healthzHandler(c echo.Context) (err error) {
 	err = database.DB.Internal.Ping()
 	if err != nil {
 		return c.JSON(http.StatusServiceUnavailable, healthResponse{Status: "Service Unavailable"})
@@ -22,7 +22,7 @@ func (s *Server) healthzHandler(c echo.Context) (err error) {
 }
 
 // readyzHandler godoc
-func (s *Server) readyzHandler(c echo.Context) (err error) {
+func (server *Server) readyzHandler(c echo.Context) (err error) {
 	if atomic.LoadInt32(&ready) == 1 {
 		return c.JSON(http.StatusOK, healthResponse{Status: "OK"})
 	}
