@@ -28,7 +28,7 @@ import (
 // @Security API
 // @Success 200 {object} []models.EAB
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) GetExternalAccountKeys(c*echo.Context) error {
+func (h *Handler) GetExternalAccountKeys(c *echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	span := sentryecho.GetSpanFromContext(c)
 	ctx := c.Request().Context()
@@ -86,7 +86,7 @@ func (h *Handler) GetExternalAccountKeys(c*echo.Context) error {
 // @Security API
 // @Success 201 {object} models.EAB
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) CreateNewKey(c*echo.Context) error {
+func (h *Handler) CreateNewKey(c *echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	span := sentryecho.GetSpanFromContext(c)
 	ctx := c.Request().Context()
@@ -142,7 +142,7 @@ func (h *Handler) CreateNewKey(c*echo.Context) error {
 // @Security API
 // @Success 204
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) DeleteKey(c*echo.Context) error {
+func (h *Handler) DeleteKey(c *echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	span := sentryecho.GetSpanFromContext(c)
 	ctx := c.Request().Context()
