@@ -14,7 +14,7 @@ type healthResponse struct {
 }
 
 // healthzHandler godoc
-func (server *Server) healthzHandler(c*echo.Context) error {
+func (server *Server) healthzHandler(c *echo.Context) error {
 	err := database.DB.Internal.Ping()
 	if err != nil {
 		server.logger.Error("Error connecting to database", zap.Error(err))
