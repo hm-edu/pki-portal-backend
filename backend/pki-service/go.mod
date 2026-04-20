@@ -22,7 +22,6 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.3.1 // indirect
 	github.com/labstack/echo/v5 v5.1.0 // indirect
 	github.com/pquerna/otp v1.5.0 // indirect
-	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/afero v1.15.0 // indirect
 	github.com/zclconf/go-cty-yaml v1.2.0 // indirect
