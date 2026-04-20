@@ -4,7 +4,7 @@ import (
 	"github.com/hm-edu/domain-rest-interface/ent"
 	"github.com/hm-edu/portal-common/helper"
 	"github.com/hm-edu/portal-common/model"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 // DomainRequest represents an request for an action on a domain.
@@ -13,7 +13,7 @@ type DomainRequest struct {
 }
 
 // Bind binds an incoming echo request to the internal domain model and perfoms a validation
-func (r *DomainRequest) Bind(c echo.Context, v *model.Validator) error {
+func (r *DomainRequest) Bind(c *echo.Context, v *model.Validator) error {
 	if err := c.Bind(r); err != nil {
 		return err
 	}

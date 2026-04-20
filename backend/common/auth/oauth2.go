@@ -8,7 +8,7 @@ import (
 	"github.com/MicahParks/keyfunc/v3"
 	jwt "github.com/golang-jwt/jwt/v5"
 	"github.com/hm-edu/portal-common/helper"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 // SubFromRequest extracts username (or email) from the previously claimset.
@@ -23,7 +23,7 @@ func SubFromRequest(token interface{}) (string, error) {
 }
 
 // UserFromRequest extracts username (or email) from the previously claimset.
-func UserFromRequest(c echo.Context) (string, error) {
+func UserFromRequest(c *echo.Context) (string, error) {
 	if token, ok := c.Get("user").(*jwt.Token); ok {
 		if user, ok := token.Claims.(jwt.MapClaims); ok {
 			if _, ok := user["email"]; !ok {
@@ -53,7 +53,7 @@ func GetToken(auth string, keyfunc keyfunc.Keyfunc, aud string) (interface{}, er
 // HasScope tries to extract the scope from the provided token.
 func HasScope(scope string) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 
 			if token, ok := c.Get("user").(*jwt.Token); ok {
 				if user, ok := token.Claims.(jwt.MapClaims); ok {

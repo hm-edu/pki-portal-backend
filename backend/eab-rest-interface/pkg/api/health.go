@@ -5,7 +5,7 @@ import (
 	"sync/atomic"
 
 	"github.com/hm-edu/eab-rest-interface/pkg/database"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"go.uber.org/zap"
 )
 
@@ -14,7 +14,7 @@ type healthResponse struct {
 }
 
 // healthzHandler godoc
-func (server *Server) healthzHandler(c echo.Context) error {
+func (server *Server) healthzHandler(c*echo.Context) error {
 	err := database.DB.Internal.Ping()
 	if err != nil {
 		server.logger.Error("Error connecting to database", zap.Error(err))
@@ -29,7 +29,7 @@ func (server *Server) healthzHandler(c echo.Context) error {
 }
 
 // readyzHandler godoc
-func (server *Server) readyzHandler(c echo.Context) (err error) {
+func (server *Server) readyzHandler(c *echo.Context) (err error) {
 	if atomic.LoadInt32(&ready) == 1 {
 		return c.JSON(http.StatusOK, healthResponse{Status: "OK"})
 	}

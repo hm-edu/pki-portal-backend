@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 // User contains the basic user data provided using OIDC/OAuth2 Access Tokens
@@ -19,7 +19,7 @@ type User struct {
 }
 
 // Bind binds an incoming echo request to the the User and perfoms a validation
-func (r *User) Bind(c echo.Context, v *Validator) error {
+func (r *User) Bind(c *echo.Context, v *Validator) error {
 	token := c.Get("user").(*jwt.Token)
 	claims := token.Claims.(jwt.MapClaims)
 

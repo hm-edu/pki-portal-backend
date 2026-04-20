@@ -13,7 +13,7 @@ import (
 	"github.com/hm-edu/portal-common/helper"
 	"github.com/hm-edu/portal-common/logging"
 	commonModel "github.com/hm-edu/portal-common/model"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"go.uber.org/zap"
 )
 
@@ -27,7 +27,7 @@ import (
 // @Security API
 // @Success 200 {object} []pb.ListSmimeResponse_CertificateDetails "certificates"
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) List(c echo.Context) error {
+func (h *Handler) List(c*echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 
 	req := &model.ListSmimeCertificatesRequest{}
@@ -46,7 +46,7 @@ func (h *Handler) List(c echo.Context) error {
 	})
 	if err := req.Bind(c, h.validator); err != nil {
 		hub.CaptureException(err)
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request").Wrap(err)
 	}
 
 	span := sentryecho.GetSpanFromContext(c)
@@ -86,7 +86,7 @@ func (h *Handler) List(c echo.Context) error {
 // @Security API
 // @Success 204
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) Revoke(c echo.Context) error {
+func (h *Handler) Revoke(c*echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 
 	hub := sentryecho.GetHubFromContext(c)
@@ -107,7 +107,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 	req := &model.RevokeRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
 		hub.CaptureException(err)
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request").Wrap(err)
 	}
 
 	span := sentryecho.GetSpanFromContext(c)
@@ -120,7 +120,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 	listRes, err := h.smime.ListCertificates(ctx, &pb.ListSmimeRequest{Email: user.Email})
 	if err != nil {
 		hub.CaptureException(err)
-		return &echo.HTTPError{Code: http.StatusInternalServerError, Internal: err, Message: "Error processing the request"}
+		return echo.NewHTTPError(http.StatusInternalServerError, "Error processing the request").Wrap(err)
 	}
 
 	// list certificates for all emails
@@ -137,14 +137,14 @@ func (h *Handler) Revoke(c echo.Context) error {
 
 	if !helper.Contains(helper.Map(certs, func(t *pb.ListSmimeResponse_CertificateDetails) string { return t.Serial }), req.Serial) {
 		logger.Warn("certificate not found", zap.String("serial", req.Serial))
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request").Wrap(err)
 	}
 
 	_, err = h.smime.RevokeCertificate(ctx, &pb.RevokeSmimeRequest{Reason: req.Reason, Identifier: &pb.RevokeSmimeRequest_Serial{Serial: req.Serial}})
 	if err != nil {
 		hub.CaptureException(err)
 		logger.Error("error requesting smime certificate revocation", zap.Error(err))
-		return &echo.HTTPError{Code: http.StatusInternalServerError, Internal: err, Message: "Error processing the request"}
+		return echo.NewHTTPError(http.StatusInternalServerError, "Error processing the request").Wrap(err)
 	}
 	return c.NoContent(http.StatusNoContent)
 }
@@ -162,7 +162,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 // @Security API
 // @Success 200 {string} string "certificate"
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) HandleCsr(c echo.Context) error {
+func (h *Handler) HandleCsr(c*echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	hub := sentryecho.GetHubFromContext(c)
 	if hub == nil {
@@ -192,7 +192,7 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 	req := &model.CsrRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
 		hub.CaptureException(err)
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request").Wrap(err)
 	}
 
 	block, _ := pem.Decode([]byte(req.CSR))
@@ -204,14 +204,14 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 	if err != nil {
 		hub.CaptureException(err)
 		logger.Error("error while parsing csr", zap.Error(err))
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request. CSR has invalid format."}
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request. CSR has invalid format.").Wrap(err)
 	}
 
 	// Validate the CSR
 	if err := csr.CheckSignature(); err != nil {
 		hub.CaptureException(err)
 		logger.Error("error while parsing csr", zap.Error(err))
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request. CSR has invalid signature."}
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request. CSR has invalid signature.").Wrap(err)
 	}
 
 	// check if the requested email belongs to the user
@@ -237,7 +237,7 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 	if err != nil {
 		hub.CaptureException(err)
 		logger.Error("error requesting smime certificate", zap.Error(err))
-		return &echo.HTTPError{Code: http.StatusInternalServerError, Internal: err, Message: "Handling CSR failed"}
+		return echo.NewHTTPError(http.StatusInternalServerError, "Handling CSR failed").Wrap(err)
 	}
 
 	return c.JSON(http.StatusOK, cert.Certificate)

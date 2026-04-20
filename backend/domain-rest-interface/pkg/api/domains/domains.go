@@ -17,7 +17,7 @@ import (
 	"github.com/hm-edu/portal-common/logging"
 	"golang.org/x/net/publicsuffix"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"go.uber.org/zap"
 )
 
@@ -31,7 +31,7 @@ import (
 // @Security API
 // @Success 200 {object} []model.Domain
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) ListDomains(c echo.Context) error {
+func (h *Handler) ListDomains(c *echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 
 	span := sentryecho.GetSpanFromContext(c)
@@ -56,7 +56,7 @@ func (h *Handler) ListDomains(c echo.Context) error {
 	domains, err := h.enumerateDomains(ctx, user, logger)
 	if err != nil {
 		logger.Error("Listing domains failed", zap.Error(err))
-		return &echo.HTTPError{Internal: err, Code: http.StatusInternalServerError, Message: "Error while listing domains"}
+		return echo.NewHTTPError(http.StatusInternalServerError, "Error while listing domains").Wrap(err)
 	}
 	logger.Debug("Listing domains", zap.Int("count", len(domains)), zap.Any("domains", domains))
 	return c.JSON(http.StatusOK, domains)
@@ -153,7 +153,7 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string, logger *zap
 // @Security API
 // @Success 201 {object} model.Domain
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) CreateDomain(c echo.Context) error {
+func (h *Handler) CreateDomain(c *echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 
 	span := sentryecho.GetSpanFromContext(c)
@@ -169,7 +169,7 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 	user, err := auth.UserFromRequest(c)
 	if err != nil {
 		logger.Error("Failed to get user from request", zap.Error(err))
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid Request").Wrap(err)
 	}
 	hub.ConfigureScope(func(scope *sentry.Scope) {
 		scope.SetUser(sentry.User{Email: user})
@@ -178,14 +178,14 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 	req := &model.DomainRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
 		logger.Error("Binding request failed", zap.Error(err))
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid Request").Wrap(err)
 	}
 	logger = logger.With(zap.String("fqdn", req.FQDN))
 
 	allDomains, err := h.domainStore.ListAllDomains(ctx, false)
 	if err != nil {
 		logger.Error("Listing domains failed", zap.Error(err))
-		return &echo.HTTPError{Code: http.StatusInternalServerError, Internal: err, Message: "Failed to list domains"}
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to list domains").Wrap(err)
 	}
 	if helper.Contains(allDomains, req.FQDN) {
 		logger.Error("Domain already exists", zap.String("fqdn", req.FQDN))
@@ -196,7 +196,7 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 
 	domains, err := h.domainStore.ListDomains(ctx, user, true, false)
 	if err != nil {
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid Request").Wrap(err)
 	}
 
 	if helper.Any(domains, func(i *ent.Domain) bool { return i.Approved && strings.HasSuffix(domain.Fqdn, "."+i.Fqdn) }) || helper.Contains(h.admins, user) {
@@ -206,7 +206,7 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 	logger.Info("Creating domain", zap.Bool("approved", domain.Approved), zap.String("owner", domain.Owner))
 	created, err := h.domainStore.Create(ctx, &domain)
 	if err != nil {
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid Request").Wrap(err)
 	}
 	item := model.DomainToOutput(created)
 	item.Permissions.CanDelete = true
@@ -229,7 +229,7 @@ func (h *Handler) CreateDomain(c echo.Context) error {
 // @Security API
 // @Success 204
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) DeleteDomain(c echo.Context) error {
+func (h *Handler) DeleteDomain(c *echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 
 	span := sentryecho.GetSpanFromContext(c)
@@ -247,7 +247,7 @@ func (h *Handler) DeleteDomain(c echo.Context) error {
 		_, err := h.pkiService.RevokeCertificate(ctx, &pb.RevokeSslRequest{Identifier: &pb.RevokeSslRequest_CommonName{CommonName: item.FQDN}, Reason: fmt.Sprintf("Domain '%s' deleted in PKI-Portal", item.FQDN)})
 		if err != nil {
 			logger.Error("Failed to revoke certificate", zap.Error(err))
-			return &echo.HTTPError{Code: http.StatusInternalServerError, Internal: err, Message: "Failed to revoke certificate"}
+			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to revoke certificate").Wrap(err)
 		}
 	}
 
@@ -259,7 +259,7 @@ func (h *Handler) DeleteDomain(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-func (h *Handler) evaluatePermission(ctx context.Context, c echo.Context, logger *zap.Logger, predicate func(*model.Domain) bool) (*model.Domain, error) {
+func (h *Handler) evaluatePermission(ctx context.Context, c *echo.Context, logger *zap.Logger, predicate func(*model.Domain) bool) (*model.Domain, error) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		logger.Error("Invalid domain id", zap.Error(err))
@@ -304,7 +304,7 @@ func (h *Handler) evaluatePermission(ctx context.Context, c echo.Context, logger
 // @Security API
 // @Success 200 {object} model.Domain The updated domain
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) ApproveDomain(c echo.Context) error {
+func (h *Handler) ApproveDomain(c *echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 
 	span := sentryecho.GetSpanFromContext(c)
@@ -339,7 +339,7 @@ func (h *Handler) ApproveDomain(c echo.Context) error {
 // @Security API
 // @Success 200 {object} model.Domain The updated domain
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) TransferDomain(c echo.Context) error {
+func (h *Handler) TransferDomain(c *echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 
 	span := sentryecho.GetSpanFromContext(c)
@@ -379,7 +379,7 @@ func (h *Handler) TransferDomain(c echo.Context) error {
 // @Security API
 // @Success 200 {object} model.Domain The updated domain
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) DeleteDelegation(c echo.Context) error {
+func (h *Handler) DeleteDelegation(c *echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 
 	span := sentryecho.GetSpanFromContext(c)
@@ -425,7 +425,7 @@ func (h *Handler) DeleteDelegation(c echo.Context) error {
 // @Security API
 // @Success 200 {object} model.Domain The updated domain
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) AddDelegation(c echo.Context) error {
+func (h *Handler) AddDelegation(c *echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 
 	span := sentryecho.GetSpanFromContext(c)
@@ -435,7 +435,7 @@ func (h *Handler) AddDelegation(c echo.Context) error {
 	}
 	req := &model.DelegationRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid Request").Wrap(err)
 	}
 	item, err := h.evaluatePermission(ctx, c, logger, func(d *model.Domain) bool { return d.Permissions.CanDelegate })
 	if err != nil {

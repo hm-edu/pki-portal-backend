@@ -14,7 +14,7 @@ import (
 	"github.com/hm-edu/portal-common/logging"
 	"github.com/smallstep/certificates/acme"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"go.uber.org/zap"
 )
 
@@ -28,7 +28,7 @@ import (
 // @Security API
 // @Success 200 {object} []models.EAB
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) GetExternalAccountKeys(c echo.Context) error {
+func (h *Handler) GetExternalAccountKeys(c*echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	span := sentryecho.GetSpanFromContext(c)
 	ctx := c.Request().Context()
@@ -86,7 +86,7 @@ func (h *Handler) GetExternalAccountKeys(c echo.Context) error {
 // @Security API
 // @Success 201 {object} models.EAB
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) CreateNewKey(c echo.Context) error {
+func (h *Handler) CreateNewKey(c*echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	span := sentryecho.GetSpanFromContext(c)
 	ctx := c.Request().Context()
@@ -108,7 +108,7 @@ func (h *Handler) CreateNewKey(c echo.Context) error {
 	req := &models.EabRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
 		logger.Error("Binding request failed", zap.Error(err))
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid Request"}
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid Request").Wrap(err)
 	}
 
 	logger.Info("Requesting new external account key")
@@ -142,7 +142,7 @@ func (h *Handler) CreateNewKey(c echo.Context) error {
 // @Security API
 // @Success 204
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) DeleteKey(c echo.Context) error {
+func (h *Handler) DeleteKey(c*echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	span := sentryecho.GetSpanFromContext(c)
 	ctx := c.Request().Context()

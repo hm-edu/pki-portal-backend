@@ -10,15 +10,12 @@ import (
 
 	"github.com/MicahParks/keyfunc/v3"
 	"github.com/TheZeroSlave/zapsentry"
-	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/getsentry/sentry-go"
 	sentryecho "github.com/getsentry/sentry-go/echo"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 	"github.com/labstack/gommon/log"
-	echoSwagger "github.com/swaggo/echo-swagger"
 
-	"github.com/hm-edu/pki-rest-interface/pkg/api/docs"
 	"github.com/hm-edu/pki-rest-interface/pkg/api/smime"
 	"github.com/hm-edu/pki-rest-interface/pkg/api/ssl"
 	"github.com/hm-edu/pki-rest-interface/pkg/cfg"
@@ -30,15 +27,11 @@ import (
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-
-	// Required for the generation of swagger docs
-	_ "github.com/hm-edu/pki-rest-interface/pkg/api/docs"
 )
 
 var (
-	healthy     int32
-	ready       int32
-	openAPISpec *openapi3.T
+	healthy int32
+	ready   int32
 )
 
 // @title PKI Service
@@ -69,16 +62,13 @@ func NewServer(logger *zap.Logger, config *api.Config, handlerCfg *cfg.HandlerCo
 }
 
 func (server *Server) wireRoutesAndMiddleware() {
-	server.app.HideBanner = true
-	server.app.HidePort = true
-
 	jwks, err := keyfunc.NewDefault([]string{server.config.JwksURI})
 	if err != nil {
 		server.logger.Fatal("fetching jwk set failed", zap.Error(err))
 	}
 
 	config := commonAuth.JWTConfig{
-		ParseTokenFunc: func(auth string, _ echo.Context) (interface{}, error) {
+		ParseTokenFunc: func(auth string, _ *echo.Context) (interface{}, error) {
 			return commonAuth.GetToken(auth, jwks, server.config.Audience)
 		},
 	}
@@ -122,19 +112,6 @@ func (server *Server) wireRoutesAndMiddleware() {
 			AllowMethods:     []string{http.MethodGet, http.MethodOptions, http.MethodPost, http.MethodDelete},
 		}))
 	}
-	server.app.GET("/docs/spec.json", func(c echo.Context) error {
-		if openAPISpec == nil {
-			spec, err := api.ToOpenAPI3(docs.SwaggerInfo)
-			if err != nil {
-				return err
-			}
-			openAPISpec = spec
-		}
-		return c.JSON(http.StatusOK, openAPISpec)
-	})
-	server.app.GET("/docs/*", echoSwagger.EchoWrapHandler(func(c *echoSwagger.Config) {
-		c.URL = "/docs/spec.json"
-	})) // default
 	server.app.GET("/healthz", server.healthzHandler)
 	server.app.GET("/readyz", server.readyzHandler)
 	server.app.GET("/whoami", server.whoamiHandler, jwtMiddleware)
@@ -216,16 +193,20 @@ func sslClient(host string, sentryDSN string) (pb.SSLServiceClient, error) {
 func (server *Server) ListenAndServe(stopCh <-chan struct{}) {
 
 	server.wireRoutesAndMiddleware()
+
+	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
 		addr := server.config.Host + ":" + server.config.Port
 		server.logger.Info("Starting HTTP Server.", zap.String("addr", addr))
-		if err := server.app.Start(addr); !errors.Is(err, http.ErrServerClosed) {
+		sc := echo.StartConfig{
+			Address:    addr,
+			HideBanner: true,
+			HidePort:   true,
+		}
+		if err := sc.Start(ctx, server.app); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			server.logger.Fatal("HTTP server crashed", zap.Error(err))
 		}
 	}()
 	<-stopCh
-	err := server.app.Shutdown(context.Background())
-	if err != nil {
-		server.logger.Fatal("Stopping http server failed", zap.Error(err))
-	}
+	cancel()
 }
