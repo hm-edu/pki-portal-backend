@@ -27,7 +27,7 @@ import (
 // @Security API
 // @Success 200 {object} []pb.ListSmimeResponse_CertificateDetails "certificates"
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) List(c*echo.Context) error {
+func (h *Handler) List(c *echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 
 	req := &model.ListSmimeCertificatesRequest{}
@@ -86,7 +86,7 @@ func (h *Handler) List(c*echo.Context) error {
 // @Security API
 // @Success 204
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) Revoke(c*echo.Context) error {
+func (h *Handler) Revoke(c *echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 
 	hub := sentryecho.GetHubFromContext(c)
@@ -162,7 +162,7 @@ func (h *Handler) Revoke(c*echo.Context) error {
 // @Security API
 // @Success 200 {string} string "certificate"
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) HandleCsr(c*echo.Context) error {
+func (h *Handler) HandleCsr(c *echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	hub := sentryecho.GetHubFromContext(c)
 	if hub == nil {
