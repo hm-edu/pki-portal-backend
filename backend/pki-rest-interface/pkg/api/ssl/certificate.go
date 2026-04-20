@@ -17,7 +17,7 @@ import (
 	"github.com/hm-edu/portal-common/logging"
 
 	pb "github.com/hm-edu/portal-apis"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"go.uber.org/zap"
 )
 
@@ -31,7 +31,7 @@ import (
 // @Security API
 // @Success 200 {object} []pb.SslCertificateDetails "Certificates"
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) Active(c echo.Context) error {
+func (h *Handler) Active(c*echo.Context) error {
 
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	hub := sentryecho.GetHubFromContext(c)
@@ -111,7 +111,7 @@ func (h *Handler) Active(c echo.Context) error {
 // @Security API
 // @Success 200 {object} []pb.SslCertificateDetails "Certificates"
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) List(c echo.Context) error {
+func (h *Handler) List(c*echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 
 	span := sentryecho.GetSpanFromContext(c)
@@ -161,7 +161,7 @@ func (h *Handler) List(c echo.Context) error {
 // @Security API
 // @Success 204
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) Revoke(c echo.Context) error {
+func (h *Handler) Revoke(c*echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	hub := sentryecho.GetHubFromContext(c)
 	if hub == nil {
@@ -187,7 +187,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 	req := &model.RevokeRequest{}
 	if err := req.Bind(c, h.validator); err != nil {
 		logger.Error("error while validating request", zap.Error(err))
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request").Wrap(err)
 	}
 
 	logger.Info("trying to revoke certificate", zap.String("serial", req.Serial), zap.String("reason", req.Reason))
@@ -234,7 +234,7 @@ func (h *Handler) Revoke(c echo.Context) error {
 // @Security API
 // @Success 200 {string} string "certificate"
 // @Response default {object} echo.HTTPError "Error processing the request"
-func (h *Handler) HandleCsr(c echo.Context) error {
+func (h *Handler) HandleCsr(c*echo.Context) error {
 	logger := c.Request().Context().Value(logging.LoggingContextKey).(*zap.Logger)
 	hub := sentryecho.GetHubFromContext(c)
 	if hub == nil {
@@ -262,25 +262,25 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 	if err := req.Bind(c, h.validator); err != nil {
 		hub.CaptureException(err)
 		logger.Error("error while parsing csr", zap.Error(err))
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request"}
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request").Wrap(err)
 	}
 	block, _ := pem.Decode([]byte(req.CSR))
 
 	if block == nil {
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request. CSR has invalid format."}
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request. CSR has invalid format.").Wrap(err)
 	}
 
 	csr, err := x509.ParseCertificateRequest(block.Bytes)
 	if err != nil {
 		logger.Error("error while parsing csr", zap.Error(err))
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request. CSR has invalid format."}
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request. CSR has invalid format.").Wrap(err)
 	}
 
 	// Validate the CSR
 	if err := csr.CheckSignature(); err != nil {
 		hub.CaptureException(err)
 		logger.Error("error while parsing csr", zap.Error(err))
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request. CSR has invalid signature."}
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request. CSR has invalid signature.").Wrap(err)
 	}
 
 	// Get the public key from the CSR
@@ -289,7 +289,7 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 		size := pubKey.Size() * 8
 		if ok && size < 2048 {
 			logger.Warn("Invalid key length", zap.String("key_length", fmt.Sprintf("%d", size)))
-			return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request. RSA key length must be greater than 2048."}
+			return echo.NewHTTPError(http.StatusBadRequest, "Invalid request. RSA key length must be greater than 2048.").Wrap(err)
 		}
 	}
 	sans := make([]string, 0, len(csr.DNSNames)+len(csr.IPAddresses)+len(csr.URIs)+1)
@@ -305,7 +305,7 @@ func (h *Handler) HandleCsr(c echo.Context) error {
 	}
 	if len(sans) == 0 {
 		logger.Info("no SANs found in CSR")
-		return &echo.HTTPError{Code: http.StatusBadRequest, Internal: err, Message: "Invalid request. No SANs found in CSR"}
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request. No SANs found in CSR").Wrap(err)
 	}
 
 	permissions, err := h.domain.CheckPermission(ctx, &pb.CheckPermissionRequest{User: user, Domains: sans})

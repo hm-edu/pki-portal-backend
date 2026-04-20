@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/hm-edu/portal-common/auth"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 // whoamiHandler godoc
@@ -17,7 +17,7 @@ import (
 // @Security API
 // @Success 200 {string} string "Username"
 // @Failure 400 {object} echo.HTTPError "Unauthorized"
-func (server *Server) whoamiHandler(c echo.Context) (err error) {
+func (server *Server) whoamiHandler(c *echo.Context) (err error) {
 	sub, err := auth.UserFromRequest(c)
 	if err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}

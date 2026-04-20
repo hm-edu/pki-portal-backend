@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/hm-edu/portal-common/model"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/smallstep/certificates/acme"
 )
 
@@ -17,7 +17,7 @@ type EabRequest struct {
 }
 
 // Bind binds an incoming echo request to the internal model and perfoms a validation
-func (r *EabRequest) Bind(c echo.Context, _ *model.Validator) error {
+func (r *EabRequest) Bind(c *echo.Context, _ *model.Validator) error {
 	if err := c.Bind(r); err != nil {
 		return err
 	}

@@ -7,8 +7,8 @@ import (
 
 	"github.com/TheZeroSlave/zapsentry"
 	sentryecho "github.com/getsentry/sentry-go/echo"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -48,7 +48,7 @@ func ZapLogger(log *zap.Logger, opts ...Option) echo.MiddlewareFunc {
 	}
 
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 
 			req := c.Request()
 
@@ -77,18 +77,23 @@ func ZapLogger(log *zap.Logger, opts ...Option) echo.MiddlewareFunc {
 
 			err := next(c)
 			if err != nil {
-				c.Error(err)
+				c.Echo().HTTPErrorHandler(c, err)
 			}
 
 			res := c.Response()
+			resp, status := echo.ResolveResponseStatus(res, err)
+			var size int64
+			if resp != nil {
+				size = resp.Size
+			}
 
 			fields = append(fields,
 				zap.String("latency", time.Since(start).String()),
-				zap.Int("status", res.Status),
-				zap.Int64("size", res.Size),
+				zap.Int("status", status),
+				zap.Int64("size", size),
 			)
 
-			n := res.Status
+			n := status
 			switch {
 			case n >= 500:
 				logger.With(zap.Error(err)).Error("Server error", fields...)

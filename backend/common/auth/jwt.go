@@ -12,8 +12,8 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/hm-edu/portal-common/logging"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 	"go.uber.org/zap"
 )
 
@@ -113,17 +113,17 @@ type (
 		// ParseTokenFunc defines a user-defined function that parses token from given auth. Returns an error when token
 		// parsing fails or parsed token is invalid.
 		// Defaults to implementation using `github.com/golang-jwt/jwt` as JWT implementation library
-		ParseTokenFunc func(auth string, c echo.Context) (interface{}, error)
+		ParseTokenFunc func(auth string, c *echo.Context) (interface{}, error)
 	}
 
 	// JWTSuccessHandler defines a function which is executed for a valid token.
-	JWTSuccessHandler func(c echo.Context)
+	JWTSuccessHandler func(c *echo.Context)
 
 	// JWTErrorHandler defines a function which is executed for an invalid token.
 	JWTErrorHandler func(err error) error
 
 	// JWTErrorHandlerWithContext is almost identical to JWTErrorHandler, but it's passed the current context.
-	JWTErrorHandlerWithContext func(err error, c echo.Context) error
+	JWTErrorHandlerWithContext func(err error, c *echo.Context) error
 )
 
 // Algorithms
@@ -206,7 +206,7 @@ func JWTWithConfig(config JWTConfig) echo.MiddlewareFunc {
 	}
 
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			if config.Skipper(c) {
 				return next(c)
 			}
@@ -264,18 +264,14 @@ func JWTWithConfig(config JWTConfig) echo.MiddlewareFunc {
 
 			// backwards compatible errors codes
 			if lastTokenErr != nil {
-				return &echo.HTTPError{
-					Code:     ErrJWTInvalid.Code,
-					Message:  ErrJWTInvalid.Message,
-					Internal: err,
-				}
+				return ErrJWTInvalid.Wrap(err)
 			}
 			return err // this is lastExtractorErr value
 		}
 	}
 }
 
-func (config *JWTConfig) defaultParseToken(auth string, _ echo.Context) (interface{}, error) {
+func (config *JWTConfig) defaultParseToken(auth string, _ *echo.Context) (interface{}, error) {
 	var token *jwt.Token
 	var err error
 	// Issue #647, #656

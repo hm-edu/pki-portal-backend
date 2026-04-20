@@ -21,7 +21,7 @@ import (
 
 	"github.com/hm-edu/portal-common/helper"
 	"github.com/hm-edu/portal-common/logging"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -122,8 +122,7 @@ func TestDeletePermissions(t *testing.T) {
 			ctx.SetRequest(ctx.Request().WithContext(context.WithValue(ctx.Request().Context(), logging.LoggingContextKey, zap.L())))
 			ctx.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": c.User}})
 			ctx.SetPath("/:id")
-			ctx.SetParamNames("id")
-			ctx.SetParamValues(fmt.Sprint(c.ID))
+			ctx.SetPathValues(echo.PathValues{{Name: "id", Value: fmt.Sprint(c.ID)}})
 
 			resp := h.DeleteDomain(ctx)
 			if c.Success {
@@ -470,8 +469,7 @@ func TestApproveDomainsNotAllowed(t *testing.T) {
 			c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "max"}})
 
 			c.SetPath("/:id")
-			c.SetParamNames("id")
-			c.SetParamValues(fmt.Sprint(i))
+			c.SetPathValues(echo.PathValues{{Name: "id", Value: fmt.Sprint(i)}})
 			resp := h.ApproveDomain(c)
 			assert.Error(t, resp)
 		})
@@ -540,8 +538,7 @@ func TestApproveDomainsAllowed(t *testing.T) {
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		c = e.NewContext(req, rec)
 		c.SetPath("/:id")
-		c.SetParamNames("id")
-		c.SetParamValues(fmt.Sprint(2))
+		c.SetPathValues(echo.PathValues{{Name: "id", Value: fmt.Sprint(2)}})
 		c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
 		c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "test"}})
 		resp := h.ApproveDomain(c)
@@ -553,8 +550,7 @@ func TestApproveDomainsAllowed(t *testing.T) {
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		c = e.NewContext(req, rec)
 		c.SetPath("/:id")
-		c.SetParamNames("id")
-		c.SetParamValues(fmt.Sprint(4))
+		c.SetPathValues(echo.PathValues{{Name: "id", Value: fmt.Sprint(4)}})
 		c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
 		c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": "max"}})
 		resp := h.ApproveDomain(c)
