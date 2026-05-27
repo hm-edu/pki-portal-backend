@@ -89,7 +89,7 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	srv := grpc.NewServer(
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
-				interceptors...,
+			//interceptors...,
 			)),
 		grpc.StreamInterceptor(
 			grpc_middleware.ChainStreamServer(
