@@ -5,7 +5,6 @@ import (
 	"net"
 
 	"github.com/getsentry/sentry-go"
-	grpc_sentry "github.com/johnbellone/grpc-middleware-sentry"
 
 	pb "github.com/hm-edu/portal-apis"
 
@@ -82,14 +81,14 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 			zap.L().Sugar().Warnf("Sentry initialization failed: %v\n", err)
 		} else {
 			s.logger.Info("Sentry initialized")
-			interceptors = append(interceptors, grpc_sentry.UnaryServerInterceptor())
+			//interceptors = append(interceptors, grpc_sentry.UnaryServerInterceptor())
 		}
 	}
 
 	srv := grpc.NewServer(
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
-			//interceptors...,
+				interceptors...,
 			)),
 		grpc.StreamInterceptor(
 			grpc_middleware.ChainStreamServer(
