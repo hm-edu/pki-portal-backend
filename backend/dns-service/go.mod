@@ -1,6 +1,6 @@
 module github.com/hm-edu/dns-service
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
@@ -51,7 +51,7 @@ require (
 )
 
 require (
-	github.com/hm-edu/portal-common v0.0.0-20260102070157-b3a9db657b6e
+	github.com/hm-edu/portal-common v0.0.0-20260420051753-adbc9362a678
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
 )

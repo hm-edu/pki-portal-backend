@@ -1,12 +1,12 @@
 module github.com/hm-edu/pki-rest-interface
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/MicahParks/keyfunc/v3 v3.8.0
 	github.com/getsentry/sentry-go/echo v0.46.2
 	github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776
-	github.com/hm-edu/portal-common v0.0.0-20260102070157-b3a9db657b6e
+	github.com/hm-edu/portal-common v0.0.0-20260420051753-adbc9362a678
 	github.com/johnbellone/grpc-middleware-sentry v0.4.0
 	github.com/labstack/echo/v5 v5.1.1
 	github.com/labstack/gommon v0.5.0
@@ -72,3 +72,5 @@ require (
 )
 
 replace github.com/hm-edu/portal-common => ../common
+
+replace github.com/johnbellone/grpc-middleware-sentry => github.com/janwytze/grpc-middleware-sentry v0.4.1-0.20260505112459-44a6e7845810

@@ -1,9 +1,9 @@
 module github.com/hm-edu/eab-rest-interface
 
-go 1.25.8
+go 1.26.0
 
 require (
-	github.com/hm-edu/portal-common v0.0.0-20260102070157-b3a9db657b6e
+	github.com/hm-edu/portal-common v0.0.0-20260420051753-adbc9362a678
 	github.com/smallstep/certificates v0.30.2
 	go.uber.org/zap v1.28.0
 	google.golang.org/grpc v1.81.1
@@ -177,3 +177,5 @@ replace github.com/smallstep/nosql => github.com/hm-edu/nosql v0.4.1-0.202303050
 replace github.com/smallstep/certificates => github.com/hm-edu/certificates v0.0.0-20260309055156-559c0cb923b7
 
 replace github.com/dgraph-io/ristretto => github.com/dgraph-io/ristretto v0.1.1
+
+replace github.com/johnbellone/grpc-middleware-sentry => github.com/janwytze/grpc-middleware-sentry v0.4.1-0.20260505112459-44a6e7845810
