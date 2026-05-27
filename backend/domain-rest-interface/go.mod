@@ -1,9 +1,9 @@
 module github.com/hm-edu/domain-rest-interface
 
-go 1.25.0
+go 1.26.0
 
 require (
-	github.com/hm-edu/portal-common v0.0.0-20260309064552-d455a2746541
+	github.com/hm-edu/portal-common v0.0.0-20260420051753-adbc9362a678
 	go.uber.org/zap v1.28.0
 	google.golang.org/grpc v1.81.1
 )
@@ -104,3 +104,5 @@ require (
 )
 
 replace github.com/hm-edu/portal-common => ../common
+
+replace github.com/johnbellone/grpc-middleware-sentry => github.com/janwytze/grpc-middleware-sentry v0.4.1-0.20260505112459-44a6e7845810

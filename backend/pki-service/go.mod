@@ -1,6 +1,6 @@
 module github.com/hm-edu/pki-service
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
@@ -80,7 +80,7 @@ require (
 require (
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
-	github.com/hm-edu/portal-common v0.0.0-20260102070157-b3a9db657b6e
+	github.com/hm-edu/portal-common v0.0.0-20260420051753-adbc9362a678
 	github.com/spf13/cast v1.10.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	golang.org/x/net v0.55.0 // indirect
@@ -101,3 +101,5 @@ require (
 )
 
 replace github.com/hm-edu/portal-common => ../common
+
+replace github.com/johnbellone/grpc-middleware-sentry => github.com/janwytze/grpc-middleware-sentry v0.4.1-0.20260505112459-44a6e7845810

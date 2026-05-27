@@ -1,6 +1,6 @@
 module github.com/hm-edu/portal-common
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/MicahParks/keyfunc/v3 v3.8.0
