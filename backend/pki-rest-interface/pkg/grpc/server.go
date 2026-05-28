@@ -9,7 +9,6 @@ import (
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
-	grpc_sentry "github.com/johnbellone/grpc-middleware-sentry"
 
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/zap"
@@ -85,7 +84,7 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 				s.logger.Error("Sentry initialization failed", zap.Error(err))
 			}
 			s.logger = zapsentry.AttachCoreToLogger(core, s.logger)
-			interceptors = append(interceptors, grpc_sentry.UnaryServerInterceptor())
+			//interceptors = append(interceptors, grpc_sentry.UnaryServerInterceptor())
 		}
 	}
 

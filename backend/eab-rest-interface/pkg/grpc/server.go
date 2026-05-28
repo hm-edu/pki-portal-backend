@@ -9,7 +9,6 @@ import (
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
-	grpc_sentry "github.com/johnbellone/grpc-middleware-sentry"
 
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/api"
@@ -91,7 +90,7 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 				s.logger.Error("Sentry initialization failed", zap.Error(err))
 			}
 			s.logger = zapsentry.AttachCoreToLogger(core, s.logger)
-			interceptors = append(interceptors, grpc_sentry.UnaryServerInterceptor())
+			//interceptors = append(interceptors, grpc_sentry.UnaryServerInterceptor())
 		}
 	}
 
@@ -131,7 +130,7 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 func domainClient(host string, sentryDSN string) (pb.DomainServiceClient, error) {
 	var interceptor []grpc.UnaryClientInterceptor
 	if sentryDSN != "" {
-		interceptor = append(interceptor, grpc_sentry.UnaryClientInterceptor())
+		//	interceptor = append(interceptor, grpc_sentry.UnaryClientInterceptor())
 	}
 	conn, err := api.ConnectGRPC(host, grpc.WithChainUnaryInterceptor(interceptor...))
 	if err != nil {
