@@ -57,16 +57,16 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 		s.logger.Fatal("failed to listen", zap.Int("port", s.config.Port))
 	}
 
-	interceptors := []grpc.UnaryServerInterceptor{
-		grpc_recovery.UnaryServerInterceptor(),
-		grpc_zap.UnaryServerInterceptor(s.logger,
-			grpc_zap.WithDecider(func(fullMethodName string, err error) bool {
-				if fullMethodName == "/grpc.health.v1.Health/Check" && err == nil {
-					return false
-				}
-				return true
-			}),
-		)}
+	//interceptors := []grpc.UnaryServerInterceptor{
+	//	grpc_recovery.UnaryServerInterceptor(),
+	//	grpc_zap.UnaryServerInterceptor(s.logger,
+	//		grpc_zap.WithDecider(func(fullMethodName string, err error) bool {
+	//			if fullMethodName == "/grpc.health.v1.Health/Check" && err == nil {
+	//				return false
+	//			}
+	//			return true
+	//		}),
+	//	)}
 
 	if s.config.SentryDSN != "" {
 		if err := sentry.Init(sentry.ClientOptions{
@@ -88,7 +88,7 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	srv := grpc.NewServer(
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
-				interceptors...,
+			//interceptors...,
 			)),
 		grpc.StreamInterceptor(
 			grpc_middleware.ChainStreamServer(
