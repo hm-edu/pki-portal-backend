@@ -12,6 +12,7 @@ import (
 
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/api"
+	"github.com/hm-edu/portal-common/interceptor"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -65,32 +66,30 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 				}
 				return true
 			}),
-		)}
+		),
+		interceptor.UnaryServerInterceptor(),
+	}
 
 	if s.config.SentryDSN != "" {
-
 		if client, err := sentry.NewClient(sentry.ClientOptions{
-			Dsn: s.config.SentryDSN,
-			// Set TracesSampleRate to 1.0 to capture 100%
-			// of transactions for performance monitoring.
-			// We recommend adjusting this value in production,
+			Dsn:                s.config.SentryDSN,
 			TracesSampleRate:   1.0,
 			EnableTracing:      true,
 			IgnoreTransactions: []string{"/grpc.health.v1.Health/Check"},
 		}); err != nil {
 			s.logger.Sugar().Warnf("Sentry initialization failed: %v\n", err)
 		} else {
+			sentry.CurrentHub().BindClient(client)
 			cfg := zapsentry.Configuration{
-				Level:             zapcore.WarnLevel, //when to send message to sentry
-				EnableBreadcrumbs: true,              // enable sending breadcrumbs to Sentry
-				BreadcrumbLevel:   zapcore.InfoLevel, // at what level should we sent breadcrumbs to sentry, this level can't be higher than `Level`
+				Level:             zapcore.WarnLevel,
+				EnableBreadcrumbs: true,
+				BreadcrumbLevel:   zapcore.InfoLevel,
 			}
 			core, err := zapsentry.NewCore(cfg, zapsentry.NewSentryClientFromClient(client))
 			if err != nil {
 				s.logger.Error("Sentry initialization failed", zap.Error(err))
 			}
 			s.logger = zapsentry.AttachCoreToLogger(core, s.logger)
-			//interceptors = append(interceptors, grpc_sentry.UnaryServerInterceptor())
 		}
 	}
 
@@ -102,12 +101,13 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 		grpc.StreamInterceptor(
 			grpc_middleware.ChainStreamServer(
 				grpc_recovery.StreamServerInterceptor(),
-				grpc_zap.StreamServerInterceptor(s.logger))))
+				grpc_zap.StreamServerInterceptor(s.logger),
+				interceptor.StreamServerInterceptor())))
 
 	server := health.NewServer()
 	reflection.Register(srv)
 
-	domainClient, err := domainClient(s.config.DomainService, s.config.SentryDSN)
+	domainClient, err := domainClient(s.config.DomainService)
 	if err != nil {
 		s.logger.Fatal("failed to create domain client", zap.Error(err))
 	}
@@ -127,12 +127,8 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	srv.GracefulStop()
 }
 
-func domainClient(host string, sentryDSN string) (pb.DomainServiceClient, error) {
-	var interceptor []grpc.UnaryClientInterceptor
-	if sentryDSN != "" {
-		//	interceptor = append(interceptor, grpc_sentry.UnaryClientInterceptor())
-	}
-	conn, err := api.ConnectGRPC(host, grpc.WithChainUnaryInterceptor(interceptor...))
+func domainClient(host string) (pb.DomainServiceClient, error) {
+	conn, err := api.ConnectGRPC(host, grpc.WithChainUnaryInterceptor(interceptor.UnaryClientInterceptor()))
 	if err != nil {
 		return nil, err
 	}

@@ -95,7 +95,6 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jackc/pgx/v4 v4.18.3
-	github.com/johnbellone/grpc-middleware-sentry v0.4.0
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
 )

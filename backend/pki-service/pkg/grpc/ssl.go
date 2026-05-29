@@ -74,7 +74,7 @@ func mapCertificate(x *ent.Certificate) *pb.SslCertificateDetails {
 }
 
 func flattenCertificates(certs []*x509.Certificate) string {
-	var result []byte
+	result := make([]byte, 0, len(certs))
 	for _, cert := range certs {
 		c := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw})
 		result = append(result, c...)

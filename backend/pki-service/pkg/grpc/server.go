@@ -14,6 +14,7 @@ import (
 
 	"github.com/hm-edu/pki-service/ent"
 	"github.com/hm-edu/pki-service/pkg/cfg"
+	"github.com/hm-edu/portal-common/interceptor"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -57,16 +58,18 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 		s.logger.Fatal("failed to listen", zap.Int("port", s.config.Port))
 	}
 
-	//interceptors := []grpc.UnaryServerInterceptor{
-	//	grpc_recovery.UnaryServerInterceptor(),
-	//	grpc_zap.UnaryServerInterceptor(s.logger,
-	//		grpc_zap.WithDecider(func(fullMethodName string, err error) bool {
-	//			if fullMethodName == "/grpc.health.v1.Health/Check" && err == nil {
-	//				return false
-	//			}
-	//			return true
-	//		}),
-	//	)}
+	interceptors := []grpc.UnaryServerInterceptor{
+		grpc_recovery.UnaryServerInterceptor(),
+		grpc_zap.UnaryServerInterceptor(s.logger,
+			grpc_zap.WithDecider(func(fullMethodName string, err error) bool {
+				if fullMethodName == "/grpc.health.v1.Health/Check" && err == nil {
+					return false
+				}
+				return true
+			}),
+		),
+		interceptor.UnaryServerInterceptor(),
+	}
 
 	if s.config.SentryDSN != "" {
 		if err := sentry.Init(sentry.ClientOptions{
@@ -88,12 +91,13 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	srv := grpc.NewServer(
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
-			//interceptors...,
+				interceptors...,
 			)),
 		grpc.StreamInterceptor(
 			grpc_middleware.ChainStreamServer(
 				grpc_recovery.StreamServerInterceptor(),
-				grpc_zap.StreamServerInterceptor(s.logger))))
+				grpc_zap.StreamServerInterceptor(s.logger),
+				interceptor.StreamServerInterceptor())))
 
 	server := NewHealthChecker()
 	reflection.Register(srv)

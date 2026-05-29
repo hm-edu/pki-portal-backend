@@ -55,7 +55,7 @@ require (
 )
 
 require (
-	github.com/getsentry/sentry-go v0.46.2 // indirect
+	github.com/getsentry/sentry-go v0.46.2
 	github.com/go-playground/validator/v10 v10.30.2
 	go.uber.org/zap v1.28.0
 	golang.org/x/sys v0.45.0 // indirect

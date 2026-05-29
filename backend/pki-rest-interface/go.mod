@@ -7,7 +7,6 @@ require (
 	github.com/getsentry/sentry-go/echo v0.46.2
 	github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776
 	github.com/hm-edu/portal-common v0.0.0-20260420051753-adbc9362a678
-	github.com/johnbellone/grpc-middleware-sentry v0.4.0
 	github.com/labstack/echo/v5 v5.1.1
 	github.com/labstack/gommon v0.5.0
 	github.com/spf13/cobra v1.10.2
