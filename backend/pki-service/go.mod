@@ -3,7 +3,7 @@ module github.com/hm-edu/pki-service
 go 1.26.0
 
 require (
-	github.com/DATA-DOG/go-sqlmock v1.5.0
+	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/TheZeroSlave/zapsentry v1.24.0
 	github.com/getsentry/sentry-go v0.46.2
 	github.com/hm-edu/harica v1.10.0
