@@ -116,7 +116,24 @@ func hubFromContext(ctx context.Context) (*sentry.Hub, context.Context) {
 	return hub, ctx
 }
 
+// serverTransactionOpts builds the SpanOption slice for StartTransaction.
+// continueFromMetadata may return nil when there is no incoming trace header;
+// passing a nil SpanOption to the Sentry SDK causes a nil-pointer panic because
+// the SDK calls every option unconditionally, so we filter it out here.
+func serverTransactionOpts(method string, md metadata.MD) []sentry.SpanOption {
+	opts := []sentry.SpanOption{
+		sentry.WithOpName("grpc.server"),
+		sentry.WithDescription(method),
+		sentry.WithTransactionSource(sentry.SourceURL),
+	}
+	if traceOpt := continueFromMetadata(md); traceOpt != nil {
+		opts = append(opts, traceOpt)
+	}
+	return opts
+}
+
 // continueFromMetadata extracts a Sentry trace from incoming gRPC metadata.
+// Returns nil when no trace header is present.
 func continueFromMetadata(md metadata.MD) sentry.SpanOption {
 	if md == nil {
 		return nil
@@ -186,12 +203,7 @@ func UnaryServerInterceptor(opts ...Option) grpc.UnaryServerInterceptor {
 		hub, ctx := hubFromContext(ctx)
 
 		md, _ := metadata.FromIncomingContext(ctx)
-		tx := sentry.StartTransaction(ctx, info.FullMethod,
-			sentry.WithOpName("grpc.server"),
-			sentry.WithDescription(info.FullMethod),
-			sentry.WithTransactionSource(sentry.SourceURL),
-			continueFromMetadata(md),
-		)
+		tx := sentry.StartTransaction(ctx, info.FullMethod, serverTransactionOpts(info.FullMethod, md)...)
 		tx.SetData("grpc.request.method", info.FullMethod)
 		ctx = tx.Context()
 		defer tx.Finish()
@@ -217,12 +229,7 @@ func StreamServerInterceptor(opts ...Option) grpc.StreamServerInterceptor {
 		hub, ctx := hubFromContext(ctx)
 
 		md, _ := metadata.FromIncomingContext(ctx)
-		tx := sentry.StartTransaction(ctx, info.FullMethod,
-			sentry.WithOpName("grpc.server"),
-			sentry.WithDescription(info.FullMethod),
-			sentry.WithTransactionSource(sentry.SourceURL),
-			continueFromMetadata(md),
-		)
+		tx := sentry.StartTransaction(ctx, info.FullMethod, serverTransactionOpts(info.FullMethod, md)...)
 		tx.SetData("grpc.request.method", info.FullMethod)
 		ctx = tx.Context()
 		defer tx.Finish()
