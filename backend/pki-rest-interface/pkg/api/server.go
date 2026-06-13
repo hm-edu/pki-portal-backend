@@ -22,6 +22,7 @@ import (
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/api"
 	commonAuth "github.com/hm-edu/portal-common/auth"
+	commonInterceptor "github.com/hm-edu/portal-common/interceptor"
 	"github.com/hm-edu/portal-common/logging"
 
 	"go.uber.org/zap"
@@ -155,7 +156,7 @@ func (server *Server) wireRoutesAndMiddleware() {
 func domainClient(host string, sentryDSN string) (pb.DomainServiceClient, error) {
 	var interceptor []grpc.UnaryClientInterceptor
 	if sentryDSN != "" {
-		//interceptor = append(interceptor, grpc_sentry.UnaryClientInterceptor())
+		interceptor = append(interceptor, commonInterceptor.UnaryClientInterceptor())
 	}
 	conn, err := api.ConnectGRPC(host, grpc.WithChainUnaryInterceptor(interceptor...))
 	if err != nil {
@@ -167,7 +168,7 @@ func domainClient(host string, sentryDSN string) (pb.DomainServiceClient, error)
 func smimeClient(host string, sentryDSN string) (pb.SmimeServiceClient, error) {
 	var interceptor []grpc.UnaryClientInterceptor
 	if sentryDSN != "" {
-		//interceptor = append(interceptor, grpc_sentry.UnaryClientInterceptor())
+		interceptor = append(interceptor, commonInterceptor.UnaryClientInterceptor())
 	}
 	conn, err := api.ConnectGRPC(host, grpc.WithChainUnaryInterceptor(interceptor...))
 	if err != nil {
@@ -179,7 +180,7 @@ func smimeClient(host string, sentryDSN string) (pb.SmimeServiceClient, error) {
 func sslClient(host string, sentryDSN string) (pb.SSLServiceClient, error) {
 	var interceptor []grpc.UnaryClientInterceptor
 	if sentryDSN != "" {
-		//interceptor = append(interceptor, grpc_sentry.UnaryClientInterceptor())
+		interceptor = append(interceptor, commonInterceptor.UnaryClientInterceptor())
 	}
 	conn, err := api.ConnectGRPC(host, grpc.WithChainUnaryInterceptor(interceptor...))
 	if err != nil {

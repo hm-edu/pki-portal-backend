@@ -10,6 +10,7 @@ import (
 	"github.com/hm-edu/domain-rest-interface/pkg/store"
 	pb "github.com/hm-edu/portal-apis"
 	commonApi "github.com/hm-edu/portal-common/api"
+	commonInterceptor "github.com/hm-edu/portal-common/interceptor"
 	"github.com/hm-edu/portal-common/signals"
 	"github.com/hm-edu/portal-common/tracing"
 	"github.com/spf13/cobra"
@@ -84,7 +85,7 @@ var runCmd = &cobra.Command{
 func sslClient(host string, sentryDSN string) (pb.SSLServiceClient, error) {
 	var interceptor []googleGrpc.UnaryClientInterceptor
 	if sentryDSN != "" {
-		//interceptor = append(interceptor, grpc_sentry.UnaryClientInterceptor())
+		interceptor = append(interceptor, commonInterceptor.UnaryClientInterceptor())
 	}
 	conn, err := commonApi.ConnectGRPC(host, googleGrpc.WithChainUnaryInterceptor(interceptor...))
 	if err != nil {
