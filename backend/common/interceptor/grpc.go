@@ -94,7 +94,7 @@ type wrappedStream struct {
 func (w *wrappedStream) Context() context.Context { return w.ctx }
 
 // recoverWithSentry reports a panic to Sentry and optionally re-panics.
-func recoverWithSentry(hub *sentry.Hub, ctx context.Context, o options) {
+func recoverWithSentry(ctx context.Context, hub *sentry.Hub, o options) {
 	if err := recover(); err != nil {
 		hub.RecoverWithContext(ctx, err)
 		if o.waitForDelivery {
@@ -208,7 +208,7 @@ func UnaryServerInterceptor(opts ...Option) grpc.UnaryServerInterceptor {
 		ctx = tx.Context()
 		defer tx.Finish()
 
-		defer recoverWithSentry(hub, ctx, o)
+		defer recoverWithSentry(ctx, hub, o)
 
 		resp, err = handler(ctx, req)
 		if err != nil && o.reportOn(err) {
@@ -234,7 +234,7 @@ func StreamServerInterceptor(opts ...Option) grpc.StreamServerInterceptor {
 		ctx = tx.Context()
 		defer tx.Finish()
 
-		defer recoverWithSentry(hub, ctx, o)
+		defer recoverWithSentry(ctx, hub, o)
 
 		err = handler(srv, &wrappedStream{ss, ctx})
 		if err != nil && o.reportOn(err) {
