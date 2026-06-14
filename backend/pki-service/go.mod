@@ -70,7 +70,10 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-require github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776
+require (
+	github.com/go-co-op/gocron v1.37.0
+	github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776
+)
 
 require (
 	go.uber.org/multierr v1.11.0 // indirect
@@ -91,7 +94,7 @@ require (
 
 require (
 	entgo.io/ent v0.14.6
-	github.com/go-co-op/gocron v1.37.0
+	github.com/go-co-op/gocron/v2 v2.21.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jackc/pgx/v4 v4.18.3

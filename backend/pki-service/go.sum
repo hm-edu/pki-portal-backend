@@ -52,6 +52,7 @@ github.com/getsentry/sentry-go/echo v0.46.2 h1:M1i9deyi7FXtYFRkVpLWy48sCYOI0pBru
 github.com/getsentry/sentry-go/echo v0.46.2/go.mod h1:+sFEwKe3y6hVJuiifCkLwOD1h9CDJ/3Qn8ez+4q0tvM=
 github.com/go-co-op/gocron v1.37.0 h1:ZYDJGtQ4OMhTLKOKMIch+/CY70Brbb1dGdooLEhh7b0=
 github.com/go-co-op/gocron v1.37.0/go.mod h1:3L/n6BkO7ABj+TrfSVXLRzsP26zmikL4ISkLQ0O8iNY=
+github.com/go-co-op/gocron/v2 v2.21.2/go.mod h1:5lEiCKk1oVJV39Zg7/YG10OnaVrDAV5GGR6O0663k6U=
 github.com/go-errors/errors v1.4.2 h1:J6MZopCL4uSllY1OfXM374weqZFFItUbrImctkmUxIA=
 github.com/go-errors/errors v1.4.2/go.mod h1:sIVyrIiJhuEF+Pj9Ebtd6P/rEYROXFi3BopGUQ5a5Og=
 github.com/go-kit/log v0.1.0/go.mod h1:zbhenjAZHb184qTLMA9ZjW7ThYL0H2mk7Q6pNt4vbaY=
