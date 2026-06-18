@@ -53,7 +53,10 @@ var runCmd = &cobra.Command{
 			logger.Fatal("Error updating certificates", zap.Error(errUpdate))
 		}
 
-		s := gocron.NewScheduler(time.UTC)
+		s, err := gocron.NewScheduler(gocron.WithLocation(time.UTC))
+		if err != nil {
+			logger.Fatal("Error creating scheduler", zap.Error(err))
+		}
 		if viper.GetBool("enable_notifications") {
 
 			w := worker.Notifier{Db: database.DB.Db,
@@ -64,24 +67,35 @@ var runCmd = &cobra.Command{
 				MailToBcc: viper.GetString("mail_bcc"),
 			}
 
-			_, err := s.Every(1).Day().At("09:00").Do(func() {
-				if err := w.Notify(logger); err != nil {
-					logger.Error("Error while sending notifications", zap.Error(err))
-				}
-			})
+			_, err := s.NewJob(
+				gocron.DailyJob(1,
+					gocron.NewAtTimes(gocron.NewAtTime(9, 0, 0)),
+				),
+				gocron.NewTask(func() {
+					if err := w.Notify(logger); err != nil {
+						logger.Error("Error while sending notifications", zap.Error(err))
+					}
+				}),
+			)
 			if err != nil {
 				logger.Error("Error while scheduling notifications", zap.Error(err))
 			}
 		}
-		_, err := s.Every(1).Day().At("01:00").Do(func() {
-			if err := worker.Cleanup(logger, database.DB.Db); err != nil {
-				logger.Error("Error while cleaning up", zap.Error(err))
-			}
-		})
+
+		_, err = s.NewJob(
+			gocron.DailyJob(1,
+				gocron.NewAtTimes(gocron.NewAtTime(1, 0, 0)),
+			),
+			gocron.NewTask(func() {
+				if err := worker.Cleanup(logger, database.DB.Db); err != nil {
+					logger.Error("Error while cleaning up", zap.Error(err))
+				}
+			}),
+		)
 		if err != nil {
 			logger.Error("Error while scheduling cleanup", zap.Error(err))
 		}
-		s.StartAsync()
+		s.Start()
 		// start gRPC server
 		if grpcCfg.Port > 0 {
 			grpcSrv, _ := grpc.NewServer(&grpcCfg, logger, &pkiCfg, database.DB.Db)
