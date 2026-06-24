@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/vscode/devcontainers/go:1.21
+FROM mcr.microsoft.com/vscode/devcontainers/go:1.26
 
 # [Choice] Node.js version: none, lts/*, 16, 14, 12, 10
 ARG NODE_VERSION="none"
