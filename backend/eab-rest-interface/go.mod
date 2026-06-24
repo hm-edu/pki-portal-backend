@@ -36,6 +36,7 @@ require (
 	github.com/getsentry/sentry-go v0.47.0
 	github.com/getsentry/sentry-go/echo v0.47.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.3
 	github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776
 	github.com/labstack/echo/v5 v5.2.1
 	github.com/labstack/gommon v0.5.0
