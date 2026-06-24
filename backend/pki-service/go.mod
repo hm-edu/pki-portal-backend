@@ -5,7 +5,7 @@ go 1.26.0
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/TheZeroSlave/zapsentry v1.24.0
-	github.com/getsentry/sentry-go v0.46.2
+	github.com/getsentry/sentry-go v0.47.0
 	github.com/hm-edu/harica v1.10.0
 	github.com/mattn/go-sqlite3 v1.14.28
 	github.com/spf13/cobra v1.10.2
@@ -15,13 +15,13 @@ require (
 
 require (
 	github.com/boombuler/barcode v1.1.0 // indirect
-	github.com/getsentry/sentry-go/echo v0.46.2 // indirect
+	github.com/getsentry/sentry-go/echo v0.47.0 // indirect
 	github.com/go-resty/resty/v2 v2.17.2 // indirect
 	github.com/go-test/deep v1.0.8 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.3.1 // indirect
 	github.com/jonboulle/clockwork v0.5.0 // indirect
-	github.com/labstack/echo/v5 v5.1.1 // indirect
+	github.com/labstack/echo/v5 v5.2.1 // indirect
 	github.com/pquerna/otp v1.5.0 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/afero v1.15.0 // indirect
@@ -50,11 +50,11 @@ require (
 	github.com/jackc/pgtype v1.14.4 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/pelletier/go-toml/v2 v2.3.1 // indirect
+	github.com/pelletier/go-toml/v2 v2.4.2 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/client_golang v1.23.2
 	github.com/prometheus/client_model v0.6.2 // indirect
-	github.com/prometheus/common v0.68.1 // indirect
+	github.com/prometheus/common v0.69.0 // indirect
 	github.com/prometheus/procfs v0.20.1 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
@@ -65,7 +65,7 @@ require (
 	golang.org/x/sync v0.21.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
 	golang.org/x/tools v0.46.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260610212136-7ab31c22f7ad // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260622175928-b703f567277d // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
