@@ -72,6 +72,7 @@ require (
 require (
 	github.com/go-co-op/gocron/v2 v2.21.2
 	github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776
+	github.com/jackc/pgx/v4 v4.18.2
 )
 
 require (
@@ -95,7 +96,7 @@ require (
 	entgo.io/ent v0.14.6
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/jackc/pgx/v4 v4.18.3
+	github.com/jackc/pgx/v5 v5.10.0
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
 )
