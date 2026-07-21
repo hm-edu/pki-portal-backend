@@ -11,7 +11,6 @@ import (
 	"github.com/TheZeroSlave/zapsentry"
 	"github.com/getsentry/sentry-go"
 
-	harica "github.com/hm-edu/harica/client"
 	"github.com/hm-edu/harica/models"
 
 	"github.com/hm-edu/pki-service/ent"
@@ -94,34 +93,18 @@ type sslAPIServer struct {
 	db     *ent.Client
 	cfg    *cfg.PKIConfiguration
 	logger *zap.Logger
+	harica *haricaClients
 
 	last     *time.Time
 	duration *time.Duration
 }
 
-func newSslAPIServer(cfg *cfg.PKIConfiguration, db *ent.Client) (*sslAPIServer, error) {
-	_, err := harica.NewClient(
-		cfg.User,
-		cfg.Password,
-		cfg.TotpSeed,
-		harica.WithRetry(3),
-	)
-	if err != nil {
-		return nil, err
-	}
-	_, err = harica.NewClient(
-		cfg.ValidationUser,
-		cfg.ValidationPassword,
-		cfg.ValidationTotpSeed,
-		harica.WithRetry(3),
-	)
-	if err != nil {
-		return nil, err
-	}
+func newSslAPIServer(cfg *cfg.PKIConfiguration, db *ent.Client, clients *haricaClients) *sslAPIServer {
 	instance := &sslAPIServer{
 		cfg:    cfg,
 		logger: zap.L(),
 		db:     db,
+		harica: clients,
 	}
 	_ = promauto.NewGaugeFunc(prometheus.GaugeOpts{
 		Name: "ssl_issue_last_duration",
@@ -143,7 +126,7 @@ func newSslAPIServer(cfg *cfg.PKIConfiguration, db *ent.Client) (*sslAPIServer, 
 		return 0
 	})
 
-	return instance, nil
+	return instance
 }
 
 func (s *sslAPIServer) CertificateDetails(ctx context.Context, req *pb.CertificateDetailsRequest) (*pb.SslCertificateDetails, error) {
@@ -262,44 +245,20 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		return s.handleError("Error while storing certificate", err, logger, hub)
 	}
 
-	client, err := harica.NewClient(
-		s.cfg.User,
-		s.cfg.Password,
-		s.cfg.TotpSeed,
-		harica.WithRetry(3),
-	)
-	if err != nil {
-		return s.handleError("Error while creating HARICA client", err, logger, hub)
-	}
-
-	validationClient, err := harica.NewClient(
-		s.cfg.ValidationUser,
-		s.cfg.ValidationPassword,
-		s.cfg.ValidationTotpSeed,
-		harica.WithRetry(3),
-	)
-	if err != nil {
-		return s.handleError("Error while creating HARICA validation client", err, logger, hub)
-	}
-
-	// Ensure we have a valid session
-	err = client.SessionRefresh(true)
-	if err != nil {
-		return s.handleError("Error while refreshing session", err, logger, hub)
-	}
-	// Ensure we have a valid session
-	err = validationClient.SessionRefresh(true)
-	if err != nil {
-		return s.handleError("Error while refreshing session", err, logger, hub)
-	}
+	client := s.harica.client
+	validationClient := s.harica.validation
 
 	// Check which organization the domains belong to
-	orgs, err := client.CheckMatchingOrganization(sans)
+	orgs, err := retryHarica(ctx, logger, client, "CheckMatchingOrganization", func() ([]models.OrganizationResponse, error) {
+		return client.CheckMatchingOrganization(sans)
+	})
 	if err != nil || len(orgs) == 0 {
 		return s.handleError("Error while checking organization", err, logger, hub)
 	}
 
-	transaction, err := client.RequestCertificate(sans, req.Csr, s.cfg.CertType, orgs[0])
+	transaction, err := retryHarica(ctx, logger, client, "RequestCertificate", func() (*models.CertificateRequestResponse, error) {
+		return client.RequestCertificate(sans, req.Csr, s.cfg.CertType, orgs[0])
+	})
 	if err != nil {
 		return s.handleError("Error while requesting certificate", err, logger, hub)
 	}
@@ -309,7 +268,9 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		return s.handleError("Error while storing certificate", err, logger, hub)
 	}
 
-	reviews, err := validationClient.GetPendingReviews()
+	reviews, err := retryHarica(ctx, logger, validationClient, "GetPendingReviews", func() ([]models.ReviewResponse, error) {
+		return validationClient.GetPendingReviews()
+	})
 	if err != nil {
 		return s.handleError("Error while fetching pending reviews", err, logger, hub)
 	}
@@ -318,7 +279,9 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	for _, r := range reviews {
 		if r.TransactionID == transaction.TransactionID {
 			for _, sub := range r.ReviewGetDTOs {
-				err = validationClient.ApproveRequest(sub.ReviewID, "Auto Approval", sub.ReviewValue)
+				err = retryHaricaVoid(ctx, logger, validationClient, "ApproveRequest", func() error {
+					return validationClient.ApproveRequest(sub.ReviewID, "Auto Approval", sub.ReviewValue)
+				})
 				if err != nil {
 					return s.handleError("Error while approving request", err, logger, hub)
 				}
@@ -327,7 +290,9 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		}
 	}
 
-	transactions, err := client.GetMyTransactions()
+	transactions, err := retryHarica(ctx, logger, client, "GetMyTransactions", func() ([]models.TransactionResponse, error) {
+		return client.GetMyTransactions()
+	})
 	if err != nil {
 		return s.handleError("Error while fetching transactions", err, logger, hub)
 	}
@@ -340,7 +305,9 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		}
 	}
 	logger.Info("Request approved. Collecting certificate")
-	cert, err := client.GetCertificate(transaction.TransactionID)
+	cert, err := retryHarica(ctx, logger, client, "GetCertificate", func() (*models.CertificateResponse, error) {
+		return client.GetCertificate(transaction.TransactionID)
+	})
 	if err != nil {
 		return s.handleError("Error while obtaining certificate", err, logger, hub)
 	}
@@ -392,27 +359,12 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 		return nil, status.Errorf(codes.Internal, "Failed to revoke certificate")
 	}
 
-	client, err := harica.NewClient(
-		s.cfg.User,
-		s.cfg.Password,
-		s.cfg.TotpSeed,
-		harica.WithRetry(3),
-	)
-	if err != nil {
-		return errorReturn(err, logger)
-	}
+	client := s.harica.client
+	validationClient := s.harica.validation
 
-	validationClient, err := harica.NewClient(
-		s.cfg.ValidationUser,
-		s.cfg.ValidationPassword,
-		s.cfg.ValidationTotpSeed,
-		harica.WithRetry(3),
-	)
-	if err != nil {
-		return errorReturn(err, logger)
-	}
-
-	reasons, err := client.GetRevocationReasons()
+	reasons, err := retryHarica(ctx, logger, client, "GetRevocationReasons", func() ([]models.RevocationReasonsResponse, error) {
+		return client.GetRevocationReasons()
+	})
 	if err != nil {
 		return errorReturn(err, logger)
 	}
@@ -444,7 +396,9 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 			return &emptypb.Empty{}, nil
 		}
 		logger.Info("Revoking certificate", zap.String("transaction_id", c.TransactionId), zap.String("reason", reason.Name), zap.String("description", req.Reason))
-		err = validationClient.RevokeCertificate(*reason, req.Reason, c.TransactionId)
+		err = retryHaricaVoid(ctx, logger, validationClient, "RevokeCertificate", func() error {
+			return validationClient.RevokeCertificate(*reason, "", c.TransactionId)
+		})
 		if err != nil {
 			logger.Error("Revoking request failed", zap.Error(err))
 			return errorReturn(err, logger)
@@ -481,7 +435,9 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 					ret <- struct{ err error }{}
 					return
 				}
-				err = validationClient.RevokeCertificate(*reason, req.Reason, c.TransactionId)
+				err := retryHaricaVoid(ctx, logger, validationClient, "RevokeCertificate", func() error {
+					return validationClient.RevokeCertificate(*reason, "", c.TransactionId)
+				})
 				if err != nil {
 					ret <- struct{ err error }{err}
 					return

@@ -106,16 +106,14 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	// "Clients are safe for concurrent use by multiple goroutines."
 	// => one http client is fine ;)
 
-	ssl, err := newSslAPIServer(s.pkiCfg, s.db)
+	// The HARICA clients are shared between the SSL and the SMIME server so
+	// the sessions are reused across all requests.
+	clients, err := newHaricaClients(s.pkiCfg)
 	if err != nil {
-		s.logger.Fatal("failed to create ssl server", zap.Error(err))
+		s.logger.Fatal("failed to create HARICA clients", zap.Error(err))
 	}
-	pb.RegisterSSLServiceServer(srv, ssl)
-	smime, err := newSmimeAPIServer(s.pkiCfg, s.db)
-	if err != nil {
-		s.logger.Fatal("failed to create smime server", zap.Error(err))
-	}
-	pb.RegisterSmimeServiceServer(srv, smime)
+	pb.RegisterSSLServiceServer(srv, newSslAPIServer(s.pkiCfg, s.db, clients))
+	pb.RegisterSmimeServiceServer(srv, newSmimeAPIServer(s.pkiCfg, s.db, clients))
 	grpc_health_v1.RegisterHealthServer(srv, server)
 
 	go func() {

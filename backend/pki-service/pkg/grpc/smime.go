@@ -11,7 +11,6 @@ import (
 
 	"github.com/TheZeroSlave/zapsentry"
 	"github.com/getsentry/sentry-go"
-	harica "github.com/hm-edu/harica/client"
 	"github.com/hm-edu/harica/models"
 	"github.com/hm-edu/pki-service/ent"
 	"github.com/hm-edu/pki-service/ent/smimecertificate"
@@ -30,24 +29,16 @@ type smimeAPIServer struct {
 	cfg    *cfg.PKIConfiguration
 	logger *zap.Logger
 	db     *ent.Client
+	harica *haricaClients
 }
 
-func newSmimeAPIServer(cfg *cfg.PKIConfiguration, db *ent.Client) (*smimeAPIServer, error) {
-	_, err := harica.NewClient(
-		cfg.ValidationUser,
-		cfg.ValidationPassword,
-		cfg.ValidationTotpSeed,
-		harica.WithRetry(3),
-	)
-	if err != nil {
-		return nil, err
-	}
-	instance := &smimeAPIServer{
+func newSmimeAPIServer(cfg *cfg.PKIConfiguration, db *ent.Client, clients *haricaClients) *smimeAPIServer {
+	return &smimeAPIServer{
 		cfg:    cfg,
 		logger: zap.L(),
 		db:     db,
+		harica: clients,
 	}
-	return instance, nil
 }
 
 const (
@@ -166,12 +157,7 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 	logger.Info("Issuing new smime certificate")
 	block, _ := pem.Decode([]byte(req.Csr))
 
-	client, err := harica.NewClient(s.cfg.ValidationUser, s.cfg.ValidationPassword, s.cfg.ValidationTotpSeed)
-	if err != nil {
-		hub.CaptureException(err)
-		logger.Error("Error creating validation client", zap.Error(err))
-		return nil, status.Error(codes.Internal, "Error creating validation client")
-	}
+	client := s.harica.validation
 
 	// Validate the passed CSR to comply the server-side requirements (e.g. key-strength, key-type, etc.)
 	// The "real" user-data will be filled in by sectigo so we can sort of ignore any data provided by the user and simply pass the CSR to sectigo
@@ -202,7 +188,9 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 	}
 
 	// Fetch the available groups and use the first one (should be the only one)
-	groups, err := client.GetOrganizationsBulk()
+	groups, err := retryHarica(ctx, logger, client, "GetOrganizationsBulk", func() ([]models.Organization, error) {
+		return client.GetOrganizationsBulk()
+	})
 	if err != nil {
 		hub.CaptureException(err)
 		logger.Error("Error fetching organizations", zap.Error(err))
@@ -221,7 +209,10 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 			params.CertType = "natural_legal_lcp"
 		}
 	}
-	cert, err := client.RequestSmimeBulkCertificates(groups[0].OrganizationID, params)
+	// Not retried: a repeated bulk request would issue duplicate certificates.
+	cert, err := runHaricaOnce(client, func() (*models.SmimeBulkResponse, error) {
+		return client.RequestSmimeBulkCertificates(groups[0].OrganizationID, params)
+	})
 	if err != nil {
 		hub.CaptureException(err)
 		logger.Error("Error requesting certificate", zap.Error(err))
@@ -278,13 +269,10 @@ func (s *smimeAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSm
 
 	logger := log.With(zap.String("reason", req.Reason))
 	logger.Info("Revoking smime certificate")
-	client, err := harica.NewClient(s.cfg.ValidationUser, s.cfg.ValidationPassword, s.cfg.TotpSeed)
-	if err != nil {
-		hub.CaptureException(err)
-		logger.Error("Error creating validation client", zap.Error(err))
-		return nil, status.Error(codes.Internal, "Error creating validation client")
-	}
-	reasons, err := client.GetRevocationReasons()
+	client := s.harica.validation
+	reasons, err := retryHarica(ctx, logger, client, "GetRevocationReasons", func() ([]models.RevocationReasonsResponse, error) {
+		return client.GetRevocationReasons()
+	})
 	if err != nil {
 		return nil, status.Error(codes.Internal, "Error fetching revocation reasons")
 	}
@@ -312,7 +300,9 @@ func (s *smimeAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSm
 		}
 		for _, cert := range certs {
 			s.logger.Info("Revoking smime certificate", zap.String("serial", req.GetSerial()), zap.String("email", cert.Email), zap.String("transaction_id", cert.TransactionId))
-			err := client.RevokeSmimeBulkCertificateEntry(cert.TransactionId, req.Reason, reason.Name)
+			err := retryHaricaVoid(ctx, logger, client, "RevokeSmimeBulkCertificateEntry", func() error {
+				return client.RevokeSmimeBulkCertificateEntry(cert.TransactionId, req.Reason, reason.Name)
+			})
 			if err != nil {
 				return nil, status.Error(codes.Internal, "Error revoking certificate")
 			}
@@ -335,7 +325,9 @@ func (s *smimeAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSm
 		}
 		for _, cert := range certs {
 			s.logger.Info("Revoking smime certificate", zap.String("serial", req.GetSerial()), zap.String("email", cert.Email), zap.String("transaction_id", cert.TransactionId))
-			err := client.RevokeSmimeBulkCertificateEntry(cert.TransactionId, req.Reason, reason.Name)
+			err := retryHaricaVoid(ctx, logger, client, "RevokeSmimeBulkCertificateEntry", func() error {
+				return client.RevokeSmimeBulkCertificateEntry(cert.TransactionId, req.Reason, reason.Name)
+			})
 			if err != nil {
 				return nil, status.Error(codes.Internal, "Error revoking certificate")
 			}

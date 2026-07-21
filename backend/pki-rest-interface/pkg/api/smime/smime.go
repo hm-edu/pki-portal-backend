@@ -140,7 +140,7 @@ func (h *Handler) Revoke(c *echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid request").Wrap(err)
 	}
 
-	_, err = h.smime.RevokeCertificate(ctx, &pb.RevokeSmimeRequest{Reason: req.Reason, Identifier: &pb.RevokeSmimeRequest_Serial{Serial: req.Serial}})
+	_, err = h.smime.RevokeCertificate(ctx, &pb.RevokeSmimeRequest{Reason: "", Identifier: &pb.RevokeSmimeRequest_Serial{Serial: req.Serial}})
 	if err != nil {
 		hub.CaptureException(err)
 		logger.Error("error requesting smime certificate revocation", zap.Error(err))
