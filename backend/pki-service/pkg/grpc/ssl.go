@@ -293,14 +293,12 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	transactions, err := retryHarica(ctx, logger, client, "GetMyTransactions", func() ([]models.TransactionResponse, error) {
 		return client.GetMyTransactions()
 	})
-	if err != nil {
-		return s.handleError("Error while fetching transactions", err, logger, hub)
-	}
-
-	for _, t := range transactions {
-		if t.TransactionID == transaction.TransactionID {
-			if t.IsHighRisk && strings.EqualFold(t.TransactionStatus, "Pending") {
-				return s.handleError("pending transaction is high risk", fmt.Errorf("high risk transaction"), logger, hub)
+	if err == nil {
+		for _, t := range transactions {
+			if t.TransactionID == transaction.TransactionID {
+				if t.IsHighRisk && strings.EqualFold(t.TransactionStatus, "Pending") {
+					return s.handleError("pending transaction is high risk", fmt.Errorf("high risk transaction"), logger, hub)
+				}
 			}
 		}
 	}
