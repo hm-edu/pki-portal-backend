@@ -9,6 +9,8 @@ import (
 	"github.com/hm-edu/pki-service/ent/enttest"
 	pb "github.com/hm-edu/portal-apis"
 	"go.uber.org/zap"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	// Importing the go-sqlite3 is required to create a sqlite3 database.
 	_ "github.com/mattn/go-sqlite3"
@@ -65,5 +67,23 @@ func TestListCertificates(t *testing.T) {
 	}
 	if len(ret.Items) != 2 {
 		t.Error("Expected 2 certificate, got", len(ret.Items))
+	}
+}
+
+func TestCollectCertificate(t *testing.T) {
+	client := enttest.Open(t, "sqlite3", "file:db2?mode=memory&cache=shared&_fk=1")
+	defer func(*ent.Client) {
+		_ = client.Close()
+	}(client)
+	server := sslAPIServer{db: client, logger: zap.L()}
+
+	_, err := server.CollectCertificate(context.TODO(), &pb.CollectSslRequest{})
+	if status.Code(err) != codes.InvalidArgument {
+		t.Error("Expected InvalidArgument for missing transaction id, got", err)
+	}
+
+	_, err = server.CollectCertificate(context.TODO(), &pb.CollectSslRequest{TransactionId: "unknown"})
+	if status.Code(err) != codes.NotFound {
+		t.Error("Expected NotFound for unknown transaction id, got", err)
 	}
 }

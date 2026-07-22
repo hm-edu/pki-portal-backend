@@ -5,7 +5,7 @@ go 1.26.0
 require (
 	github.com/MicahParks/keyfunc/v3 v3.8.0
 	github.com/getsentry/sentry-go/echo v0.47.0
-	github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776
+	github.com/hm-edu/portal-apis v0.0.0-20260722062737-d43882e11746
 	github.com/hm-edu/portal-common v0.0.0-20260613132347-a1589de7a36f
 	github.com/labstack/echo/v5 v5.2.1
 	github.com/labstack/gommon v0.5.0

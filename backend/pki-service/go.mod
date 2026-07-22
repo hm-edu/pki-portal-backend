@@ -71,9 +71,8 @@ require (
 
 require (
 	github.com/go-co-op/gocron/v2 v2.22.0
-	github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776
+	github.com/hm-edu/portal-apis v0.0.0-20260722062737-d43882e11746
 	github.com/jackc/pgx/v4 v4.18.2
-	github.com/jackc/pgx/v5 v5.10.0
 )
 
 require (

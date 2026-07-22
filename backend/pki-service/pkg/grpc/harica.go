@@ -76,6 +76,20 @@ func isBadRequestError(err error) bool {
 	return false
 }
 
+// isCertificatePending reports whether an error returned by GetCertificate
+// indicates that the certificate simply has not been issued yet. HARICA
+// responds with a client error as long as the transaction is still being
+// processed, so any non-auth 4xx is treated as "not ready yet".
+func isCertificatePending(err error) bool {
+	var codeErr *harica.UnexpectedResponseCodeError
+	if errors.As(err, &codeErr) {
+		return codeErr.Code >= http.StatusBadRequest &&
+			codeErr.Code < http.StatusInternalServerError &&
+			!isAuthError(err)
+	}
+	return false
+}
+
 func isRetryableError(err error) bool {
 	var codeErr *harica.UnexpectedResponseCodeError
 	if errors.As(err, &codeErr) {

@@ -321,7 +321,7 @@ func (h *Handler) HandleCsr(c *echo.Context) error {
 		return &echo.HTTPError{Code: http.StatusForbidden, Message: "You are not authorized to issue this certificate. Missing permissions for domains: " + strings.Join(missing, ", ")}
 	}
 
-	resp, err := h.ssl.IssueCertificate(ctx, &pb.IssueSslRequest{Csr: req.CSR, SubjectAlternativeNames: sans, Issuer: user, Source: "API"})
+	resp, err := h.ssl.IssueCertificate(ctx, &pb.IssueSslRequest{Csr: req.CSR, SubjectAlternativeNames: sans, Issuer: user, Source: "API", WaitForIssue: true})
 	if err != nil {
 		hub.CaptureException(err)
 		logger.Error("error while processing CSR", zap.Error(err))

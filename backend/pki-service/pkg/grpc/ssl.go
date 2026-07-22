@@ -237,7 +237,6 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		return s.handleError("Error while creating certificate", err, logger, hub)
 	}
 
-	start := time.Now()
 	hub.AddBreadcrumb(&sentry.Breadcrumb{Message: "Requesting certificate", Category: "info", Level: sentry.LevelInfo}, nil)
 
 	entry, err = s.db.Certificate.UpdateOneID(entry.ID).SetStatus(certificate.StatusRequested).Save(ctx)
@@ -302,6 +301,11 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 			}
 		}
 	}
+	if !req.WaitForIssue {
+		logger.Info("Request approved. Certificate will be collected later", zap.String("transaction_id", transaction.TransactionID))
+		return &pb.IssueSslResponse{TransactionId: transaction.TransactionID}, nil
+	}
+
 	logger.Info("Request approved. Collecting certificate")
 	cert, err := retryHarica(ctx, logger, client, "GetCertificate", func() (*models.CertificateResponse, error) {
 		return client.GetCertificate(transaction.TransactionID)
@@ -310,19 +314,105 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		return s.handleError("Error while obtaining certificate", err, logger, hub)
 	}
 	logger.Info("Certificate collected")
+	return s.storeCollectedCertificate(ctx, logger, hub, entry, transaction.TransactionID, cert)
+}
+
+// CollectCertificate tries to collect a certificate that was requested via
+// IssueCertificate with wait_for_issue disabled. Every call performs at most
+// one collection attempt against HARICA; as long as the certificate has not
+// been issued yet, a response without certificate is returned so that the
+// caller can poll again with a fresh, short-lived request.
+func (s *sslAPIServer) CollectCertificate(ctx context.Context, req *pb.CollectSslRequest) (*pb.IssueSslResponse, error) {
+	hub := sentry.GetHubFromContext(ctx)
+	if hub == nil {
+		hub = sentry.CurrentHub().Clone()
+	}
+	log := s.logger
+	if hub != nil && hub.Scope() != nil {
+		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
+	}
+	logger := log.With(zap.String("transaction_id", req.TransactionId))
+
+	if req.TransactionId == "" {
+		return nil, status.Error(codes.InvalidArgument, "No transaction id provided")
+	}
+
+	entry, err := s.db.Certificate.Query().Where(certificate.TransactionId(req.TransactionId)).First(ctx)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "Certificate not found")
+	}
+
+	client := s.harica.client
+	validationClient := s.harica.validation
+
+	// The pending review is sometimes not visible yet while the certificate
+	// is requested. Re-check the reviews on every poll until the certificate
+	// is issued so a late review does not stall the transaction forever.
+	if entry.Status != certificate.StatusIssued {
+		reviews, err := runHaricaOnce(validationClient, func() ([]models.ReviewResponse, error) {
+			return validationClient.GetPendingReviews()
+		})
+		if err != nil {
+			logger.Warn("Fetching pending reviews failed", zap.Error(err))
+			if isAuthError(err) {
+				_ = validationClient.SessionRefresh(true)
+			}
+		} else {
+			for _, r := range reviews {
+				if r.TransactionID != req.TransactionId {
+					continue
+				}
+				logger.Info("Approving pending request")
+				for _, sub := range r.ReviewGetDTOs {
+					if _, err := runHaricaOnce(validationClient, func() (struct{}, error) {
+						return struct{}{}, validationClient.ApproveRequest(sub.ReviewID, "Auto Approval", sub.ReviewValue)
+					}); err != nil {
+						logger.Warn("Approving request failed", zap.Error(err))
+					}
+				}
+				break
+			}
+		}
+	}
+
+	cert, err := runHaricaOnce(client, func() (*models.CertificateResponse, error) {
+		return client.GetCertificate(req.TransactionId)
+	})
+	if err != nil {
+		if isCertificatePending(err) {
+			logger.Info("Certificate not issued yet")
+			return &pb.IssueSslResponse{TransactionId: req.TransactionId}, nil
+		}
+		if isAuthError(err) {
+			_ = client.SessionRefresh(true)
+		}
+		logger.Warn("Collecting certificate failed", zap.Error(err))
+		return nil, status.Error(codes.Unavailable, "Collecting certificate failed")
+	}
+	if cert.PemBundle == "" {
+		logger.Info("Certificate not issued yet")
+		return &pb.IssueSslResponse{TransactionId: req.TransactionId}, nil
+	}
+	logger.Info("Certificate collected")
+	return s.storeCollectedCertificate(ctx, logger, hub, entry, req.TransactionId, cert)
+}
+
+// storeCollectedCertificate parses a certificate bundle collected from HARICA,
+// persists the certificate metadata and returns the certificate chain.
+func (s *sslAPIServer) storeCollectedCertificate(ctx context.Context, logger *zap.Logger, hub *sentry.Hub, entry *ent.Certificate, transactionID string, cert *models.CertificateResponse) (*pb.IssueSslResponse, error) {
 	hub.AddBreadcrumb(&sentry.Breadcrumb{Message: "Certificate collected", Category: "info", Level: sentry.LevelInfo}, nil)
-	stop := time.Now()
-	duration := stop.Sub(start)
-	s.duration = &duration
-	s.last = &stop
 	certs, err := pkiHelper.ParseCertificates([]byte(cert.PemBundle))
 	if err != nil {
 		return s.handleError("Error parsing certificate", err, logger, hub)
 	}
+	stop := time.Now()
+	duration := stop.Sub(entry.CreateTime)
+	s.duration = &duration
+	s.last = &stop
 	pem := certs[0]
 	serial := fmt.Sprintf("%032x", pem.SerialNumber)
 	logger.Info("Certificate issued",
-		zap.Duration("duration", time.Duration(stop.Sub(start).Seconds())),
+		zap.Duration("duration", duration),
 		zap.String("serial", serial))
 
 	_, err = s.db.Certificate.UpdateOneID(entry.ID).
@@ -331,14 +421,14 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		SetNotAfter(pem.NotAfter).
 		SetNotBefore(pem.NotBefore).
 		SetCreated(stop).
-		SetTransactionId(transaction.TransactionID).
+		SetTransactionId(transactionID).
 		Save(ctx)
 
 	if err != nil {
 		return s.handleError("Error while saving collected certificate", err, logger, hub)
 	}
 
-	return &pb.IssueSslResponse{Certificate: flattenCertificates(certs)}, nil
+	return &pb.IssueSslResponse{Certificate: flattenCertificates(certs), TransactionId: transactionID}, nil
 }
 
 func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslRequest) (*emptypb.Empty, error) {
