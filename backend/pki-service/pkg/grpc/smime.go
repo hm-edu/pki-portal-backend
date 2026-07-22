@@ -157,7 +157,12 @@ func (s *smimeAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSmim
 	logger.Info("Issuing new smime certificate")
 	block, _ := pem.Decode([]byte(req.Csr))
 
-	client := s.harica.validation
+	client, err := s.harica.Validation()
+	if err != nil {
+		hub.CaptureException(err)
+		logger.Error("Error while connecting to HARICA", zap.Error(err))
+		return nil, status.Error(codes.Internal, "Error connecting to HARICA")
+	}
 
 	// Validate the passed CSR to comply the server-side requirements (e.g. key-strength, key-type, etc.)
 	// The "real" user-data will be filled in by sectigo so we can sort of ignore any data provided by the user and simply pass the CSR to sectigo
@@ -269,7 +274,11 @@ func (s *smimeAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSm
 
 	logger := log.With(zap.String("reason", req.Reason))
 	logger.Info("Revoking smime certificate")
-	client := s.harica.validation
+	client, err := s.harica.Validation()
+	if err != nil {
+		logger.Error("Error while connecting to HARICA", zap.Error(err))
+		return nil, status.Error(codes.Internal, "Error connecting to HARICA")
+	}
 	reasons, err := retryHarica(ctx, logger, client, "GetRevocationReasons", func() ([]models.RevocationReasonsResponse, error) {
 		return client.GetRevocationReasons()
 	})

@@ -257,8 +257,14 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		return s.issueAcmeCertificate(ctx, logger, hub, entry, csr, time.Now())
 	}
 
-	client := s.harica.client
-	validationClient := s.harica.validation
+	client, err := s.harica.Client()
+	if err != nil {
+		return s.handleError("Error while connecting to HARICA", err, logger, hub)
+	}
+	validationClient, err := s.harica.Validation()
+	if err != nil {
+		return s.handleError("Error while connecting to HARICA", err, logger, hub)
+	}
 
 	// Check which organization the domains belong to
 	orgs, err := retryHarica(ctx, logger, client, "CheckMatchingOrganization", func() ([]models.OrganizationResponse, error) {
@@ -342,8 +348,14 @@ func (s *sslAPIServer) CollectCertificate(ctx context.Context, req *pb.CollectSs
 		return nil, status.Error(codes.NotFound, "Certificate not found")
 	}
 
-	client := s.harica.client
-	validationClient := s.harica.validation
+	client, err := s.harica.Client()
+	if err != nil {
+		return s.handleError("Error while connecting to HARICA", err, logger, hub)
+	}
+	validationClient, err := s.harica.Validation()
+	if err != nil {
+		return s.handleError("Error while connecting to HARICA", err, logger, hub)
+	}
 
 	// The pending review is sometimes not visible yet while the certificate
 	// is requested. Re-check the reviews on every poll until the certificate
@@ -523,12 +535,13 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 		return nil, status.Errorf(codes.Internal, "Failed to revoke certificate")
 	}
 
-	client := s.harica.client
-	validationClient := s.harica.validation
-
 	// The HARICA revocation reason is only required (and fetched) if a
 	// HARICA certificate is actually revoked.
 	getReason := sync.OnceValues(func() (*models.RevocationReasonsResponse, error) {
+		client, err := s.harica.Client()
+		if err != nil {
+			return nil, err
+		}
 		reasons, err := retryHarica(ctx, logger, client, "GetRevocationReasons", func() ([]models.RevocationReasonsResponse, error) {
 			return client.GetRevocationReasons()
 		})
@@ -567,6 +580,10 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 			if c.TransactionId == "" {
 				logger.Warn("Certificate has no transaction id", zap.Int("id", c.ID))
 				return nil
+			}
+			validationClient, err := s.harica.Validation()
+			if err != nil {
+				return err
 			}
 			reason, err := getReason()
 			if err != nil {

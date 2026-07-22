@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"sync"
 	"time"
 
 	harica "github.com/hm-edu/harica/client"
@@ -25,10 +26,15 @@ const (
 )
 
 // haricaClients bundles the shared HARICA API clients. Both clients are
-// created once at startup and reused for all requests. Sessions are kept
-// alive as long as the token is valid; a fresh login only happens close to
-// the token expiry (or forced after an authorization failure).
+// created lazily (harica.NewClient performs a login, which must not prevent
+// the service from starting while HARICA is unavailable) and then reused for
+// all requests. Sessions are kept alive as long as the token is valid; a
+// fresh login only happens close to the token expiry (or forced after an
+// authorization failure).
 type haricaClients struct {
+	cfg *cfg.PKIConfiguration
+
+	mu sync.Mutex
 	// client is bound to the regular account and used for requesting certificates.
 	client *harica.Client
 	// validation is bound to the validation account and used for approving
@@ -36,28 +42,59 @@ type haricaClients struct {
 	validation *harica.Client
 }
 
-func newHaricaClients(cfg *cfg.PKIConfiguration) (*haricaClients, error) {
-	client, err := harica.NewClient(
-		cfg.User,
-		cfg.Password,
-		cfg.TotpSeed,
-		harica.WithRefreshInterval(haricaRefreshInterval),
-		harica.WithRequestTimeout(haricaRequestTimeout),
-	)
-	if err != nil {
-		return nil, err
+// newHaricaClients performs a best-effort initial login. A failure is only
+// logged; the affected client is created on first use instead.
+func newHaricaClients(cfg *cfg.PKIConfiguration, logger *zap.Logger) *haricaClients {
+	h := &haricaClients{cfg: cfg}
+	if _, err := h.Client(); err != nil {
+		logger.Warn("Initial HARICA login failed, retrying on first use", zap.Error(err))
 	}
-	validation, err := harica.NewClient(
-		cfg.ValidationUser,
-		cfg.ValidationPassword,
-		cfg.ValidationTotpSeed,
-		harica.WithRefreshInterval(haricaRefreshInterval),
-		harica.WithRequestTimeout(haricaRequestTimeout),
-	)
-	if err != nil {
-		return nil, err
+	if _, err := h.Validation(); err != nil {
+		logger.Warn("Initial HARICA validation login failed, retrying on first use", zap.Error(err))
 	}
-	return &haricaClients{client: client, validation: validation}, nil
+	return h
+}
+
+// Client returns the shared client for the regular account, creating it (and
+// logging in) if that has not succeeded yet.
+func (h *haricaClients) Client() (*harica.Client, error) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if h.client == nil {
+		client, err := harica.NewClient(
+			h.cfg.User,
+			h.cfg.Password,
+			h.cfg.TotpSeed,
+			harica.WithRefreshInterval(haricaRefreshInterval),
+			harica.WithRequestTimeout(haricaRequestTimeout),
+		)
+		if err != nil {
+			return nil, err
+		}
+		h.client = client
+	}
+	return h.client, nil
+}
+
+// Validation returns the shared client for the validation account, creating
+// it (and logging in) if that has not succeeded yet.
+func (h *haricaClients) Validation() (*harica.Client, error) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if h.validation == nil {
+		validation, err := harica.NewClient(
+			h.cfg.ValidationUser,
+			h.cfg.ValidationPassword,
+			h.cfg.ValidationTotpSeed,
+			harica.WithRefreshInterval(haricaRefreshInterval),
+			harica.WithRequestTimeout(haricaRequestTimeout),
+		)
+		if err != nil {
+			return nil, err
+		}
+		h.validation = validation
+	}
+	return h.validation, nil
 }
 
 func isAuthError(err error) bool {

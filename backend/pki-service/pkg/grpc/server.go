@@ -109,11 +109,9 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	// => one http client is fine ;)
 
 	// The HARICA clients are shared between the SSL and the SMIME server so
-	// the sessions are reused across all requests.
-	clients, err := newHaricaClients(s.pkiCfg)
-	if err != nil {
-		s.logger.Fatal("failed to create HARICA clients", zap.Error(err))
-	}
+	// the sessions are reused across all requests. The initial login is
+	// best-effort: HARICA outages must not prevent the service from starting.
+	clients := newHaricaClients(s.pkiCfg, s.logger)
 
 	// The ACME client (e.g. Let's Encrypt) is created once at startup so the
 	// account and the ACME session are reused across all requests.
