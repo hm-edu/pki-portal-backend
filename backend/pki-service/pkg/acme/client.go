@@ -65,7 +65,7 @@ func NewClient(ctx context.Context, email, directory, keyPath string, dnsCfg *DN
 	dns01.SetDefaultClient(dns01.NewClient(&dns01.Options{
 		RecursiveNameservers: []string{"1.1.1.1:53", "8.8.8.8:53"},
 	}))
-	if err := client.Challenge.SetDNS01Provider(NewDNSProvider(dnsCfg, logger)); err != nil {
+	if err := client.Challenge.SetDNS01Provider(NewDNSProvider(dnsCfg, logger), dns01.DisableAuthoritativeNssPropagationRequirement()); err != nil {
 		return nil, fmt.Errorf("setting DNS-01 provider: %w", err)
 	}
 
