@@ -41,7 +41,6 @@ func newHaricaClients(cfg *cfg.PKIConfiguration) (*haricaClients, error) {
 		cfg.User,
 		cfg.Password,
 		cfg.TotpSeed,
-		harica.WithRetry(3),
 		harica.WithRefreshInterval(haricaRefreshInterval),
 		harica.WithRequestTimeout(haricaRequestTimeout),
 	)
@@ -52,7 +51,6 @@ func newHaricaClients(cfg *cfg.PKIConfiguration) (*haricaClients, error) {
 		cfg.ValidationUser,
 		cfg.ValidationPassword,
 		cfg.ValidationTotpSeed,
-		harica.WithRetry(3),
 		harica.WithRefreshInterval(haricaRefreshInterval),
 		harica.WithRequestTimeout(haricaRequestTimeout),
 	)
