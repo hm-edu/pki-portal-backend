@@ -10,6 +10,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 
 	legoacme "github.com/go-acme/lego/v5/acme"
@@ -17,6 +18,7 @@ import (
 	"github.com/go-acme/lego/v5/certificate"
 	"github.com/go-acme/lego/v5/challenge/dns01"
 	"github.com/go-acme/lego/v5/lego"
+	legolog "github.com/go-acme/lego/v5/log"
 	"github.com/go-acme/lego/v5/registration"
 	"go.uber.org/zap"
 )
@@ -48,6 +50,9 @@ func NewClient(ctx context.Context, email, directory, keyPath string, dnsCfg *DN
 	if email == "" {
 		return nil, errors.New("no ACME account email configured")
 	}
+	legolog.SetDefault(slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	})))
 	key, created, err := loadOrCreateKey(keyPath)
 	if err != nil {
 		return nil, err
