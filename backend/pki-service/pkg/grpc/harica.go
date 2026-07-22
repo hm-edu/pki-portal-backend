@@ -68,6 +68,14 @@ func isAuthError(err error) bool {
 	return false
 }
 
+func isBadRequestError(err error) bool {
+	var codeErr *harica.UnexpectedResponseCodeError
+	if errors.As(err, &codeErr) {
+		return codeErr.Code == http.StatusBadRequest
+	}
+	return false
+}
+
 func isRetryableError(err error) bool {
 	var codeErr *harica.UnexpectedResponseCodeError
 	if errors.As(err, &codeErr) {
@@ -118,6 +126,14 @@ func retryHarica[T any](ctx context.Context, logger *zap.Logger, client *harica.
 			return result, nil
 		}
 		lastErr = err
+		// in case of a bad request we can retry
+		if isBadRequestError(err) {
+			logger.Warn("Bad request to HARICA, retrying",
+				zap.String("operation", op),
+				zap.Int("attempt", attempt),
+				zap.Error(err))
+			continue
+		}
 		if !isRetryableError(err) {
 			return zero, err
 		}
