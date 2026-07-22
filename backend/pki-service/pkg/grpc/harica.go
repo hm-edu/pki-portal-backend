@@ -135,6 +135,10 @@ func retryHarica[T any](ctx context.Context, logger *zap.Logger, client *harica.
 			continue
 		}
 		if !isRetryableError(err) {
+			logger.Warn("Non-retryable error from HARICA",
+				zap.String("operation", op),
+				zap.Int("attempt", attempt),
+				zap.Error(err))
 			return zero, err
 		}
 		if isAuthError(err) {

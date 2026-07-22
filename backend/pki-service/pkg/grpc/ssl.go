@@ -309,6 +309,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	if err != nil {
 		return s.handleError("Error while obtaining certificate", err, logger, hub)
 	}
+	logger.Info("Certificate collected")
 	hub.AddBreadcrumb(&sentry.Breadcrumb{Message: "Certificate collected", Category: "info", Level: sentry.LevelInfo}, nil)
 	stop := time.Now()
 	duration := stop.Sub(start)
@@ -321,7 +322,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	pem := certs[0]
 	serial := fmt.Sprintf("%032x", pem.SerialNumber)
 	logger.Info("Certificate issued",
-		zap.Duration("duration", stop.Sub(start)),
+		zap.Duration("duration", time.Duration(stop.Sub(start).Seconds())),
 		zap.String("serial", serial))
 
 	_, err = s.db.Certificate.UpdateOneID(entry.ID).
