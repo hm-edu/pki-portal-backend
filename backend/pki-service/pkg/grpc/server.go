@@ -1,6 +1,7 @@
 package grpc
 
 import (
+	"context"
 	"fmt"
 	"net"
 
@@ -13,6 +14,7 @@ import (
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 
 	"github.com/hm-edu/pki-service/ent"
+	"github.com/hm-edu/pki-service/pkg/acme"
 	"github.com/hm-edu/pki-service/pkg/cfg"
 	"github.com/hm-edu/portal-common/interceptor"
 
@@ -112,7 +114,22 @@ func (s *Server) ListenAndServe(stopCh <-chan struct{}) {
 	if err != nil {
 		s.logger.Fatal("failed to create HARICA clients", zap.Error(err))
 	}
-	pb.RegisterSSLServiceServer(srv, newSslAPIServer(s.pkiCfg, s.db, clients))
+
+	// The ACME client (e.g. Let's Encrypt) is created once at startup so the
+	// account and the ACME session are reused across all requests.
+	var acmeClient *acme.Client
+	if s.pkiCfg.SslCa == "letsencrypt" {
+		dnsCfg, err := acme.LoadDNSConfig(s.pkiCfg.AcmeDNSConfig)
+		if err != nil {
+			s.logger.Fatal("failed to load ACME DNS config", zap.Error(err))
+		}
+		acmeClient, err = acme.NewClient(context.Background(), s.pkiCfg.AcmeEmail, s.pkiCfg.AcmeDirectory, s.pkiCfg.AcmeAccountKey, dnsCfg, s.logger)
+		if err != nil {
+			s.logger.Fatal("failed to create ACME client", zap.Error(err))
+		}
+	}
+
+	pb.RegisterSSLServiceServer(srv, newSslAPIServer(s.pkiCfg, s.db, clients, acmeClient))
 	pb.RegisterSmimeServiceServer(srv, newSmimeAPIServer(s.pkiCfg, s.db, clients))
 	grpc_health_v1.RegisterHealthServer(srv, server)
 

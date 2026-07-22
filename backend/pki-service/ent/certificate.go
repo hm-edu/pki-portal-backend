@@ -43,6 +43,8 @@ type Certificate struct {
 	Status certificate.Status `json:"status,omitempty"`
 	// Ca holds the value of the "ca" field.
 	Ca *string `json:"ca,omitempty"`
+	// Certificate holds the value of the "certificate" field.
+	Certificate *string `json:"certificate,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CertificateQuery when eager-loading is set.
 	Edges        CertificateEdges `json:"edges"`
@@ -74,7 +76,7 @@ func (*Certificate) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case certificate.FieldID, certificate.FieldSslId:
 			values[i] = new(sql.NullInt64)
-		case certificate.FieldTransactionId, certificate.FieldSerial, certificate.FieldCommonName, certificate.FieldIssuedBy, certificate.FieldSource, certificate.FieldStatus, certificate.FieldCa:
+		case certificate.FieldTransactionId, certificate.FieldSerial, certificate.FieldCommonName, certificate.FieldIssuedBy, certificate.FieldSource, certificate.FieldStatus, certificate.FieldCa, certificate.FieldCertificate:
 			values[i] = new(sql.NullString)
 		case certificate.FieldCreateTime, certificate.FieldUpdateTime, certificate.FieldNotBefore, certificate.FieldNotAfter, certificate.FieldCreated:
 			values[i] = new(sql.NullTime)
@@ -87,7 +89,7 @@ func (*Certificate) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Certificate fields.
-func (c *Certificate) assignValues(columns []string, values []any) error {
+func (_m *Certificate) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -98,92 +100,99 @@ func (c *Certificate) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			c.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case certificate.FieldCreateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field create_time", values[i])
 			} else if value.Valid {
-				c.CreateTime = value.Time
+				_m.CreateTime = value.Time
 			}
 		case certificate.FieldUpdateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field update_time", values[i])
 			} else if value.Valid {
-				c.UpdateTime = value.Time
+				_m.UpdateTime = value.Time
 			}
 		case certificate.FieldSslId:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field sslId", values[i])
 			} else if value.Valid {
-				c.SslId = int(value.Int64)
+				_m.SslId = int(value.Int64)
 			}
 		case certificate.FieldTransactionId:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field transactionId", values[i])
 			} else if value.Valid {
-				c.TransactionId = value.String
+				_m.TransactionId = value.String
 			}
 		case certificate.FieldSerial:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field serial", values[i])
 			} else if value.Valid {
-				c.Serial = value.String
+				_m.Serial = value.String
 			}
 		case certificate.FieldCommonName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field commonName", values[i])
 			} else if value.Valid {
-				c.CommonName = value.String
+				_m.CommonName = value.String
 			}
 		case certificate.FieldNotBefore:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field notBefore", values[i])
 			} else if value.Valid {
-				c.NotBefore = new(time.Time)
-				*c.NotBefore = value.Time
+				_m.NotBefore = new(time.Time)
+				*_m.NotBefore = value.Time
 			}
 		case certificate.FieldNotAfter:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field notAfter", values[i])
 			} else if value.Valid {
-				c.NotAfter = value.Time
+				_m.NotAfter = value.Time
 			}
 		case certificate.FieldIssuedBy:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field issuedBy", values[i])
 			} else if value.Valid {
-				c.IssuedBy = new(string)
-				*c.IssuedBy = value.String
+				_m.IssuedBy = new(string)
+				*_m.IssuedBy = value.String
 			}
 		case certificate.FieldSource:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field source", values[i])
 			} else if value.Valid {
-				c.Source = new(string)
-				*c.Source = value.String
+				_m.Source = new(string)
+				*_m.Source = value.String
 			}
 		case certificate.FieldCreated:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created", values[i])
 			} else if value.Valid {
-				c.Created = new(time.Time)
-				*c.Created = value.Time
+				_m.Created = new(time.Time)
+				*_m.Created = value.Time
 			}
 		case certificate.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				c.Status = certificate.Status(value.String)
+				_m.Status = certificate.Status(value.String)
 			}
 		case certificate.FieldCa:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field ca", values[i])
 			} else if value.Valid {
-				c.Ca = new(string)
-				*c.Ca = value.String
+				_m.Ca = new(string)
+				*_m.Ca = value.String
+			}
+		case certificate.FieldCertificate:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field certificate", values[i])
+			} else if value.Valid {
+				_m.Certificate = new(string)
+				*_m.Certificate = value.String
 			}
 		default:
-			c.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -191,84 +200,89 @@ func (c *Certificate) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Certificate.
 // This includes values selected through modifiers, order, etc.
-func (c *Certificate) Value(name string) (ent.Value, error) {
-	return c.selectValues.Get(name)
+func (_m *Certificate) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryDomains queries the "domains" edge of the Certificate entity.
-func (c *Certificate) QueryDomains() *DomainQuery {
-	return NewCertificateClient(c.config).QueryDomains(c)
+func (_m *Certificate) QueryDomains() *DomainQuery {
+	return NewCertificateClient(_m.config).QueryDomains(_m)
 }
 
 // Update returns a builder for updating this Certificate.
 // Note that you need to call Certificate.Unwrap() before calling this method if this Certificate
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (c *Certificate) Update() *CertificateUpdateOne {
-	return NewCertificateClient(c.config).UpdateOne(c)
+func (_m *Certificate) Update() *CertificateUpdateOne {
+	return NewCertificateClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Certificate entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (c *Certificate) Unwrap() *Certificate {
-	_tx, ok := c.config.driver.(*txDriver)
+func (_m *Certificate) Unwrap() *Certificate {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Certificate is not a transactional entity")
 	}
-	c.config.driver = _tx.drv
-	return c
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (c *Certificate) String() string {
+func (_m *Certificate) String() string {
 	var builder strings.Builder
 	builder.WriteString("Certificate(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("create_time=")
-	builder.WriteString(c.CreateTime.Format(time.ANSIC))
+	builder.WriteString(_m.CreateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("update_time=")
-	builder.WriteString(c.UpdateTime.Format(time.ANSIC))
+	builder.WriteString(_m.UpdateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("sslId=")
-	builder.WriteString(fmt.Sprintf("%v", c.SslId))
+	builder.WriteString(fmt.Sprintf("%v", _m.SslId))
 	builder.WriteString(", ")
 	builder.WriteString("transactionId=")
-	builder.WriteString(c.TransactionId)
+	builder.WriteString(_m.TransactionId)
 	builder.WriteString(", ")
 	builder.WriteString("serial=")
-	builder.WriteString(c.Serial)
+	builder.WriteString(_m.Serial)
 	builder.WriteString(", ")
 	builder.WriteString("commonName=")
-	builder.WriteString(c.CommonName)
+	builder.WriteString(_m.CommonName)
 	builder.WriteString(", ")
-	if v := c.NotBefore; v != nil {
+	if v := _m.NotBefore; v != nil {
 		builder.WriteString("notBefore=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("notAfter=")
-	builder.WriteString(c.NotAfter.Format(time.ANSIC))
+	builder.WriteString(_m.NotAfter.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := c.IssuedBy; v != nil {
+	if v := _m.IssuedBy; v != nil {
 		builder.WriteString("issuedBy=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	if v := c.Source; v != nil {
+	if v := _m.Source; v != nil {
 		builder.WriteString("source=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	if v := c.Created; v != nil {
+	if v := _m.Created; v != nil {
 		builder.WriteString("created=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("status=")
-	builder.WriteString(fmt.Sprintf("%v", c.Status))
+	builder.WriteString(fmt.Sprintf("%v", _m.Status))
 	builder.WriteString(", ")
-	if v := c.Ca; v != nil {
+	if v := _m.Ca; v != nil {
 		builder.WriteString("ca=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := _m.Certificate; v != nil {
+		builder.WriteString("certificate=")
 		builder.WriteString(*v)
 	}
 	builder.WriteByte(')')

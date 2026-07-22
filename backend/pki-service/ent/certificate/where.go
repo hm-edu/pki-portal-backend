@@ -115,6 +115,11 @@ func Ca(v string) predicate.Certificate {
 	return predicate.Certificate(sql.FieldEQ(FieldCa, v))
 }
 
+// Certificate applies equality check predicate on the "certificate" field. It's identical to CertificateEQ.
+func Certificate(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldEQ(FieldCertificate, v))
+}
+
 // CreateTimeEQ applies the EQ predicate on the "create_time" field.
 func CreateTimeEQ(v time.Time) predicate.Certificate {
 	return predicate.Certificate(sql.FieldEQ(FieldCreateTime, v))
@@ -853,6 +858,81 @@ func CaEqualFold(v string) predicate.Certificate {
 // CaContainsFold applies the ContainsFold predicate on the "ca" field.
 func CaContainsFold(v string) predicate.Certificate {
 	return predicate.Certificate(sql.FieldContainsFold(FieldCa, v))
+}
+
+// CertificateEQ applies the EQ predicate on the "certificate" field.
+func CertificateEQ(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldEQ(FieldCertificate, v))
+}
+
+// CertificateNEQ applies the NEQ predicate on the "certificate" field.
+func CertificateNEQ(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldNEQ(FieldCertificate, v))
+}
+
+// CertificateIn applies the In predicate on the "certificate" field.
+func CertificateIn(vs ...string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldIn(FieldCertificate, vs...))
+}
+
+// CertificateNotIn applies the NotIn predicate on the "certificate" field.
+func CertificateNotIn(vs ...string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldNotIn(FieldCertificate, vs...))
+}
+
+// CertificateGT applies the GT predicate on the "certificate" field.
+func CertificateGT(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldGT(FieldCertificate, v))
+}
+
+// CertificateGTE applies the GTE predicate on the "certificate" field.
+func CertificateGTE(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldGTE(FieldCertificate, v))
+}
+
+// CertificateLT applies the LT predicate on the "certificate" field.
+func CertificateLT(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldLT(FieldCertificate, v))
+}
+
+// CertificateLTE applies the LTE predicate on the "certificate" field.
+func CertificateLTE(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldLTE(FieldCertificate, v))
+}
+
+// CertificateContains applies the Contains predicate on the "certificate" field.
+func CertificateContains(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldContains(FieldCertificate, v))
+}
+
+// CertificateHasPrefix applies the HasPrefix predicate on the "certificate" field.
+func CertificateHasPrefix(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldHasPrefix(FieldCertificate, v))
+}
+
+// CertificateHasSuffix applies the HasSuffix predicate on the "certificate" field.
+func CertificateHasSuffix(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldHasSuffix(FieldCertificate, v))
+}
+
+// CertificateIsNil applies the IsNil predicate on the "certificate" field.
+func CertificateIsNil() predicate.Certificate {
+	return predicate.Certificate(sql.FieldIsNull(FieldCertificate))
+}
+
+// CertificateNotNil applies the NotNil predicate on the "certificate" field.
+func CertificateNotNil() predicate.Certificate {
+	return predicate.Certificate(sql.FieldNotNull(FieldCertificate))
+}
+
+// CertificateEqualFold applies the EqualFold predicate on the "certificate" field.
+func CertificateEqualFold(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldEqualFold(FieldCertificate, v))
+}
+
+// CertificateContainsFold applies the ContainsFold predicate on the "certificate" field.
+func CertificateContainsFold(v string) predicate.Certificate {
+	return predicate.Certificate(sql.FieldContainsFold(FieldCertificate, v))
 }
 
 // HasDomains applies the HasEdge predicate on the "domains" edge.

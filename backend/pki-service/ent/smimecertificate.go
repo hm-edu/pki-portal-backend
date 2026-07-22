@@ -60,7 +60,7 @@ func (*SmimeCertificate) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the SmimeCertificate fields.
-func (sc *SmimeCertificate) assignValues(columns []string, values []any) error {
+func (_m *SmimeCertificate) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -71,72 +71,72 @@ func (sc *SmimeCertificate) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			sc.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case smimecertificate.FieldCreateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field create_time", values[i])
 			} else if value.Valid {
-				sc.CreateTime = value.Time
+				_m.CreateTime = value.Time
 			}
 		case smimecertificate.FieldUpdateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field update_time", values[i])
 			} else if value.Valid {
-				sc.UpdateTime = value.Time
+				_m.UpdateTime = value.Time
 			}
 		case smimecertificate.FieldTransactionId:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field transactionId", values[i])
 			} else if value.Valid {
-				sc.TransactionId = value.String
+				_m.TransactionId = value.String
 			}
 		case smimecertificate.FieldEmail:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field email", values[i])
 			} else if value.Valid {
-				sc.Email = value.String
+				_m.Email = value.String
 			}
 		case smimecertificate.FieldSerial:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field serial", values[i])
 			} else if value.Valid {
-				sc.Serial = value.String
+				_m.Serial = value.String
 			}
 		case smimecertificate.FieldNotBefore:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field notBefore", values[i])
 			} else if value.Valid {
-				sc.NotBefore = new(time.Time)
-				*sc.NotBefore = value.Time
+				_m.NotBefore = new(time.Time)
+				*_m.NotBefore = value.Time
 			}
 		case smimecertificate.FieldNotAfter:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field notAfter", values[i])
 			} else if value.Valid {
-				sc.NotAfter = value.Time
+				_m.NotAfter = value.Time
 			}
 		case smimecertificate.FieldCreated:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created", values[i])
 			} else if value.Valid {
-				sc.Created = new(time.Time)
-				*sc.Created = value.Time
+				_m.Created = new(time.Time)
+				*_m.Created = value.Time
 			}
 		case smimecertificate.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				sc.Status = smimecertificate.Status(value.String)
+				_m.Status = smimecertificate.Status(value.String)
 			}
 		case smimecertificate.FieldCa:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field ca", values[i])
 			} else if value.Valid {
-				sc.Ca = new(string)
-				*sc.Ca = value.String
+				_m.Ca = new(string)
+				*_m.Ca = value.String
 			}
 		default:
-			sc.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -144,65 +144,65 @@ func (sc *SmimeCertificate) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the SmimeCertificate.
 // This includes values selected through modifiers, order, etc.
-func (sc *SmimeCertificate) Value(name string) (ent.Value, error) {
-	return sc.selectValues.Get(name)
+func (_m *SmimeCertificate) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this SmimeCertificate.
 // Note that you need to call SmimeCertificate.Unwrap() before calling this method if this SmimeCertificate
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (sc *SmimeCertificate) Update() *SmimeCertificateUpdateOne {
-	return NewSmimeCertificateClient(sc.config).UpdateOne(sc)
+func (_m *SmimeCertificate) Update() *SmimeCertificateUpdateOne {
+	return NewSmimeCertificateClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the SmimeCertificate entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (sc *SmimeCertificate) Unwrap() *SmimeCertificate {
-	_tx, ok := sc.config.driver.(*txDriver)
+func (_m *SmimeCertificate) Unwrap() *SmimeCertificate {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: SmimeCertificate is not a transactional entity")
 	}
-	sc.config.driver = _tx.drv
-	return sc
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (sc *SmimeCertificate) String() string {
+func (_m *SmimeCertificate) String() string {
 	var builder strings.Builder
 	builder.WriteString("SmimeCertificate(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", sc.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("create_time=")
-	builder.WriteString(sc.CreateTime.Format(time.ANSIC))
+	builder.WriteString(_m.CreateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("update_time=")
-	builder.WriteString(sc.UpdateTime.Format(time.ANSIC))
+	builder.WriteString(_m.UpdateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("transactionId=")
-	builder.WriteString(sc.TransactionId)
+	builder.WriteString(_m.TransactionId)
 	builder.WriteString(", ")
 	builder.WriteString("email=")
-	builder.WriteString(sc.Email)
+	builder.WriteString(_m.Email)
 	builder.WriteString(", ")
 	builder.WriteString("serial=")
-	builder.WriteString(sc.Serial)
+	builder.WriteString(_m.Serial)
 	builder.WriteString(", ")
-	if v := sc.NotBefore; v != nil {
+	if v := _m.NotBefore; v != nil {
 		builder.WriteString("notBefore=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("notAfter=")
-	builder.WriteString(sc.NotAfter.Format(time.ANSIC))
+	builder.WriteString(_m.NotAfter.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := sc.Created; v != nil {
+	if v := _m.Created; v != nil {
 		builder.WriteString("created=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("status=")
-	builder.WriteString(fmt.Sprintf("%v", sc.Status))
+	builder.WriteString(fmt.Sprintf("%v", _m.Status))
 	builder.WriteString(", ")
-	if v := sc.Ca; v != nil {
+	if v := _m.Ca; v != nil {
 		builder.WriteString("ca=")
 		builder.WriteString(*v)
 	}

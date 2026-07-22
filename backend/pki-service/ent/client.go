@@ -272,8 +272,8 @@ func (c *CertificateClient) Update() *CertificateUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *CertificateClient) UpdateOne(ce *Certificate) *CertificateUpdateOne {
-	mutation := newCertificateMutation(c.config, OpUpdateOne, withCertificate(ce))
+func (c *CertificateClient) UpdateOne(_m *Certificate) *CertificateUpdateOne {
+	mutation := newCertificateMutation(c.config, OpUpdateOne, withCertificate(_m))
 	return &CertificateUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -290,8 +290,8 @@ func (c *CertificateClient) Delete() *CertificateDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *CertificateClient) DeleteOne(ce *Certificate) *CertificateDeleteOne {
-	return c.DeleteOneID(ce.ID)
+func (c *CertificateClient) DeleteOne(_m *Certificate) *CertificateDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -326,16 +326,16 @@ func (c *CertificateClient) GetX(ctx context.Context, id int) *Certificate {
 }
 
 // QueryDomains queries the domains edge of a Certificate.
-func (c *CertificateClient) QueryDomains(ce *Certificate) *DomainQuery {
+func (c *CertificateClient) QueryDomains(_m *Certificate) *DomainQuery {
 	query := (&DomainClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ce.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(certificate.Table, certificate.FieldID, id),
 			sqlgraph.To(domain.Table, domain.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, certificate.DomainsTable, certificate.DomainsPrimaryKey...),
 		)
-		fromV = sqlgraph.Neighbors(ce.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -422,8 +422,8 @@ func (c *DomainClient) Update() *DomainUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *DomainClient) UpdateOne(d *Domain) *DomainUpdateOne {
-	mutation := newDomainMutation(c.config, OpUpdateOne, withDomain(d))
+func (c *DomainClient) UpdateOne(_m *Domain) *DomainUpdateOne {
+	mutation := newDomainMutation(c.config, OpUpdateOne, withDomain(_m))
 	return &DomainUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -440,8 +440,8 @@ func (c *DomainClient) Delete() *DomainDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *DomainClient) DeleteOne(d *Domain) *DomainDeleteOne {
-	return c.DeleteOneID(d.ID)
+func (c *DomainClient) DeleteOne(_m *Domain) *DomainDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -476,16 +476,16 @@ func (c *DomainClient) GetX(ctx context.Context, id int) *Domain {
 }
 
 // QueryCertificates queries the certificates edge of a Domain.
-func (c *DomainClient) QueryCertificates(d *Domain) *CertificateQuery {
+func (c *DomainClient) QueryCertificates(_m *Domain) *CertificateQuery {
 	query := (&CertificateClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := d.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(domain.Table, domain.FieldID, id),
 			sqlgraph.To(certificate.Table, certificate.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, domain.CertificatesTable, domain.CertificatesPrimaryKey...),
 		)
-		fromV = sqlgraph.Neighbors(d.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -571,8 +571,8 @@ func (c *SmimeCertificateClient) Update() *SmimeCertificateUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *SmimeCertificateClient) UpdateOne(sc *SmimeCertificate) *SmimeCertificateUpdateOne {
-	mutation := newSmimeCertificateMutation(c.config, OpUpdateOne, withSmimeCertificate(sc))
+func (c *SmimeCertificateClient) UpdateOne(_m *SmimeCertificate) *SmimeCertificateUpdateOne {
+	mutation := newSmimeCertificateMutation(c.config, OpUpdateOne, withSmimeCertificate(_m))
 	return &SmimeCertificateUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -589,8 +589,8 @@ func (c *SmimeCertificateClient) Delete() *SmimeCertificateDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *SmimeCertificateClient) DeleteOne(sc *SmimeCertificate) *SmimeCertificateDeleteOne {
-	return c.DeleteOneID(sc.ID)
+func (c *SmimeCertificateClient) DeleteOne(_m *SmimeCertificate) *SmimeCertificateDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.

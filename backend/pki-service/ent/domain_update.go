@@ -23,74 +23,74 @@ type DomainUpdate struct {
 }
 
 // Where appends a list predicates to the DomainUpdate builder.
-func (du *DomainUpdate) Where(ps ...predicate.Domain) *DomainUpdate {
-	du.mutation.Where(ps...)
-	return du
+func (_u *DomainUpdate) Where(ps ...predicate.Domain) *DomainUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetFqdn sets the "fqdn" field.
-func (du *DomainUpdate) SetFqdn(s string) *DomainUpdate {
-	du.mutation.SetFqdn(s)
-	return du
+func (_u *DomainUpdate) SetFqdn(v string) *DomainUpdate {
+	_u.mutation.SetFqdn(v)
+	return _u
 }
 
 // SetNillableFqdn sets the "fqdn" field if the given value is not nil.
-func (du *DomainUpdate) SetNillableFqdn(s *string) *DomainUpdate {
-	if s != nil {
-		du.SetFqdn(*s)
+func (_u *DomainUpdate) SetNillableFqdn(v *string) *DomainUpdate {
+	if v != nil {
+		_u.SetFqdn(*v)
 	}
-	return du
+	return _u
 }
 
 // AddCertificateIDs adds the "certificates" edge to the Certificate entity by IDs.
-func (du *DomainUpdate) AddCertificateIDs(ids ...int) *DomainUpdate {
-	du.mutation.AddCertificateIDs(ids...)
-	return du
+func (_u *DomainUpdate) AddCertificateIDs(ids ...int) *DomainUpdate {
+	_u.mutation.AddCertificateIDs(ids...)
+	return _u
 }
 
 // AddCertificates adds the "certificates" edges to the Certificate entity.
-func (du *DomainUpdate) AddCertificates(c ...*Certificate) *DomainUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_u *DomainUpdate) AddCertificates(v ...*Certificate) *DomainUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return du.AddCertificateIDs(ids...)
+	return _u.AddCertificateIDs(ids...)
 }
 
 // Mutation returns the DomainMutation object of the builder.
-func (du *DomainUpdate) Mutation() *DomainMutation {
-	return du.mutation
+func (_u *DomainUpdate) Mutation() *DomainMutation {
+	return _u.mutation
 }
 
 // ClearCertificates clears all "certificates" edges to the Certificate entity.
-func (du *DomainUpdate) ClearCertificates() *DomainUpdate {
-	du.mutation.ClearCertificates()
-	return du
+func (_u *DomainUpdate) ClearCertificates() *DomainUpdate {
+	_u.mutation.ClearCertificates()
+	return _u
 }
 
 // RemoveCertificateIDs removes the "certificates" edge to Certificate entities by IDs.
-func (du *DomainUpdate) RemoveCertificateIDs(ids ...int) *DomainUpdate {
-	du.mutation.RemoveCertificateIDs(ids...)
-	return du
+func (_u *DomainUpdate) RemoveCertificateIDs(ids ...int) *DomainUpdate {
+	_u.mutation.RemoveCertificateIDs(ids...)
+	return _u
 }
 
 // RemoveCertificates removes "certificates" edges to Certificate entities.
-func (du *DomainUpdate) RemoveCertificates(c ...*Certificate) *DomainUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_u *DomainUpdate) RemoveCertificates(v ...*Certificate) *DomainUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return du.RemoveCertificateIDs(ids...)
+	return _u.RemoveCertificateIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (du *DomainUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, du.sqlSave, du.mutation, du.hooks)
+func (_u *DomainUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (du *DomainUpdate) SaveX(ctx context.Context) int {
-	affected, err := du.Save(ctx)
+func (_u *DomainUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -98,21 +98,21 @@ func (du *DomainUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (du *DomainUpdate) Exec(ctx context.Context) error {
-	_, err := du.Save(ctx)
+func (_u *DomainUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (du *DomainUpdate) ExecX(ctx context.Context) {
-	if err := du.Exec(ctx); err != nil {
+func (_u *DomainUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (du *DomainUpdate) check() error {
-	if v, ok := du.mutation.Fqdn(); ok {
+func (_u *DomainUpdate) check() error {
+	if v, ok := _u.mutation.Fqdn(); ok {
 		if err := domain.FqdnValidator(v); err != nil {
 			return &ValidationError{Name: "fqdn", err: fmt.Errorf(`ent: validator failed for field "Domain.fqdn": %w`, err)}
 		}
@@ -120,22 +120,22 @@ func (du *DomainUpdate) check() error {
 	return nil
 }
 
-func (du *DomainUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := du.check(); err != nil {
-		return n, err
+func (_u *DomainUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(domain.Table, domain.Columns, sqlgraph.NewFieldSpec(domain.FieldID, field.TypeInt))
-	if ps := du.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := du.mutation.Fqdn(); ok {
+	if value, ok := _u.mutation.Fqdn(); ok {
 		_spec.SetField(domain.FieldFqdn, field.TypeString, value)
 	}
-	if du.mutation.CertificatesCleared() {
+	if _u.mutation.CertificatesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -148,7 +148,7 @@ func (du *DomainUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := du.mutation.RemovedCertificatesIDs(); len(nodes) > 0 && !du.mutation.CertificatesCleared() {
+	if nodes := _u.mutation.RemovedCertificatesIDs(); len(nodes) > 0 && !_u.mutation.CertificatesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -164,7 +164,7 @@ func (du *DomainUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := du.mutation.CertificatesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CertificatesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -180,7 +180,7 @@ func (du *DomainUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, du.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{domain.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -188,8 +188,8 @@ func (du *DomainUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	du.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // DomainUpdateOne is the builder for updating a single Domain entity.
@@ -201,81 +201,81 @@ type DomainUpdateOne struct {
 }
 
 // SetFqdn sets the "fqdn" field.
-func (duo *DomainUpdateOne) SetFqdn(s string) *DomainUpdateOne {
-	duo.mutation.SetFqdn(s)
-	return duo
+func (_u *DomainUpdateOne) SetFqdn(v string) *DomainUpdateOne {
+	_u.mutation.SetFqdn(v)
+	return _u
 }
 
 // SetNillableFqdn sets the "fqdn" field if the given value is not nil.
-func (duo *DomainUpdateOne) SetNillableFqdn(s *string) *DomainUpdateOne {
-	if s != nil {
-		duo.SetFqdn(*s)
+func (_u *DomainUpdateOne) SetNillableFqdn(v *string) *DomainUpdateOne {
+	if v != nil {
+		_u.SetFqdn(*v)
 	}
-	return duo
+	return _u
 }
 
 // AddCertificateIDs adds the "certificates" edge to the Certificate entity by IDs.
-func (duo *DomainUpdateOne) AddCertificateIDs(ids ...int) *DomainUpdateOne {
-	duo.mutation.AddCertificateIDs(ids...)
-	return duo
+func (_u *DomainUpdateOne) AddCertificateIDs(ids ...int) *DomainUpdateOne {
+	_u.mutation.AddCertificateIDs(ids...)
+	return _u
 }
 
 // AddCertificates adds the "certificates" edges to the Certificate entity.
-func (duo *DomainUpdateOne) AddCertificates(c ...*Certificate) *DomainUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_u *DomainUpdateOne) AddCertificates(v ...*Certificate) *DomainUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return duo.AddCertificateIDs(ids...)
+	return _u.AddCertificateIDs(ids...)
 }
 
 // Mutation returns the DomainMutation object of the builder.
-func (duo *DomainUpdateOne) Mutation() *DomainMutation {
-	return duo.mutation
+func (_u *DomainUpdateOne) Mutation() *DomainMutation {
+	return _u.mutation
 }
 
 // ClearCertificates clears all "certificates" edges to the Certificate entity.
-func (duo *DomainUpdateOne) ClearCertificates() *DomainUpdateOne {
-	duo.mutation.ClearCertificates()
-	return duo
+func (_u *DomainUpdateOne) ClearCertificates() *DomainUpdateOne {
+	_u.mutation.ClearCertificates()
+	return _u
 }
 
 // RemoveCertificateIDs removes the "certificates" edge to Certificate entities by IDs.
-func (duo *DomainUpdateOne) RemoveCertificateIDs(ids ...int) *DomainUpdateOne {
-	duo.mutation.RemoveCertificateIDs(ids...)
-	return duo
+func (_u *DomainUpdateOne) RemoveCertificateIDs(ids ...int) *DomainUpdateOne {
+	_u.mutation.RemoveCertificateIDs(ids...)
+	return _u
 }
 
 // RemoveCertificates removes "certificates" edges to Certificate entities.
-func (duo *DomainUpdateOne) RemoveCertificates(c ...*Certificate) *DomainUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_u *DomainUpdateOne) RemoveCertificates(v ...*Certificate) *DomainUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return duo.RemoveCertificateIDs(ids...)
+	return _u.RemoveCertificateIDs(ids...)
 }
 
 // Where appends a list predicates to the DomainUpdate builder.
-func (duo *DomainUpdateOne) Where(ps ...predicate.Domain) *DomainUpdateOne {
-	duo.mutation.Where(ps...)
-	return duo
+func (_u *DomainUpdateOne) Where(ps ...predicate.Domain) *DomainUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (duo *DomainUpdateOne) Select(field string, fields ...string) *DomainUpdateOne {
-	duo.fields = append([]string{field}, fields...)
-	return duo
+func (_u *DomainUpdateOne) Select(field string, fields ...string) *DomainUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Domain entity.
-func (duo *DomainUpdateOne) Save(ctx context.Context) (*Domain, error) {
-	return withHooks(ctx, duo.sqlSave, duo.mutation, duo.hooks)
+func (_u *DomainUpdateOne) Save(ctx context.Context) (*Domain, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (duo *DomainUpdateOne) SaveX(ctx context.Context) *Domain {
-	node, err := duo.Save(ctx)
+func (_u *DomainUpdateOne) SaveX(ctx context.Context) *Domain {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -283,21 +283,21 @@ func (duo *DomainUpdateOne) SaveX(ctx context.Context) *Domain {
 }
 
 // Exec executes the query on the entity.
-func (duo *DomainUpdateOne) Exec(ctx context.Context) error {
-	_, err := duo.Save(ctx)
+func (_u *DomainUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (duo *DomainUpdateOne) ExecX(ctx context.Context) {
-	if err := duo.Exec(ctx); err != nil {
+func (_u *DomainUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (duo *DomainUpdateOne) check() error {
-	if v, ok := duo.mutation.Fqdn(); ok {
+func (_u *DomainUpdateOne) check() error {
+	if v, ok := _u.mutation.Fqdn(); ok {
 		if err := domain.FqdnValidator(v); err != nil {
 			return &ValidationError{Name: "fqdn", err: fmt.Errorf(`ent: validator failed for field "Domain.fqdn": %w`, err)}
 		}
@@ -305,17 +305,17 @@ func (duo *DomainUpdateOne) check() error {
 	return nil
 }
 
-func (duo *DomainUpdateOne) sqlSave(ctx context.Context) (_node *Domain, err error) {
-	if err := duo.check(); err != nil {
+func (_u *DomainUpdateOne) sqlSave(ctx context.Context) (_node *Domain, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(domain.Table, domain.Columns, sqlgraph.NewFieldSpec(domain.FieldID, field.TypeInt))
-	id, ok := duo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Domain.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := duo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, domain.FieldID)
 		for _, f := range fields {
@@ -327,17 +327,17 @@ func (duo *DomainUpdateOne) sqlSave(ctx context.Context) (_node *Domain, err err
 			}
 		}
 	}
-	if ps := duo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := duo.mutation.Fqdn(); ok {
+	if value, ok := _u.mutation.Fqdn(); ok {
 		_spec.SetField(domain.FieldFqdn, field.TypeString, value)
 	}
-	if duo.mutation.CertificatesCleared() {
+	if _u.mutation.CertificatesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -350,7 +350,7 @@ func (duo *DomainUpdateOne) sqlSave(ctx context.Context) (_node *Domain, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := duo.mutation.RemovedCertificatesIDs(); len(nodes) > 0 && !duo.mutation.CertificatesCleared() {
+	if nodes := _u.mutation.RemovedCertificatesIDs(); len(nodes) > 0 && !_u.mutation.CertificatesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -366,7 +366,7 @@ func (duo *DomainUpdateOne) sqlSave(ctx context.Context) (_node *Domain, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := duo.mutation.CertificatesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CertificatesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -382,10 +382,10 @@ func (duo *DomainUpdateOne) sqlSave(ctx context.Context) (_node *Domain, err err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &Domain{config: duo.config}
+	_node = &Domain{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, duo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{domain.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -393,6 +393,6 @@ func (duo *DomainUpdateOne) sqlSave(ctx context.Context) (_node *Domain, err err
 		}
 		return nil, err
 	}
-	duo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

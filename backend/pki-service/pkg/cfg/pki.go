@@ -10,4 +10,18 @@ type PKIConfiguration struct {
 	ValidationTotpSeed string `mapstructure:"validation_totp_seed"`
 	SmimeKeyLength     string `mapstructure:"smime_key_length"`
 	CertType           string `mapstructure:"cert_type"`
+
+	// SslCa selects the CA used for issuing server certificates
+	// ("harica" or "letsencrypt").
+	SslCa string `mapstructure:"ssl_ca"`
+	// AcmeEmail is the contact mail address of the ACME account.
+	AcmeEmail string `mapstructure:"acme_email"`
+	// AcmeDirectory is the directory URL of the ACME CA.
+	AcmeDirectory string `mapstructure:"acme_directory"`
+	// AcmeAccountKey is the path to the PEM encoded ACME account key.
+	// The key is generated (and the account registered) on first start.
+	AcmeAccountKey string `mapstructure:"acme_account_key"`
+	// AcmeDNSConfig is the path to the YAML file mapping DNS zones to the
+	// TSIG keys used for the DNS-01 validation.
+	AcmeDNSConfig string `mapstructure:"acme_dns_config"`
 }

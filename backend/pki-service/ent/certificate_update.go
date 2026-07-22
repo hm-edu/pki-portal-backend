@@ -24,284 +24,304 @@ type CertificateUpdate struct {
 }
 
 // Where appends a list predicates to the CertificateUpdate builder.
-func (cu *CertificateUpdate) Where(ps ...predicate.Certificate) *CertificateUpdate {
-	cu.mutation.Where(ps...)
-	return cu
+func (_u *CertificateUpdate) Where(ps ...predicate.Certificate) *CertificateUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (cu *CertificateUpdate) SetUpdateTime(t time.Time) *CertificateUpdate {
-	cu.mutation.SetUpdateTime(t)
-	return cu
+func (_u *CertificateUpdate) SetUpdateTime(v time.Time) *CertificateUpdate {
+	_u.mutation.SetUpdateTime(v)
+	return _u
 }
 
 // SetSslId sets the "sslId" field.
-func (cu *CertificateUpdate) SetSslId(i int) *CertificateUpdate {
-	cu.mutation.ResetSslId()
-	cu.mutation.SetSslId(i)
-	return cu
+func (_u *CertificateUpdate) SetSslId(v int) *CertificateUpdate {
+	_u.mutation.ResetSslId()
+	_u.mutation.SetSslId(v)
+	return _u
 }
 
 // SetNillableSslId sets the "sslId" field if the given value is not nil.
-func (cu *CertificateUpdate) SetNillableSslId(i *int) *CertificateUpdate {
-	if i != nil {
-		cu.SetSslId(*i)
+func (_u *CertificateUpdate) SetNillableSslId(v *int) *CertificateUpdate {
+	if v != nil {
+		_u.SetSslId(*v)
 	}
-	return cu
+	return _u
 }
 
-// AddSslId adds i to the "sslId" field.
-func (cu *CertificateUpdate) AddSslId(i int) *CertificateUpdate {
-	cu.mutation.AddSslId(i)
-	return cu
+// AddSslId adds value to the "sslId" field.
+func (_u *CertificateUpdate) AddSslId(v int) *CertificateUpdate {
+	_u.mutation.AddSslId(v)
+	return _u
 }
 
 // ClearSslId clears the value of the "sslId" field.
-func (cu *CertificateUpdate) ClearSslId() *CertificateUpdate {
-	cu.mutation.ClearSslId()
-	return cu
+func (_u *CertificateUpdate) ClearSslId() *CertificateUpdate {
+	_u.mutation.ClearSslId()
+	return _u
 }
 
 // SetTransactionId sets the "transactionId" field.
-func (cu *CertificateUpdate) SetTransactionId(s string) *CertificateUpdate {
-	cu.mutation.SetTransactionId(s)
-	return cu
+func (_u *CertificateUpdate) SetTransactionId(v string) *CertificateUpdate {
+	_u.mutation.SetTransactionId(v)
+	return _u
 }
 
 // SetNillableTransactionId sets the "transactionId" field if the given value is not nil.
-func (cu *CertificateUpdate) SetNillableTransactionId(s *string) *CertificateUpdate {
-	if s != nil {
-		cu.SetTransactionId(*s)
+func (_u *CertificateUpdate) SetNillableTransactionId(v *string) *CertificateUpdate {
+	if v != nil {
+		_u.SetTransactionId(*v)
 	}
-	return cu
+	return _u
 }
 
 // ClearTransactionId clears the value of the "transactionId" field.
-func (cu *CertificateUpdate) ClearTransactionId() *CertificateUpdate {
-	cu.mutation.ClearTransactionId()
-	return cu
+func (_u *CertificateUpdate) ClearTransactionId() *CertificateUpdate {
+	_u.mutation.ClearTransactionId()
+	return _u
 }
 
 // SetSerial sets the "serial" field.
-func (cu *CertificateUpdate) SetSerial(s string) *CertificateUpdate {
-	cu.mutation.SetSerial(s)
-	return cu
+func (_u *CertificateUpdate) SetSerial(v string) *CertificateUpdate {
+	_u.mutation.SetSerial(v)
+	return _u
 }
 
 // SetNillableSerial sets the "serial" field if the given value is not nil.
-func (cu *CertificateUpdate) SetNillableSerial(s *string) *CertificateUpdate {
-	if s != nil {
-		cu.SetSerial(*s)
+func (_u *CertificateUpdate) SetNillableSerial(v *string) *CertificateUpdate {
+	if v != nil {
+		_u.SetSerial(*v)
 	}
-	return cu
+	return _u
 }
 
 // ClearSerial clears the value of the "serial" field.
-func (cu *CertificateUpdate) ClearSerial() *CertificateUpdate {
-	cu.mutation.ClearSerial()
-	return cu
+func (_u *CertificateUpdate) ClearSerial() *CertificateUpdate {
+	_u.mutation.ClearSerial()
+	return _u
 }
 
 // SetCommonName sets the "commonName" field.
-func (cu *CertificateUpdate) SetCommonName(s string) *CertificateUpdate {
-	cu.mutation.SetCommonName(s)
-	return cu
+func (_u *CertificateUpdate) SetCommonName(v string) *CertificateUpdate {
+	_u.mutation.SetCommonName(v)
+	return _u
 }
 
 // SetNillableCommonName sets the "commonName" field if the given value is not nil.
-func (cu *CertificateUpdate) SetNillableCommonName(s *string) *CertificateUpdate {
-	if s != nil {
-		cu.SetCommonName(*s)
+func (_u *CertificateUpdate) SetNillableCommonName(v *string) *CertificateUpdate {
+	if v != nil {
+		_u.SetCommonName(*v)
 	}
-	return cu
+	return _u
 }
 
 // SetNotBefore sets the "notBefore" field.
-func (cu *CertificateUpdate) SetNotBefore(t time.Time) *CertificateUpdate {
-	cu.mutation.SetNotBefore(t)
-	return cu
+func (_u *CertificateUpdate) SetNotBefore(v time.Time) *CertificateUpdate {
+	_u.mutation.SetNotBefore(v)
+	return _u
 }
 
 // SetNillableNotBefore sets the "notBefore" field if the given value is not nil.
-func (cu *CertificateUpdate) SetNillableNotBefore(t *time.Time) *CertificateUpdate {
-	if t != nil {
-		cu.SetNotBefore(*t)
+func (_u *CertificateUpdate) SetNillableNotBefore(v *time.Time) *CertificateUpdate {
+	if v != nil {
+		_u.SetNotBefore(*v)
 	}
-	return cu
+	return _u
 }
 
 // ClearNotBefore clears the value of the "notBefore" field.
-func (cu *CertificateUpdate) ClearNotBefore() *CertificateUpdate {
-	cu.mutation.ClearNotBefore()
-	return cu
+func (_u *CertificateUpdate) ClearNotBefore() *CertificateUpdate {
+	_u.mutation.ClearNotBefore()
+	return _u
 }
 
 // SetNotAfter sets the "notAfter" field.
-func (cu *CertificateUpdate) SetNotAfter(t time.Time) *CertificateUpdate {
-	cu.mutation.SetNotAfter(t)
-	return cu
+func (_u *CertificateUpdate) SetNotAfter(v time.Time) *CertificateUpdate {
+	_u.mutation.SetNotAfter(v)
+	return _u
 }
 
 // SetNillableNotAfter sets the "notAfter" field if the given value is not nil.
-func (cu *CertificateUpdate) SetNillableNotAfter(t *time.Time) *CertificateUpdate {
-	if t != nil {
-		cu.SetNotAfter(*t)
+func (_u *CertificateUpdate) SetNillableNotAfter(v *time.Time) *CertificateUpdate {
+	if v != nil {
+		_u.SetNotAfter(*v)
 	}
-	return cu
+	return _u
 }
 
 // ClearNotAfter clears the value of the "notAfter" field.
-func (cu *CertificateUpdate) ClearNotAfter() *CertificateUpdate {
-	cu.mutation.ClearNotAfter()
-	return cu
+func (_u *CertificateUpdate) ClearNotAfter() *CertificateUpdate {
+	_u.mutation.ClearNotAfter()
+	return _u
 }
 
 // SetIssuedBy sets the "issuedBy" field.
-func (cu *CertificateUpdate) SetIssuedBy(s string) *CertificateUpdate {
-	cu.mutation.SetIssuedBy(s)
-	return cu
+func (_u *CertificateUpdate) SetIssuedBy(v string) *CertificateUpdate {
+	_u.mutation.SetIssuedBy(v)
+	return _u
 }
 
 // SetNillableIssuedBy sets the "issuedBy" field if the given value is not nil.
-func (cu *CertificateUpdate) SetNillableIssuedBy(s *string) *CertificateUpdate {
-	if s != nil {
-		cu.SetIssuedBy(*s)
+func (_u *CertificateUpdate) SetNillableIssuedBy(v *string) *CertificateUpdate {
+	if v != nil {
+		_u.SetIssuedBy(*v)
 	}
-	return cu
+	return _u
 }
 
 // ClearIssuedBy clears the value of the "issuedBy" field.
-func (cu *CertificateUpdate) ClearIssuedBy() *CertificateUpdate {
-	cu.mutation.ClearIssuedBy()
-	return cu
+func (_u *CertificateUpdate) ClearIssuedBy() *CertificateUpdate {
+	_u.mutation.ClearIssuedBy()
+	return _u
 }
 
 // SetSource sets the "source" field.
-func (cu *CertificateUpdate) SetSource(s string) *CertificateUpdate {
-	cu.mutation.SetSource(s)
-	return cu
+func (_u *CertificateUpdate) SetSource(v string) *CertificateUpdate {
+	_u.mutation.SetSource(v)
+	return _u
 }
 
 // SetNillableSource sets the "source" field if the given value is not nil.
-func (cu *CertificateUpdate) SetNillableSource(s *string) *CertificateUpdate {
-	if s != nil {
-		cu.SetSource(*s)
+func (_u *CertificateUpdate) SetNillableSource(v *string) *CertificateUpdate {
+	if v != nil {
+		_u.SetSource(*v)
 	}
-	return cu
+	return _u
 }
 
 // ClearSource clears the value of the "source" field.
-func (cu *CertificateUpdate) ClearSource() *CertificateUpdate {
-	cu.mutation.ClearSource()
-	return cu
+func (_u *CertificateUpdate) ClearSource() *CertificateUpdate {
+	_u.mutation.ClearSource()
+	return _u
 }
 
 // SetCreated sets the "created" field.
-func (cu *CertificateUpdate) SetCreated(t time.Time) *CertificateUpdate {
-	cu.mutation.SetCreated(t)
-	return cu
+func (_u *CertificateUpdate) SetCreated(v time.Time) *CertificateUpdate {
+	_u.mutation.SetCreated(v)
+	return _u
 }
 
 // SetNillableCreated sets the "created" field if the given value is not nil.
-func (cu *CertificateUpdate) SetNillableCreated(t *time.Time) *CertificateUpdate {
-	if t != nil {
-		cu.SetCreated(*t)
+func (_u *CertificateUpdate) SetNillableCreated(v *time.Time) *CertificateUpdate {
+	if v != nil {
+		_u.SetCreated(*v)
 	}
-	return cu
+	return _u
 }
 
 // ClearCreated clears the value of the "created" field.
-func (cu *CertificateUpdate) ClearCreated() *CertificateUpdate {
-	cu.mutation.ClearCreated()
-	return cu
+func (_u *CertificateUpdate) ClearCreated() *CertificateUpdate {
+	_u.mutation.ClearCreated()
+	return _u
 }
 
 // SetStatus sets the "status" field.
-func (cu *CertificateUpdate) SetStatus(c certificate.Status) *CertificateUpdate {
-	cu.mutation.SetStatus(c)
-	return cu
+func (_u *CertificateUpdate) SetStatus(v certificate.Status) *CertificateUpdate {
+	_u.mutation.SetStatus(v)
+	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (cu *CertificateUpdate) SetNillableStatus(c *certificate.Status) *CertificateUpdate {
-	if c != nil {
-		cu.SetStatus(*c)
+func (_u *CertificateUpdate) SetNillableStatus(v *certificate.Status) *CertificateUpdate {
+	if v != nil {
+		_u.SetStatus(*v)
 	}
-	return cu
+	return _u
 }
 
 // SetCa sets the "ca" field.
-func (cu *CertificateUpdate) SetCa(s string) *CertificateUpdate {
-	cu.mutation.SetCa(s)
-	return cu
+func (_u *CertificateUpdate) SetCa(v string) *CertificateUpdate {
+	_u.mutation.SetCa(v)
+	return _u
 }
 
 // SetNillableCa sets the "ca" field if the given value is not nil.
-func (cu *CertificateUpdate) SetNillableCa(s *string) *CertificateUpdate {
-	if s != nil {
-		cu.SetCa(*s)
+func (_u *CertificateUpdate) SetNillableCa(v *string) *CertificateUpdate {
+	if v != nil {
+		_u.SetCa(*v)
 	}
-	return cu
+	return _u
 }
 
 // ClearCa clears the value of the "ca" field.
-func (cu *CertificateUpdate) ClearCa() *CertificateUpdate {
-	cu.mutation.ClearCa()
-	return cu
+func (_u *CertificateUpdate) ClearCa() *CertificateUpdate {
+	_u.mutation.ClearCa()
+	return _u
+}
+
+// SetCertificate sets the "certificate" field.
+func (_u *CertificateUpdate) SetCertificate(v string) *CertificateUpdate {
+	_u.mutation.SetCertificate(v)
+	return _u
+}
+
+// SetNillableCertificate sets the "certificate" field if the given value is not nil.
+func (_u *CertificateUpdate) SetNillableCertificate(v *string) *CertificateUpdate {
+	if v != nil {
+		_u.SetCertificate(*v)
+	}
+	return _u
+}
+
+// ClearCertificate clears the value of the "certificate" field.
+func (_u *CertificateUpdate) ClearCertificate() *CertificateUpdate {
+	_u.mutation.ClearCertificate()
+	return _u
 }
 
 // AddDomainIDs adds the "domains" edge to the Domain entity by IDs.
-func (cu *CertificateUpdate) AddDomainIDs(ids ...int) *CertificateUpdate {
-	cu.mutation.AddDomainIDs(ids...)
-	return cu
+func (_u *CertificateUpdate) AddDomainIDs(ids ...int) *CertificateUpdate {
+	_u.mutation.AddDomainIDs(ids...)
+	return _u
 }
 
 // AddDomains adds the "domains" edges to the Domain entity.
-func (cu *CertificateUpdate) AddDomains(d ...*Domain) *CertificateUpdate {
-	ids := make([]int, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *CertificateUpdate) AddDomains(v ...*Domain) *CertificateUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cu.AddDomainIDs(ids...)
+	return _u.AddDomainIDs(ids...)
 }
 
 // Mutation returns the CertificateMutation object of the builder.
-func (cu *CertificateUpdate) Mutation() *CertificateMutation {
-	return cu.mutation
+func (_u *CertificateUpdate) Mutation() *CertificateMutation {
+	return _u.mutation
 }
 
 // ClearDomains clears all "domains" edges to the Domain entity.
-func (cu *CertificateUpdate) ClearDomains() *CertificateUpdate {
-	cu.mutation.ClearDomains()
-	return cu
+func (_u *CertificateUpdate) ClearDomains() *CertificateUpdate {
+	_u.mutation.ClearDomains()
+	return _u
 }
 
 // RemoveDomainIDs removes the "domains" edge to Domain entities by IDs.
-func (cu *CertificateUpdate) RemoveDomainIDs(ids ...int) *CertificateUpdate {
-	cu.mutation.RemoveDomainIDs(ids...)
-	return cu
+func (_u *CertificateUpdate) RemoveDomainIDs(ids ...int) *CertificateUpdate {
+	_u.mutation.RemoveDomainIDs(ids...)
+	return _u
 }
 
 // RemoveDomains removes "domains" edges to Domain entities.
-func (cu *CertificateUpdate) RemoveDomains(d ...*Domain) *CertificateUpdate {
-	ids := make([]int, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *CertificateUpdate) RemoveDomains(v ...*Domain) *CertificateUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cu.RemoveDomainIDs(ids...)
+	return _u.RemoveDomainIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (cu *CertificateUpdate) Save(ctx context.Context) (int, error) {
-	if err := cu.defaults(); err != nil {
+func (_u *CertificateUpdate) Save(ctx context.Context) (int, error) {
+	if err := _u.defaults(); err != nil {
 		return 0, err
 	}
-	return withHooks(ctx, cu.sqlSave, cu.mutation, cu.hooks)
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (cu *CertificateUpdate) SaveX(ctx context.Context) int {
-	affected, err := cu.Save(ctx)
+func (_u *CertificateUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -309,38 +329,38 @@ func (cu *CertificateUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (cu *CertificateUpdate) Exec(ctx context.Context) error {
-	_, err := cu.Save(ctx)
+func (_u *CertificateUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cu *CertificateUpdate) ExecX(ctx context.Context) {
-	if err := cu.Exec(ctx); err != nil {
+func (_u *CertificateUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (cu *CertificateUpdate) defaults() error {
-	if _, ok := cu.mutation.UpdateTime(); !ok {
+func (_u *CertificateUpdate) defaults() error {
+	if _, ok := _u.mutation.UpdateTime(); !ok {
 		if certificate.UpdateDefaultUpdateTime == nil {
 			return fmt.Errorf("ent: uninitialized certificate.UpdateDefaultUpdateTime (forgotten import ent/runtime?)")
 		}
 		v := certificate.UpdateDefaultUpdateTime()
-		cu.mutation.SetUpdateTime(v)
+		_u.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (cu *CertificateUpdate) check() error {
-	if v, ok := cu.mutation.CommonName(); ok {
+func (_u *CertificateUpdate) check() error {
+	if v, ok := _u.mutation.CommonName(); ok {
 		if err := certificate.CommonNameValidator(v); err != nil {
 			return &ValidationError{Name: "commonName", err: fmt.Errorf(`ent: validator failed for field "Certificate.commonName": %w`, err)}
 		}
 	}
-	if v, ok := cu.mutation.Status(); ok {
+	if v, ok := _u.mutation.Status(); ok {
 		if err := certificate.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Certificate.status": %w`, err)}
 		}
@@ -348,85 +368,91 @@ func (cu *CertificateUpdate) check() error {
 	return nil
 }
 
-func (cu *CertificateUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := cu.check(); err != nil {
-		return n, err
+func (_u *CertificateUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(certificate.Table, certificate.Columns, sqlgraph.NewFieldSpec(certificate.FieldID, field.TypeInt))
-	if ps := cu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := cu.mutation.UpdateTime(); ok {
+	if value, ok := _u.mutation.UpdateTime(); ok {
 		_spec.SetField(certificate.FieldUpdateTime, field.TypeTime, value)
 	}
-	if value, ok := cu.mutation.SslId(); ok {
+	if value, ok := _u.mutation.SslId(); ok {
 		_spec.SetField(certificate.FieldSslId, field.TypeInt, value)
 	}
-	if value, ok := cu.mutation.AddedSslId(); ok {
+	if value, ok := _u.mutation.AddedSslId(); ok {
 		_spec.AddField(certificate.FieldSslId, field.TypeInt, value)
 	}
-	if cu.mutation.SslIdCleared() {
+	if _u.mutation.SslIdCleared() {
 		_spec.ClearField(certificate.FieldSslId, field.TypeInt)
 	}
-	if value, ok := cu.mutation.TransactionId(); ok {
+	if value, ok := _u.mutation.TransactionId(); ok {
 		_spec.SetField(certificate.FieldTransactionId, field.TypeString, value)
 	}
-	if cu.mutation.TransactionIdCleared() {
+	if _u.mutation.TransactionIdCleared() {
 		_spec.ClearField(certificate.FieldTransactionId, field.TypeString)
 	}
-	if value, ok := cu.mutation.Serial(); ok {
+	if value, ok := _u.mutation.Serial(); ok {
 		_spec.SetField(certificate.FieldSerial, field.TypeString, value)
 	}
-	if cu.mutation.SerialCleared() {
+	if _u.mutation.SerialCleared() {
 		_spec.ClearField(certificate.FieldSerial, field.TypeString)
 	}
-	if value, ok := cu.mutation.CommonName(); ok {
+	if value, ok := _u.mutation.CommonName(); ok {
 		_spec.SetField(certificate.FieldCommonName, field.TypeString, value)
 	}
-	if value, ok := cu.mutation.NotBefore(); ok {
+	if value, ok := _u.mutation.NotBefore(); ok {
 		_spec.SetField(certificate.FieldNotBefore, field.TypeTime, value)
 	}
-	if cu.mutation.NotBeforeCleared() {
+	if _u.mutation.NotBeforeCleared() {
 		_spec.ClearField(certificate.FieldNotBefore, field.TypeTime)
 	}
-	if value, ok := cu.mutation.NotAfter(); ok {
+	if value, ok := _u.mutation.NotAfter(); ok {
 		_spec.SetField(certificate.FieldNotAfter, field.TypeTime, value)
 	}
-	if cu.mutation.NotAfterCleared() {
+	if _u.mutation.NotAfterCleared() {
 		_spec.ClearField(certificate.FieldNotAfter, field.TypeTime)
 	}
-	if value, ok := cu.mutation.IssuedBy(); ok {
+	if value, ok := _u.mutation.IssuedBy(); ok {
 		_spec.SetField(certificate.FieldIssuedBy, field.TypeString, value)
 	}
-	if cu.mutation.IssuedByCleared() {
+	if _u.mutation.IssuedByCleared() {
 		_spec.ClearField(certificate.FieldIssuedBy, field.TypeString)
 	}
-	if value, ok := cu.mutation.Source(); ok {
+	if value, ok := _u.mutation.Source(); ok {
 		_spec.SetField(certificate.FieldSource, field.TypeString, value)
 	}
-	if cu.mutation.SourceCleared() {
+	if _u.mutation.SourceCleared() {
 		_spec.ClearField(certificate.FieldSource, field.TypeString)
 	}
-	if value, ok := cu.mutation.Created(); ok {
+	if value, ok := _u.mutation.Created(); ok {
 		_spec.SetField(certificate.FieldCreated, field.TypeTime, value)
 	}
-	if cu.mutation.CreatedCleared() {
+	if _u.mutation.CreatedCleared() {
 		_spec.ClearField(certificate.FieldCreated, field.TypeTime)
 	}
-	if value, ok := cu.mutation.Status(); ok {
+	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(certificate.FieldStatus, field.TypeEnum, value)
 	}
-	if value, ok := cu.mutation.Ca(); ok {
+	if value, ok := _u.mutation.Ca(); ok {
 		_spec.SetField(certificate.FieldCa, field.TypeString, value)
 	}
-	if cu.mutation.CaCleared() {
+	if _u.mutation.CaCleared() {
 		_spec.ClearField(certificate.FieldCa, field.TypeString)
 	}
-	if cu.mutation.DomainsCleared() {
+	if value, ok := _u.mutation.Certificate(); ok {
+		_spec.SetField(certificate.FieldCertificate, field.TypeString, value)
+	}
+	if _u.mutation.CertificateCleared() {
+		_spec.ClearField(certificate.FieldCertificate, field.TypeString)
+	}
+	if _u.mutation.DomainsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -439,7 +465,7 @@ func (cu *CertificateUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.RemovedDomainsIDs(); len(nodes) > 0 && !cu.mutation.DomainsCleared() {
+	if nodes := _u.mutation.RemovedDomainsIDs(); len(nodes) > 0 && !_u.mutation.DomainsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -455,7 +481,7 @@ func (cu *CertificateUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.DomainsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.DomainsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -471,7 +497,7 @@ func (cu *CertificateUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{certificate.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -479,8 +505,8 @@ func (cu *CertificateUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	cu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // CertificateUpdateOne is the builder for updating a single Certificate entity.
@@ -492,291 +518,311 @@ type CertificateUpdateOne struct {
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (cuo *CertificateUpdateOne) SetUpdateTime(t time.Time) *CertificateUpdateOne {
-	cuo.mutation.SetUpdateTime(t)
-	return cuo
+func (_u *CertificateUpdateOne) SetUpdateTime(v time.Time) *CertificateUpdateOne {
+	_u.mutation.SetUpdateTime(v)
+	return _u
 }
 
 // SetSslId sets the "sslId" field.
-func (cuo *CertificateUpdateOne) SetSslId(i int) *CertificateUpdateOne {
-	cuo.mutation.ResetSslId()
-	cuo.mutation.SetSslId(i)
-	return cuo
+func (_u *CertificateUpdateOne) SetSslId(v int) *CertificateUpdateOne {
+	_u.mutation.ResetSslId()
+	_u.mutation.SetSslId(v)
+	return _u
 }
 
 // SetNillableSslId sets the "sslId" field if the given value is not nil.
-func (cuo *CertificateUpdateOne) SetNillableSslId(i *int) *CertificateUpdateOne {
-	if i != nil {
-		cuo.SetSslId(*i)
+func (_u *CertificateUpdateOne) SetNillableSslId(v *int) *CertificateUpdateOne {
+	if v != nil {
+		_u.SetSslId(*v)
 	}
-	return cuo
+	return _u
 }
 
-// AddSslId adds i to the "sslId" field.
-func (cuo *CertificateUpdateOne) AddSslId(i int) *CertificateUpdateOne {
-	cuo.mutation.AddSslId(i)
-	return cuo
+// AddSslId adds value to the "sslId" field.
+func (_u *CertificateUpdateOne) AddSslId(v int) *CertificateUpdateOne {
+	_u.mutation.AddSslId(v)
+	return _u
 }
 
 // ClearSslId clears the value of the "sslId" field.
-func (cuo *CertificateUpdateOne) ClearSslId() *CertificateUpdateOne {
-	cuo.mutation.ClearSslId()
-	return cuo
+func (_u *CertificateUpdateOne) ClearSslId() *CertificateUpdateOne {
+	_u.mutation.ClearSslId()
+	return _u
 }
 
 // SetTransactionId sets the "transactionId" field.
-func (cuo *CertificateUpdateOne) SetTransactionId(s string) *CertificateUpdateOne {
-	cuo.mutation.SetTransactionId(s)
-	return cuo
+func (_u *CertificateUpdateOne) SetTransactionId(v string) *CertificateUpdateOne {
+	_u.mutation.SetTransactionId(v)
+	return _u
 }
 
 // SetNillableTransactionId sets the "transactionId" field if the given value is not nil.
-func (cuo *CertificateUpdateOne) SetNillableTransactionId(s *string) *CertificateUpdateOne {
-	if s != nil {
-		cuo.SetTransactionId(*s)
+func (_u *CertificateUpdateOne) SetNillableTransactionId(v *string) *CertificateUpdateOne {
+	if v != nil {
+		_u.SetTransactionId(*v)
 	}
-	return cuo
+	return _u
 }
 
 // ClearTransactionId clears the value of the "transactionId" field.
-func (cuo *CertificateUpdateOne) ClearTransactionId() *CertificateUpdateOne {
-	cuo.mutation.ClearTransactionId()
-	return cuo
+func (_u *CertificateUpdateOne) ClearTransactionId() *CertificateUpdateOne {
+	_u.mutation.ClearTransactionId()
+	return _u
 }
 
 // SetSerial sets the "serial" field.
-func (cuo *CertificateUpdateOne) SetSerial(s string) *CertificateUpdateOne {
-	cuo.mutation.SetSerial(s)
-	return cuo
+func (_u *CertificateUpdateOne) SetSerial(v string) *CertificateUpdateOne {
+	_u.mutation.SetSerial(v)
+	return _u
 }
 
 // SetNillableSerial sets the "serial" field if the given value is not nil.
-func (cuo *CertificateUpdateOne) SetNillableSerial(s *string) *CertificateUpdateOne {
-	if s != nil {
-		cuo.SetSerial(*s)
+func (_u *CertificateUpdateOne) SetNillableSerial(v *string) *CertificateUpdateOne {
+	if v != nil {
+		_u.SetSerial(*v)
 	}
-	return cuo
+	return _u
 }
 
 // ClearSerial clears the value of the "serial" field.
-func (cuo *CertificateUpdateOne) ClearSerial() *CertificateUpdateOne {
-	cuo.mutation.ClearSerial()
-	return cuo
+func (_u *CertificateUpdateOne) ClearSerial() *CertificateUpdateOne {
+	_u.mutation.ClearSerial()
+	return _u
 }
 
 // SetCommonName sets the "commonName" field.
-func (cuo *CertificateUpdateOne) SetCommonName(s string) *CertificateUpdateOne {
-	cuo.mutation.SetCommonName(s)
-	return cuo
+func (_u *CertificateUpdateOne) SetCommonName(v string) *CertificateUpdateOne {
+	_u.mutation.SetCommonName(v)
+	return _u
 }
 
 // SetNillableCommonName sets the "commonName" field if the given value is not nil.
-func (cuo *CertificateUpdateOne) SetNillableCommonName(s *string) *CertificateUpdateOne {
-	if s != nil {
-		cuo.SetCommonName(*s)
+func (_u *CertificateUpdateOne) SetNillableCommonName(v *string) *CertificateUpdateOne {
+	if v != nil {
+		_u.SetCommonName(*v)
 	}
-	return cuo
+	return _u
 }
 
 // SetNotBefore sets the "notBefore" field.
-func (cuo *CertificateUpdateOne) SetNotBefore(t time.Time) *CertificateUpdateOne {
-	cuo.mutation.SetNotBefore(t)
-	return cuo
+func (_u *CertificateUpdateOne) SetNotBefore(v time.Time) *CertificateUpdateOne {
+	_u.mutation.SetNotBefore(v)
+	return _u
 }
 
 // SetNillableNotBefore sets the "notBefore" field if the given value is not nil.
-func (cuo *CertificateUpdateOne) SetNillableNotBefore(t *time.Time) *CertificateUpdateOne {
-	if t != nil {
-		cuo.SetNotBefore(*t)
+func (_u *CertificateUpdateOne) SetNillableNotBefore(v *time.Time) *CertificateUpdateOne {
+	if v != nil {
+		_u.SetNotBefore(*v)
 	}
-	return cuo
+	return _u
 }
 
 // ClearNotBefore clears the value of the "notBefore" field.
-func (cuo *CertificateUpdateOne) ClearNotBefore() *CertificateUpdateOne {
-	cuo.mutation.ClearNotBefore()
-	return cuo
+func (_u *CertificateUpdateOne) ClearNotBefore() *CertificateUpdateOne {
+	_u.mutation.ClearNotBefore()
+	return _u
 }
 
 // SetNotAfter sets the "notAfter" field.
-func (cuo *CertificateUpdateOne) SetNotAfter(t time.Time) *CertificateUpdateOne {
-	cuo.mutation.SetNotAfter(t)
-	return cuo
+func (_u *CertificateUpdateOne) SetNotAfter(v time.Time) *CertificateUpdateOne {
+	_u.mutation.SetNotAfter(v)
+	return _u
 }
 
 // SetNillableNotAfter sets the "notAfter" field if the given value is not nil.
-func (cuo *CertificateUpdateOne) SetNillableNotAfter(t *time.Time) *CertificateUpdateOne {
-	if t != nil {
-		cuo.SetNotAfter(*t)
+func (_u *CertificateUpdateOne) SetNillableNotAfter(v *time.Time) *CertificateUpdateOne {
+	if v != nil {
+		_u.SetNotAfter(*v)
 	}
-	return cuo
+	return _u
 }
 
 // ClearNotAfter clears the value of the "notAfter" field.
-func (cuo *CertificateUpdateOne) ClearNotAfter() *CertificateUpdateOne {
-	cuo.mutation.ClearNotAfter()
-	return cuo
+func (_u *CertificateUpdateOne) ClearNotAfter() *CertificateUpdateOne {
+	_u.mutation.ClearNotAfter()
+	return _u
 }
 
 // SetIssuedBy sets the "issuedBy" field.
-func (cuo *CertificateUpdateOne) SetIssuedBy(s string) *CertificateUpdateOne {
-	cuo.mutation.SetIssuedBy(s)
-	return cuo
+func (_u *CertificateUpdateOne) SetIssuedBy(v string) *CertificateUpdateOne {
+	_u.mutation.SetIssuedBy(v)
+	return _u
 }
 
 // SetNillableIssuedBy sets the "issuedBy" field if the given value is not nil.
-func (cuo *CertificateUpdateOne) SetNillableIssuedBy(s *string) *CertificateUpdateOne {
-	if s != nil {
-		cuo.SetIssuedBy(*s)
+func (_u *CertificateUpdateOne) SetNillableIssuedBy(v *string) *CertificateUpdateOne {
+	if v != nil {
+		_u.SetIssuedBy(*v)
 	}
-	return cuo
+	return _u
 }
 
 // ClearIssuedBy clears the value of the "issuedBy" field.
-func (cuo *CertificateUpdateOne) ClearIssuedBy() *CertificateUpdateOne {
-	cuo.mutation.ClearIssuedBy()
-	return cuo
+func (_u *CertificateUpdateOne) ClearIssuedBy() *CertificateUpdateOne {
+	_u.mutation.ClearIssuedBy()
+	return _u
 }
 
 // SetSource sets the "source" field.
-func (cuo *CertificateUpdateOne) SetSource(s string) *CertificateUpdateOne {
-	cuo.mutation.SetSource(s)
-	return cuo
+func (_u *CertificateUpdateOne) SetSource(v string) *CertificateUpdateOne {
+	_u.mutation.SetSource(v)
+	return _u
 }
 
 // SetNillableSource sets the "source" field if the given value is not nil.
-func (cuo *CertificateUpdateOne) SetNillableSource(s *string) *CertificateUpdateOne {
-	if s != nil {
-		cuo.SetSource(*s)
+func (_u *CertificateUpdateOne) SetNillableSource(v *string) *CertificateUpdateOne {
+	if v != nil {
+		_u.SetSource(*v)
 	}
-	return cuo
+	return _u
 }
 
 // ClearSource clears the value of the "source" field.
-func (cuo *CertificateUpdateOne) ClearSource() *CertificateUpdateOne {
-	cuo.mutation.ClearSource()
-	return cuo
+func (_u *CertificateUpdateOne) ClearSource() *CertificateUpdateOne {
+	_u.mutation.ClearSource()
+	return _u
 }
 
 // SetCreated sets the "created" field.
-func (cuo *CertificateUpdateOne) SetCreated(t time.Time) *CertificateUpdateOne {
-	cuo.mutation.SetCreated(t)
-	return cuo
+func (_u *CertificateUpdateOne) SetCreated(v time.Time) *CertificateUpdateOne {
+	_u.mutation.SetCreated(v)
+	return _u
 }
 
 // SetNillableCreated sets the "created" field if the given value is not nil.
-func (cuo *CertificateUpdateOne) SetNillableCreated(t *time.Time) *CertificateUpdateOne {
-	if t != nil {
-		cuo.SetCreated(*t)
+func (_u *CertificateUpdateOne) SetNillableCreated(v *time.Time) *CertificateUpdateOne {
+	if v != nil {
+		_u.SetCreated(*v)
 	}
-	return cuo
+	return _u
 }
 
 // ClearCreated clears the value of the "created" field.
-func (cuo *CertificateUpdateOne) ClearCreated() *CertificateUpdateOne {
-	cuo.mutation.ClearCreated()
-	return cuo
+func (_u *CertificateUpdateOne) ClearCreated() *CertificateUpdateOne {
+	_u.mutation.ClearCreated()
+	return _u
 }
 
 // SetStatus sets the "status" field.
-func (cuo *CertificateUpdateOne) SetStatus(c certificate.Status) *CertificateUpdateOne {
-	cuo.mutation.SetStatus(c)
-	return cuo
+func (_u *CertificateUpdateOne) SetStatus(v certificate.Status) *CertificateUpdateOne {
+	_u.mutation.SetStatus(v)
+	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (cuo *CertificateUpdateOne) SetNillableStatus(c *certificate.Status) *CertificateUpdateOne {
-	if c != nil {
-		cuo.SetStatus(*c)
+func (_u *CertificateUpdateOne) SetNillableStatus(v *certificate.Status) *CertificateUpdateOne {
+	if v != nil {
+		_u.SetStatus(*v)
 	}
-	return cuo
+	return _u
 }
 
 // SetCa sets the "ca" field.
-func (cuo *CertificateUpdateOne) SetCa(s string) *CertificateUpdateOne {
-	cuo.mutation.SetCa(s)
-	return cuo
+func (_u *CertificateUpdateOne) SetCa(v string) *CertificateUpdateOne {
+	_u.mutation.SetCa(v)
+	return _u
 }
 
 // SetNillableCa sets the "ca" field if the given value is not nil.
-func (cuo *CertificateUpdateOne) SetNillableCa(s *string) *CertificateUpdateOne {
-	if s != nil {
-		cuo.SetCa(*s)
+func (_u *CertificateUpdateOne) SetNillableCa(v *string) *CertificateUpdateOne {
+	if v != nil {
+		_u.SetCa(*v)
 	}
-	return cuo
+	return _u
 }
 
 // ClearCa clears the value of the "ca" field.
-func (cuo *CertificateUpdateOne) ClearCa() *CertificateUpdateOne {
-	cuo.mutation.ClearCa()
-	return cuo
+func (_u *CertificateUpdateOne) ClearCa() *CertificateUpdateOne {
+	_u.mutation.ClearCa()
+	return _u
+}
+
+// SetCertificate sets the "certificate" field.
+func (_u *CertificateUpdateOne) SetCertificate(v string) *CertificateUpdateOne {
+	_u.mutation.SetCertificate(v)
+	return _u
+}
+
+// SetNillableCertificate sets the "certificate" field if the given value is not nil.
+func (_u *CertificateUpdateOne) SetNillableCertificate(v *string) *CertificateUpdateOne {
+	if v != nil {
+		_u.SetCertificate(*v)
+	}
+	return _u
+}
+
+// ClearCertificate clears the value of the "certificate" field.
+func (_u *CertificateUpdateOne) ClearCertificate() *CertificateUpdateOne {
+	_u.mutation.ClearCertificate()
+	return _u
 }
 
 // AddDomainIDs adds the "domains" edge to the Domain entity by IDs.
-func (cuo *CertificateUpdateOne) AddDomainIDs(ids ...int) *CertificateUpdateOne {
-	cuo.mutation.AddDomainIDs(ids...)
-	return cuo
+func (_u *CertificateUpdateOne) AddDomainIDs(ids ...int) *CertificateUpdateOne {
+	_u.mutation.AddDomainIDs(ids...)
+	return _u
 }
 
 // AddDomains adds the "domains" edges to the Domain entity.
-func (cuo *CertificateUpdateOne) AddDomains(d ...*Domain) *CertificateUpdateOne {
-	ids := make([]int, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *CertificateUpdateOne) AddDomains(v ...*Domain) *CertificateUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cuo.AddDomainIDs(ids...)
+	return _u.AddDomainIDs(ids...)
 }
 
 // Mutation returns the CertificateMutation object of the builder.
-func (cuo *CertificateUpdateOne) Mutation() *CertificateMutation {
-	return cuo.mutation
+func (_u *CertificateUpdateOne) Mutation() *CertificateMutation {
+	return _u.mutation
 }
 
 // ClearDomains clears all "domains" edges to the Domain entity.
-func (cuo *CertificateUpdateOne) ClearDomains() *CertificateUpdateOne {
-	cuo.mutation.ClearDomains()
-	return cuo
+func (_u *CertificateUpdateOne) ClearDomains() *CertificateUpdateOne {
+	_u.mutation.ClearDomains()
+	return _u
 }
 
 // RemoveDomainIDs removes the "domains" edge to Domain entities by IDs.
-func (cuo *CertificateUpdateOne) RemoveDomainIDs(ids ...int) *CertificateUpdateOne {
-	cuo.mutation.RemoveDomainIDs(ids...)
-	return cuo
+func (_u *CertificateUpdateOne) RemoveDomainIDs(ids ...int) *CertificateUpdateOne {
+	_u.mutation.RemoveDomainIDs(ids...)
+	return _u
 }
 
 // RemoveDomains removes "domains" edges to Domain entities.
-func (cuo *CertificateUpdateOne) RemoveDomains(d ...*Domain) *CertificateUpdateOne {
-	ids := make([]int, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *CertificateUpdateOne) RemoveDomains(v ...*Domain) *CertificateUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cuo.RemoveDomainIDs(ids...)
+	return _u.RemoveDomainIDs(ids...)
 }
 
 // Where appends a list predicates to the CertificateUpdate builder.
-func (cuo *CertificateUpdateOne) Where(ps ...predicate.Certificate) *CertificateUpdateOne {
-	cuo.mutation.Where(ps...)
-	return cuo
+func (_u *CertificateUpdateOne) Where(ps ...predicate.Certificate) *CertificateUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (cuo *CertificateUpdateOne) Select(field string, fields ...string) *CertificateUpdateOne {
-	cuo.fields = append([]string{field}, fields...)
-	return cuo
+func (_u *CertificateUpdateOne) Select(field string, fields ...string) *CertificateUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Certificate entity.
-func (cuo *CertificateUpdateOne) Save(ctx context.Context) (*Certificate, error) {
-	if err := cuo.defaults(); err != nil {
+func (_u *CertificateUpdateOne) Save(ctx context.Context) (*Certificate, error) {
+	if err := _u.defaults(); err != nil {
 		return nil, err
 	}
-	return withHooks(ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (cuo *CertificateUpdateOne) SaveX(ctx context.Context) *Certificate {
-	node, err := cuo.Save(ctx)
+func (_u *CertificateUpdateOne) SaveX(ctx context.Context) *Certificate {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -784,38 +830,38 @@ func (cuo *CertificateUpdateOne) SaveX(ctx context.Context) *Certificate {
 }
 
 // Exec executes the query on the entity.
-func (cuo *CertificateUpdateOne) Exec(ctx context.Context) error {
-	_, err := cuo.Save(ctx)
+func (_u *CertificateUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cuo *CertificateUpdateOne) ExecX(ctx context.Context) {
-	if err := cuo.Exec(ctx); err != nil {
+func (_u *CertificateUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (cuo *CertificateUpdateOne) defaults() error {
-	if _, ok := cuo.mutation.UpdateTime(); !ok {
+func (_u *CertificateUpdateOne) defaults() error {
+	if _, ok := _u.mutation.UpdateTime(); !ok {
 		if certificate.UpdateDefaultUpdateTime == nil {
 			return fmt.Errorf("ent: uninitialized certificate.UpdateDefaultUpdateTime (forgotten import ent/runtime?)")
 		}
 		v := certificate.UpdateDefaultUpdateTime()
-		cuo.mutation.SetUpdateTime(v)
+		_u.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (cuo *CertificateUpdateOne) check() error {
-	if v, ok := cuo.mutation.CommonName(); ok {
+func (_u *CertificateUpdateOne) check() error {
+	if v, ok := _u.mutation.CommonName(); ok {
 		if err := certificate.CommonNameValidator(v); err != nil {
 			return &ValidationError{Name: "commonName", err: fmt.Errorf(`ent: validator failed for field "Certificate.commonName": %w`, err)}
 		}
 	}
-	if v, ok := cuo.mutation.Status(); ok {
+	if v, ok := _u.mutation.Status(); ok {
 		if err := certificate.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Certificate.status": %w`, err)}
 		}
@@ -823,17 +869,17 @@ func (cuo *CertificateUpdateOne) check() error {
 	return nil
 }
 
-func (cuo *CertificateUpdateOne) sqlSave(ctx context.Context) (_node *Certificate, err error) {
-	if err := cuo.check(); err != nil {
+func (_u *CertificateUpdateOne) sqlSave(ctx context.Context) (_node *Certificate, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(certificate.Table, certificate.Columns, sqlgraph.NewFieldSpec(certificate.FieldID, field.TypeInt))
-	id, ok := cuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Certificate.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := cuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, certificate.FieldID)
 		for _, f := range fields {
@@ -845,80 +891,86 @@ func (cuo *CertificateUpdateOne) sqlSave(ctx context.Context) (_node *Certificat
 			}
 		}
 	}
-	if ps := cuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := cuo.mutation.UpdateTime(); ok {
+	if value, ok := _u.mutation.UpdateTime(); ok {
 		_spec.SetField(certificate.FieldUpdateTime, field.TypeTime, value)
 	}
-	if value, ok := cuo.mutation.SslId(); ok {
+	if value, ok := _u.mutation.SslId(); ok {
 		_spec.SetField(certificate.FieldSslId, field.TypeInt, value)
 	}
-	if value, ok := cuo.mutation.AddedSslId(); ok {
+	if value, ok := _u.mutation.AddedSslId(); ok {
 		_spec.AddField(certificate.FieldSslId, field.TypeInt, value)
 	}
-	if cuo.mutation.SslIdCleared() {
+	if _u.mutation.SslIdCleared() {
 		_spec.ClearField(certificate.FieldSslId, field.TypeInt)
 	}
-	if value, ok := cuo.mutation.TransactionId(); ok {
+	if value, ok := _u.mutation.TransactionId(); ok {
 		_spec.SetField(certificate.FieldTransactionId, field.TypeString, value)
 	}
-	if cuo.mutation.TransactionIdCleared() {
+	if _u.mutation.TransactionIdCleared() {
 		_spec.ClearField(certificate.FieldTransactionId, field.TypeString)
 	}
-	if value, ok := cuo.mutation.Serial(); ok {
+	if value, ok := _u.mutation.Serial(); ok {
 		_spec.SetField(certificate.FieldSerial, field.TypeString, value)
 	}
-	if cuo.mutation.SerialCleared() {
+	if _u.mutation.SerialCleared() {
 		_spec.ClearField(certificate.FieldSerial, field.TypeString)
 	}
-	if value, ok := cuo.mutation.CommonName(); ok {
+	if value, ok := _u.mutation.CommonName(); ok {
 		_spec.SetField(certificate.FieldCommonName, field.TypeString, value)
 	}
-	if value, ok := cuo.mutation.NotBefore(); ok {
+	if value, ok := _u.mutation.NotBefore(); ok {
 		_spec.SetField(certificate.FieldNotBefore, field.TypeTime, value)
 	}
-	if cuo.mutation.NotBeforeCleared() {
+	if _u.mutation.NotBeforeCleared() {
 		_spec.ClearField(certificate.FieldNotBefore, field.TypeTime)
 	}
-	if value, ok := cuo.mutation.NotAfter(); ok {
+	if value, ok := _u.mutation.NotAfter(); ok {
 		_spec.SetField(certificate.FieldNotAfter, field.TypeTime, value)
 	}
-	if cuo.mutation.NotAfterCleared() {
+	if _u.mutation.NotAfterCleared() {
 		_spec.ClearField(certificate.FieldNotAfter, field.TypeTime)
 	}
-	if value, ok := cuo.mutation.IssuedBy(); ok {
+	if value, ok := _u.mutation.IssuedBy(); ok {
 		_spec.SetField(certificate.FieldIssuedBy, field.TypeString, value)
 	}
-	if cuo.mutation.IssuedByCleared() {
+	if _u.mutation.IssuedByCleared() {
 		_spec.ClearField(certificate.FieldIssuedBy, field.TypeString)
 	}
-	if value, ok := cuo.mutation.Source(); ok {
+	if value, ok := _u.mutation.Source(); ok {
 		_spec.SetField(certificate.FieldSource, field.TypeString, value)
 	}
-	if cuo.mutation.SourceCleared() {
+	if _u.mutation.SourceCleared() {
 		_spec.ClearField(certificate.FieldSource, field.TypeString)
 	}
-	if value, ok := cuo.mutation.Created(); ok {
+	if value, ok := _u.mutation.Created(); ok {
 		_spec.SetField(certificate.FieldCreated, field.TypeTime, value)
 	}
-	if cuo.mutation.CreatedCleared() {
+	if _u.mutation.CreatedCleared() {
 		_spec.ClearField(certificate.FieldCreated, field.TypeTime)
 	}
-	if value, ok := cuo.mutation.Status(); ok {
+	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(certificate.FieldStatus, field.TypeEnum, value)
 	}
-	if value, ok := cuo.mutation.Ca(); ok {
+	if value, ok := _u.mutation.Ca(); ok {
 		_spec.SetField(certificate.FieldCa, field.TypeString, value)
 	}
-	if cuo.mutation.CaCleared() {
+	if _u.mutation.CaCleared() {
 		_spec.ClearField(certificate.FieldCa, field.TypeString)
 	}
-	if cuo.mutation.DomainsCleared() {
+	if value, ok := _u.mutation.Certificate(); ok {
+		_spec.SetField(certificate.FieldCertificate, field.TypeString, value)
+	}
+	if _u.mutation.CertificateCleared() {
+		_spec.ClearField(certificate.FieldCertificate, field.TypeString)
+	}
+	if _u.mutation.DomainsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -931,7 +983,7 @@ func (cuo *CertificateUpdateOne) sqlSave(ctx context.Context) (_node *Certificat
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.RemovedDomainsIDs(); len(nodes) > 0 && !cuo.mutation.DomainsCleared() {
+	if nodes := _u.mutation.RemovedDomainsIDs(); len(nodes) > 0 && !_u.mutation.DomainsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -947,7 +999,7 @@ func (cuo *CertificateUpdateOne) sqlSave(ctx context.Context) (_node *Certificat
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.DomainsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.DomainsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -963,10 +1015,10 @@ func (cuo *CertificateUpdateOne) sqlSave(ctx context.Context) (_node *Certificat
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &Certificate{config: cuo.config}
+	_node = &Certificate{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, cuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{certificate.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -974,6 +1026,6 @@ func (cuo *CertificateUpdateOne) sqlSave(ctx context.Context) (_node *Certificat
 		}
 		return nil, err
 	}
-	cuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

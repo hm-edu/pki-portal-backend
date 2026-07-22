@@ -6,6 +6,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/TheZeroSlave/zapsentry"
@@ -17,6 +18,7 @@ import (
 	"github.com/hm-edu/pki-service/ent/certificate"
 	"github.com/hm-edu/pki-service/ent/domain"
 	"github.com/hm-edu/pki-service/ent/predicate"
+	"github.com/hm-edu/pki-service/pkg/acme"
 	"github.com/hm-edu/pki-service/pkg/cfg"
 	pkiHelper "github.com/hm-edu/pki-service/pkg/helper"
 	pb "github.com/hm-edu/portal-apis"
@@ -94,17 +96,19 @@ type sslAPIServer struct {
 	cfg    *cfg.PKIConfiguration
 	logger *zap.Logger
 	harica *haricaClients
+	acme   *acme.Client
 
 	last     *time.Time
 	duration *time.Duration
 }
 
-func newSslAPIServer(cfg *cfg.PKIConfiguration, db *ent.Client, clients *haricaClients) *sslAPIServer {
+func newSslAPIServer(cfg *cfg.PKIConfiguration, db *ent.Client, clients *haricaClients, acmeClient *acme.Client) *sslAPIServer {
 	instance := &sslAPIServer{
 		cfg:    cfg,
 		logger: zap.L(),
 		db:     db,
 		harica: clients,
+		acme:   acmeClient,
 	}
 	_ = promauto.NewGaugeFunc(prometheus.GaugeOpts{
 		Name: "ssl_issue_last_duration",
@@ -209,7 +213,12 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	}
 	ids := []int{}
 
-	logger = logger.With(zap.Strings("subject_alternative_names", sans))
+	ca := "harica"
+	if s.canUseAcme(csr, sans, logger) {
+		ca = "letsencrypt"
+	}
+
+	logger = logger.With(zap.Strings("subject_alternative_names", sans), zap.String("ca", ca))
 	logger.Info("Issuing new server certificate")
 
 	for _, fqdn := range sans {
@@ -229,7 +238,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		SetCommonName(sans[0]).
 		SetIssuedBy(req.Issuer).
 		SetSource(req.Source).
-		SetCa("harica").
+		SetCa(ca).
 		AddDomainIDs(ids...).
 		Save(ctx)
 
@@ -242,6 +251,10 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	entry, err = s.db.Certificate.UpdateOneID(entry.ID).SetStatus(certificate.StatusRequested).Save(ctx)
 	if err != nil {
 		return s.handleError("Error while storing certificate", err, logger, hub)
+	}
+
+	if ca == "letsencrypt" {
+		return s.issueAcmeCertificate(ctx, logger, hub, entry, csr, time.Now())
 	}
 
 	client := s.harica.client
@@ -289,23 +302,10 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 		}
 	}
 
-	transactions, err := retryHarica(ctx, logger, client, "GetMyTransactions", func() ([]models.TransactionResponse, error) {
-		return client.GetMyTransactions()
-	})
-	if err == nil {
-		for _, t := range transactions {
-			if t.TransactionID == transaction.TransactionID {
-				if t.IsHighRisk && strings.EqualFold(t.TransactionStatus, "Pending") {
-					return s.handleError("pending transaction is high risk", fmt.Errorf("high risk transaction"), logger, hub)
-				}
-			}
-		}
-	}
 	if !req.WaitForIssue {
 		logger.Info("Request approved. Certificate will be collected later", zap.String("transaction_id", transaction.TransactionID))
 		return &pb.IssueSslResponse{TransactionId: transaction.TransactionID}, nil
 	}
-
 	logger.Info("Request approved. Collecting certificate")
 	cert, err := retryHarica(ctx, logger, client, "GetCertificate", func() (*models.CertificateResponse, error) {
 		return client.GetCertificate(transaction.TransactionID)
@@ -431,6 +431,81 @@ func (s *sslAPIServer) storeCollectedCertificate(ctx context.Context, logger *za
 	return &pb.IssueSslResponse{Certificate: flattenCertificates(certs), TransactionId: transactionID}, nil
 }
 
+// canUseAcme reports whether the requested certificate can be issued by the
+// ACME CA. The ACME order is derived from the CSR, so the CSR must contain
+// exactly the requested domains and all of them must be covered by the DNS
+// validation config. Requests that do not qualify fall back to HARICA so
+// zones can be migrated one by one.
+func (s *sslAPIServer) canUseAcme(csr *x509.CertificateRequest, sans []string, logger *zap.Logger) bool {
+	if s.acme == nil {
+		return false
+	}
+	csrDomains := make(map[string]bool)
+	if csr.Subject.CommonName != "" {
+		csrDomains[strings.ToLower(csr.Subject.CommonName)] = true
+	}
+	for _, d := range csr.DNSNames {
+		csrDomains[strings.ToLower(d)] = true
+	}
+	requested := make(map[string]bool)
+	for _, san := range sans {
+		requested[strings.ToLower(san)] = true
+	}
+	for san := range requested {
+		if !csrDomains[san] {
+			logger.Warn("Domain missing in CSR, falling back to HARICA", zap.String("domain", san))
+			return false
+		}
+	}
+	for d := range csrDomains {
+		if !requested[d] {
+			logger.Warn("CSR contains additional domain, falling back to HARICA", zap.String("domain", d))
+			return false
+		}
+	}
+	if !s.acme.Covers(sans) {
+		logger.Info("Domains not covered by DNS validation config, falling back to HARICA")
+		return false
+	}
+	return true
+}
+
+func (s *sslAPIServer) issueAcmeCertificate(ctx context.Context, logger *zap.Logger, hub *sentry.Hub, entry *ent.Certificate, csr *x509.CertificateRequest, start time.Time) (*pb.IssueSslResponse, error) {
+	certPEM, err := s.acme.ObtainForCSR(ctx, csr)
+	if err != nil {
+		return s.handleError("Error while requesting certificate", err, logger, hub)
+	}
+	hub.AddBreadcrumb(&sentry.Breadcrumb{Message: "Certificate collected", Category: "info", Level: sentry.LevelInfo}, nil)
+	stop := time.Now()
+	duration := stop.Sub(start)
+	s.duration = &duration
+	s.last = &stop
+	certs, err := pkiHelper.ParseCertificates(certPEM)
+	if err != nil {
+		return s.handleError("Error parsing certificate", err, logger, hub)
+	}
+	leaf := certs[0]
+	serial := fmt.Sprintf("%032x", leaf.SerialNumber)
+	logger.Info("Certificate issued",
+		zap.Duration("duration", duration),
+		zap.String("serial", serial))
+
+	_, err = s.db.Certificate.UpdateOneID(entry.ID).
+		SetSerial(pkiHelper.NormalizeSerial(serial)).
+		SetStatus(certificate.StatusIssued).
+		SetNotAfter(leaf.NotAfter).
+		SetNotBefore(leaf.NotBefore).
+		SetCreated(stop).
+		SetCertificate(string(certPEM)).
+		Save(ctx)
+
+	if err != nil {
+		return s.handleError("Error while saving collected certificate", err, logger, hub)
+	}
+
+	return &pb.IssueSslResponse{Certificate: flattenCertificates(certs)}, nil
+}
+
 func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslRequest) (*emptypb.Empty, error) {
 	hub := sentry.GetHubFromContext(ctx)
 	if hub == nil {
@@ -451,22 +526,67 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 	client := s.harica.client
 	validationClient := s.harica.validation
 
-	reasons, err := retryHarica(ctx, logger, client, "GetRevocationReasons", func() ([]models.RevocationReasonsResponse, error) {
-		return client.GetRevocationReasons()
-	})
-	if err != nil {
-		return errorReturn(err, logger)
-	}
-	var reason *models.RevocationReasonsResponse
-	for _, r := range reasons {
-		if r.Name == "4.9.1.1.1.1" {
-			reason = &r
-			break
+	// The HARICA revocation reason is only required (and fetched) if a
+	// HARICA certificate is actually revoked.
+	getReason := sync.OnceValues(func() (*models.RevocationReasonsResponse, error) {
+		reasons, err := retryHarica(ctx, logger, client, "GetRevocationReasons", func() ([]models.RevocationReasonsResponse, error) {
+			return client.GetRevocationReasons()
+		})
+		if err != nil {
+			return nil, err
 		}
+		for _, r := range reasons {
+			if r.Name == "4.9.1.1.1.1" {
+				return &r, nil
+			}
+		}
+		return nil, fmt.Errorf("revocation reason not found")
+	})
+
+	// revokeOne revokes a single certificate using the CA it was issued by.
+	// Certificates from unknown CAs are skipped without an error.
+	revokeOne := func(c *ent.Certificate, logger *zap.Logger) error {
+		ca := ""
+		if c.Ca != nil {
+			ca = *c.Ca
+		}
+		switch ca {
+		case "letsencrypt":
+			if s.acme == nil {
+				return fmt.Errorf("certificate %d was issued via ACME but no ACME client is configured", c.ID)
+			}
+			if c.Certificate == nil || *c.Certificate == "" {
+				logger.Warn("Certificate has no stored PEM. Cannot revoke", zap.Int("id", c.ID))
+				return nil
+			}
+			logger.Info("Revoking certificate via ACME", zap.Int("id", c.ID))
+			if err := s.acme.Revoke(ctx, []byte(*c.Certificate)); err != nil {
+				return err
+			}
+		case "harica":
+			if c.TransactionId == "" {
+				logger.Warn("Certificate has no transaction id", zap.Int("id", c.ID))
+				return nil
+			}
+			reason, err := getReason()
+			if err != nil {
+				return err
+			}
+			logger.Info("Revoking certificate", zap.String("transaction_id", c.TransactionId), zap.String("reason", reason.Name), zap.String("description", req.Reason))
+			err = retryHaricaVoid(ctx, logger, validationClient, "RevokeCertificate", func() error {
+				return validationClient.RevokeCertificate(*reason, "", c.TransactionId)
+			})
+			if err != nil {
+				return err
+			}
+		default:
+			logger.Info("Skipping certificate. Not issued by HARICA or ACME", zap.Int("id", c.ID))
+			return nil
+		}
+		_, err := s.db.Certificate.UpdateOneID(c.ID).SetStatus(certificate.StatusRevoked).Save(ctx)
+		return err
 	}
-	if reason == nil {
-		return errorReturn(fmt.Errorf("revocation reason not found"), logger)
-	}
+
 	switch req.Identifier.(type) {
 	case *pb.RevokeSslRequest_Serial:
 		serial := pkiHelper.NormalizeSerial(req.GetSerial())
@@ -476,24 +596,8 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 		if err != nil {
 			return errorReturn(err, logger)
 		}
-		if c.Ca == nil || *c.Ca != "harica" {
-			logger.Info("Skipping certificate. Not issued by HARICA", zap.Int("id", c.ID))
-			return &emptypb.Empty{}, nil
-		}
-		if c.TransactionId == "" {
-			logger.Warn("Certificate has no transaction id", zap.Int("id", c.ID))
-			return &emptypb.Empty{}, nil
-		}
-		logger.Info("Revoking certificate", zap.String("transaction_id", c.TransactionId), zap.String("reason", reason.Name), zap.String("description", req.Reason))
-		err = retryHaricaVoid(ctx, logger, validationClient, "RevokeCertificate", func() error {
-			return validationClient.RevokeCertificate(*reason, "", c.TransactionId)
-		})
-		if err != nil {
+		if err := revokeOne(c, logger); err != nil {
 			logger.Error("Revoking request failed", zap.Error(err))
-			return errorReturn(err, logger)
-		}
-		_, err = s.db.Certificate.UpdateOneID(c.ID).SetStatus(certificate.StatusRevoked).Save(ctx)
-		if err != nil {
 			return errorReturn(err, logger)
 		}
 	case *pb.RevokeSslRequest_CommonName:
@@ -514,29 +618,7 @@ func (s *sslAPIServer) RevokeCertificate(ctx context.Context, req *pb.RevokeSslR
 
 		for _, c := range certs {
 			go func(c *ent.Certificate, ret chan struct{ err error }) {
-				if c.Ca == nil || *c.Ca != "harica" {
-					logger.Info("Skipping certificate. Not issued by HARICA", zap.Int("id", c.ID))
-					ret <- struct{ err error }{}
-					return
-				}
-				if c.TransactionId == "" {
-					logger.Warn("Certificate has no transaction id", zap.Int("id", c.ID))
-					ret <- struct{ err error }{}
-					return
-				}
-				err := retryHaricaVoid(ctx, logger, validationClient, "RevokeCertificate", func() error {
-					return validationClient.RevokeCertificate(*reason, "", c.TransactionId)
-				})
-				if err != nil {
-					ret <- struct{ err error }{err}
-					return
-				}
-				_, err = s.db.Certificate.UpdateOneID(c.ID).SetStatus(certificate.StatusRevoked).Save(ctx)
-				if err != nil {
-					ret <- struct{ err error }{err}
-					return
-				}
-				ret <- struct{ err error }{}
+				ret <- struct{ err error }{revokeOne(c, logger)}
 			}(c, ret)
 		}
 		var errors []error

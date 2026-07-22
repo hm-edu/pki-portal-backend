@@ -24,210 +24,224 @@ type CertificateCreate struct {
 }
 
 // SetCreateTime sets the "create_time" field.
-func (cc *CertificateCreate) SetCreateTime(t time.Time) *CertificateCreate {
-	cc.mutation.SetCreateTime(t)
-	return cc
+func (_c *CertificateCreate) SetCreateTime(v time.Time) *CertificateCreate {
+	_c.mutation.SetCreateTime(v)
+	return _c
 }
 
 // SetNillableCreateTime sets the "create_time" field if the given value is not nil.
-func (cc *CertificateCreate) SetNillableCreateTime(t *time.Time) *CertificateCreate {
-	if t != nil {
-		cc.SetCreateTime(*t)
+func (_c *CertificateCreate) SetNillableCreateTime(v *time.Time) *CertificateCreate {
+	if v != nil {
+		_c.SetCreateTime(*v)
 	}
-	return cc
+	return _c
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (cc *CertificateCreate) SetUpdateTime(t time.Time) *CertificateCreate {
-	cc.mutation.SetUpdateTime(t)
-	return cc
+func (_c *CertificateCreate) SetUpdateTime(v time.Time) *CertificateCreate {
+	_c.mutation.SetUpdateTime(v)
+	return _c
 }
 
 // SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
-func (cc *CertificateCreate) SetNillableUpdateTime(t *time.Time) *CertificateCreate {
-	if t != nil {
-		cc.SetUpdateTime(*t)
+func (_c *CertificateCreate) SetNillableUpdateTime(v *time.Time) *CertificateCreate {
+	if v != nil {
+		_c.SetUpdateTime(*v)
 	}
-	return cc
+	return _c
 }
 
 // SetSslId sets the "sslId" field.
-func (cc *CertificateCreate) SetSslId(i int) *CertificateCreate {
-	cc.mutation.SetSslId(i)
-	return cc
+func (_c *CertificateCreate) SetSslId(v int) *CertificateCreate {
+	_c.mutation.SetSslId(v)
+	return _c
 }
 
 // SetNillableSslId sets the "sslId" field if the given value is not nil.
-func (cc *CertificateCreate) SetNillableSslId(i *int) *CertificateCreate {
-	if i != nil {
-		cc.SetSslId(*i)
+func (_c *CertificateCreate) SetNillableSslId(v *int) *CertificateCreate {
+	if v != nil {
+		_c.SetSslId(*v)
 	}
-	return cc
+	return _c
 }
 
 // SetTransactionId sets the "transactionId" field.
-func (cc *CertificateCreate) SetTransactionId(s string) *CertificateCreate {
-	cc.mutation.SetTransactionId(s)
-	return cc
+func (_c *CertificateCreate) SetTransactionId(v string) *CertificateCreate {
+	_c.mutation.SetTransactionId(v)
+	return _c
 }
 
 // SetNillableTransactionId sets the "transactionId" field if the given value is not nil.
-func (cc *CertificateCreate) SetNillableTransactionId(s *string) *CertificateCreate {
-	if s != nil {
-		cc.SetTransactionId(*s)
+func (_c *CertificateCreate) SetNillableTransactionId(v *string) *CertificateCreate {
+	if v != nil {
+		_c.SetTransactionId(*v)
 	}
-	return cc
+	return _c
 }
 
 // SetSerial sets the "serial" field.
-func (cc *CertificateCreate) SetSerial(s string) *CertificateCreate {
-	cc.mutation.SetSerial(s)
-	return cc
+func (_c *CertificateCreate) SetSerial(v string) *CertificateCreate {
+	_c.mutation.SetSerial(v)
+	return _c
 }
 
 // SetNillableSerial sets the "serial" field if the given value is not nil.
-func (cc *CertificateCreate) SetNillableSerial(s *string) *CertificateCreate {
-	if s != nil {
-		cc.SetSerial(*s)
+func (_c *CertificateCreate) SetNillableSerial(v *string) *CertificateCreate {
+	if v != nil {
+		_c.SetSerial(*v)
 	}
-	return cc
+	return _c
 }
 
 // SetCommonName sets the "commonName" field.
-func (cc *CertificateCreate) SetCommonName(s string) *CertificateCreate {
-	cc.mutation.SetCommonName(s)
-	return cc
+func (_c *CertificateCreate) SetCommonName(v string) *CertificateCreate {
+	_c.mutation.SetCommonName(v)
+	return _c
 }
 
 // SetNotBefore sets the "notBefore" field.
-func (cc *CertificateCreate) SetNotBefore(t time.Time) *CertificateCreate {
-	cc.mutation.SetNotBefore(t)
-	return cc
+func (_c *CertificateCreate) SetNotBefore(v time.Time) *CertificateCreate {
+	_c.mutation.SetNotBefore(v)
+	return _c
 }
 
 // SetNillableNotBefore sets the "notBefore" field if the given value is not nil.
-func (cc *CertificateCreate) SetNillableNotBefore(t *time.Time) *CertificateCreate {
-	if t != nil {
-		cc.SetNotBefore(*t)
+func (_c *CertificateCreate) SetNillableNotBefore(v *time.Time) *CertificateCreate {
+	if v != nil {
+		_c.SetNotBefore(*v)
 	}
-	return cc
+	return _c
 }
 
 // SetNotAfter sets the "notAfter" field.
-func (cc *CertificateCreate) SetNotAfter(t time.Time) *CertificateCreate {
-	cc.mutation.SetNotAfter(t)
-	return cc
+func (_c *CertificateCreate) SetNotAfter(v time.Time) *CertificateCreate {
+	_c.mutation.SetNotAfter(v)
+	return _c
 }
 
 // SetNillableNotAfter sets the "notAfter" field if the given value is not nil.
-func (cc *CertificateCreate) SetNillableNotAfter(t *time.Time) *CertificateCreate {
-	if t != nil {
-		cc.SetNotAfter(*t)
+func (_c *CertificateCreate) SetNillableNotAfter(v *time.Time) *CertificateCreate {
+	if v != nil {
+		_c.SetNotAfter(*v)
 	}
-	return cc
+	return _c
 }
 
 // SetIssuedBy sets the "issuedBy" field.
-func (cc *CertificateCreate) SetIssuedBy(s string) *CertificateCreate {
-	cc.mutation.SetIssuedBy(s)
-	return cc
+func (_c *CertificateCreate) SetIssuedBy(v string) *CertificateCreate {
+	_c.mutation.SetIssuedBy(v)
+	return _c
 }
 
 // SetNillableIssuedBy sets the "issuedBy" field if the given value is not nil.
-func (cc *CertificateCreate) SetNillableIssuedBy(s *string) *CertificateCreate {
-	if s != nil {
-		cc.SetIssuedBy(*s)
+func (_c *CertificateCreate) SetNillableIssuedBy(v *string) *CertificateCreate {
+	if v != nil {
+		_c.SetIssuedBy(*v)
 	}
-	return cc
+	return _c
 }
 
 // SetSource sets the "source" field.
-func (cc *CertificateCreate) SetSource(s string) *CertificateCreate {
-	cc.mutation.SetSource(s)
-	return cc
+func (_c *CertificateCreate) SetSource(v string) *CertificateCreate {
+	_c.mutation.SetSource(v)
+	return _c
 }
 
 // SetNillableSource sets the "source" field if the given value is not nil.
-func (cc *CertificateCreate) SetNillableSource(s *string) *CertificateCreate {
-	if s != nil {
-		cc.SetSource(*s)
+func (_c *CertificateCreate) SetNillableSource(v *string) *CertificateCreate {
+	if v != nil {
+		_c.SetSource(*v)
 	}
-	return cc
+	return _c
 }
 
 // SetCreated sets the "created" field.
-func (cc *CertificateCreate) SetCreated(t time.Time) *CertificateCreate {
-	cc.mutation.SetCreated(t)
-	return cc
+func (_c *CertificateCreate) SetCreated(v time.Time) *CertificateCreate {
+	_c.mutation.SetCreated(v)
+	return _c
 }
 
 // SetNillableCreated sets the "created" field if the given value is not nil.
-func (cc *CertificateCreate) SetNillableCreated(t *time.Time) *CertificateCreate {
-	if t != nil {
-		cc.SetCreated(*t)
+func (_c *CertificateCreate) SetNillableCreated(v *time.Time) *CertificateCreate {
+	if v != nil {
+		_c.SetCreated(*v)
 	}
-	return cc
+	return _c
 }
 
 // SetStatus sets the "status" field.
-func (cc *CertificateCreate) SetStatus(c certificate.Status) *CertificateCreate {
-	cc.mutation.SetStatus(c)
-	return cc
+func (_c *CertificateCreate) SetStatus(v certificate.Status) *CertificateCreate {
+	_c.mutation.SetStatus(v)
+	return _c
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (cc *CertificateCreate) SetNillableStatus(c *certificate.Status) *CertificateCreate {
-	if c != nil {
-		cc.SetStatus(*c)
+func (_c *CertificateCreate) SetNillableStatus(v *certificate.Status) *CertificateCreate {
+	if v != nil {
+		_c.SetStatus(*v)
 	}
-	return cc
+	return _c
 }
 
 // SetCa sets the "ca" field.
-func (cc *CertificateCreate) SetCa(s string) *CertificateCreate {
-	cc.mutation.SetCa(s)
-	return cc
+func (_c *CertificateCreate) SetCa(v string) *CertificateCreate {
+	_c.mutation.SetCa(v)
+	return _c
 }
 
 // SetNillableCa sets the "ca" field if the given value is not nil.
-func (cc *CertificateCreate) SetNillableCa(s *string) *CertificateCreate {
-	if s != nil {
-		cc.SetCa(*s)
+func (_c *CertificateCreate) SetNillableCa(v *string) *CertificateCreate {
+	if v != nil {
+		_c.SetCa(*v)
 	}
-	return cc
+	return _c
+}
+
+// SetCertificate sets the "certificate" field.
+func (_c *CertificateCreate) SetCertificate(v string) *CertificateCreate {
+	_c.mutation.SetCertificate(v)
+	return _c
+}
+
+// SetNillableCertificate sets the "certificate" field if the given value is not nil.
+func (_c *CertificateCreate) SetNillableCertificate(v *string) *CertificateCreate {
+	if v != nil {
+		_c.SetCertificate(*v)
+	}
+	return _c
 }
 
 // AddDomainIDs adds the "domains" edge to the Domain entity by IDs.
-func (cc *CertificateCreate) AddDomainIDs(ids ...int) *CertificateCreate {
-	cc.mutation.AddDomainIDs(ids...)
-	return cc
+func (_c *CertificateCreate) AddDomainIDs(ids ...int) *CertificateCreate {
+	_c.mutation.AddDomainIDs(ids...)
+	return _c
 }
 
 // AddDomains adds the "domains" edges to the Domain entity.
-func (cc *CertificateCreate) AddDomains(d ...*Domain) *CertificateCreate {
-	ids := make([]int, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_c *CertificateCreate) AddDomains(v ...*Domain) *CertificateCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cc.AddDomainIDs(ids...)
+	return _c.AddDomainIDs(ids...)
 }
 
 // Mutation returns the CertificateMutation object of the builder.
-func (cc *CertificateCreate) Mutation() *CertificateMutation {
-	return cc.mutation
+func (_c *CertificateCreate) Mutation() *CertificateMutation {
+	return _c.mutation
 }
 
 // Save creates the Certificate in the database.
-func (cc *CertificateCreate) Save(ctx context.Context) (*Certificate, error) {
-	if err := cc.defaults(); err != nil {
+func (_c *CertificateCreate) Save(ctx context.Context) (*Certificate, error) {
+	if err := _c.defaults(); err != nil {
 		return nil, err
 	}
-	return withHooks(ctx, cc.sqlSave, cc.mutation, cc.hooks)
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (cc *CertificateCreate) SaveX(ctx context.Context) *Certificate {
-	v, err := cc.Save(ctx)
+func (_c *CertificateCreate) SaveX(ctx context.Context) *Certificate {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -235,61 +249,61 @@ func (cc *CertificateCreate) SaveX(ctx context.Context) *Certificate {
 }
 
 // Exec executes the query.
-func (cc *CertificateCreate) Exec(ctx context.Context) error {
-	_, err := cc.Save(ctx)
+func (_c *CertificateCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cc *CertificateCreate) ExecX(ctx context.Context) {
-	if err := cc.Exec(ctx); err != nil {
+func (_c *CertificateCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (cc *CertificateCreate) defaults() error {
-	if _, ok := cc.mutation.CreateTime(); !ok {
+func (_c *CertificateCreate) defaults() error {
+	if _, ok := _c.mutation.CreateTime(); !ok {
 		if certificate.DefaultCreateTime == nil {
 			return fmt.Errorf("ent: uninitialized certificate.DefaultCreateTime (forgotten import ent/runtime?)")
 		}
 		v := certificate.DefaultCreateTime()
-		cc.mutation.SetCreateTime(v)
+		_c.mutation.SetCreateTime(v)
 	}
-	if _, ok := cc.mutation.UpdateTime(); !ok {
+	if _, ok := _c.mutation.UpdateTime(); !ok {
 		if certificate.DefaultUpdateTime == nil {
 			return fmt.Errorf("ent: uninitialized certificate.DefaultUpdateTime (forgotten import ent/runtime?)")
 		}
 		v := certificate.DefaultUpdateTime()
-		cc.mutation.SetUpdateTime(v)
+		_c.mutation.SetUpdateTime(v)
 	}
-	if _, ok := cc.mutation.Status(); !ok {
+	if _, ok := _c.mutation.Status(); !ok {
 		v := certificate.DefaultStatus
-		cc.mutation.SetStatus(v)
+		_c.mutation.SetStatus(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (cc *CertificateCreate) check() error {
-	if _, ok := cc.mutation.CreateTime(); !ok {
+func (_c *CertificateCreate) check() error {
+	if _, ok := _c.mutation.CreateTime(); !ok {
 		return &ValidationError{Name: "create_time", err: errors.New(`ent: missing required field "Certificate.create_time"`)}
 	}
-	if _, ok := cc.mutation.UpdateTime(); !ok {
+	if _, ok := _c.mutation.UpdateTime(); !ok {
 		return &ValidationError{Name: "update_time", err: errors.New(`ent: missing required field "Certificate.update_time"`)}
 	}
-	if _, ok := cc.mutation.CommonName(); !ok {
+	if _, ok := _c.mutation.CommonName(); !ok {
 		return &ValidationError{Name: "commonName", err: errors.New(`ent: missing required field "Certificate.commonName"`)}
 	}
-	if v, ok := cc.mutation.CommonName(); ok {
+	if v, ok := _c.mutation.CommonName(); ok {
 		if err := certificate.CommonNameValidator(v); err != nil {
 			return &ValidationError{Name: "commonName", err: fmt.Errorf(`ent: validator failed for field "Certificate.commonName": %w`, err)}
 		}
 	}
-	if _, ok := cc.mutation.Status(); !ok {
+	if _, ok := _c.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Certificate.status"`)}
 	}
-	if v, ok := cc.mutation.Status(); ok {
+	if v, ok := _c.mutation.Status(); ok {
 		if err := certificate.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Certificate.status": %w`, err)}
 		}
@@ -297,12 +311,12 @@ func (cc *CertificateCreate) check() error {
 	return nil
 }
 
-func (cc *CertificateCreate) sqlSave(ctx context.Context) (*Certificate, error) {
-	if err := cc.check(); err != nil {
+func (_c *CertificateCreate) sqlSave(ctx context.Context) (*Certificate, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := cc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, cc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -310,70 +324,74 @@ func (cc *CertificateCreate) sqlSave(ctx context.Context) (*Certificate, error) 
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int(id)
-	cc.mutation.id = &_node.ID
-	cc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (cc *CertificateCreate) createSpec() (*Certificate, *sqlgraph.CreateSpec) {
+func (_c *CertificateCreate) createSpec() (*Certificate, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Certificate{config: cc.config}
+		_node = &Certificate{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(certificate.Table, sqlgraph.NewFieldSpec(certificate.FieldID, field.TypeInt))
 	)
-	_spec.OnConflict = cc.conflict
-	if value, ok := cc.mutation.CreateTime(); ok {
+	_spec.OnConflict = _c.conflict
+	if value, ok := _c.mutation.CreateTime(); ok {
 		_spec.SetField(certificate.FieldCreateTime, field.TypeTime, value)
 		_node.CreateTime = value
 	}
-	if value, ok := cc.mutation.UpdateTime(); ok {
+	if value, ok := _c.mutation.UpdateTime(); ok {
 		_spec.SetField(certificate.FieldUpdateTime, field.TypeTime, value)
 		_node.UpdateTime = value
 	}
-	if value, ok := cc.mutation.SslId(); ok {
+	if value, ok := _c.mutation.SslId(); ok {
 		_spec.SetField(certificate.FieldSslId, field.TypeInt, value)
 		_node.SslId = value
 	}
-	if value, ok := cc.mutation.TransactionId(); ok {
+	if value, ok := _c.mutation.TransactionId(); ok {
 		_spec.SetField(certificate.FieldTransactionId, field.TypeString, value)
 		_node.TransactionId = value
 	}
-	if value, ok := cc.mutation.Serial(); ok {
+	if value, ok := _c.mutation.Serial(); ok {
 		_spec.SetField(certificate.FieldSerial, field.TypeString, value)
 		_node.Serial = value
 	}
-	if value, ok := cc.mutation.CommonName(); ok {
+	if value, ok := _c.mutation.CommonName(); ok {
 		_spec.SetField(certificate.FieldCommonName, field.TypeString, value)
 		_node.CommonName = value
 	}
-	if value, ok := cc.mutation.NotBefore(); ok {
+	if value, ok := _c.mutation.NotBefore(); ok {
 		_spec.SetField(certificate.FieldNotBefore, field.TypeTime, value)
 		_node.NotBefore = &value
 	}
-	if value, ok := cc.mutation.NotAfter(); ok {
+	if value, ok := _c.mutation.NotAfter(); ok {
 		_spec.SetField(certificate.FieldNotAfter, field.TypeTime, value)
 		_node.NotAfter = value
 	}
-	if value, ok := cc.mutation.IssuedBy(); ok {
+	if value, ok := _c.mutation.IssuedBy(); ok {
 		_spec.SetField(certificate.FieldIssuedBy, field.TypeString, value)
 		_node.IssuedBy = &value
 	}
-	if value, ok := cc.mutation.Source(); ok {
+	if value, ok := _c.mutation.Source(); ok {
 		_spec.SetField(certificate.FieldSource, field.TypeString, value)
 		_node.Source = &value
 	}
-	if value, ok := cc.mutation.Created(); ok {
+	if value, ok := _c.mutation.Created(); ok {
 		_spec.SetField(certificate.FieldCreated, field.TypeTime, value)
 		_node.Created = &value
 	}
-	if value, ok := cc.mutation.Status(); ok {
+	if value, ok := _c.mutation.Status(); ok {
 		_spec.SetField(certificate.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
 	}
-	if value, ok := cc.mutation.Ca(); ok {
+	if value, ok := _c.mutation.Ca(); ok {
 		_spec.SetField(certificate.FieldCa, field.TypeString, value)
 		_node.Ca = &value
 	}
-	if nodes := cc.mutation.DomainsIDs(); len(nodes) > 0 {
+	if value, ok := _c.mutation.Certificate(); ok {
+		_spec.SetField(certificate.FieldCertificate, field.TypeString, value)
+		_node.Certificate = &value
+	}
+	if nodes := _c.mutation.DomainsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -408,10 +426,10 @@ func (cc *CertificateCreate) createSpec() (*Certificate, *sqlgraph.CreateSpec) {
 //			SetCreateTime(v+v).
 //		}).
 //		Exec(ctx)
-func (cc *CertificateCreate) OnConflict(opts ...sql.ConflictOption) *CertificateUpsertOne {
-	cc.conflict = opts
+func (_c *CertificateCreate) OnConflict(opts ...sql.ConflictOption) *CertificateUpsertOne {
+	_c.conflict = opts
 	return &CertificateUpsertOne{
-		create: cc,
+		create: _c,
 	}
 }
 
@@ -421,10 +439,10 @@ func (cc *CertificateCreate) OnConflict(opts ...sql.ConflictOption) *Certificate
 //	client.Certificate.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (cc *CertificateCreate) OnConflictColumns(columns ...string) *CertificateUpsertOne {
-	cc.conflict = append(cc.conflict, sql.ConflictColumns(columns...))
+func (_c *CertificateCreate) OnConflictColumns(columns ...string) *CertificateUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &CertificateUpsertOne{
-		create: cc,
+		create: _c,
 	}
 }
 
@@ -642,6 +660,24 @@ func (u *CertificateUpsert) UpdateCa() *CertificateUpsert {
 // ClearCa clears the value of the "ca" field.
 func (u *CertificateUpsert) ClearCa() *CertificateUpsert {
 	u.SetNull(certificate.FieldCa)
+	return u
+}
+
+// SetCertificate sets the "certificate" field.
+func (u *CertificateUpsert) SetCertificate(v string) *CertificateUpsert {
+	u.Set(certificate.FieldCertificate, v)
+	return u
+}
+
+// UpdateCertificate sets the "certificate" field to the value that was provided on create.
+func (u *CertificateUpsert) UpdateCertificate() *CertificateUpsert {
+	u.SetExcluded(certificate.FieldCertificate)
+	return u
+}
+
+// ClearCertificate clears the value of the "certificate" field.
+func (u *CertificateUpsert) ClearCertificate() *CertificateUpsert {
+	u.SetNull(certificate.FieldCertificate)
 	return u
 }
 
@@ -928,6 +964,27 @@ func (u *CertificateUpsertOne) ClearCa() *CertificateUpsertOne {
 	})
 }
 
+// SetCertificate sets the "certificate" field.
+func (u *CertificateUpsertOne) SetCertificate(v string) *CertificateUpsertOne {
+	return u.Update(func(s *CertificateUpsert) {
+		s.SetCertificate(v)
+	})
+}
+
+// UpdateCertificate sets the "certificate" field to the value that was provided on create.
+func (u *CertificateUpsertOne) UpdateCertificate() *CertificateUpsertOne {
+	return u.Update(func(s *CertificateUpsert) {
+		s.UpdateCertificate()
+	})
+}
+
+// ClearCertificate clears the value of the "certificate" field.
+func (u *CertificateUpsertOne) ClearCertificate() *CertificateUpsertOne {
+	return u.Update(func(s *CertificateUpsert) {
+		s.ClearCertificate()
+	})
+}
+
 // Exec executes the query.
 func (u *CertificateUpsertOne) Exec(ctx context.Context) error {
 	if len(u.create.conflict) == 0 {
@@ -970,16 +1027,16 @@ type CertificateCreateBulk struct {
 }
 
 // Save creates the Certificate entities in the database.
-func (ccb *CertificateCreateBulk) Save(ctx context.Context) ([]*Certificate, error) {
-	if ccb.err != nil {
-		return nil, ccb.err
+func (_c *CertificateCreateBulk) Save(ctx context.Context) ([]*Certificate, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(ccb.builders))
-	nodes := make([]*Certificate, len(ccb.builders))
-	mutators := make([]Mutator, len(ccb.builders))
-	for i := range ccb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*Certificate, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := ccb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*CertificateMutation)
@@ -993,12 +1050,12 @@ func (ccb *CertificateCreateBulk) Save(ctx context.Context) ([]*Certificate, err
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, ccb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = ccb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, ccb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -1022,7 +1079,7 @@ func (ccb *CertificateCreateBulk) Save(ctx context.Context) ([]*Certificate, err
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, ccb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -1030,8 +1087,8 @@ func (ccb *CertificateCreateBulk) Save(ctx context.Context) ([]*Certificate, err
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (ccb *CertificateCreateBulk) SaveX(ctx context.Context) []*Certificate {
-	v, err := ccb.Save(ctx)
+func (_c *CertificateCreateBulk) SaveX(ctx context.Context) []*Certificate {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -1039,14 +1096,14 @@ func (ccb *CertificateCreateBulk) SaveX(ctx context.Context) []*Certificate {
 }
 
 // Exec executes the query.
-func (ccb *CertificateCreateBulk) Exec(ctx context.Context) error {
-	_, err := ccb.Save(ctx)
+func (_c *CertificateCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ccb *CertificateCreateBulk) ExecX(ctx context.Context) {
-	if err := ccb.Exec(ctx); err != nil {
+func (_c *CertificateCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -1066,10 +1123,10 @@ func (ccb *CertificateCreateBulk) ExecX(ctx context.Context) {
 //			SetCreateTime(v+v).
 //		}).
 //		Exec(ctx)
-func (ccb *CertificateCreateBulk) OnConflict(opts ...sql.ConflictOption) *CertificateUpsertBulk {
-	ccb.conflict = opts
+func (_c *CertificateCreateBulk) OnConflict(opts ...sql.ConflictOption) *CertificateUpsertBulk {
+	_c.conflict = opts
 	return &CertificateUpsertBulk{
-		create: ccb,
+		create: _c,
 	}
 }
 
@@ -1079,10 +1136,10 @@ func (ccb *CertificateCreateBulk) OnConflict(opts ...sql.ConflictOption) *Certif
 //	client.Certificate.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (ccb *CertificateCreateBulk) OnConflictColumns(columns ...string) *CertificateUpsertBulk {
-	ccb.conflict = append(ccb.conflict, sql.ConflictColumns(columns...))
+func (_c *CertificateCreateBulk) OnConflictColumns(columns ...string) *CertificateUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &CertificateUpsertBulk{
-		create: ccb,
+		create: _c,
 	}
 }
 
@@ -1374,6 +1431,27 @@ func (u *CertificateUpsertBulk) UpdateCa() *CertificateUpsertBulk {
 func (u *CertificateUpsertBulk) ClearCa() *CertificateUpsertBulk {
 	return u.Update(func(s *CertificateUpsert) {
 		s.ClearCa()
+	})
+}
+
+// SetCertificate sets the "certificate" field.
+func (u *CertificateUpsertBulk) SetCertificate(v string) *CertificateUpsertBulk {
+	return u.Update(func(s *CertificateUpsert) {
+		s.SetCertificate(v)
+	})
+}
+
+// UpdateCertificate sets the "certificate" field to the value that was provided on create.
+func (u *CertificateUpsertBulk) UpdateCertificate() *CertificateUpsertBulk {
+	return u.Update(func(s *CertificateUpsert) {
+		s.UpdateCertificate()
+	})
+}
+
+// ClearCertificate clears the value of the "certificate" field.
+func (u *CertificateUpsertBulk) ClearCertificate() *CertificateUpsertBulk {
+	return u.Update(func(s *CertificateUpsert) {
+		s.ClearCertificate()
 	})
 }
 

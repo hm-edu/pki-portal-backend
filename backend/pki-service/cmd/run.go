@@ -126,4 +126,9 @@ func init() {
 	runCmd.Flags().String("validation_password", "", "The password for the HARICA API")
 	runCmd.Flags().String("validation_totp_seed", "", "The totp seed for the HARICA API")
 	runCmd.Flags().String("cert_type", "OV", "The certificate type to use")
+	runCmd.Flags().String("ssl_ca", "harica", "The CA to use for server certificates (harica or letsencrypt)")
+	runCmd.Flags().String("acme_email", "", "The contact mail address for the ACME account")
+	runCmd.Flags().String("acme_directory", "https://acme-v02.api.letsencrypt.org/directory", "The directory URL of the ACME CA")
+	runCmd.Flags().String("acme_account_key", "acme-account-key.pem", "Path to the PEM encoded ACME account key (created on first start)")
+	runCmd.Flags().String("acme_dns_config", "", "Path to the YAML file mapping DNS zones to TSIG keys for the DNS-01 validation")
 }

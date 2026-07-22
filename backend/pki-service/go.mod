@@ -1,11 +1,11 @@
 module github.com/hm-edu/pki-service
 
-go 1.26.0
+go 1.26.4
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/TheZeroSlave/zapsentry v1.24.0
-	github.com/getsentry/sentry-go v0.47.0
+	github.com/getsentry/sentry-go v0.48.0
 	github.com/hm-edu/harica v1.12.1
 	github.com/mattn/go-sqlite3 v1.14.48
 	github.com/spf13/cobra v1.10.2
@@ -14,25 +14,27 @@ require (
 )
 
 require (
+	github.com/apparentlymart/go-textseg/v17 v17.0.1 // indirect
 	github.com/boombuler/barcode v1.1.0 // indirect
-	github.com/getsentry/sentry-go/echo v0.47.0 // indirect
+	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
+	github.com/getsentry/sentry-go/echo v0.48.0 // indirect
+	github.com/go-jose/go-jose/v4 v4.1.4 // indirect
 	github.com/go-resty/resty/v2 v2.17.2 // indirect
 	github.com/go-test/deep v1.0.8 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.3.1 // indirect
 	github.com/jonboulle/clockwork v0.5.0 // indirect
-	github.com/labstack/echo/v5 v5.2.1 // indirect
+	github.com/labstack/echo/v5 v5.3.1 // indirect
 	github.com/pquerna/otp v1.5.0 // indirect
-	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/afero v1.15.0 // indirect
 	github.com/zclconf/go-cty-yaml v1.2.0 // indirect
-	go.mozilla.org/pkcs7 v0.9.0 // indirect
+	go.mozilla.org/pkcs7 v0.10.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	software.sslmate.com/src/go-pkcs12 v0.7.3 // indirect
 )
 
 require (
-	ariga.io/atlas v1.2.2 // indirect
+	ariga.io/atlas v1.2.3 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -52,29 +54,31 @@ require (
 	github.com/jackc/pgtype v1.14.4 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/pelletier/go-toml/v2 v2.4.2 // indirect
+	github.com/pelletier/go-toml/v2 v2.4.3 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
-	github.com/prometheus/client_golang v1.23.2
+	github.com/prometheus/client_golang v1.24.0
 	github.com/prometheus/client_model v0.6.2 // indirect
-	github.com/prometheus/common v0.69.0 // indirect
-	github.com/prometheus/procfs v0.20.1 // indirect
+	github.com/prometheus/common v0.70.1 // indirect
+	github.com/prometheus/procfs v0.21.1 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
 	github.com/spf13/viper v1.21.0 // indirect
-	github.com/zclconf/go-cty v1.18.1 // indirect
+	github.com/zclconf/go-cty v1.19.0 // indirect
 	golang.org/x/crypto v0.54.0 // indirect
-	golang.org/x/mod v0.37.0 // indirect
+	golang.org/x/mod v0.38.0 // indirect
 	golang.org/x/sync v0.22.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
-	golang.org/x/tools v0.47.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260622175928-b703f567277d // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
+	golang.org/x/tools v0.48.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260720211330-0afa2a65878a // indirect
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
+	github.com/go-acme/lego/v5 v5.3.1
 	github.com/go-co-op/gocron/v2 v2.22.0
 	github.com/hm-edu/portal-apis v0.0.0-20260722062737-d43882e11746
-	github.com/jackc/pgx/v4 v4.18.2
+	github.com/jackc/pgx/v4 v4.18.3
+	github.com/miekg/dns v1.1.72
 )
 
 require (
@@ -85,13 +89,13 @@ require (
 require (
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
-	github.com/hm-edu/portal-common v0.0.0-20260613132347-a1589de7a36f
+	github.com/hm-edu/portal-common v0.0.0-20260722073307-cfc43baae4ea
 	github.com/spf13/cast v1.10.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	golang.org/x/net v0.57.0 // indirect
 	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/text v0.40.0 // indirect
-	google.golang.org/grpc v1.81.1
+	google.golang.org/grpc v1.82.1
 )
 
 require (

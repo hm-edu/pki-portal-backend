@@ -23,175 +23,175 @@ type SmimeCertificateUpdate struct {
 }
 
 // Where appends a list predicates to the SmimeCertificateUpdate builder.
-func (scu *SmimeCertificateUpdate) Where(ps ...predicate.SmimeCertificate) *SmimeCertificateUpdate {
-	scu.mutation.Where(ps...)
-	return scu
+func (_u *SmimeCertificateUpdate) Where(ps ...predicate.SmimeCertificate) *SmimeCertificateUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (scu *SmimeCertificateUpdate) SetUpdateTime(t time.Time) *SmimeCertificateUpdate {
-	scu.mutation.SetUpdateTime(t)
-	return scu
+func (_u *SmimeCertificateUpdate) SetUpdateTime(v time.Time) *SmimeCertificateUpdate {
+	_u.mutation.SetUpdateTime(v)
+	return _u
 }
 
 // SetTransactionId sets the "transactionId" field.
-func (scu *SmimeCertificateUpdate) SetTransactionId(s string) *SmimeCertificateUpdate {
-	scu.mutation.SetTransactionId(s)
-	return scu
+func (_u *SmimeCertificateUpdate) SetTransactionId(v string) *SmimeCertificateUpdate {
+	_u.mutation.SetTransactionId(v)
+	return _u
 }
 
 // SetNillableTransactionId sets the "transactionId" field if the given value is not nil.
-func (scu *SmimeCertificateUpdate) SetNillableTransactionId(s *string) *SmimeCertificateUpdate {
-	if s != nil {
-		scu.SetTransactionId(*s)
+func (_u *SmimeCertificateUpdate) SetNillableTransactionId(v *string) *SmimeCertificateUpdate {
+	if v != nil {
+		_u.SetTransactionId(*v)
 	}
-	return scu
+	return _u
 }
 
 // ClearTransactionId clears the value of the "transactionId" field.
-func (scu *SmimeCertificateUpdate) ClearTransactionId() *SmimeCertificateUpdate {
-	scu.mutation.ClearTransactionId()
-	return scu
+func (_u *SmimeCertificateUpdate) ClearTransactionId() *SmimeCertificateUpdate {
+	_u.mutation.ClearTransactionId()
+	return _u
 }
 
 // SetEmail sets the "email" field.
-func (scu *SmimeCertificateUpdate) SetEmail(s string) *SmimeCertificateUpdate {
-	scu.mutation.SetEmail(s)
-	return scu
+func (_u *SmimeCertificateUpdate) SetEmail(v string) *SmimeCertificateUpdate {
+	_u.mutation.SetEmail(v)
+	return _u
 }
 
 // SetNillableEmail sets the "email" field if the given value is not nil.
-func (scu *SmimeCertificateUpdate) SetNillableEmail(s *string) *SmimeCertificateUpdate {
-	if s != nil {
-		scu.SetEmail(*s)
+func (_u *SmimeCertificateUpdate) SetNillableEmail(v *string) *SmimeCertificateUpdate {
+	if v != nil {
+		_u.SetEmail(*v)
 	}
-	return scu
+	return _u
 }
 
 // SetSerial sets the "serial" field.
-func (scu *SmimeCertificateUpdate) SetSerial(s string) *SmimeCertificateUpdate {
-	scu.mutation.SetSerial(s)
-	return scu
+func (_u *SmimeCertificateUpdate) SetSerial(v string) *SmimeCertificateUpdate {
+	_u.mutation.SetSerial(v)
+	return _u
 }
 
 // SetNillableSerial sets the "serial" field if the given value is not nil.
-func (scu *SmimeCertificateUpdate) SetNillableSerial(s *string) *SmimeCertificateUpdate {
-	if s != nil {
-		scu.SetSerial(*s)
+func (_u *SmimeCertificateUpdate) SetNillableSerial(v *string) *SmimeCertificateUpdate {
+	if v != nil {
+		_u.SetSerial(*v)
 	}
-	return scu
+	return _u
 }
 
 // SetNotBefore sets the "notBefore" field.
-func (scu *SmimeCertificateUpdate) SetNotBefore(t time.Time) *SmimeCertificateUpdate {
-	scu.mutation.SetNotBefore(t)
-	return scu
+func (_u *SmimeCertificateUpdate) SetNotBefore(v time.Time) *SmimeCertificateUpdate {
+	_u.mutation.SetNotBefore(v)
+	return _u
 }
 
 // SetNillableNotBefore sets the "notBefore" field if the given value is not nil.
-func (scu *SmimeCertificateUpdate) SetNillableNotBefore(t *time.Time) *SmimeCertificateUpdate {
-	if t != nil {
-		scu.SetNotBefore(*t)
+func (_u *SmimeCertificateUpdate) SetNillableNotBefore(v *time.Time) *SmimeCertificateUpdate {
+	if v != nil {
+		_u.SetNotBefore(*v)
 	}
-	return scu
+	return _u
 }
 
 // ClearNotBefore clears the value of the "notBefore" field.
-func (scu *SmimeCertificateUpdate) ClearNotBefore() *SmimeCertificateUpdate {
-	scu.mutation.ClearNotBefore()
-	return scu
+func (_u *SmimeCertificateUpdate) ClearNotBefore() *SmimeCertificateUpdate {
+	_u.mutation.ClearNotBefore()
+	return _u
 }
 
 // SetNotAfter sets the "notAfter" field.
-func (scu *SmimeCertificateUpdate) SetNotAfter(t time.Time) *SmimeCertificateUpdate {
-	scu.mutation.SetNotAfter(t)
-	return scu
+func (_u *SmimeCertificateUpdate) SetNotAfter(v time.Time) *SmimeCertificateUpdate {
+	_u.mutation.SetNotAfter(v)
+	return _u
 }
 
 // SetNillableNotAfter sets the "notAfter" field if the given value is not nil.
-func (scu *SmimeCertificateUpdate) SetNillableNotAfter(t *time.Time) *SmimeCertificateUpdate {
-	if t != nil {
-		scu.SetNotAfter(*t)
+func (_u *SmimeCertificateUpdate) SetNillableNotAfter(v *time.Time) *SmimeCertificateUpdate {
+	if v != nil {
+		_u.SetNotAfter(*v)
 	}
-	return scu
+	return _u
 }
 
 // ClearNotAfter clears the value of the "notAfter" field.
-func (scu *SmimeCertificateUpdate) ClearNotAfter() *SmimeCertificateUpdate {
-	scu.mutation.ClearNotAfter()
-	return scu
+func (_u *SmimeCertificateUpdate) ClearNotAfter() *SmimeCertificateUpdate {
+	_u.mutation.ClearNotAfter()
+	return _u
 }
 
 // SetCreated sets the "created" field.
-func (scu *SmimeCertificateUpdate) SetCreated(t time.Time) *SmimeCertificateUpdate {
-	scu.mutation.SetCreated(t)
-	return scu
+func (_u *SmimeCertificateUpdate) SetCreated(v time.Time) *SmimeCertificateUpdate {
+	_u.mutation.SetCreated(v)
+	return _u
 }
 
 // SetNillableCreated sets the "created" field if the given value is not nil.
-func (scu *SmimeCertificateUpdate) SetNillableCreated(t *time.Time) *SmimeCertificateUpdate {
-	if t != nil {
-		scu.SetCreated(*t)
+func (_u *SmimeCertificateUpdate) SetNillableCreated(v *time.Time) *SmimeCertificateUpdate {
+	if v != nil {
+		_u.SetCreated(*v)
 	}
-	return scu
+	return _u
 }
 
 // ClearCreated clears the value of the "created" field.
-func (scu *SmimeCertificateUpdate) ClearCreated() *SmimeCertificateUpdate {
-	scu.mutation.ClearCreated()
-	return scu
+func (_u *SmimeCertificateUpdate) ClearCreated() *SmimeCertificateUpdate {
+	_u.mutation.ClearCreated()
+	return _u
 }
 
 // SetStatus sets the "status" field.
-func (scu *SmimeCertificateUpdate) SetStatus(s smimecertificate.Status) *SmimeCertificateUpdate {
-	scu.mutation.SetStatus(s)
-	return scu
+func (_u *SmimeCertificateUpdate) SetStatus(v smimecertificate.Status) *SmimeCertificateUpdate {
+	_u.mutation.SetStatus(v)
+	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (scu *SmimeCertificateUpdate) SetNillableStatus(s *smimecertificate.Status) *SmimeCertificateUpdate {
-	if s != nil {
-		scu.SetStatus(*s)
+func (_u *SmimeCertificateUpdate) SetNillableStatus(v *smimecertificate.Status) *SmimeCertificateUpdate {
+	if v != nil {
+		_u.SetStatus(*v)
 	}
-	return scu
+	return _u
 }
 
 // SetCa sets the "ca" field.
-func (scu *SmimeCertificateUpdate) SetCa(s string) *SmimeCertificateUpdate {
-	scu.mutation.SetCa(s)
-	return scu
+func (_u *SmimeCertificateUpdate) SetCa(v string) *SmimeCertificateUpdate {
+	_u.mutation.SetCa(v)
+	return _u
 }
 
 // SetNillableCa sets the "ca" field if the given value is not nil.
-func (scu *SmimeCertificateUpdate) SetNillableCa(s *string) *SmimeCertificateUpdate {
-	if s != nil {
-		scu.SetCa(*s)
+func (_u *SmimeCertificateUpdate) SetNillableCa(v *string) *SmimeCertificateUpdate {
+	if v != nil {
+		_u.SetCa(*v)
 	}
-	return scu
+	return _u
 }
 
 // ClearCa clears the value of the "ca" field.
-func (scu *SmimeCertificateUpdate) ClearCa() *SmimeCertificateUpdate {
-	scu.mutation.ClearCa()
-	return scu
+func (_u *SmimeCertificateUpdate) ClearCa() *SmimeCertificateUpdate {
+	_u.mutation.ClearCa()
+	return _u
 }
 
 // Mutation returns the SmimeCertificateMutation object of the builder.
-func (scu *SmimeCertificateUpdate) Mutation() *SmimeCertificateMutation {
-	return scu.mutation
+func (_u *SmimeCertificateUpdate) Mutation() *SmimeCertificateMutation {
+	return _u.mutation
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (scu *SmimeCertificateUpdate) Save(ctx context.Context) (int, error) {
-	if err := scu.defaults(); err != nil {
+func (_u *SmimeCertificateUpdate) Save(ctx context.Context) (int, error) {
+	if err := _u.defaults(); err != nil {
 		return 0, err
 	}
-	return withHooks(ctx, scu.sqlSave, scu.mutation, scu.hooks)
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (scu *SmimeCertificateUpdate) SaveX(ctx context.Context) int {
-	affected, err := scu.Save(ctx)
+func (_u *SmimeCertificateUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -199,43 +199,43 @@ func (scu *SmimeCertificateUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (scu *SmimeCertificateUpdate) Exec(ctx context.Context) error {
-	_, err := scu.Save(ctx)
+func (_u *SmimeCertificateUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (scu *SmimeCertificateUpdate) ExecX(ctx context.Context) {
-	if err := scu.Exec(ctx); err != nil {
+func (_u *SmimeCertificateUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (scu *SmimeCertificateUpdate) defaults() error {
-	if _, ok := scu.mutation.UpdateTime(); !ok {
+func (_u *SmimeCertificateUpdate) defaults() error {
+	if _, ok := _u.mutation.UpdateTime(); !ok {
 		if smimecertificate.UpdateDefaultUpdateTime == nil {
 			return fmt.Errorf("ent: uninitialized smimecertificate.UpdateDefaultUpdateTime (forgotten import ent/runtime?)")
 		}
 		v := smimecertificate.UpdateDefaultUpdateTime()
-		scu.mutation.SetUpdateTime(v)
+		_u.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (scu *SmimeCertificateUpdate) check() error {
-	if v, ok := scu.mutation.Email(); ok {
+func (_u *SmimeCertificateUpdate) check() error {
+	if v, ok := _u.mutation.Email(); ok {
 		if err := smimecertificate.EmailValidator(v); err != nil {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "SmimeCertificate.email": %w`, err)}
 		}
 	}
-	if v, ok := scu.mutation.Serial(); ok {
+	if v, ok := _u.mutation.Serial(); ok {
 		if err := smimecertificate.SerialValidator(v); err != nil {
 			return &ValidationError{Name: "serial", err: fmt.Errorf(`ent: validator failed for field "SmimeCertificate.serial": %w`, err)}
 		}
 	}
-	if v, ok := scu.mutation.Status(); ok {
+	if v, ok := _u.mutation.Status(); ok {
 		if err := smimecertificate.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "SmimeCertificate.status": %w`, err)}
 		}
@@ -243,61 +243,61 @@ func (scu *SmimeCertificateUpdate) check() error {
 	return nil
 }
 
-func (scu *SmimeCertificateUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := scu.check(); err != nil {
-		return n, err
+func (_u *SmimeCertificateUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(smimecertificate.Table, smimecertificate.Columns, sqlgraph.NewFieldSpec(smimecertificate.FieldID, field.TypeInt))
-	if ps := scu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := scu.mutation.UpdateTime(); ok {
+	if value, ok := _u.mutation.UpdateTime(); ok {
 		_spec.SetField(smimecertificate.FieldUpdateTime, field.TypeTime, value)
 	}
-	if value, ok := scu.mutation.TransactionId(); ok {
+	if value, ok := _u.mutation.TransactionId(); ok {
 		_spec.SetField(smimecertificate.FieldTransactionId, field.TypeString, value)
 	}
-	if scu.mutation.TransactionIdCleared() {
+	if _u.mutation.TransactionIdCleared() {
 		_spec.ClearField(smimecertificate.FieldTransactionId, field.TypeString)
 	}
-	if value, ok := scu.mutation.Email(); ok {
+	if value, ok := _u.mutation.Email(); ok {
 		_spec.SetField(smimecertificate.FieldEmail, field.TypeString, value)
 	}
-	if value, ok := scu.mutation.Serial(); ok {
+	if value, ok := _u.mutation.Serial(); ok {
 		_spec.SetField(smimecertificate.FieldSerial, field.TypeString, value)
 	}
-	if value, ok := scu.mutation.NotBefore(); ok {
+	if value, ok := _u.mutation.NotBefore(); ok {
 		_spec.SetField(smimecertificate.FieldNotBefore, field.TypeTime, value)
 	}
-	if scu.mutation.NotBeforeCleared() {
+	if _u.mutation.NotBeforeCleared() {
 		_spec.ClearField(smimecertificate.FieldNotBefore, field.TypeTime)
 	}
-	if value, ok := scu.mutation.NotAfter(); ok {
+	if value, ok := _u.mutation.NotAfter(); ok {
 		_spec.SetField(smimecertificate.FieldNotAfter, field.TypeTime, value)
 	}
-	if scu.mutation.NotAfterCleared() {
+	if _u.mutation.NotAfterCleared() {
 		_spec.ClearField(smimecertificate.FieldNotAfter, field.TypeTime)
 	}
-	if value, ok := scu.mutation.Created(); ok {
+	if value, ok := _u.mutation.Created(); ok {
 		_spec.SetField(smimecertificate.FieldCreated, field.TypeTime, value)
 	}
-	if scu.mutation.CreatedCleared() {
+	if _u.mutation.CreatedCleared() {
 		_spec.ClearField(smimecertificate.FieldCreated, field.TypeTime)
 	}
-	if value, ok := scu.mutation.Status(); ok {
+	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(smimecertificate.FieldStatus, field.TypeEnum, value)
 	}
-	if value, ok := scu.mutation.Ca(); ok {
+	if value, ok := _u.mutation.Ca(); ok {
 		_spec.SetField(smimecertificate.FieldCa, field.TypeString, value)
 	}
-	if scu.mutation.CaCleared() {
+	if _u.mutation.CaCleared() {
 		_spec.ClearField(smimecertificate.FieldCa, field.TypeString)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, scu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{smimecertificate.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -305,8 +305,8 @@ func (scu *SmimeCertificateUpdate) sqlSave(ctx context.Context) (n int, err erro
 		}
 		return 0, err
 	}
-	scu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // SmimeCertificateUpdateOne is the builder for updating a single SmimeCertificate entity.
@@ -318,182 +318,182 @@ type SmimeCertificateUpdateOne struct {
 }
 
 // SetUpdateTime sets the "update_time" field.
-func (scuo *SmimeCertificateUpdateOne) SetUpdateTime(t time.Time) *SmimeCertificateUpdateOne {
-	scuo.mutation.SetUpdateTime(t)
-	return scuo
+func (_u *SmimeCertificateUpdateOne) SetUpdateTime(v time.Time) *SmimeCertificateUpdateOne {
+	_u.mutation.SetUpdateTime(v)
+	return _u
 }
 
 // SetTransactionId sets the "transactionId" field.
-func (scuo *SmimeCertificateUpdateOne) SetTransactionId(s string) *SmimeCertificateUpdateOne {
-	scuo.mutation.SetTransactionId(s)
-	return scuo
+func (_u *SmimeCertificateUpdateOne) SetTransactionId(v string) *SmimeCertificateUpdateOne {
+	_u.mutation.SetTransactionId(v)
+	return _u
 }
 
 // SetNillableTransactionId sets the "transactionId" field if the given value is not nil.
-func (scuo *SmimeCertificateUpdateOne) SetNillableTransactionId(s *string) *SmimeCertificateUpdateOne {
-	if s != nil {
-		scuo.SetTransactionId(*s)
+func (_u *SmimeCertificateUpdateOne) SetNillableTransactionId(v *string) *SmimeCertificateUpdateOne {
+	if v != nil {
+		_u.SetTransactionId(*v)
 	}
-	return scuo
+	return _u
 }
 
 // ClearTransactionId clears the value of the "transactionId" field.
-func (scuo *SmimeCertificateUpdateOne) ClearTransactionId() *SmimeCertificateUpdateOne {
-	scuo.mutation.ClearTransactionId()
-	return scuo
+func (_u *SmimeCertificateUpdateOne) ClearTransactionId() *SmimeCertificateUpdateOne {
+	_u.mutation.ClearTransactionId()
+	return _u
 }
 
 // SetEmail sets the "email" field.
-func (scuo *SmimeCertificateUpdateOne) SetEmail(s string) *SmimeCertificateUpdateOne {
-	scuo.mutation.SetEmail(s)
-	return scuo
+func (_u *SmimeCertificateUpdateOne) SetEmail(v string) *SmimeCertificateUpdateOne {
+	_u.mutation.SetEmail(v)
+	return _u
 }
 
 // SetNillableEmail sets the "email" field if the given value is not nil.
-func (scuo *SmimeCertificateUpdateOne) SetNillableEmail(s *string) *SmimeCertificateUpdateOne {
-	if s != nil {
-		scuo.SetEmail(*s)
+func (_u *SmimeCertificateUpdateOne) SetNillableEmail(v *string) *SmimeCertificateUpdateOne {
+	if v != nil {
+		_u.SetEmail(*v)
 	}
-	return scuo
+	return _u
 }
 
 // SetSerial sets the "serial" field.
-func (scuo *SmimeCertificateUpdateOne) SetSerial(s string) *SmimeCertificateUpdateOne {
-	scuo.mutation.SetSerial(s)
-	return scuo
+func (_u *SmimeCertificateUpdateOne) SetSerial(v string) *SmimeCertificateUpdateOne {
+	_u.mutation.SetSerial(v)
+	return _u
 }
 
 // SetNillableSerial sets the "serial" field if the given value is not nil.
-func (scuo *SmimeCertificateUpdateOne) SetNillableSerial(s *string) *SmimeCertificateUpdateOne {
-	if s != nil {
-		scuo.SetSerial(*s)
+func (_u *SmimeCertificateUpdateOne) SetNillableSerial(v *string) *SmimeCertificateUpdateOne {
+	if v != nil {
+		_u.SetSerial(*v)
 	}
-	return scuo
+	return _u
 }
 
 // SetNotBefore sets the "notBefore" field.
-func (scuo *SmimeCertificateUpdateOne) SetNotBefore(t time.Time) *SmimeCertificateUpdateOne {
-	scuo.mutation.SetNotBefore(t)
-	return scuo
+func (_u *SmimeCertificateUpdateOne) SetNotBefore(v time.Time) *SmimeCertificateUpdateOne {
+	_u.mutation.SetNotBefore(v)
+	return _u
 }
 
 // SetNillableNotBefore sets the "notBefore" field if the given value is not nil.
-func (scuo *SmimeCertificateUpdateOne) SetNillableNotBefore(t *time.Time) *SmimeCertificateUpdateOne {
-	if t != nil {
-		scuo.SetNotBefore(*t)
+func (_u *SmimeCertificateUpdateOne) SetNillableNotBefore(v *time.Time) *SmimeCertificateUpdateOne {
+	if v != nil {
+		_u.SetNotBefore(*v)
 	}
-	return scuo
+	return _u
 }
 
 // ClearNotBefore clears the value of the "notBefore" field.
-func (scuo *SmimeCertificateUpdateOne) ClearNotBefore() *SmimeCertificateUpdateOne {
-	scuo.mutation.ClearNotBefore()
-	return scuo
+func (_u *SmimeCertificateUpdateOne) ClearNotBefore() *SmimeCertificateUpdateOne {
+	_u.mutation.ClearNotBefore()
+	return _u
 }
 
 // SetNotAfter sets the "notAfter" field.
-func (scuo *SmimeCertificateUpdateOne) SetNotAfter(t time.Time) *SmimeCertificateUpdateOne {
-	scuo.mutation.SetNotAfter(t)
-	return scuo
+func (_u *SmimeCertificateUpdateOne) SetNotAfter(v time.Time) *SmimeCertificateUpdateOne {
+	_u.mutation.SetNotAfter(v)
+	return _u
 }
 
 // SetNillableNotAfter sets the "notAfter" field if the given value is not nil.
-func (scuo *SmimeCertificateUpdateOne) SetNillableNotAfter(t *time.Time) *SmimeCertificateUpdateOne {
-	if t != nil {
-		scuo.SetNotAfter(*t)
+func (_u *SmimeCertificateUpdateOne) SetNillableNotAfter(v *time.Time) *SmimeCertificateUpdateOne {
+	if v != nil {
+		_u.SetNotAfter(*v)
 	}
-	return scuo
+	return _u
 }
 
 // ClearNotAfter clears the value of the "notAfter" field.
-func (scuo *SmimeCertificateUpdateOne) ClearNotAfter() *SmimeCertificateUpdateOne {
-	scuo.mutation.ClearNotAfter()
-	return scuo
+func (_u *SmimeCertificateUpdateOne) ClearNotAfter() *SmimeCertificateUpdateOne {
+	_u.mutation.ClearNotAfter()
+	return _u
 }
 
 // SetCreated sets the "created" field.
-func (scuo *SmimeCertificateUpdateOne) SetCreated(t time.Time) *SmimeCertificateUpdateOne {
-	scuo.mutation.SetCreated(t)
-	return scuo
+func (_u *SmimeCertificateUpdateOne) SetCreated(v time.Time) *SmimeCertificateUpdateOne {
+	_u.mutation.SetCreated(v)
+	return _u
 }
 
 // SetNillableCreated sets the "created" field if the given value is not nil.
-func (scuo *SmimeCertificateUpdateOne) SetNillableCreated(t *time.Time) *SmimeCertificateUpdateOne {
-	if t != nil {
-		scuo.SetCreated(*t)
+func (_u *SmimeCertificateUpdateOne) SetNillableCreated(v *time.Time) *SmimeCertificateUpdateOne {
+	if v != nil {
+		_u.SetCreated(*v)
 	}
-	return scuo
+	return _u
 }
 
 // ClearCreated clears the value of the "created" field.
-func (scuo *SmimeCertificateUpdateOne) ClearCreated() *SmimeCertificateUpdateOne {
-	scuo.mutation.ClearCreated()
-	return scuo
+func (_u *SmimeCertificateUpdateOne) ClearCreated() *SmimeCertificateUpdateOne {
+	_u.mutation.ClearCreated()
+	return _u
 }
 
 // SetStatus sets the "status" field.
-func (scuo *SmimeCertificateUpdateOne) SetStatus(s smimecertificate.Status) *SmimeCertificateUpdateOne {
-	scuo.mutation.SetStatus(s)
-	return scuo
+func (_u *SmimeCertificateUpdateOne) SetStatus(v smimecertificate.Status) *SmimeCertificateUpdateOne {
+	_u.mutation.SetStatus(v)
+	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (scuo *SmimeCertificateUpdateOne) SetNillableStatus(s *smimecertificate.Status) *SmimeCertificateUpdateOne {
-	if s != nil {
-		scuo.SetStatus(*s)
+func (_u *SmimeCertificateUpdateOne) SetNillableStatus(v *smimecertificate.Status) *SmimeCertificateUpdateOne {
+	if v != nil {
+		_u.SetStatus(*v)
 	}
-	return scuo
+	return _u
 }
 
 // SetCa sets the "ca" field.
-func (scuo *SmimeCertificateUpdateOne) SetCa(s string) *SmimeCertificateUpdateOne {
-	scuo.mutation.SetCa(s)
-	return scuo
+func (_u *SmimeCertificateUpdateOne) SetCa(v string) *SmimeCertificateUpdateOne {
+	_u.mutation.SetCa(v)
+	return _u
 }
 
 // SetNillableCa sets the "ca" field if the given value is not nil.
-func (scuo *SmimeCertificateUpdateOne) SetNillableCa(s *string) *SmimeCertificateUpdateOne {
-	if s != nil {
-		scuo.SetCa(*s)
+func (_u *SmimeCertificateUpdateOne) SetNillableCa(v *string) *SmimeCertificateUpdateOne {
+	if v != nil {
+		_u.SetCa(*v)
 	}
-	return scuo
+	return _u
 }
 
 // ClearCa clears the value of the "ca" field.
-func (scuo *SmimeCertificateUpdateOne) ClearCa() *SmimeCertificateUpdateOne {
-	scuo.mutation.ClearCa()
-	return scuo
+func (_u *SmimeCertificateUpdateOne) ClearCa() *SmimeCertificateUpdateOne {
+	_u.mutation.ClearCa()
+	return _u
 }
 
 // Mutation returns the SmimeCertificateMutation object of the builder.
-func (scuo *SmimeCertificateUpdateOne) Mutation() *SmimeCertificateMutation {
-	return scuo.mutation
+func (_u *SmimeCertificateUpdateOne) Mutation() *SmimeCertificateMutation {
+	return _u.mutation
 }
 
 // Where appends a list predicates to the SmimeCertificateUpdate builder.
-func (scuo *SmimeCertificateUpdateOne) Where(ps ...predicate.SmimeCertificate) *SmimeCertificateUpdateOne {
-	scuo.mutation.Where(ps...)
-	return scuo
+func (_u *SmimeCertificateUpdateOne) Where(ps ...predicate.SmimeCertificate) *SmimeCertificateUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (scuo *SmimeCertificateUpdateOne) Select(field string, fields ...string) *SmimeCertificateUpdateOne {
-	scuo.fields = append([]string{field}, fields...)
-	return scuo
+func (_u *SmimeCertificateUpdateOne) Select(field string, fields ...string) *SmimeCertificateUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated SmimeCertificate entity.
-func (scuo *SmimeCertificateUpdateOne) Save(ctx context.Context) (*SmimeCertificate, error) {
-	if err := scuo.defaults(); err != nil {
+func (_u *SmimeCertificateUpdateOne) Save(ctx context.Context) (*SmimeCertificate, error) {
+	if err := _u.defaults(); err != nil {
 		return nil, err
 	}
-	return withHooks(ctx, scuo.sqlSave, scuo.mutation, scuo.hooks)
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (scuo *SmimeCertificateUpdateOne) SaveX(ctx context.Context) *SmimeCertificate {
-	node, err := scuo.Save(ctx)
+func (_u *SmimeCertificateUpdateOne) SaveX(ctx context.Context) *SmimeCertificate {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -501,43 +501,43 @@ func (scuo *SmimeCertificateUpdateOne) SaveX(ctx context.Context) *SmimeCertific
 }
 
 // Exec executes the query on the entity.
-func (scuo *SmimeCertificateUpdateOne) Exec(ctx context.Context) error {
-	_, err := scuo.Save(ctx)
+func (_u *SmimeCertificateUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (scuo *SmimeCertificateUpdateOne) ExecX(ctx context.Context) {
-	if err := scuo.Exec(ctx); err != nil {
+func (_u *SmimeCertificateUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (scuo *SmimeCertificateUpdateOne) defaults() error {
-	if _, ok := scuo.mutation.UpdateTime(); !ok {
+func (_u *SmimeCertificateUpdateOne) defaults() error {
+	if _, ok := _u.mutation.UpdateTime(); !ok {
 		if smimecertificate.UpdateDefaultUpdateTime == nil {
 			return fmt.Errorf("ent: uninitialized smimecertificate.UpdateDefaultUpdateTime (forgotten import ent/runtime?)")
 		}
 		v := smimecertificate.UpdateDefaultUpdateTime()
-		scuo.mutation.SetUpdateTime(v)
+		_u.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (scuo *SmimeCertificateUpdateOne) check() error {
-	if v, ok := scuo.mutation.Email(); ok {
+func (_u *SmimeCertificateUpdateOne) check() error {
+	if v, ok := _u.mutation.Email(); ok {
 		if err := smimecertificate.EmailValidator(v); err != nil {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "SmimeCertificate.email": %w`, err)}
 		}
 	}
-	if v, ok := scuo.mutation.Serial(); ok {
+	if v, ok := _u.mutation.Serial(); ok {
 		if err := smimecertificate.SerialValidator(v); err != nil {
 			return &ValidationError{Name: "serial", err: fmt.Errorf(`ent: validator failed for field "SmimeCertificate.serial": %w`, err)}
 		}
 	}
-	if v, ok := scuo.mutation.Status(); ok {
+	if v, ok := _u.mutation.Status(); ok {
 		if err := smimecertificate.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "SmimeCertificate.status": %w`, err)}
 		}
@@ -545,17 +545,17 @@ func (scuo *SmimeCertificateUpdateOne) check() error {
 	return nil
 }
 
-func (scuo *SmimeCertificateUpdateOne) sqlSave(ctx context.Context) (_node *SmimeCertificate, err error) {
-	if err := scuo.check(); err != nil {
+func (_u *SmimeCertificateUpdateOne) sqlSave(ctx context.Context) (_node *SmimeCertificate, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(smimecertificate.Table, smimecertificate.Columns, sqlgraph.NewFieldSpec(smimecertificate.FieldID, field.TypeInt))
-	id, ok := scuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "SmimeCertificate.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := scuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, smimecertificate.FieldID)
 		for _, f := range fields {
@@ -567,59 +567,59 @@ func (scuo *SmimeCertificateUpdateOne) sqlSave(ctx context.Context) (_node *Smim
 			}
 		}
 	}
-	if ps := scuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := scuo.mutation.UpdateTime(); ok {
+	if value, ok := _u.mutation.UpdateTime(); ok {
 		_spec.SetField(smimecertificate.FieldUpdateTime, field.TypeTime, value)
 	}
-	if value, ok := scuo.mutation.TransactionId(); ok {
+	if value, ok := _u.mutation.TransactionId(); ok {
 		_spec.SetField(smimecertificate.FieldTransactionId, field.TypeString, value)
 	}
-	if scuo.mutation.TransactionIdCleared() {
+	if _u.mutation.TransactionIdCleared() {
 		_spec.ClearField(smimecertificate.FieldTransactionId, field.TypeString)
 	}
-	if value, ok := scuo.mutation.Email(); ok {
+	if value, ok := _u.mutation.Email(); ok {
 		_spec.SetField(smimecertificate.FieldEmail, field.TypeString, value)
 	}
-	if value, ok := scuo.mutation.Serial(); ok {
+	if value, ok := _u.mutation.Serial(); ok {
 		_spec.SetField(smimecertificate.FieldSerial, field.TypeString, value)
 	}
-	if value, ok := scuo.mutation.NotBefore(); ok {
+	if value, ok := _u.mutation.NotBefore(); ok {
 		_spec.SetField(smimecertificate.FieldNotBefore, field.TypeTime, value)
 	}
-	if scuo.mutation.NotBeforeCleared() {
+	if _u.mutation.NotBeforeCleared() {
 		_spec.ClearField(smimecertificate.FieldNotBefore, field.TypeTime)
 	}
-	if value, ok := scuo.mutation.NotAfter(); ok {
+	if value, ok := _u.mutation.NotAfter(); ok {
 		_spec.SetField(smimecertificate.FieldNotAfter, field.TypeTime, value)
 	}
-	if scuo.mutation.NotAfterCleared() {
+	if _u.mutation.NotAfterCleared() {
 		_spec.ClearField(smimecertificate.FieldNotAfter, field.TypeTime)
 	}
-	if value, ok := scuo.mutation.Created(); ok {
+	if value, ok := _u.mutation.Created(); ok {
 		_spec.SetField(smimecertificate.FieldCreated, field.TypeTime, value)
 	}
-	if scuo.mutation.CreatedCleared() {
+	if _u.mutation.CreatedCleared() {
 		_spec.ClearField(smimecertificate.FieldCreated, field.TypeTime)
 	}
-	if value, ok := scuo.mutation.Status(); ok {
+	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(smimecertificate.FieldStatus, field.TypeEnum, value)
 	}
-	if value, ok := scuo.mutation.Ca(); ok {
+	if value, ok := _u.mutation.Ca(); ok {
 		_spec.SetField(smimecertificate.FieldCa, field.TypeString, value)
 	}
-	if scuo.mutation.CaCleared() {
+	if _u.mutation.CaCleared() {
 		_spec.ClearField(smimecertificate.FieldCa, field.TypeString)
 	}
-	_node = &SmimeCertificate{config: scuo.config}
+	_node = &SmimeCertificate{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, scuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{smimecertificate.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -627,6 +627,6 @@ func (scuo *SmimeCertificateUpdateOne) sqlSave(ctx context.Context) (_node *Smim
 		}
 		return nil, err
 	}
-	scuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

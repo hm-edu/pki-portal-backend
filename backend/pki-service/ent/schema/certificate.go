@@ -28,6 +28,9 @@ func (Certificate) Fields() []ent.Field {
 		field.Time("created").Nillable().Optional(),
 		field.Enum("status").Values("Invalid", "Requested", "Approved", "Declined", "Applied", "Issued", "Revoked", "Expired", "Replaced", "Rejected", "Unmanaged", "SAApproved", "Init").Default("Invalid"),
 		field.String("ca").Nillable().Optional(),
+		// The issued certificate (PEM). Required for ACME CAs since
+		// revocation requires the certificate itself.
+		field.Text("certificate").Nillable().Optional(),
 	}
 }
 

@@ -1,0 +1,21 @@
+# DNS validation configuration for ACME (Let's Encrypt) DNS-01 challenges.
+# Passed to the pki-service via --acme_dns_config.
+#
+# Every zone entry maps a domain (including all of its subdomains) to the
+# nameserver and TSIG key that is used to publish the challenge records via
+# RFC2136 dynamic updates. The most specific zone wins, so subzones with
+# their own key can be listed next to their parent zone.
+#
+# Only domains covered by a zone listed here are issued via ACME; all other
+# requests fall back to HARICA.
+zones:
+  - zone: hm.edu
+    nameserver: ns1.hm.edu # port defaults to 53
+    tsig_key_name: acme-hm-edu
+    tsig_algorithm: hmac-sha256 # hmac-md5, hmac-sha1, hmac-sha256 or hmac-sha512
+    tsig_secret: bXktYmFzZTY0LXNlY3JldA==
+  - zone: cs.hm.edu
+    nameserver: ns1.cs.hm.edu:5353
+    tsig_key_name: acme-cs-hm-edu
+    tsig_algorithm: hmac-sha512
+    tsig_secret: bXktb3RoZXItYmFzZTY0LXNlY3JldA==

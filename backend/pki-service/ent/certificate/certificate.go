@@ -42,6 +42,8 @@ const (
 	FieldStatus = "status"
 	// FieldCa holds the string denoting the ca field in the database.
 	FieldCa = "ca"
+	// FieldCertificate holds the string denoting the certificate field in the database.
+	FieldCertificate = "certificate"
 	// EdgeDomains holds the string denoting the domains edge name in mutations.
 	EdgeDomains = "domains"
 	// Table holds the table name of the certificate in the database.
@@ -69,6 +71,7 @@ var Columns = []string{
 	FieldCreated,
 	FieldStatus,
 	FieldCa,
+	FieldCertificate,
 }
 
 var (
@@ -212,6 +215,11 @@ func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 // ByCa orders the results by the ca field.
 func ByCa(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCa, opts...).ToFunc()
+}
+
+// ByCertificate orders the results by the certificate field.
+func ByCertificate(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCertificate, opts...).ToFunc()
 }
 
 // ByDomainsCount orders the results by domains count.

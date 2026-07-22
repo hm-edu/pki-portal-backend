@@ -51,6 +51,7 @@ type CertificateMutation struct {
 	created        *time.Time
 	status         *certificate.Status
 	ca             *string
+	certificate    *string
 	clearedFields  map[string]struct{}
 	domains        map[int]struct{}
 	removeddomains map[int]struct{}
@@ -764,6 +765,55 @@ func (m *CertificateMutation) ResetCa() {
 	delete(m.clearedFields, certificate.FieldCa)
 }
 
+// SetCertificate sets the "certificate" field.
+func (m *CertificateMutation) SetCertificate(s string) {
+	m.certificate = &s
+}
+
+// Certificate returns the value of the "certificate" field in the mutation.
+func (m *CertificateMutation) Certificate() (r string, exists bool) {
+	v := m.certificate
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCertificate returns the old "certificate" field's value of the Certificate entity.
+// If the Certificate object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CertificateMutation) OldCertificate(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCertificate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCertificate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCertificate: %w", err)
+	}
+	return oldValue.Certificate, nil
+}
+
+// ClearCertificate clears the value of the "certificate" field.
+func (m *CertificateMutation) ClearCertificate() {
+	m.certificate = nil
+	m.clearedFields[certificate.FieldCertificate] = struct{}{}
+}
+
+// CertificateCleared returns if the "certificate" field was cleared in this mutation.
+func (m *CertificateMutation) CertificateCleared() bool {
+	_, ok := m.clearedFields[certificate.FieldCertificate]
+	return ok
+}
+
+// ResetCertificate resets all changes to the "certificate" field.
+func (m *CertificateMutation) ResetCertificate() {
+	m.certificate = nil
+	delete(m.clearedFields, certificate.FieldCertificate)
+}
+
 // AddDomainIDs adds the "domains" edge to the Domain entity by ids.
 func (m *CertificateMutation) AddDomainIDs(ids ...int) {
 	if m.domains == nil {
@@ -852,7 +902,7 @@ func (m *CertificateMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CertificateMutation) Fields() []string {
-	fields := make([]string, 0, 13)
+	fields := make([]string, 0, 14)
 	if m.create_time != nil {
 		fields = append(fields, certificate.FieldCreateTime)
 	}
@@ -892,6 +942,9 @@ func (m *CertificateMutation) Fields() []string {
 	if m.ca != nil {
 		fields = append(fields, certificate.FieldCa)
 	}
+	if m.certificate != nil {
+		fields = append(fields, certificate.FieldCertificate)
+	}
 	return fields
 }
 
@@ -926,6 +979,8 @@ func (m *CertificateMutation) Field(name string) (ent.Value, bool) {
 		return m.Status()
 	case certificate.FieldCa:
 		return m.Ca()
+	case certificate.FieldCertificate:
+		return m.Certificate()
 	}
 	return nil, false
 }
@@ -961,6 +1016,8 @@ func (m *CertificateMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldStatus(ctx)
 	case certificate.FieldCa:
 		return m.OldCa(ctx)
+	case certificate.FieldCertificate:
+		return m.OldCertificate(ctx)
 	}
 	return nil, fmt.Errorf("unknown Certificate field %s", name)
 }
@@ -1061,6 +1118,13 @@ func (m *CertificateMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetCa(v)
 		return nil
+	case certificate.FieldCertificate:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCertificate(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Certificate field %s", name)
 }
@@ -1133,6 +1197,9 @@ func (m *CertificateMutation) ClearedFields() []string {
 	if m.FieldCleared(certificate.FieldCa) {
 		fields = append(fields, certificate.FieldCa)
 	}
+	if m.FieldCleared(certificate.FieldCertificate) {
+		fields = append(fields, certificate.FieldCertificate)
+	}
 	return fields
 }
 
@@ -1173,6 +1240,9 @@ func (m *CertificateMutation) ClearField(name string) error {
 		return nil
 	case certificate.FieldCa:
 		m.ClearCa()
+		return nil
+	case certificate.FieldCertificate:
+		m.ClearCertificate()
 		return nil
 	}
 	return fmt.Errorf("unknown Certificate nullable field %s", name)
@@ -1220,6 +1290,9 @@ func (m *CertificateMutation) ResetField(name string) error {
 		return nil
 	case certificate.FieldCa:
 		m.ResetCa()
+		return nil
+	case certificate.FieldCertificate:
+		m.ResetCertificate()
 		return nil
 	}
 	return fmt.Errorf("unknown Certificate field %s", name)

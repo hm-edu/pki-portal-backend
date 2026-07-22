@@ -3,7 +3,6 @@
 package migrate
 
 import (
-	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/dialect/sql/schema"
 	"entgo.io/ent/schema/field"
 )
@@ -25,6 +24,7 @@ var (
 		{Name: "created", Type: field.TypeTime, Nullable: true},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"Invalid", "Requested", "Approved", "Declined", "Applied", "Issued", "Revoked", "Expired", "Replaced", "Rejected", "Unmanaged", "SAApproved", "Init"}, Default: "Invalid"},
 		{Name: "ca", Type: field.TypeString, Nullable: true},
+		{Name: "certificate", Type: field.TypeString, Nullable: true, Size: 2147483647},
 	}
 	// CertificatesTable holds the schema information for the "certificates" table.
 	CertificatesTable = &schema.Table{
@@ -100,5 +100,4 @@ var (
 func init() {
 	CertificateDomainsTable.ForeignKeys[0].RefTable = CertificatesTable
 	CertificateDomainsTable.ForeignKeys[1].RefTable = DomainsTable
-	CertificateDomainsTable.Annotation = &entsql.Annotation{}
 }

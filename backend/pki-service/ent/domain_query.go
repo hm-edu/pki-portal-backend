@@ -31,44 +31,44 @@ type DomainQuery struct {
 }
 
 // Where adds a new predicate for the DomainQuery builder.
-func (dq *DomainQuery) Where(ps ...predicate.Domain) *DomainQuery {
-	dq.predicates = append(dq.predicates, ps...)
-	return dq
+func (_q *DomainQuery) Where(ps ...predicate.Domain) *DomainQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (dq *DomainQuery) Limit(limit int) *DomainQuery {
-	dq.ctx.Limit = &limit
-	return dq
+func (_q *DomainQuery) Limit(limit int) *DomainQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (dq *DomainQuery) Offset(offset int) *DomainQuery {
-	dq.ctx.Offset = &offset
-	return dq
+func (_q *DomainQuery) Offset(offset int) *DomainQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (dq *DomainQuery) Unique(unique bool) *DomainQuery {
-	dq.ctx.Unique = &unique
-	return dq
+func (_q *DomainQuery) Unique(unique bool) *DomainQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (dq *DomainQuery) Order(o ...domain.OrderOption) *DomainQuery {
-	dq.order = append(dq.order, o...)
-	return dq
+func (_q *DomainQuery) Order(o ...domain.OrderOption) *DomainQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // QueryCertificates chains the current query on the "certificates" edge.
-func (dq *DomainQuery) QueryCertificates() *CertificateQuery {
-	query := (&CertificateClient{config: dq.config}).Query()
+func (_q *DomainQuery) QueryCertificates() *CertificateQuery {
+	query := (&CertificateClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := dq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := dq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -77,7 +77,7 @@ func (dq *DomainQuery) QueryCertificates() *CertificateQuery {
 			sqlgraph.To(certificate.Table, certificate.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, domain.CertificatesTable, domain.CertificatesPrimaryKey...),
 		)
-		fromU = sqlgraph.SetNeighbors(dq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
@@ -85,8 +85,8 @@ func (dq *DomainQuery) QueryCertificates() *CertificateQuery {
 
 // First returns the first Domain entity from the query.
 // Returns a *NotFoundError when no Domain was found.
-func (dq *DomainQuery) First(ctx context.Context) (*Domain, error) {
-	nodes, err := dq.Limit(1).All(setContextOp(ctx, dq.ctx, ent.OpQueryFirst))
+func (_q *DomainQuery) First(ctx context.Context) (*Domain, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -97,8 +97,8 @@ func (dq *DomainQuery) First(ctx context.Context) (*Domain, error) {
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (dq *DomainQuery) FirstX(ctx context.Context) *Domain {
-	node, err := dq.First(ctx)
+func (_q *DomainQuery) FirstX(ctx context.Context) *Domain {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -107,9 +107,9 @@ func (dq *DomainQuery) FirstX(ctx context.Context) *Domain {
 
 // FirstID returns the first Domain ID from the query.
 // Returns a *NotFoundError when no Domain ID was found.
-func (dq *DomainQuery) FirstID(ctx context.Context) (id int, err error) {
+func (_q *DomainQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = dq.Limit(1).IDs(setContextOp(ctx, dq.ctx, ent.OpQueryFirstID)); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -120,8 +120,8 @@ func (dq *DomainQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (dq *DomainQuery) FirstIDX(ctx context.Context) int {
-	id, err := dq.FirstID(ctx)
+func (_q *DomainQuery) FirstIDX(ctx context.Context) int {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -131,8 +131,8 @@ func (dq *DomainQuery) FirstIDX(ctx context.Context) int {
 // Only returns a single Domain entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one Domain entity is found.
 // Returns a *NotFoundError when no Domain entities are found.
-func (dq *DomainQuery) Only(ctx context.Context) (*Domain, error) {
-	nodes, err := dq.Limit(2).All(setContextOp(ctx, dq.ctx, ent.OpQueryOnly))
+func (_q *DomainQuery) Only(ctx context.Context) (*Domain, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -147,8 +147,8 @@ func (dq *DomainQuery) Only(ctx context.Context) (*Domain, error) {
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (dq *DomainQuery) OnlyX(ctx context.Context) *Domain {
-	node, err := dq.Only(ctx)
+func (_q *DomainQuery) OnlyX(ctx context.Context) *Domain {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -158,9 +158,9 @@ func (dq *DomainQuery) OnlyX(ctx context.Context) *Domain {
 // OnlyID is like Only, but returns the only Domain ID in the query.
 // Returns a *NotSingularError when more than one Domain ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (dq *DomainQuery) OnlyID(ctx context.Context) (id int, err error) {
+func (_q *DomainQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = dq.Limit(2).IDs(setContextOp(ctx, dq.ctx, ent.OpQueryOnlyID)); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -175,8 +175,8 @@ func (dq *DomainQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (dq *DomainQuery) OnlyIDX(ctx context.Context) int {
-	id, err := dq.OnlyID(ctx)
+func (_q *DomainQuery) OnlyIDX(ctx context.Context) int {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -184,18 +184,18 @@ func (dq *DomainQuery) OnlyIDX(ctx context.Context) int {
 }
 
 // All executes the query and returns a list of Domains.
-func (dq *DomainQuery) All(ctx context.Context) ([]*Domain, error) {
-	ctx = setContextOp(ctx, dq.ctx, ent.OpQueryAll)
-	if err := dq.prepareQuery(ctx); err != nil {
+func (_q *DomainQuery) All(ctx context.Context) ([]*Domain, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*Domain, *DomainQuery]()
-	return withInterceptors[[]*Domain](ctx, dq, qr, dq.inters)
+	return withInterceptors[[]*Domain](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (dq *DomainQuery) AllX(ctx context.Context) []*Domain {
-	nodes, err := dq.All(ctx)
+func (_q *DomainQuery) AllX(ctx context.Context) []*Domain {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -203,20 +203,20 @@ func (dq *DomainQuery) AllX(ctx context.Context) []*Domain {
 }
 
 // IDs executes the query and returns a list of Domain IDs.
-func (dq *DomainQuery) IDs(ctx context.Context) (ids []int, err error) {
-	if dq.ctx.Unique == nil && dq.path != nil {
-		dq.Unique(true)
+func (_q *DomainQuery) IDs(ctx context.Context) (ids []int, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, dq.ctx, ent.OpQueryIDs)
-	if err = dq.Select(domain.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(domain.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (dq *DomainQuery) IDsX(ctx context.Context) []int {
-	ids, err := dq.IDs(ctx)
+func (_q *DomainQuery) IDsX(ctx context.Context) []int {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -224,17 +224,17 @@ func (dq *DomainQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (dq *DomainQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, dq.ctx, ent.OpQueryCount)
-	if err := dq.prepareQuery(ctx); err != nil {
+func (_q *DomainQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, dq, querierCount[*DomainQuery](), dq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*DomainQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (dq *DomainQuery) CountX(ctx context.Context) int {
-	count, err := dq.Count(ctx)
+func (_q *DomainQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -242,9 +242,9 @@ func (dq *DomainQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (dq *DomainQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, dq.ctx, ent.OpQueryExist)
-	switch _, err := dq.FirstID(ctx); {
+func (_q *DomainQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -255,8 +255,8 @@ func (dq *DomainQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (dq *DomainQuery) ExistX(ctx context.Context) bool {
-	exist, err := dq.Exist(ctx)
+func (_q *DomainQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -265,32 +265,32 @@ func (dq *DomainQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the DomainQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (dq *DomainQuery) Clone() *DomainQuery {
-	if dq == nil {
+func (_q *DomainQuery) Clone() *DomainQuery {
+	if _q == nil {
 		return nil
 	}
 	return &DomainQuery{
-		config:           dq.config,
-		ctx:              dq.ctx.Clone(),
-		order:            append([]domain.OrderOption{}, dq.order...),
-		inters:           append([]Interceptor{}, dq.inters...),
-		predicates:       append([]predicate.Domain{}, dq.predicates...),
-		withCertificates: dq.withCertificates.Clone(),
+		config:           _q.config,
+		ctx:              _q.ctx.Clone(),
+		order:            append([]domain.OrderOption{}, _q.order...),
+		inters:           append([]Interceptor{}, _q.inters...),
+		predicates:       append([]predicate.Domain{}, _q.predicates...),
+		withCertificates: _q.withCertificates.Clone(),
 		// clone intermediate query.
-		sql:  dq.sql.Clone(),
-		path: dq.path,
+		sql:  _q.sql.Clone(),
+		path: _q.path,
 	}
 }
 
 // WithCertificates tells the query-builder to eager-load the nodes that are connected to
 // the "certificates" edge. The optional arguments are used to configure the query builder of the edge.
-func (dq *DomainQuery) WithCertificates(opts ...func(*CertificateQuery)) *DomainQuery {
-	query := (&CertificateClient{config: dq.config}).Query()
+func (_q *DomainQuery) WithCertificates(opts ...func(*CertificateQuery)) *DomainQuery {
+	query := (&CertificateClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	dq.withCertificates = query
-	return dq
+	_q.withCertificates = query
+	return _q
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -307,10 +307,10 @@ func (dq *DomainQuery) WithCertificates(opts ...func(*CertificateQuery)) *Domain
 //		GroupBy(domain.FieldFqdn).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (dq *DomainQuery) GroupBy(field string, fields ...string) *DomainGroupBy {
-	dq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &DomainGroupBy{build: dq}
-	grbuild.flds = &dq.ctx.Fields
+func (_q *DomainQuery) GroupBy(field string, fields ...string) *DomainGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &DomainGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = domain.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -328,58 +328,58 @@ func (dq *DomainQuery) GroupBy(field string, fields ...string) *DomainGroupBy {
 //	client.Domain.Query().
 //		Select(domain.FieldFqdn).
 //		Scan(ctx, &v)
-func (dq *DomainQuery) Select(fields ...string) *DomainSelect {
-	dq.ctx.Fields = append(dq.ctx.Fields, fields...)
-	sbuild := &DomainSelect{DomainQuery: dq}
+func (_q *DomainQuery) Select(fields ...string) *DomainSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &DomainSelect{DomainQuery: _q}
 	sbuild.label = domain.Label
-	sbuild.flds, sbuild.scan = &dq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a DomainSelect configured with the given aggregations.
-func (dq *DomainQuery) Aggregate(fns ...AggregateFunc) *DomainSelect {
-	return dq.Select().Aggregate(fns...)
+func (_q *DomainQuery) Aggregate(fns ...AggregateFunc) *DomainSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (dq *DomainQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range dq.inters {
+func (_q *DomainQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, dq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range dq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !domain.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if dq.path != nil {
-		prev, err := dq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		dq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (dq *DomainQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Domain, error) {
+func (_q *DomainQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Domain, error) {
 	var (
 		nodes       = []*Domain{}
-		_spec       = dq.querySpec()
+		_spec       = _q.querySpec()
 		loadedTypes = [1]bool{
-			dq.withCertificates != nil,
+			_q.withCertificates != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Domain).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &Domain{config: dq.config}
+		node := &Domain{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
@@ -387,14 +387,14 @@ func (dq *DomainQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Domai
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, dq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := dq.withCertificates; query != nil {
-		if err := dq.loadCertificates(ctx, query, nodes,
+	if query := _q.withCertificates; query != nil {
+		if err := _q.loadCertificates(ctx, query, nodes,
 			func(n *Domain) { n.Edges.Certificates = []*Certificate{} },
 			func(n *Domain, e *Certificate) { n.Edges.Certificates = append(n.Edges.Certificates, e) }); err != nil {
 			return nil, err
@@ -403,7 +403,7 @@ func (dq *DomainQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Domai
 	return nodes, nil
 }
 
-func (dq *DomainQuery) loadCertificates(ctx context.Context, query *CertificateQuery, nodes []*Domain, init func(*Domain), assign func(*Domain, *Certificate)) error {
+func (_q *DomainQuery) loadCertificates(ctx context.Context, query *CertificateQuery, nodes []*Domain, init func(*Domain), assign func(*Domain, *Certificate)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[int]*Domain)
 	nids := make(map[int]map[*Domain]struct{})
@@ -465,24 +465,24 @@ func (dq *DomainQuery) loadCertificates(ctx context.Context, query *CertificateQ
 	return nil
 }
 
-func (dq *DomainQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := dq.querySpec()
-	_spec.Node.Columns = dq.ctx.Fields
-	if len(dq.ctx.Fields) > 0 {
-		_spec.Unique = dq.ctx.Unique != nil && *dq.ctx.Unique
+func (_q *DomainQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, dq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (dq *DomainQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *DomainQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(domain.Table, domain.Columns, sqlgraph.NewFieldSpec(domain.FieldID, field.TypeInt))
-	_spec.From = dq.sql
-	if unique := dq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if dq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := dq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, domain.FieldID)
 		for i := range fields {
@@ -491,20 +491,20 @@ func (dq *DomainQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if ps := dq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := dq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := dq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := dq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -514,33 +514,33 @@ func (dq *DomainQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (dq *DomainQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(dq.driver.Dialect())
+func (_q *DomainQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(domain.Table)
-	columns := dq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = domain.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if dq.sql != nil {
-		selector = dq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if dq.ctx.Unique != nil && *dq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	for _, p := range dq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range dq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := dq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := dq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -553,41 +553,41 @@ type DomainGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (dgb *DomainGroupBy) Aggregate(fns ...AggregateFunc) *DomainGroupBy {
-	dgb.fns = append(dgb.fns, fns...)
-	return dgb
+func (_g *DomainGroupBy) Aggregate(fns ...AggregateFunc) *DomainGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (dgb *DomainGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, dgb.build.ctx, ent.OpQueryGroupBy)
-	if err := dgb.build.prepareQuery(ctx); err != nil {
+func (_g *DomainGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*DomainQuery, *DomainGroupBy](ctx, dgb.build, dgb, dgb.build.inters, v)
+	return scanWithInterceptors[*DomainQuery, *DomainGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (dgb *DomainGroupBy) sqlScan(ctx context.Context, root *DomainQuery, v any) error {
+func (_g *DomainGroupBy) sqlScan(ctx context.Context, root *DomainQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(dgb.fns))
-	for _, fn := range dgb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*dgb.flds)+len(dgb.fns))
-		for _, f := range *dgb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*dgb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := dgb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -601,27 +601,27 @@ type DomainSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (ds *DomainSelect) Aggregate(fns ...AggregateFunc) *DomainSelect {
-	ds.fns = append(ds.fns, fns...)
-	return ds
+func (_s *DomainSelect) Aggregate(fns ...AggregateFunc) *DomainSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (ds *DomainSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ds.ctx, ent.OpQuerySelect)
-	if err := ds.prepareQuery(ctx); err != nil {
+func (_s *DomainSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*DomainQuery, *DomainSelect](ctx, ds.DomainQuery, ds, ds.inters, v)
+	return scanWithInterceptors[*DomainQuery, *DomainSelect](ctx, _s.DomainQuery, _s, _s.inters, v)
 }
 
-func (ds *DomainSelect) sqlScan(ctx context.Context, root *DomainQuery, v any) error {
+func (_s *DomainSelect) sqlScan(ctx context.Context, root *DomainQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(ds.fns))
-	for _, fn := range ds.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*ds.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -629,7 +629,7 @@ func (ds *DomainSelect) sqlScan(ctx context.Context, root *DomainQuery, v any) e
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := ds.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
