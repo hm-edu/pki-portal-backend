@@ -46,8 +46,9 @@ func InitZap(logLevel string) (*zap.Logger, error) {
 	}
 
 	zapConfig := zap.Config{
-		Level:       level,
-		Development: false,
+		Level:             level,
+		Development:       false,
+		DisableStacktrace: true,
 		Sampling: &zap.SamplingConfig{
 			Initial:    100,
 			Thereafter: 100,
