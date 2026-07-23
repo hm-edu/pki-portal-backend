@@ -3,7 +3,7 @@ module github.com/hm-edu/eab-rest-interface
 go 1.26.0
 
 require (
-	github.com/hm-edu/portal-common v0.0.0-20260613132347-a1589de7a36f
+	github.com/hm-edu/portal-common v0.0.0-20260723090638-370b94b69fe0
 	github.com/smallstep/certificates v0.30.2
 	go.uber.org/zap v1.28.0
 	google.golang.org/grpc v1.81.1
