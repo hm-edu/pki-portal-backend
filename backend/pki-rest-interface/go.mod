@@ -57,7 +57,7 @@ require (
 
 require (
 	github.com/TheZeroSlave/zapsentry v1.24.0
-	github.com/getsentry/sentry-go v0.47.0
+	github.com/getsentry/sentry-go v0.48.0
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/spf13/pflag v1.0.10 // indirect
