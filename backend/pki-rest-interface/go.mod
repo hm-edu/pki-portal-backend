@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/MicahParks/keyfunc/v3 v3.8.0
-	github.com/getsentry/sentry-go/echo v0.47.0
+	github.com/getsentry/sentry-go/echo v0.48.0
 	github.com/hm-edu/portal-apis v0.0.0-20260722062737-d43882e11746
 	github.com/hm-edu/portal-common v0.0.0-20260613132347-a1589de7a36f
 	github.com/labstack/echo/v5 v5.2.1
@@ -57,7 +57,7 @@ require (
 
 require (
 	github.com/TheZeroSlave/zapsentry v1.24.0
-	github.com/getsentry/sentry-go v0.47.0
+	github.com/getsentry/sentry-go v0.48.0
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/spf13/pflag v1.0.10 // indirect

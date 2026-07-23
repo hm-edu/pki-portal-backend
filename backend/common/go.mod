@@ -5,7 +5,7 @@ go 1.26.0
 require (
 	github.com/MicahParks/keyfunc/v3 v3.8.0
 	github.com/TheZeroSlave/zapsentry v1.24.0
-	github.com/getsentry/sentry-go/echo v0.47.0
+	github.com/getsentry/sentry-go/echo v0.48.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v5 v5.2.1
@@ -53,7 +53,7 @@ require (
 )
 
 require (
-	github.com/getsentry/sentry-go v0.47.0
+	github.com/getsentry/sentry-go v0.48.0
 	github.com/go-playground/validator/v10 v10.30.3
 	go.uber.org/zap v1.28.0
 	golang.org/x/sys v0.46.0 // indirect
