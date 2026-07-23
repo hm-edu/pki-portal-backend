@@ -89,7 +89,7 @@ require (
 require (
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
-	github.com/hm-edu/portal-common v0.0.0-20260722073307-cfc43baae4ea
+	github.com/hm-edu/portal-common v0.0.0-20260723090638-370b94b69fe0
 	github.com/spf13/cast v1.10.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	golang.org/x/net v0.57.0 // indirect

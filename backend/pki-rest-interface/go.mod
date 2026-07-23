@@ -6,7 +6,7 @@ require (
 	github.com/MicahParks/keyfunc/v3 v3.8.0
 	github.com/getsentry/sentry-go/echo v0.47.0
 	github.com/hm-edu/portal-apis v0.0.0-20260722062737-d43882e11746
-	github.com/hm-edu/portal-common v0.0.0-20260613132347-a1589de7a36f
+	github.com/hm-edu/portal-common v0.0.0-20260723090638-370b94b69fe0
 	github.com/labstack/echo/v5 v5.2.1
 	github.com/labstack/gommon v0.5.0
 	github.com/spf13/cobra v1.10.2

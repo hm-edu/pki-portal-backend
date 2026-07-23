@@ -47,7 +47,7 @@ require (
 
 require (
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
-	github.com/hm-edu/portal-common v0.0.0-20260613132347-a1589de7a36f
+	github.com/hm-edu/portal-common v0.0.0-20260723090638-370b94b69fe0
 	github.com/spf13/afero v1.15.0 // indirect
 	github.com/spf13/cast v1.10.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
