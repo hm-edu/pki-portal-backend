@@ -7,8 +7,8 @@ import (
 	"entgo.io/ent/dialect"
 	"github.com/hm-edu/pki-service/ent"
 
-	// Importing the pgx/v4/stdlib is required to create a pg database.
-	_ "github.com/jackc/pgx/v4/stdlib"
+	// Importing the pgx/v5/stdlib is required to create a pg database.
+	_ "github.com/jackc/pgx/v5/stdlib"
 
 	// Imprting the runtime is required to get the default hooks working.
 	_ "github.com/hm-edu/pki-service/ent/runtime"

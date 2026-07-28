@@ -37,7 +37,7 @@ require (
 	github.com/getsentry/sentry-go/echo v0.48.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776
-	github.com/jackc/pgx/v4 v4.18.3
+	github.com/jackc/pgx/v5 v5.10.0
 	github.com/labstack/echo/v5 v5.3.1
 	github.com/labstack/gommon v0.5.0
 	github.com/smallstep/nosql v0.8.0
@@ -129,6 +129,8 @@ require (
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/hashicorp/hcl/v2 v2.24.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/jackc/pgx/v4 v4.18.3 // indirect
+	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.15 // indirect
 	github.com/mattn/go-isatty v0.0.22 // indirect

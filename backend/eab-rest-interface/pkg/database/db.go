@@ -9,8 +9,8 @@ import (
 	"github.com/smallstep/certificates/acme/db/nosql"
 	nosqlDb "github.com/smallstep/nosql"
 
-	// Importing the pgx/v4/stdlib is required to create a pg database.
-	_ "github.com/jackc/pgx/v4/stdlib"
+	// Importing the pgx/v5/stdlib is required to create a pg database.
+	_ "github.com/jackc/pgx/v5/stdlib"
 
 	// Imprting the runtime is required to get the default hooks working.
 	entsql "entgo.io/ent/dialect/sql"
