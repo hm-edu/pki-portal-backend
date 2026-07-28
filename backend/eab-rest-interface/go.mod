@@ -31,7 +31,7 @@ require (
 
 require (
 	entgo.io/ent v0.14.6
-	github.com/MicahParks/keyfunc/v3 v3.8.0
+	github.com/MicahParks/keyfunc/v3 v3.8.1
 	github.com/TheZeroSlave/zapsentry v1.24.0
 	github.com/getsentry/sentry-go v0.48.0
 	github.com/getsentry/sentry-go/echo v0.48.0
@@ -96,7 +96,7 @@ require (
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
 	dario.cat/mergo v1.0.2 // indirect
 	filippo.io/bigmod v0.1.0 // indirect
-	github.com/MicahParks/jwkset v0.11.0 // indirect
+	github.com/MicahParks/jwkset v0.11.1 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
