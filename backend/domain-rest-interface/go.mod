@@ -31,7 +31,7 @@ require (
 require (
 	entgo.io/ent v0.14.6
 	github.com/DATA-DOG/go-sqlmock v1.5.2
-	github.com/MicahParks/keyfunc/v3 v3.8.0
+	github.com/MicahParks/keyfunc/v3 v3.8.1
 	github.com/TheZeroSlave/zapsentry v1.24.0
 	github.com/getsentry/sentry-go v0.48.0
 	github.com/getsentry/sentry-go/echo v0.48.0
@@ -47,7 +47,7 @@ require (
 )
 
 require (
-	github.com/MicahParks/jwkset v0.11.0 // indirect
+	github.com/MicahParks/jwkset v0.11.1 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bmatcuk/doublestar v1.3.4 // indirect

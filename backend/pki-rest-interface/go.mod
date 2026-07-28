@@ -3,7 +3,7 @@ module github.com/hm-edu/pki-rest-interface
 go 1.26.0
 
 require (
-	github.com/MicahParks/keyfunc/v3 v3.8.0
+	github.com/MicahParks/keyfunc/v3 v3.8.1
 	github.com/getsentry/sentry-go/echo v0.48.0
 	github.com/hm-edu/portal-apis v0.0.0-20260722062737-d43882e11746
 	github.com/hm-edu/portal-common v0.0.0-20260613132347-a1589de7a36f
@@ -16,7 +16,7 @@ require (
 )
 
 require (
-	github.com/MicahParks/jwkset v0.11.0 // indirect
+	github.com/MicahParks/jwkset v0.11.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
