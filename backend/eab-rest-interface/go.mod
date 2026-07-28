@@ -38,6 +38,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776
 	github.com/jackc/pgx/v4 v4.18.3
+	github.com/jackc/pgx/v5 v5.10.0
 	github.com/labstack/echo/v5 v5.3.1
 	github.com/labstack/gommon v0.5.0
 	github.com/smallstep/nosql v0.8.0
