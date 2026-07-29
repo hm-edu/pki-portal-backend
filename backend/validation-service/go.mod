@@ -38,7 +38,7 @@ require (
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/go-querystring v1.2.0 // indirect
-	github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776
+	github.com/hm-edu/portal-apis v0.0.0-20260722062737-d43882e11746
 	go.opentelemetry.io/otel v1.44.0
 	go.opentelemetry.io/otel/trace v1.44.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect

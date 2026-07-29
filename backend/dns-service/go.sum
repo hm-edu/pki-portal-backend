@@ -56,6 +56,8 @@ github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 h1:UH//fgunKIs4JdUbpDl1VZCDa
 github.com/grpc-ecosystem/go-grpc-middleware v1.4.0/go.mod h1:g5qyo/la0ALbONm6Vbp88Yd8NsDy6rZz+RcrMPxvld8=
 github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776 h1:5XAf2vZQ6aMyLeHqZg1V7Dn/y6fzN0cpbo/jk7dWJC0=
 github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776/go.mod h1:HoVbhQCLyk/XKtKjVahdTTkCa5KLYIi/HyzrExss1Zo=
+github.com/hm-edu/portal-apis v0.0.0-20260722062737-d43882e11746 h1:jiq5qLFe2V7hJdD8hjddGehqBb9zPG9ApJc3DGg8rKs=
+github.com/hm-edu/portal-apis v0.0.0-20260722062737-d43882e11746/go.mod h1:HoVbhQCLyk/XKtKjVahdTTkCa5KLYIi/HyzrExss1Zo=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
 github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
