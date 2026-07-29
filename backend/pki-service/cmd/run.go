@@ -60,11 +60,13 @@ var runCmd = &cobra.Command{
 		if viper.GetBool("enable_notifications") {
 
 			w := worker.Notifier{Db: database.DB.Db,
-				MailHost:  viper.GetString("mail_host"),
-				MailPort:  viper.GetInt("mail_port"),
-				MailFrom:  viper.GetString("mail_from"),
-				MailTo:    viper.GetString("mail_to"),
-				MailToBcc: viper.GetString("mail_bcc"),
+				MailHost:     viper.GetString("mail_host"),
+				MailPort:     viper.GetInt("mail_port"),
+				MailFrom:     viper.GetString("mail_from"),
+				MailTo:       viper.GetString("mail_to"),
+				MailToBcc:    viper.GetString("mail_bcc"),
+				MailUsername: viper.GetString("mail_username"),
+				MailPassword: viper.GetString("mail_password"),
 			}
 
 			_, err := s.NewJob(
@@ -119,6 +121,8 @@ func init() {
 	runCmd.Flags().String("mail_to", "", "Optional param to send notifications to a specific mail address instead of the orignal issuer.")
 	runCmd.Flags().String("mail_bcc", "", "Optional param to send notifications as blind copy to a specific mail address instead of the orignal issuer.")
 	runCmd.Flags().String("mail_from", "", "The mail from")
+	runCmd.Flags().String("mail_username", "", "Username for Mail Authentication")
+	runCmd.Flags().String("mail_password", "", "Password for Mail Authentication")
 	runCmd.Flags().String("user", "", "The user for the HARICA API")
 	runCmd.Flags().String("password", "", "The password for the HARICA API")
 	runCmd.Flags().String("totp_seed", "", "The totp seed for the HARICA API")

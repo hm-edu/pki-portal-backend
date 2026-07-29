@@ -15,13 +15,15 @@ import (
 
 // Notifier holds all required information for mail notifications related to certificate expiry
 type Notifier struct {
-	MailFrom  string
-	MailHost  string
-	MailPort  int
-	MailTo    string
-	MailToBcc string
-	Db        *ent.Client
-	Force     bool
+	MailFrom     string
+	MailHost     string
+	MailPort     int
+	MailTo       string
+	MailToBcc    string
+	Db           *ent.Client
+	Force        bool
+	MailUsername string
+	MailPassword string
 }
 
 type certificateItem struct {
@@ -81,7 +83,12 @@ func (w *Notifier) Notify(logger *zap.Logger) error {
 		if w.MailToBcc != "" && w.MailToBcc != to[0] {
 			to = append(to, w.MailToBcc)
 		}
-		err = smtp.SendMail(fmt.Sprintf("%s:%d", w.MailHost, w.MailPort), nil, w.MailFrom, to, []byte(fmt.Sprintf(`From: PKI <%s>
+		var auth smtp.Auth
+		if w.MailUsername != "" && w.MailPassword != "" {
+			auth = smtp.PlainAuth("", w.MailUsername, w.MailPassword, w.MailHost)
+		}
+
+		err = smtp.SendMail(fmt.Sprintf("%s:%d", w.MailHost, w.MailPort), auth, w.MailFrom, to, []byte(fmt.Sprintf(`From: PKI <%s>
 To: %s
 Subject: Infomationen zu Zertifikatsablauf %s
 
