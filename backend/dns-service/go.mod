@@ -4,6 +4,7 @@ go 1.26.0
 
 require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.3
 	github.com/labstack/gommon v0.5.0
 	github.com/miekg/dns v1.1.72
 	go.uber.org/zap v1.28.0
