@@ -88,7 +88,7 @@ func (w *Notifier) Notify(logger *zap.Logger) error {
 			auth = smtp.PlainAuth("", w.MailUsername, w.MailPassword, w.MailHost)
 		}
 
-		err = smtp.SendMail(fmt.Sprintf("%s:%d", w.MailHost, w.MailPort), auth, w.MailFrom, to, []byte(fmt.Sprintf(`From: PKI <%s>
+		err = smtp.SendMail(fmt.Sprintf("%s:%d", w.MailHost, w.MailPort), auth, w.MailFrom, to, fmt.Appendf(nil, `From: PKI <%s>
 To: %s
 Subject: Infomationen zu Zertifikatsablauf %s
 
@@ -104,7 +104,7 @@ Sollten Sie Fragen haben, wenden Sie sich bitte an den Support.
 
 Mit freundlichen Grüßen,
 Ihre Zentrale IT
-				`, w.MailFrom, strings.Split(*certificate.cert.IssuedBy, " ")[0], strings.Join(certificate.domains, ", "), strings.Join(certificate.domains, ", "), certificate.cert.NotAfter.Format("02.01.2006"), certDomains)))
+				`, w.MailFrom, strings.Split(*certificate.cert.IssuedBy, " ")[0], strings.Join(certificate.domains, ", "), strings.Join(certificate.domains, ", "), certificate.cert.NotAfter.Format("02.01.2006"), certDomains))
 		if err != nil {
 			logger.Error("Error sending mail", zap.Error(err))
 		}
