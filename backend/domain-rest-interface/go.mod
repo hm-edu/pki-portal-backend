@@ -40,7 +40,7 @@ require (
 	github.com/hm-edu/portal-apis v0.0.0-20250102083103-f7750f2a7776
 	github.com/jackc/pgx/v5 v5.10.0
 	github.com/labstack/echo/v5 v5.3.1
-	github.com/mattn/go-sqlite3 v1.14.48
+	github.com/mattn/go-sqlite3 v1.14.49
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.11.1
