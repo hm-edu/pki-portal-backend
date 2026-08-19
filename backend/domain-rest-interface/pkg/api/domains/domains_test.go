@@ -48,6 +48,10 @@ func (s *MockPkiService) ListCertificates(context.Context, *pb.ListSslRequest, .
 func (s *MockPkiService) CertificateDetails(context.Context, *pb.CertificateDetailsRequest, ...grpc.CallOption) (*pb.SslCertificateDetails, error) {
 	return &pb.SslCertificateDetails{}, nil
 }
+
+func (s *MockPkiService) CollectCertificate(context.Context, *pb.CollectSslRequest, ...grpc.CallOption) (*pb.IssueSslResponse, error) {
+	return &pb.IssueSslResponse{}, nil
+}
 func TestCreateDomainsWithoutTokenAndMiddleware(t *testing.T) {
 	e := echo.New()
 	client := enttest.Open(t, "sqlite3", "file:db?mode=memory&cache=shared&_fk=1")
