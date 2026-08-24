@@ -1,4 +1,4 @@
-FROM golang:1.26 AS builder
+FROM golang:1.27 AS builder
 
 ARG SERVICE
 RUN apt update && apt install -y ca-certificates wget git && update-ca-certificates
