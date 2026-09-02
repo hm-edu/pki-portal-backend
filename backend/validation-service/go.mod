@@ -5,7 +5,7 @@ go 1.26.0
 require (
 	github.com/hm-edu/sectigo-client v0.0.0-20241203213233-31e0bf071c15
 	github.com/spf13/cobra v1.10.2
-	go.opentelemetry.io/otel/metric v1.45.0
+	go.opentelemetry.io/otel/metric v1.46.0
 	go.uber.org/zap v1.28.0
 )
 
@@ -36,8 +36,8 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/go-querystring v1.2.0 // indirect
 	github.com/hm-edu/portal-apis v0.0.0-20260722062737-d43882e11746
-	go.opentelemetry.io/otel v1.45.0
-	go.opentelemetry.io/otel/trace v1.45.0 // indirect
+	go.opentelemetry.io/otel v1.46.0
+	go.opentelemetry.io/otel/trace v1.46.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 )
