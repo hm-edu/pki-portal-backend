@@ -7,7 +7,7 @@ require (
 	github.com/TheZeroSlave/zapsentry v1.24.0
 	github.com/getsentry/sentry-go v0.48.0
 	github.com/hm-edu/harica v1.12.2
-	github.com/mattn/go-sqlite3 v1.14.48
+	github.com/mattn/go-sqlite3 v1.14.52
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.12.1
 	go.uber.org/zap v1.28.0
