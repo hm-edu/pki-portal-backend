@@ -172,7 +172,7 @@ require (
 
 replace github.com/hm-edu/portal-common => ../common
 
-replace github.com/smallstep/nosql => github.com/hm-edu/nosql v0.4.1-0.20230305071512-139857866201
+replace github.com/smallstep/nosql => github.com/hm-edu/nosql v0.4.1-0.20260907192341-047aac1c810f
 
 replace github.com/smallstep/certificates => github.com/hm-edu/certificates v0.0.0-20260309055156-559c0cb923b7
 
