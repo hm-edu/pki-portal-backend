@@ -178,4 +178,4 @@ replace github.com/smallstep/certificates => github.com/hm-edu/certificates v0.0
 
 replace github.com/dgraph-io/ristretto => github.com/dgraph-io/ristretto v0.2.0
 
-replace github.com/johnbellone/grpc-middleware-sentry => github.com/janwytze/grpc-middleware-sentry v0.4.1-0.20260505112459-44a6e7845810
+replace github.com/johnbellone/grpc-middleware-sentry => github.com/janwytze/grpc-middleware-sentry v0.4.1
