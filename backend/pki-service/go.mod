@@ -44,7 +44,7 @@ require (
 	github.com/go-openapi/inflect v1.0.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/hashicorp/hcl/v2 v2.24.0 // indirect
+	github.com/hashicorp/hcl/v2 v2.25.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
@@ -63,12 +63,12 @@ require (
 	golang.org/x/sync v0.23.0 // indirect
 	golang.org/x/time v0.16.0 // indirect
 	golang.org/x/tools v0.50.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260908043556-f8649ddbbfe6 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260918162117-cecb64721679 // indirect
 	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
-	github.com/go-acme/lego/v5 v5.4.1
+	github.com/go-acme/lego/v5 v5.5.1
 	github.com/go-co-op/gocron/v2 v2.22.0
 	github.com/hm-edu/portal-apis v0.0.0-20260722062737-d43882e11746
 	github.com/jackc/pgx/v5 v5.11.0
@@ -89,7 +89,7 @@ require (
 	golang.org/x/net v0.59.0 // indirect
 	golang.org/x/sys v0.48.0 // indirect
 	golang.org/x/text v0.42.0 // indirect
-	google.golang.org/grpc v1.83.2
+	google.golang.org/grpc v1.84.0
 )
 
 require (

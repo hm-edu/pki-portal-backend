@@ -7,7 +7,7 @@ require (
 	github.com/labstack/gommon v0.5.0
 	github.com/miekg/dns v1.1.73
 	go.uber.org/zap v1.28.0
-	google.golang.org/grpc v1.83.2
+	google.golang.org/grpc v1.84.0
 )
 
 require (
@@ -26,7 +26,7 @@ require (
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/time v0.16.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260908043556-f8649ddbbfe6 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260918162117-cecb64721679 // indirect
 )
 
 require (
