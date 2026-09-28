@@ -39,7 +39,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/hm-edu/portal-apis v0.0.0-20260722062737-d43882e11746
 	github.com/jackc/pgx/v5 v5.11.0
-	github.com/labstack/echo/v5 v5.3.1
+	github.com/labstack/echo/v5 v5.4.0
 	github.com/mattn/go-sqlite3 v1.14.52
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
@@ -69,15 +69,15 @@ require (
 	github.com/zclconf/go-cty-yaml v1.2.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/sync v0.23.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260918162117-cecb64721679 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260921155816-b14227669459 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 require (
 	ariga.io/atlas v1.3.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
-	github.com/go-openapi/inflect v1.0.0 // indirect
-	github.com/go-playground/locales v0.14.1 // indirect
+	github.com/go-openapi/inflect v1.0.1 // indirect
+	github.com/go-playground/locales v0.14.2 // indirect
 	github.com/go-playground/universal-translator v0.18.2 // indirect
 	github.com/go-playground/validator/v10 v10.30.5 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
