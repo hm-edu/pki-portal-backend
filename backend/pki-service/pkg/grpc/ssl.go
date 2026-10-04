@@ -214,7 +214,7 @@ func (s *sslAPIServer) IssueCertificate(ctx context.Context, req *pb.IssueSslReq
 	ids := []int{}
 
 	ca := "harica"
-	if s.canUseAcme(csr, sans, logger) {
+	if s.canUseAcme(ctx, csr, sans, logger) {
 		ca = "letsencrypt"
 	}
 
@@ -443,12 +443,17 @@ func (s *sslAPIServer) storeCollectedCertificate(ctx context.Context, logger *za
 	return &pb.IssueSslResponse{Certificate: flattenCertificates(certs), TransactionId: transactionID}, nil
 }
 
+// dnsLookupCNAME resolves the CNAME at the given name using the public DNS
+// view. It is a variable so tests can replace it.
+var dnsLookupCNAME = acme.LookupCNAME
+
 // canUseAcme reports whether the requested certificate can be issued by the
 // ACME CA. The ACME order is derived from the CSR, so the CSR must contain
-// exactly the requested domains and all of them must be covered by the DNS
-// validation config. Requests that do not qualify fall back to HARICA so
-// zones can be migrated one by one.
-func (s *sslAPIServer) canUseAcme(csr *x509.CertificateRequest, sans []string, logger *zap.Logger) bool {
+// exactly the requested domains, all of them must be covered by the DNS
+// validation config and none of their _acme-challenge names may be a CNAME.
+// Requests that do not qualify fall back to HARICA so zones can be migrated
+// one by one.
+func (s *sslAPIServer) canUseAcme(ctx context.Context, csr *x509.CertificateRequest, sans []string, logger *zap.Logger) bool {
 	if s.acme == nil {
 		return false
 	}
@@ -478,6 +483,23 @@ func (s *sslAPIServer) canUseAcme(csr *x509.CertificateRequest, sans []string, l
 	if !s.acme.Covers(sans) {
 		logger.Info("Domains not covered by DNS validation config, falling back to HARICA")
 		return false
+	}
+	// A CNAME at _acme-challenge.<domain> (e.g. a leftover of a CNAME based
+	// validation or a delegation to another ACME DNS service) breaks the DNS-01
+	// challenge: a TXT record cannot coexist with a CNAME and lego would follow
+	// the CNAME to a name we cannot publish to. Wildcards are validated at
+	// their base domain.
+	for _, d := range sans {
+		acmeChallenge := "_acme-challenge." + strings.TrimPrefix(d, "*.")
+		cname, err := dnsLookupCNAME(ctx, acmeChallenge)
+		if err != nil {
+			logger.Warn("Error looking up CNAME for ACME challenge", zap.String("domain", acmeChallenge), zap.Error(err))
+			return false
+		}
+		if cname != "" {
+			logger.Warn("CNAME record exists for ACME challenge, falling back to HARICA", zap.String("domain", acmeChallenge), zap.String("cname", cname))
+			return false
+		}
 	}
 	return true
 }

@@ -65,10 +65,9 @@ func NewClient(ctx context.Context, email, directory, keyPath string, dnsCfg *DN
 		return nil, fmt.Errorf("creating ACME client: %w", err)
 	}
 	// Use the public DNS view for propagation checks and authoritative
-	// nameserver discovery. The system resolver may expose an internal view in
-	// split-DNS environments that is not visible to the ACME CA.
+	// nameserver discovery, see recursiveNameservers.
 	dns01.SetDefaultClient(dns01.NewClient(&dns01.Options{
-		RecursiveNameservers: []string{"1.1.1.1:53", "8.8.8.8:53"},
+		RecursiveNameservers: recursiveNameservers,
 	}))
 	if err := client.Challenge.SetDNS01Provider(NewDNSProvider(dnsCfg, logger), dns01.DisableAuthoritativeNssPropagationRequirement()); err != nil {
 		return nil, fmt.Errorf("setting DNS-01 provider: %w", err)
