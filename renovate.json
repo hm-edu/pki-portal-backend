@@ -1,6 +1,19 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
+  "extends": ["github>hm-edu/renovate-config:go"],
+  "packageRules": [
+    {
+      "description": "portal-common is wired in via `replace => ../common`; the require version is meaningless",
+      "matchPackageNames": ["github.com/hm-edu/portal-common"],
+      "enabled": false
+    },
+    {
+      "description": "One weekly PR for all non-major Go bumps across the six backend modules (replaces helper/update.sh)",
+      "matchDatasources": ["go"],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
+      "groupName": "go dependencies",
+      "schedule": ["before 6am on monday"],
+      "automerge": true
+    }
   ]
 }
