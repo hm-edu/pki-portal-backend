@@ -142,6 +142,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
+	github.com/smallstep/android-attestation v0.0.0-20260729200017-218596f95e0d // indirect
 	github.com/smallstep/cli-utils v0.12.2 // indirect
 	github.com/smallstep/go-attestation v0.4.9 // indirect
 	github.com/smallstep/linkedca v0.26.0 // indirect
@@ -175,8 +176,8 @@ replace github.com/hm-edu/portal-common => ../common
 
 replace github.com/smallstep/nosql => github.com/hm-edu/nosql v0.4.1-0.20230305071512-139857866201
 
-replace github.com/smallstep/certificates => github.com/hm-edu/certificates v0.0.0-20260309055156-559c0cb923b7
+replace github.com/smallstep/certificates => github.com/hm-edu/certificates v0.19.0
 
 replace github.com/dgraph-io/ristretto => github.com/dgraph-io/ristretto v0.2.0
 
-replace github.com/johnbellone/grpc-middleware-sentry => github.com/janwytze/grpc-middleware-sentry v0.4.1-0.20260505112459-44a6e7845810
+replace github.com/johnbellone/grpc-middleware-sentry => github.com/janwytze/grpc-middleware-sentry v0.4.1
