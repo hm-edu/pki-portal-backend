@@ -60,7 +60,7 @@ require (
 	github.com/TheZeroSlave/zapsentry v1.24.0
 	github.com/getsentry/sentry-go v0.50.0
 	github.com/golang/protobuf v1.5.4 // indirect
-	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.4
 	github.com/spf13/pflag v1.0.10 // indirect
 	go.opentelemetry.io/otel/trace v1.47.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
