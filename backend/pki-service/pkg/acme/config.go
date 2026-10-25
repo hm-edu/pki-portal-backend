@@ -7,6 +7,7 @@ package acme
 import (
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/miekg/dns"
@@ -42,7 +43,8 @@ type Zone struct {
 // domains/subdomains to the TSIG keys that are used to publish the DNS-01
 // challenges.
 type DNSConfig struct {
-	Zones []Zone `yaml:"zones"`
+	Zones    []Zone   `yaml:"zones"`
+	Excluded []string `yaml:"excluded"`
 }
 
 // LoadDNSConfig reads and validates the DNS validation configuration file.
@@ -111,6 +113,11 @@ func (c *DNSConfig) ZoneFor(domain string) *Zone {
 // Covers reports whether all given domains can be validated with the
 // configured zones.
 func (c *DNSConfig) Covers(domains []string) bool {
+	for _, domain := range domains {
+		if slices.Contains(c.Excluded, normalizeDomain(domain)) {
+			return false
+		}
+	}
 	for _, domain := range domains {
 		if c.ZoneFor(domain) == nil {
 			return false
