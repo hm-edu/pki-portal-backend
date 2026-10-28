@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/vscode/devcontainers/go:1.27@sha256:1dc3589c1ac5d2e7c3077f7138687d47e3a6f5dd0b34f3acd28bb4c075c80f4a
+FROM mcr.microsoft.com/vscode/devcontainers/go:1.27@sha256:32aad7e9eefed4fe99987cc4efef2f9723bd57c556f171143ecf65e0ba855ff3
 
 # [Choice] Node.js version: none, lts/*, 16, 14, 12, 10
 ARG NODE_VERSION="none"
