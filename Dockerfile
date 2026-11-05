@@ -1,4 +1,4 @@
-FROM golang:1.27@sha256:c292963ad0e5f51e843c726edc204a4e4c26a859ba1e4d736d91028aa3633048 AS builder
+FROM golang:1.27@sha256:0c050feb47802ae436b9030833694a0b80160d08e3b3049ad30bf7c9e724e09d AS builder
 
 ARG SERVICE
 RUN apt update && apt install -y ca-certificates wget git && update-ca-certificates
