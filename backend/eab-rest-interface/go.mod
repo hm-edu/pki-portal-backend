@@ -167,6 +167,6 @@ replace github.com/smallstep/nosql => github.com/hm-edu/nosql v0.4.1-0.202609071
 
 replace github.com/smallstep/certificates => github.com/hm-edu/certificates v0.19.0
 
-replace github.com/dgraph-io/ristretto => github.com/dgraph-io/ristretto v0.2.0
+replace github.com/dgraph-io/ristretto/v2 => github.com/dgraph-io/ristretto/v2 v2.4.2
 
 replace github.com/johnbellone/grpc-middleware-sentry => github.com/janwytze/grpc-middleware-sentry v0.4.1
