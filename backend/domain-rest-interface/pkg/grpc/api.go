@@ -6,6 +6,7 @@ import (
 	"github.com/TheZeroSlave/zapsentry"
 	"github.com/getsentry/sentry-go"
 	"github.com/hm-edu/domain-rest-interface/ent"
+	"github.com/hm-edu/domain-rest-interface/pkg/model"
 	"github.com/hm-edu/domain-rest-interface/pkg/store"
 	pb "github.com/hm-edu/portal-apis"
 	"github.com/hm-edu/portal-common/helper"
@@ -25,6 +26,7 @@ func newDomainAPIServer(store *store.DomainStore, logger *zap.Logger, admins []s
 }
 
 func (api *domainAPIServer) CheckPermission(ctx context.Context, req *pb.CheckPermissionRequest) (*pb.CheckPermissionResponse, error) {
+	user := model.NormalizeUser(req.User)
 	log := api.logger
 	hub := sentry.GetHubFromContext(ctx)
 	if hub == nil {
@@ -32,22 +34,22 @@ func (api *domainAPIServer) CheckPermission(ctx context.Context, req *pb.CheckPe
 	}
 	if hub != nil && hub.Scope() != nil {
 		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
-		hub.Scope().SetUser(sentry.User{Email: req.User})
+		hub.Scope().SetUser(sentry.User{Email: user})
 	}
-	domains, err := api.store.ListDomains(ctx, req.User, true, false)
+	domains, err := api.store.ListDomains(ctx, user, true, false)
 	if err != nil {
 		return nil, err
 	}
-	log.Info("Checking permissions", zap.String("user", req.User), zap.Strings("domains", req.Domains))
+	log.Info("Checking permissions", zap.String("user", user), zap.Strings("domains", req.Domains))
 	permissions := helper.Map(req.Domains, func(t string) *pb.Permission {
 		if helper.Any(domains, func(d *ent.Domain) bool { return d.Fqdn == t }) {
-			log.Info("Permission granted", zap.String("user", req.User), zap.String("domain", t))
+			log.Info("Permission granted", zap.String("user", user), zap.String("domain", t))
 			return &pb.Permission{Domain: t, Granted: true}
 		}
-		log.Info("Permission denied", zap.String("user", req.User), zap.String("domain", t))
+		log.Info("Permission denied", zap.String("user", user), zap.String("domain", t))
 		return &pb.Permission{Domain: t, Granted: false}
 	})
-	log.Info("Checked permissions", zap.String("user", req.User), zap.Any("permissions", permissions))
+	log.Info("Checked permissions", zap.String("user", user), zap.Any("permissions", permissions))
 	resp := pb.CheckPermissionResponse{Permissions: permissions}
 
 	return &resp, nil
@@ -80,6 +82,7 @@ func (api *domainAPIServer) CheckRegistration(ctx context.Context, req *pb.Check
 }
 
 func (api *domainAPIServer) ListDomains(ctx context.Context, req *pb.ListDomainsRequest) (*pb.ListDomainsResponse, error) {
+	user := model.NormalizeUser(req.User)
 	log := api.logger
 	hub := sentry.GetHubFromContext(ctx)
 	if hub == nil {
@@ -87,16 +90,16 @@ func (api *domainAPIServer) ListDomains(ctx context.Context, req *pb.ListDomains
 	}
 	if hub != nil && hub.Scope() != nil {
 		log = log.With(zapsentry.NewScopeFromScope(hub.Scope()))
-		hub.Scope().SetUser(sentry.User{Email: req.User})
+		hub.Scope().SetUser(sentry.User{Email: user})
 	}
 
-	log.Info("Listing domains", zap.String("user", req.User))
-	domains, err := api.store.ListDomains(ctx, req.User, req.Approved, helper.Contains(api.admins, req.User))
+	log.Info("Listing domains", zap.String("user", user))
+	domains, err := api.store.ListDomains(ctx, user, req.Approved, helper.Contains(api.admins, user))
 	if err != nil {
-		log.Error("Listing domains failed", zap.String("user", req.User), zap.Error(err))
+		log.Error("Listing domains failed", zap.String("user", user), zap.Error(err))
 		return nil, err
 	}
-	log.Debug("Listed domains", zap.String("user", req.User), zap.Any("domains", domains))
+	log.Debug("Listed domains", zap.String("user", user), zap.Any("domains", domains))
 	resp := pb.ListDomainsResponse{Domains: helper.Map(domains, func(t *ent.Domain) string { return t.Fqdn })}
 	return &resp, nil
 }

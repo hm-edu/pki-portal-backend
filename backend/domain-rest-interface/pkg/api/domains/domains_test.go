@@ -562,3 +562,91 @@ func TestApproveDomainsAllowed(t *testing.T) {
 	})
 
 }
+
+// newDomainRequest builds a JSON request for the domain with the given id,
+// authenticated as the given e-mail address.
+func newDomainRequest(e *echo.Echo, method, body, email, id string) (*echo.Context, *httptest.ResponseRecorder) {
+	req := httptest.NewRequest(method, "/", strings.NewReader(body))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetRequest(c.Request().WithContext(context.WithValue(c.Request().Context(), logging.LoggingContextKey, zap.L())))
+	c.Set("user", &jwt.Token{Claims: jwt.MapClaims{"email": email}})
+	c.SetPathValues(echo.PathValues{{Name: "id", Value: id}})
+	return c, rec
+}
+
+func TestAddDelegationNormalizesUser(t *testing.T) {
+	e := echo.New()
+	client := enttest.Open(t, "sqlite3", "file:db?mode=memory&cache=shared&_fk=1")
+	defer func(*ent.Client) {
+		_ = client.Close()
+	}(client)
+	database.DB.Internal, _, _ = sqlmock.New()
+	st := store.NewDomainStore(client)
+	h := NewHandler(st, &MockPkiService{}, []string{})
+
+	_, err := st.Create(context.Background(), &ent.Domain{Fqdn: "example.com", Owner: "test", Approved: true})
+	assert.NoError(t, err)
+
+	// The JWT e-mail is normalized as well, so " Test " is recognized as the owner.
+	c, rec := newDomainRequest(e, http.MethodPost, `{"user":"  Max.Mustermann@HM.EDU "}`, " Test ", "1")
+	if assert.NoError(t, h.AddDelegation(c)) {
+		assert.Equal(t, http.StatusOK, rec.Code)
+		// The ugly linebreak is required for the json comparison
+		assert.Equal(t, `{"id":1,"fqdn":"example.com","owner":"test","delegations":[{"id":1,"user":"max.mustermann@hm.edu"}],"approved":true,"permissions":{"can_delete":false,"can_approve":false,"can_transfer":false,"can_delegate":false}}
+`, rec.Body.String())
+	}
+
+	// The same address in another spelling is a duplicate.
+	c, _ = newDomainRequest(e, http.MethodPost, `{"user":"max.mustermann@hm.edu"}`, "test", "1")
+	var httpErr *echo.HTTPError
+	if assert.ErrorAs(t, h.AddDelegation(c), &httpErr) {
+		assert.Equal(t, http.StatusBadRequest, httpErr.Code)
+		assert.Equal(t, "Delegation already exists", httpErr.Message)
+	}
+
+	// Delegating to the owner is rejected regardless of case.
+	c, _ = newDomainRequest(e, http.MethodPost, `{"user":"TEST"}`, "test", "1")
+	if assert.ErrorAs(t, h.AddDelegation(c), &httpErr) {
+		assert.Equal(t, http.StatusBadRequest, httpErr.Code)
+		assert.Equal(t, "Delegation already exists", httpErr.Message)
+	}
+
+	// Whitespace only is stripped to an empty string and fails validation.
+	c, _ = newDomainRequest(e, http.MethodPost, `{"user":"   "}`, "test", "1")
+	if assert.ErrorAs(t, h.AddDelegation(c), &httpErr) {
+		assert.Equal(t, http.StatusBadRequest, httpErr.Code)
+	}
+
+	// The delegate is found no matter how the identity provider spells the address.
+	domains, err := st.ListDomains(context.Background(), "MAX.Mustermann@hm.edu", true, false)
+	assert.NoError(t, err)
+	assert.Len(t, domains, 1)
+}
+
+func TestTransferDomainNormalizesOwner(t *testing.T) {
+	e := echo.New()
+	client := enttest.Open(t, "sqlite3", "file:db?mode=memory&cache=shared&_fk=1")
+	defer func(*ent.Client) {
+		_ = client.Close()
+	}(client)
+	database.DB.Internal, _, _ = sqlmock.New()
+	st := store.NewDomainStore(client)
+	h := NewHandler(st, &MockPkiService{}, []string{})
+
+	_, err := st.Create(context.Background(), &ent.Domain{Fqdn: "example.com", Owner: "test", Approved: true})
+	assert.NoError(t, err)
+
+	c, rec := newDomainRequest(e, http.MethodPost, `{"owner":" New.Owner@HM.EDU "}`, "test", "1")
+	if assert.NoError(t, h.TransferDomain(c)) {
+		assert.Equal(t, http.StatusOK, rec.Code)
+		var out model.Domain
+		assert.NoError(t, json.Unmarshal(rec.Body.Bytes(), &out))
+		assert.Equal(t, "new.owner@hm.edu", out.Owner)
+	}
+
+	domains, err := st.ListDomains(context.Background(), "new.owner@hm.edu", true, false)
+	assert.NoError(t, err)
+	assert.Len(t, domains, 1)
+}

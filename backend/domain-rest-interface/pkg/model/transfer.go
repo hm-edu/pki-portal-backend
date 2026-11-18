@@ -15,6 +15,7 @@ func (r *TransferRequest) Bind(c *echo.Context, v *model.Validator) error {
 	if err := c.Bind(r); err != nil {
 		return err
 	}
+	r.Owner = NormalizeUser(r.Owner)
 	err := v.Validate(r)
 	return err
 }

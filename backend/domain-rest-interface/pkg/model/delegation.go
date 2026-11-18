@@ -16,6 +16,7 @@ func (r *DelegationRequest) Bind(c *echo.Context, v *model.Validator) error {
 	if err := c.Bind(r); err != nil {
 		return err
 	}
+	r.User = NormalizeUser(r.User)
 	err := v.Validate(r)
 	return err
 }

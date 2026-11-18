@@ -44,7 +44,7 @@ func (h *Handler) ListDomains(c *echo.Context) error {
 		hub = sentry.CurrentHub().Clone()
 	}
 
-	user, err := auth.UserFromRequest(c)
+	user, err := userFromRequest(c)
 	if err != nil {
 		logger.Error("Failed to get user from request", zap.Error(err))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
@@ -90,7 +90,7 @@ func (h *Handler) enumerateDomains(ctx context.Context, user string, logger *zap
 	for _, domain := range domains {
 		item := model.DomainToOutput(domain)
 		// Users may always delete their own domains and transfer it.
-		if item.Owner == user || admin {
+		if strings.EqualFold(item.Owner, user) || admin {
 			item.Permissions.CanDelete = true
 			if item.Approved || admin {
 				item.Permissions.CanTransfer = true
@@ -166,7 +166,7 @@ func (h *Handler) CreateDomain(c *echo.Context) error {
 		hub = sentry.CurrentHub().Clone()
 	}
 
-	user, err := auth.UserFromRequest(c)
+	user, err := userFromRequest(c)
 	if err != nil {
 		logger.Error("Failed to get user from request", zap.Error(err))
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid Request").Wrap(err)
@@ -269,7 +269,7 @@ func (h *Handler) evaluatePermission(ctx context.Context, c *echo.Context, logge
 	if hub == nil {
 		hub = sentry.CurrentHub().Clone()
 	}
-	user, err := auth.UserFromRequest(c)
+	user, err := userFromRequest(c)
 	if err != nil {
 		logger.Error("Failed to get user from request", zap.Error(err))
 		return nil, &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Request"}
@@ -441,8 +441,8 @@ func (h *Handler) AddDelegation(c *echo.Context) error {
 	if err != nil {
 		return err
 	}
-	exists := helper.Any(item.Delegations, (func(t *model.Delegation) bool { return t.User == req.User }))
-	if exists || item.Owner == req.User {
+	exists := helper.Any(item.Delegations, func(t *model.Delegation) bool { return strings.EqualFold(t.User, req.User) })
+	if exists || strings.EqualFold(item.Owner, req.User) {
 		logger.Error("Delegation already exists", zap.String("fqdn", item.FQDN), zap.String("owner", req.User))
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Delegation already exists"}
 	}
@@ -455,4 +455,14 @@ func (h *Handler) AddDelegation(c *echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, model.DomainToOutput(updated))
+}
+
+// userFromRequest extracts the user from the request's JWT and normalizes it, so
+// that it can be compared with stored owners and delegations.
+func userFromRequest(c *echo.Context) (string, error) {
+	user, err := auth.UserFromRequest(c)
+	if err != nil {
+		return "", err
+	}
+	return model.NormalizeUser(user), nil
 }

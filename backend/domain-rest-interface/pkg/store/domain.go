@@ -10,6 +10,7 @@ import (
 	"github.com/hm-edu/domain-rest-interface/ent/domain"
 	"github.com/hm-edu/domain-rest-interface/ent/predicate"
 	"github.com/hm-edu/domain-rest-interface/pkg/database"
+	"github.com/hm-edu/domain-rest-interface/pkg/model"
 	"github.com/hm-edu/portal-common/helper"
 )
 
@@ -63,7 +64,7 @@ func (s *DomainStore) ListDomains(ctx context.Context, user string, requireAppro
 			return nil, err
 		}
 	} else {
-		predicates := domain.Or(domain.HasDelegationsWith(delegation.User(user)), domain.Owner(user))
+		predicates := domain.Or(domain.HasDelegationsWith(delegationUserEqualFold(user)), domainOwnerEqualFold(user))
 		if requireApproval {
 			predicates = domain.And(predicates, domain.Approved(true))
 		}
@@ -110,7 +111,7 @@ func (s *DomainStore) Create(ctx context.Context, d *ent.Domain) (*ent.Domain, e
 	if err := database.DB.Internal.Ping(); err != nil {
 		return nil, fmt.Errorf("pinging the database: %w", err)
 	}
-	return s.db.Domain.Create().SetFqdn(d.Fqdn).SetOwner(d.Owner).SetApproved(d.Approved).Save(ctx)
+	return s.db.Domain.Create().SetFqdn(d.Fqdn).SetOwner(model.NormalizeUser(d.Owner)).SetApproved(d.Approved).Save(ctx)
 }
 
 // Owner sets the owner of a domain.
@@ -118,7 +119,7 @@ func (s *DomainStore) Owner(ctx context.Context, id int, owner string) (*ent.Dom
 	if err := database.DB.Internal.Ping(); err != nil {
 		return nil, fmt.Errorf("pinging the database: %w", err)
 	}
-	return s.db.Domain.UpdateOneID(id).SetOwner(owner).Save(ctx)
+	return s.db.Domain.UpdateOneID(id).SetOwner(model.NormalizeUser(owner)).Save(ctx)
 }
 
 // Approve sets the given domain on approved.
@@ -134,7 +135,7 @@ func (s *DomainStore) AddDelegation(ctx context.Context, d int, user string) (*e
 	if err := database.DB.Internal.Ping(); err != nil {
 		return nil, fmt.Errorf("pinging the database: %w", err)
 	}
-	err := s.db.Delegation.Create().SetDomainID(d).SetUser(user).Exec(ctx)
+	err := s.db.Delegation.Create().SetDomainID(d).SetUser(model.NormalizeUser(user)).Exec(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -166,4 +167,29 @@ func (s *DomainStore) Delete(ctx context.Context, id int) error {
 	}
 
 	return nil
+}
+
+// delegationUserEqualFold matches delegations whose user equals the given one
+// ignoring case and surrounding whitespace. Rows written before users were
+// normalized may still carry mixed case, so the comparison lowers both sides
+// instead of relying on an exact match (or on ILIKE, whose wildcards would
+// make "_" in an address match any character).
+func delegationUserEqualFold(user string) predicate.Delegation {
+	return predicate.Delegation(func(s *sql.Selector) {
+		s.Where(lowerEquals(s.C(delegation.FieldUser), user))
+	})
+}
+
+// domainOwnerEqualFold matches domains whose owner equals the given one ignoring
+// case and surrounding whitespace. See delegationUserEqualFold.
+func domainOwnerEqualFold(owner string) predicate.Domain {
+	return predicate.Domain(func(s *sql.Selector) {
+		s.Where(lowerEquals(s.C(domain.FieldOwner), owner))
+	})
+}
+
+func lowerEquals(column, value string) *sql.Predicate {
+	return sql.P(func(b *sql.Builder) {
+		b.WriteString("LOWER(").Ident(column).WriteString(") = ").Arg(model.NormalizeUser(value))
+	})
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/hm-edu/domain-rest-interface/pkg/api"
 	"github.com/hm-edu/domain-rest-interface/pkg/database"
 	"github.com/hm-edu/domain-rest-interface/pkg/grpc"
+	"github.com/hm-edu/domain-rest-interface/pkg/model"
 	"github.com/hm-edu/domain-rest-interface/pkg/store"
 	pb "github.com/hm-edu/portal-apis"
 	commonApi "github.com/hm-edu/portal-common/api"
@@ -56,10 +57,10 @@ var runCmd = &cobra.Command{
 		adminsVar := viper.GetStringSlice("admins")
 		admins := []string{}
 		for _, admin := range adminsVar {
-			if strings.Contains(admin, ",") {
-				admins = append(admins, strings.Split(admin, ",")...)
-			} else {
-				admins = append(admins, admin)
+			for _, entry := range strings.Split(admin, ",") {
+				if entry = model.NormalizeUser(entry); entry != "" {
+					admins = append(admins, entry)
+				}
 			}
 		}
 
