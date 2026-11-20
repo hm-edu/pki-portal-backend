@@ -1,7 +1,7 @@
 version: "3"
 services:
   postgresql:
-    image: postgres:15@sha256:10f9e886f772e9d6484350b043bcf990ead67ae5d9988ddce265d72a299055d5
+    image: postgres:19@sha256:bb6e70add742cd868fb62cb3b2f67d1dd2bdd2b65a521e778420748753687c60
     container_name: postgres
     restart: always
     volumes:
