@@ -1,6 +1,6 @@
 module github.com/hm-edu/pki-service
 
-go 1.26.4
+go 1.26.10
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
@@ -23,9 +23,9 @@ require (
 	github.com/go-test/deep v1.0.8 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.3.1 // indirect
-	github.com/jackc/puddle/v2 v2.2.3 // indirect
+	github.com/jackc/puddle/v2 v2.2.4 // indirect
 	github.com/jonboulle/clockwork v0.5.0 // indirect
-	github.com/labstack/echo/v5 v5.4.5 // indirect
+	github.com/labstack/echo/v5 v5.4.7 // indirect
 	github.com/pandatix/go-abnf v0.5.5 // indirect
 	github.com/pquerna/otp v1.5.0 // indirect
 	github.com/spf13/afero v1.15.0 // indirect
@@ -36,7 +36,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v1.3.0 // indirect
+	ariga.io/atlas v1.4.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -63,14 +63,14 @@ require (
 	golang.org/x/mod v0.43.0 // indirect
 	golang.org/x/sync v0.25.0 // indirect
 	golang.org/x/time v0.16.0 // indirect
-	golang.org/x/tools v0.52.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20261110000943-09e21b237f2c // indirect
+	golang.org/x/tools v0.53.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20261118221215-c8830f628b3f // indirect
 	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
 	github.com/go-acme/lego/v5 v5.6.0
-	github.com/go-co-op/gocron/v2 v2.23.1
+	github.com/go-co-op/gocron/v2 v2.23.2
 	github.com/hm-edu/portal-apis v0.0.0-20260722062737-d43882e11746
 	github.com/jackc/pgx/v5 v5.13.0
 	github.com/miekg/dns v1.1.73
@@ -87,7 +87,7 @@ require (
 	github.com/hm-edu/portal-common v0.0.0-20260722073307-cfc43baae4ea
 	github.com/spf13/cast v1.10.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	golang.org/x/net v0.62.0 // indirect
+	golang.org/x/net v0.63.0 // indirect
 	golang.org/x/sys v0.50.0 // indirect
 	golang.org/x/text v0.44.0 // indirect
 	google.golang.org/grpc v1.85.0
