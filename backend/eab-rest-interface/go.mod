@@ -12,7 +12,7 @@ require (
 	github.com/hm-edu/portal-apis v0.0.0-20260722062737-d43882e11746
 	github.com/hm-edu/portal-common v0.0.0-20260613132347-a1589de7a36f
 	github.com/jackc/pgx/v5 v5.13.0
-	github.com/labstack/echo/v5 v5.4.5
+	github.com/labstack/echo/v5 v5.4.7
 	github.com/labstack/gommon v0.5.0
 	github.com/smallstep/certificates v0.30.2
 	github.com/smallstep/nosql v0.8.0
@@ -64,7 +64,7 @@ require (
 	github.com/go-playground/locales v0.14.2 // indirect
 	github.com/go-playground/universal-translator v0.18.2 // indirect
 	github.com/go-playground/validator/v10 v10.30.6 // indirect
-	github.com/go-sql-driver/mysql v1.10.1 // indirect
+	github.com/go-sql-driver/mysql v1.10.2 // indirect
 	github.com/go-test/deep v1.0.8 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.3.1 // indirect
@@ -163,7 +163,7 @@ require (
 
 replace github.com/hm-edu/portal-common => ../common
 
-replace github.com/smallstep/nosql => github.com/hm-edu/nosql v0.4.1-0.20260907192341-047aac1c810f
+replace github.com/smallstep/nosql => github.com/hm-edu/nosql v0.4.1-0.20261123192832-34cd8ef5bcb9
 
 replace github.com/smallstep/certificates => github.com/hm-edu/certificates v0.19.0
 
